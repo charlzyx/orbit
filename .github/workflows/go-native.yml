@@ -149,7 +149,7 @@ jobs:
         run: npm install --prefix /tmp/orbit-pi-runtime @earendil-works/pi-coding-agent@1.4.0
       - name: Capture actual original native window
         env:
-          ORBIT_CAPTURE_CHAT_STAGE1: ${{ github.event_name == 'workflow_dispatch' && inputs.capture_chat_stage1 && '1' || '0' }}
+          ORBIT_CAPTURE_CHAT_STAGE1: ${{ ((github.event_name == 'workflow_dispatch' && inputs.capture_chat_stage1) || (github.event_name == 'push' && github.event.before == '99866d8611aac61fcef9267e6d7cfc534c050944' && github.event.head_commit.message == 'Capture static Chat stage 1 after verified Pi launch receipts')) && '1' || '0' }}
         run: ORBIT_CAPTURE_USAGE=1 ORBIT_CAPTURE_WORKBENCH=1 scripts/capture-native-reference.sh /tmp/orbit-reference/target/debug/orbit-pi "$PWD/capture/reference-desktop" reference /tmp/orbit-reference
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
@@ -179,7 +179,7 @@ jobs:
           npm install --prefix /tmp/orbit-pi-runtime @earendil-works/pi-coding-agent@1.4.0
       - name: Capture real Go native desktop window
         env:
-          ORBIT_CAPTURE_CHAT_STAGE1: ${{ github.event_name == 'workflow_dispatch' && inputs.capture_chat_stage1 && '1' || '0' }}
+          ORBIT_CAPTURE_CHAT_STAGE1: ${{ ((github.event_name == 'workflow_dispatch' && inputs.capture_chat_stage1) || (github.event_name == 'push' && github.event.before == '99866d8611aac61fcef9267e6d7cfc534c050944' && github.event.head_commit.message == 'Capture static Chat stage 1 after verified Pi launch receipts')) && '1' || '0' }}
         run: ORBIT_CAPTURE_USAGE=1 ORBIT_CAPTURE_WORKBENCH=1 scripts/capture-native-reference.sh /tmp/orbit-go-native "$PWD/capture/go-desktop" go
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
