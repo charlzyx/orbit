@@ -72,6 +72,11 @@ func (a *App) commandPalette(c *ui.Context) {
 			}
 		}
 		for _, cmd := range Commands {
+			// Rust command_enabled hides Abort when no run is in flight.
+			// Running already includes the manager's awaiting-reply state.
+			if cmd.ID == "AbortRun" && !a.Model.Running {
+				continue
+			}
 			if cmd.ID == "OpenSessionSlot" || cmd.Category == "Review" {
 				continue
 			}
@@ -329,6 +334,7 @@ func (a *App) Prompt(title, value string, commit func(string)) {
 	a.promptOpen = true
 }
 func (a *App) Confirm(title, detail string, commit func()) {
+	a.paletteDelete = nil // a newer confirmation supersedes any palette delete intent
 	a.confirmTitle = title
 	a.confirmMessage = detail
 	a.confirmCommit = commit
@@ -336,9 +342,19 @@ func (a *App) Confirm(title, detail string, commit func()) {
 }
 func (a *App) confirm(c *ui.Context) {
 	if !a.confirmOpen {
+		a.paletteDelete = nil
 		return
 	}
-	a.modal(c.Key("confirmation"), &a.confirmOpen, 480, func() {
+	var key any = "confirmation"
+	if a.paletteDelete != nil {
+		// A held press belongs to the exact armed victim, not a replacement
+		// confirmation opened before the next frame.
+		key = struct {
+			kind   string
+			intent *paletteDeleteIntent
+		}{"palette-delete-confirmation", a.paletteDelete}
+	}
+	a.modal(c.Key(key), &a.confirmOpen, 480, func() {
 		ui.Text(c, a.confirmTitle).FontSize(18).FontWeight(600)
 		ui.Text(c, a.confirmMessage)
 		ui.Row(c).Justify(ui.End).Gap(8).Children(func() {
@@ -354,6 +370,9 @@ func (a *App) confirm(c *ui.Context) {
 			}
 		})
 	})
+	if !a.confirmOpen {
+		a.paletteDelete = nil // Cancel, Escape and outside dismissal revoke the intent
+	}
 }
 func (a *App) commandSession(id string, s SessionRow) {
 	switch id {

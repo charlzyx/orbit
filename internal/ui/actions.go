@@ -275,10 +275,16 @@ func (a *App) command(id, value string) {
 			a.workflow = v
 			a.Dispatch(Action{Kind: "SetWorkflow", Value: v})
 		})
+	case "PinSession":
+		// Palette commands have no row payload. Pin the active saved path,
+		// never the empty value used by the command registry result.
+		if a.Model.SessionPath != "" {
+			a.Dispatch(Action{Kind: id, Value: a.Model.SessionPath, SessionID: a.Model.SessionID})
+		}
 	case "RenameSession":
 		a.Prompt("Rename task", a.Model.SessionName, func(v string) { a.Dispatch(Action{Kind: id, Value: v}) })
 	case "DeleteSession":
-		a.Confirm("Delete task?", "This removes the saved session file. Sessions with a live runtime cannot be deleted.", func() { a.Dispatch(Action{Kind: id, Value: a.Model.SessionPath}) })
+		a.confirmPaletteDelete()
 	case "CopySessionId":
 		a.Dispatch(Action{Kind: "CopyText", Value: a.Model.SessionID})
 	case "CopyLastResponse":

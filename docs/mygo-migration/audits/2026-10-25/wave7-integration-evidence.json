@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "runtimeParent": "918805045b7e9c77ab252f72a70652cfb8438920",
+  "rustReference": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "releaseUnchanged": ".4",
+  "scope": "wave7 feature source only; no actual installer/auth or user data deletion executed",
+  "patches": [
+    {
+      "name": "orbit-palette-delete-frozen-1943.patch",
+      "sha256": "64b9f64aef044a46e0a492de5ab426c984d4bac9c690271bc8a692aa36392446",
+      "independentReview": "root approved bounded source scope"
+    },
+    {
+      "name": "orbit-palette-pin-frozen-1947.patch",
+      "sha256": "5af40f971d96083e0bedd8bab60c7b80215d5c50520bd4c64fc6e84ae163a578",
+      "independentReview": "root approved bounded source scope"
+    },
+    {
+      "name": "orbit-palette-idle-frozen-2000.patch",
+      "sha256": "c542e50db3c6557da88cede8521abbb2fb0f11a75194e1fd7558a0aa68604ed8",
+      "independentReview": "root approved bounded source scope"
+    },
+    {
+      "name": "orbit-inline-image-content-review.patch",
+      "sha256": "5c4790d62bf5ec10a1bd1c66d0e57fa1b960308ad8f28be5536c493080964c24",
+      "independentReview": "root approved bounded source scope"
+    },
+    {
+      "name": "orbit-review-header-final-1949.patch",
+      "sha256": "f05f6a7a33d500597d6901f5844260f3072b5f556210dccb9f7eae288b13b26f",
+      "independentReview": "root approved bounded source scope"
+    },
+    {
+      "name": "orbit-setup-migration-binding-final-candidate.patch",
+      "sha256": "dfc92806de50007c4bd8a68dee105427e7e4ae786c6c5b2e13ed211e96843edd",
+      "independentReview": "root approved bounded source scope"
+    }
+  ],
+  "sourceHashCount": 581,
+  "frozenSourceManifestLocal": "/workspace/shared/orbit-wave7-source-freeze-2001.json",
+  "combinedFocusedSeconds": {
+    "initialOwnerHeaderDelete": 16.313,
+    "setup": 27.983,
+    "paletteAbort": 48.697
+  },
+  "finalGate": {
+    "status": "PASS",
+    "startedUTC": "2026-10-25T20:03:00Z",
+    "commands": [
+      "scripts/go-native.sh vet ./...",
+      "scripts/go-native.sh test -race ./...",
+      "CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 scripts/go-native.sh build ./cmd/orbit"
+    ],
+    "completedUTC": "2026-10-25T20:14:00Z",
+    "exitCode": 0,
+    "uiRaceSeconds": 587.024,
+    "nativeRaceSeconds": 86.43,
+    "workbenchRaceSeconds": 18.277,
+    "sourceHashesUnchanged": 581
+  },
+  "native": "not yet published/captured; screenshots are not interaction proof"
+}

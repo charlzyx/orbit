@@ -8,6 +8,8 @@ import (
 )
 
 type onboardingState struct {
+	installation                native.PiInstallation
+	migrating                   bool
 	enabled, loaded, refreshing bool
 	dependencies                []native.Dependency
 	facts                       []native.HostFact
@@ -102,6 +104,9 @@ func (a *App) onboardingView(c *ui.Context) {
 					}
 				}
 			})
+			if s.installation.Kind == native.PiNPM {
+				a.setupMigrationCard(c)
+			}
 			if s.error != "" {
 				ui.Text(c, s.error).TextColor(t.Error).Selectable()
 			}
@@ -113,7 +118,7 @@ func (a *App) onboardingView(c *ui.Context) {
 				if s.refreshing {
 					label = a.Tr("common.checking")
 				}
-				if a.button(c, label, "icons/refresh.svg", false).Label("Refresh setup").Disabled(s.refreshing).Clicked() {
+				if a.button(c, label, "icons/refresh.svg", false).Label("Refresh setup").Disabled(s.refreshing || s.migrating).Clicked() {
 					a.Dispatch(Action{Kind: "RefreshSetup"})
 				}
 			})

@@ -282,6 +282,7 @@ func (x *Controller) syncAt(now time.Time) {
 	s := x.Agent.Snapshot()
 	x.UI.Runtime = x.Agent.RuntimeSnapshot()
 	x.UI.SetSnapshot(adaptSnapshot(s, x.workspace, x.pinned, x.archived))
+	x.UI.setup.migrating = x.setupInstall.pending != nil
 	if x.UI.setup.enabled && x.setupProbe.binary != x.Agent.PiBinary() {
 		x.invalidateSetupProbe()
 		x.refreshSetup()
@@ -384,6 +385,7 @@ func (x *Controller) SetWorkspace(path string) {
 func (x *Controller) changeWorkspaceServices(path string) {
 	if path != x.workspace || path != x.UI.Model.Workspace {
 		x.UI.resetMarkdownImageOwner()
+		x.UI.cancelPaletteDelete()
 	}
 	x.workspaceBrowse.epoch++
 	x.workspace = path
@@ -655,6 +657,8 @@ func (x *Controller) Action(a Action) {
 			command = pirpc.SetSteeringMode
 		}
 		e = m.Send(command, map[string]any{"mode": a.Value})
+	case "RequestSetupMigration":
+		x.requestSetupMigration()
 	case "RefreshSetup":
 		x.refreshSetup()
 	case "CheckPiUpdate":

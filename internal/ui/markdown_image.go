@@ -123,6 +123,7 @@ func (a *App) markdownImageBlock(c *ui.Context, d *parser.Document, i int) bool 
 				// Data rasters have no external navigation target; show the decoded safe
 				// image in the existing native preview instead of launching a data URL.
 				if strings.HasPrefix(strings.ToLower(input.url), "data:") {
+					a.inlineImages.preview = inlineImageContentToken{}
 					a.imagePreview = result.Bitmap
 					a.imageOpen = true
 				} else {

@@ -35,8 +35,10 @@ type setupInstallOperation struct {
 	cancel        context.CancelFunc
 }
 type setupInstallState struct {
-	pending *setupInstallOperation
-	receipt setupInstallReceipt
+	backend   *setupInstallBackend
+	onReceipt func(setupInstallReceipt)
+	pending   *setupInstallOperation
+	receipt   setupInstallReceipt
 }
 type setupInstallBackend struct {
 	supported    func() bool
@@ -58,6 +60,9 @@ func (x *Controller) beginSetupInstall(i setupInstallIntent, backend setupInstal
 	if !x.ownsSetupInstallIntent(i) {
 		return errors.New("Setup confirmation is stale; refresh and try again")
 	}
+	if x.setupProbe.cancel != nil {
+		return errors.New("Dependency refresh is in progress; wait before migrating Pi")
+	}
 	if i.binary != "" || os.Getenv("PI_BIN") != "" {
 		return errors.New("A custom Pi launcher is selected; managed installation would not repair that launcher")
 	}
@@ -74,6 +79,11 @@ func (x *Controller) beginSetupInstall(i setupInstallIntent, backend setupInstal
 	if err != nil {
 		return err
 	}
+	if !x.ownsSetupInstallIntent(i) || x.setupProbe.cancel != nil {
+		release()
+		return errors.New("Setup confirmation changed before maintenance admission")
+	}
+	onReceipt := x.setupInstall.onReceipt
 	ctx, cancel := context.WithTimeout(x.background, 10*time.Minute)
 	op := &setupInstallOperation{intent: i, done: make(chan struct{}), runnerSettled: make(chan struct{}), cancel: cancel}
 	x.setupInstall.pending = op
@@ -96,6 +106,9 @@ func (x *Controller) beginSetupInstall(i setupInstallIntent, backend setupInstal
 			x.setupInstall.pending = nil
 			if x.ownsSetupInstallIntent(i) {
 				x.setupInstall.receipt = receipt
+				if onReceipt != nil {
+					onReceipt(receipt)
+				}
 			}
 		})
 		select {

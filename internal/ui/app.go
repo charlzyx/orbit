@@ -221,6 +221,7 @@ type App struct {
 	promptTitle, promptValue                                        string
 	promptCommit                                                    func(string)
 	confirmOpen                                                     bool
+	paletteDelete                                                   *paletteDeleteIntent
 	confirmTitle, confirmMessage                                    string
 	confirmCommit                                                   func()
 	toastStack                                                      native.ToastStack
@@ -315,6 +316,7 @@ func (a *App) text(key, fallback string) string {
 	return s
 }
 func (a *App) SetSnapshot(s Snapshot) {
+	a.invalidatePaletteDelete(s)
 	if s.RuntimeID != a.Model.RuntimeID || s.SessionID != a.Model.SessionID || s.SessionPath != a.Model.SessionPath || s.Workspace != a.Model.Workspace {
 		a.resetMarkdownImageOwner()
 	}
@@ -356,6 +358,7 @@ func (a *App) SetSnapshot(s Snapshot) {
 	}
 	a.Model = s
 	a.syncInlineImageOwner()
+	a.syncInlineImageContents(s.Messages)
 	a.pruneAttachmentPaths()
 	a.syncExtensionUI(s)
 	a.syncModelCatalog()

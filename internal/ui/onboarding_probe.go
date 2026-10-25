@@ -9,6 +9,7 @@ import (
 )
 
 type setupProbeResult struct {
+	installation native.PiInstallation
 	dependencies []native.Dependency
 	facts        []native.HostFact
 }
@@ -36,7 +37,7 @@ func (x *Controller) probeSetup(ctx context.Context, binary string) (setupProbeR
 	}
 	facts := native.RuntimeHostFacts(native.ProbeHost(ctx), x.Store.PiDir, x.Store.RootDir)
 	facts = append(facts, native.PiInstallFacts(p)...)
-	return setupProbeResult{deps, facts}, ctx.Err()
+	return setupProbeResult{dependencies: deps, facts: facts, installation: p}, ctx.Err()
 }
 func (x *Controller) invalidateSetupProbe() {
 	x.setupProbe.generation++
@@ -48,7 +49,7 @@ func (x *Controller) invalidateSetupProbe() {
 	x.UI.setup.loaded = false
 }
 func (x *Controller) refreshSetup() {
-	if x.hostStopped() || x.setupProbe.cancel != nil {
+	if x.hostStopped() || x.setupProbe.cancel != nil || x.setupInstall.pending != nil {
 		return
 	}
 	s := &x.UI.setup
@@ -82,6 +83,7 @@ func (x *Controller) refreshSetup() {
 			s.error = ""
 			s.dependencies = append([]native.Dependency(nil), result.dependencies...)
 			s.facts = append([]native.HostFact(nil), result.facts...)
+			s.installation = result.installation
 			if wasMissing && native.AllRequiredInstalled(s.dependencies) && x.Agent.CaptureWorkflowTarget() == target {
 				if !x.sessionGate.TryRLock() {
 					return

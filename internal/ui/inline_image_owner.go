@@ -10,9 +10,12 @@ type inlineImageOwner struct {
 	task                              attachmentOwner
 }
 type inlineImageState struct {
-	owner         inlineImageOwner
-	generation    uint64
-	known, closed bool
+	contents            map[string]inlineImageContent
+	nextContentRevision uint64
+	preview             inlineImageContentToken
+	owner               inlineImageOwner
+	generation          uint64
+	known, closed       bool
 }
 type inlineImageToken struct {
 	owner      inlineImageOwner
@@ -24,6 +27,8 @@ func (a *App) currentInlineImageOwner() inlineImageOwner {
 }
 func (a *App) resetInlineImages() {
 	a.inlineImages.generation++
+	a.inlineImages.contents = nil
+	a.inlineImages.preview = inlineImageContentToken{}
 	a.messageImages = map[string]ui.ImageSource{}
 	a.imageLoading = map[string]bool{}
 	a.imageErrors = map[string]string{}

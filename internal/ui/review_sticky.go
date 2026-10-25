@@ -11,8 +11,10 @@ import (
 func (a *App) reviewFileHeader(c *ui.Context, l workspace.ReviewLine, sticky bool) {
 	s, t := &a.reviewState, a.Theme
 	path := l.Content
+	additions, deletions := 0, 0
 	if l.File >= 0 && l.File < len(s.data.Files) {
-		path = s.data.Files[l.File].Path
+		file := s.data.Files[l.File]
+		path, additions, deletions = file.Path, file.Additions, file.Deletions
 	}
 	row := ui.Row(c)
 	if sticky {
@@ -26,7 +28,7 @@ func (a *App) reviewFileHeader(c *ui.Context, l workspace.ReviewLine, sticky boo
 		}
 		row.Label(fmt.Sprintf("Review file header %d", l.File)).Bind(s.headerHandles[l.File])
 	}
-	row.Height(34).Background(t.Surface).PaddingX(10).AlignItems(ui.Center).Children(func() {
+	row.Height(34).Background(t.Surface).PaddingX(t.Space(12)).Gap(t.Space(8)).AlignItems(ui.Center).Children(func() {
 		icon := "icons/chevron-down.svg"
 		if s.collapsed[l.File] {
 			icon = "icons/chevron-right.svg"
@@ -38,7 +40,21 @@ func (a *App) reviewFileHeader(c *ui.Context, l workspace.ReviewLine, sticky boo
 			s.collapsed[l.File] = !s.collapsed[l.File]
 			s.selected = l.File
 		}
-		ui.Text(c, path).MaxLines(1).FontWeight(500).Grow(1)
+		// Rust diff_view::render_file_header uses a file glyph (plain file SVG
+		// when no Nerd Font is installed), never an extension badge.
+		a.icon(c, "icons/file.svg", t.Px(14), t.TextMuted).Label("Review file icon").Shrink(0)
+		ui.Text(c, path).MaxLines(1).Font(a.Fonts.CodeFamily).FontSize(t.Px(12)).TextColor(t.TextSecondary).FontWeight(500).Grow(1).MinWidth(0)
+		addedColor, deletedColor := t.TextMuted, t.TextMuted
+		if additions > 0 {
+			addedColor = t.Success
+		}
+		if deletions > 0 {
+			deletedColor = t.Error
+		}
+		// Zero counts remain visible, including empty and binary files. These
+		// are snapshot metadata, not counts recomputed from visible/context rows.
+		ui.Text(c, fmt.Sprintf("+%d", additions)).FontSize(t.Px(12)).TextColor(addedColor).Shrink(0)
+		ui.Text(c, fmt.Sprintf("-%d", deletions)).FontSize(t.Px(12)).TextColor(deletedColor).Shrink(0)
 		if a.iconButton(c, "Open file", "icons/external-link.svg").Clicked() {
 			a.OpenFile(filepath.Join(a.Model.Workspace, path))
 		}

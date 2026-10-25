@@ -156,6 +156,7 @@ func (a *App) messageImageRow(c *ui.Context, m Message) {
 	ui.Row(c).Gap(8).Children(func() {
 		for i, im := range m.Images {
 			key := fmt.Sprintf("%s:%d", m.ID, i)
+			content := a.inlineImagePayload(key, im)
 			source := a.messageImages[key]
 			if source == nil && !a.imageLoading[key] && a.imageErrors[key] == "" {
 				a.imageLoading[key] = true
@@ -176,7 +177,7 @@ func (a *App) messageImageRow(c *ui.Context, m Message) {
 						}
 					}
 					return func() {
-						if !a.ownsInlineImage(owner) {
+						if !a.ownsInlineImage(owner) || !a.ownsInlineImagePayload(content) {
 							return
 						}
 						a.imageLoading[key] = false
@@ -189,8 +190,9 @@ func (a *App) messageImageRow(c *ui.Context, m Message) {
 				})
 			}
 			if source != nil {
-				b := ui.ButtonBase(c.Key(fmt.Sprintf("inline-image:%d:%s", owner.generation, key))).Label("Open image attachment").Padding(4).Radius(8).Border(1, a.Theme.Border).Children(func() { ui.Image(c, source).MaxWidth(240).MaxHeight(180) })
-				if b.Clicked() {
+				b := ui.ButtonBase(c.Key(fmt.Sprintf("inline-image:%d:%d:%s", owner.generation, content.revision, key))).Label("Open image attachment").Padding(4).Radius(8).Border(1, a.Theme.Border).Children(func() { ui.Image(c, source).MaxWidth(240).MaxHeight(180) })
+				if b.Clicked() && a.ownsInlineImage(owner) && a.ownsInlineImagePayload(content) {
+					a.inlineImages.preview = content
 					a.imagePreview = source
 					a.imageOpen = true
 				}
@@ -211,6 +213,7 @@ func (a *App) imageDialog(c *ui.Context) {
 			ui.Text(c, "Image attachment").Grow(1)
 			if a.iconButton(c, "Close image", "icons/x.svg").Clicked() {
 				a.imageOpen = false
+				a.inlineImages.preview = inlineImageContentToken{}
 			}
 		})
 		width, height := c.Size()
