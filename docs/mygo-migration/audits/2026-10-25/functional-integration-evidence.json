@@ -40,7 +40,7 @@
     "skip": 2,
     "status": "PASS"
   },
-  "nativeFinalSource": "PENDING",
+  "nativeFinalSource": "CAPTURE_COMPLETE; bounded manual review only, no full parity",
   "fullParity": false,
   "cloudFrozenRuntime": {
     "commit": "ecba1eb386ba202815c1e9f8d90b76cf4d9c0975",
@@ -56,5 +56,23 @@
     "status": "PASS",
     "runtimeSourceUnchanged": true,
     "logSHA256": "1693da13838e36348c1432dcd4ab3b967b05b1e4ade0fb9f0aee68ae712071e0"
+  },
+  "finalCloud": {
+    "commit": "7aeba2bd10abfee17b0199bc0fe4c2d032eed019",
+    "goMigrationRun": 40203779024,
+    "goMigrationConclusion": "success",
+    "standardRun": 40203779023,
+    "standardConclusion": "success",
+    "workbenchCasesPerSide": 8,
+    "goArtifact": 12603026617,
+    "goZipSHA256": "551cb4fbaf60f54e23d9a8e0e9e92346487c22cfd2087fc48c2e604cdee7e820",
+    "referenceArtifact": 12603500170,
+    "referenceZipSHA256": "6cf82e00117cbdef999f4a2c1146977d59f864d2116e2a7a7d358adda16e2dbb",
+    "manualReviewedFinalImages": [
+      "workbench/wb02-explorer-dark.png",
+      "workbench/wb08-terminal-dark.png"
+    ],
+    "fullPixelEquality": false,
+    "macOSFunctionalAcceptance": false
   }
 }

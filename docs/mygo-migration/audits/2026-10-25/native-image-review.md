@@ -55,3 +55,13 @@ Capture stopped before WB03 pointer input: PSM11 recognized exact alpha.go at [1
 This harness failure does not establish a runtime regression. The updated harness must still finish a new actual capture on the identical runtime before native acceptance claims.
 
 Safety review additionally tightened exact-literal uniqueness across all in-region OCR candidates, including a second low-confidence duplicate; nonfinite/out-of-range confidence is rejected. This is the same OCR engine with another segmentation mode, not statistically independent recognition. Hash equality proves the saved image is unchanged, not that a dynamic live window cannot change while OCR runs; this harness uses the bounded static synthetic fixture and does not generalize to arbitrary dynamic UI clicking. Local alternate OCR used Tesseract5.5.0; CI must independently pass its own engine and unchanged gate.
+
+## Final same-runtime recapture: 7aeba2b
+
+Run40203779024 completed all three jobs successfully, including aggregate and both actual native renderers. Standard CI40203779023 also succeeded across its matrix/audits. Both workbench reports contain8/8 cases and remain OCR-ready/manual-review-needed, not pixel equality.
+
+- Go artifact12603026617 ZIP SHA256 `551cb4fbaf60f54e23d9a8e0e9e92346487c22cfd2087fc48c2e604cdee7e820`.
+- Rust artifact12603500170 ZIP SHA256 `6cf82e00117cbdef999f4a2c1146977d59f864d2116e2a7a7d358adda16e2dbb`.
+- Both downloaded ZIPs match GitHub digests. Final WB02/WB08 pairs directly inspected: badge labels are contained/centered; Go restart icon now visible. Terminal tab sizing, sidebar/transcript layouts and prior reported differences still prevent parity claims.
+- Actual WB03 action proof retained primary52.055969 and alternate80.610741 on identical[1286,190,44,11] bounds; only after confirmation did input dispatch. Both TSV hashes verified. There was one confirmation action (pending and sent records describe the same action, not two coverage cases).
+- No real model inference, native macOS exit/restart acceptance or workspace-confirm success is established here. `.4` release bytes are unchanged.

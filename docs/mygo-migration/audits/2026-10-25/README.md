@@ -56,6 +56,10 @@ Pi 正常读取 `~/.pi/agent` 或指定的 `PI_CODING_AGENT_DIR`；原生 Pi 可
 - [MCP / 终端 / badge 及测试同步修正](functional-integration.md)：功能补丁与门禁有独立证据，未发布为安装包。
 - [原生实图对照及剩余差异](native-image-review.md)：History、Usage 几何有改善，但截图不是全功能验收，仍非像素级对齐。
 
+### 最新分支验证结果
+
+`7aeba2b` 的Go迁移与三平台标准CI均通过；新原生图确认Explorer语言标签不再错位、终端重启入口出现。详见[最终证据](functional-integration.md)。这些是**未发版源码**，不改变上表`.4`缺口；工作区确认无响应仍未确认修复，迁移仍未达到完整1:1。
+
 ## 详细追踪
 
 - [C01–C20：Chat / Pi RPC / 扩展交互](chat.md)

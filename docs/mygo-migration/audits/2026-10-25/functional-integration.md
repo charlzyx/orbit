@@ -28,3 +28,12 @@ MCP初稿独立复审发现三处组合边界：新编辑覆盖后bootstrap失�
 ## 云端冻结运行时门禁（14:44 UTC）
 
 [ecba1eb run40203054192](https://github.com/charlzyx/orbit/actions/runs/40203054192) 的 aggregate 与 Rust reference-desktop 均通过。aggregate包含全仓race/vet、composer/selection、wrapper、终端模块、CPU采集与Linux/Windows双架构及macOS arm64编译。Go native-desktop在精确OCR点击前因置信不足停止，未发送该点击；该workflow整体仍为失败，不拼成全绿。后续只改harness与证据文档，所有本批runtime/test源文件哈希保持一致，再采集仍待完成。
+
+## 最终同 SHA 云端结果（14:53 UTC）
+
+开发分支源码 `7aeba2bd10abfee17b0199bc0fe4c2d032eed019`：
+- [Go native migration 40203779024](https://github.com/charlzyx/orbit/actions/runs/40203779024)：aggregate、Go native-desktop、Rust reference-desktop 均成功。
+- [标准 CI 40203779023](https://github.com/charlzyx/orbit/actions/runs/40203779023)：macOS/Linux/Windows、audit、secrets 与 build 汇总均成功。
+- 两端工作台8/8状态均完成采集；保留的报告仍为 `READY_FOR_MANUAL_REVIEW` / `UNREVIEWED` / `NOT_COMPARED`，不把OCR就绪提升成全功能或像素验收。
+- 新图直接核对：Go的GO/TXT文字已在对应badge中居中，终端header重启按钮已出现；其它此前报告的布局/功能差异仍然保留。终端退出恢复的操作证据来自临时PTY/CPU宿主测试，不冒充真实Mac全流程。
+- 此次没有生成新release；`.4`下载包完全未变，工作区原生确认和用户报告的无响应仍未确认修复。
