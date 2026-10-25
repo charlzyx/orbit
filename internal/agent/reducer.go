@@ -541,6 +541,7 @@ func (s *sessionState) authEvent(event pirpc.Event) {
 	}
 	switch event.Type {
 	case "auth_login_started":
+		clearAuthChallenge(auth)
 		auth.Status = "pending"
 		auth.Method = event.String("method")
 		auth.Error = ""

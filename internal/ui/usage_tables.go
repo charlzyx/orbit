@@ -12,6 +12,8 @@ import (
 )
 
 type usageTableState struct {
+	contextHandle        ui.Handle
+	rowHandles           map[int]*ui.Handle
 	Search               string
 	sortPhase            int
 	Sort, observedSort   ui.SortOrder
@@ -124,7 +126,7 @@ func usageRowField(r usageTableRow, id, metric, latency string) (string, float64
 	case "model":
 		return r.Model, 0, true
 	case "started":
-		return "", float64(r.Started.UnixMilli()), false
+		return "", float64(r.Ended.UnixMilli()), false
 	case "date", "time", "latest":
 		return "", float64(r.At.UnixMilli()), false
 	case "requests", "calls":
@@ -134,7 +136,7 @@ func usageRowField(r usageTableRow, id, metric, latency string) (string, float64
 	case "output":
 		return "", float64(r.Tokens.Output), false
 	case "cache":
-		return "", float64(usageAdd(r.Tokens.CacheRead, r.Tokens.CacheWrite)), false
+		return "", float64(r.Tokens.CacheRead), false
 	case "cache-hit":
 		rate, ok := usageCacheRate(r.Tokens)
 		if !ok {
@@ -285,7 +287,7 @@ func usageTableColumns(kind, metric string) []ui.TableColumn {
 		if slices.Contains([]string{"title", "name", "tool", "workspace", "provider", "model", "when", "date", "time", "started", "kind", "session", "message"}, id) {
 			align = ui.Start
 		}
-		cols = append(cols, ui.TableColumn{ID: id, Title: title, Width: w, MinWidth: 48, Align: align, Sortable: id != "share"})
+		cols = append(cols, ui.TableColumn{ID: id, Title: title, Width: w, MinWidth: 48, Align: align, Sortable: id != "share" && id != "message" && kind != "breakdown:tools"})
 	}
 	return cols
 }
@@ -328,7 +330,7 @@ func (a *App) usageTableRows(kind string) []usageTableRow {
 	}
 	return out
 }
-func (a *App) usageCell(r usageTableRow, id string) string {
+func (a *App) usageCell(r usageTableRow, id, kind string) string {
 	s := &a.usageState
 	if r.Failure != nil {
 		e := r.Failure
@@ -336,7 +338,7 @@ func (a *App) usageCell(r usageTableRow, id string) string {
 		case "when":
 			return e.At.Local().Format("Jan 2, 15:04")
 		case "kind":
-			return titleCase(e.Kind)
+			return a.text("usage.error_kind_"+e.Kind, titleCase(e.Kind))
 		case "model":
 			return e.Model
 		case "session":
@@ -353,14 +355,20 @@ func (a *App) usageCell(r usageTableRow, id string) string {
 	case "provider":
 		return r.Provider
 	case "model":
+		if kind == "sessions" && r.Model != "" {
+			return r.Model + " · " + r.Provider
+		}
 		return r.Model
 	case "time", "date":
 		return r.Name
 	case "started":
-		if r.Started.IsZero() {
+		if r.Ended.IsZero() {
 			return "—"
 		}
-		return r.Started.Local().Format("Jan 2 15:04")
+		if r.Ended.Local().Year() == s.now().Year() {
+			return r.Ended.Local().Format("Jan 2")
+		}
+		return r.Ended.Local().Format("Jan 2, 2006")
 	case "duration":
 		if r.Started.IsZero() || r.Ended.IsZero() {
 			return "—"
@@ -373,7 +381,10 @@ func (a *App) usageCell(r usageTableRow, id string) string {
 	case "output":
 		return compactCount(r.Tokens.Output)
 	case "cache":
-		return compactCount(usageAdd(r.Tokens.CacheRead, r.Tokens.CacheWrite))
+		if kind == "sessions" && r.Tokens.CacheRead == 0 && r.Tokens.CacheWrite == 0 {
+			return "—"
+		}
+		return compactCount(r.Tokens.CacheRead)
 	case "cache-hit":
 		rate, ok := usageCacheRate(r.Tokens)
 		if !ok {
@@ -381,7 +392,10 @@ func (a *App) usageCell(r usageTableRow, id string) string {
 		}
 		return usagePercent(rate)
 	case "errors":
-		return fmt.Sprint(r.Errors + r.ToolFailures)
+		if kind == "breakdown:tools" && r.ToolFailures == 0 {
+			return "—"
+		}
+		return usageCount(uint64(r.Errors + r.ToolFailures))
 	case "tools":
 		return fmt.Sprint(r.ToolRuns)
 	case "avg":
@@ -445,39 +459,7 @@ func (a *App) usageTable(c *ui.Context, kind string) {
 			t.Selected = -1
 		}
 		ui.Spacer(c)
-		ui.MenuButton(c, "Columns", func(m *ui.Menu) {
-			for _, col := range all {
-				if m.Item(col.Title).Checked(!slices.Contains(t.Hidden, col.ID) || col.ID == required).Disabled(col.ID == required).Chosen() {
-					t.toggleColumn(col.ID, required)
-					if kind == "sessions" {
-						s.hiddenColumns = append([]string(nil), t.Hidden...)
-						a.saveUsagePrefs()
-					}
-				}
-			}
-			m.Separator()
-			if m.Item("Show all columns").Chosen() {
-				t.Hidden = nil
-				if kind == "sessions" {
-					s.hiddenColumns = nil
-					a.saveUsagePrefs()
-				}
-			}
-			if m.Item("Reset column widths").Chosen() {
-				t.List.Columns = ui.TableLayout{}
-			}
-		})
-		ui.MenuButton(c, fmt.Sprintf("%d rows", t.Size), func(m *ui.Menu) {
-			for _, size := range []int{10, 25, 50, 100} {
-				if m.Item(fmt.Sprint(size)).Checked(t.Size == size).Chosen() {
-					t.setPageSize(size)
-					if kind == "sessions" {
-						s.pageSize = t.Size
-						a.saveUsagePrefs()
-					}
-				}
-			}
-		})
+		a.usageColumnControl(c, kind, all, required)
 	})
 	probe := ui.Box(c.Key("usage-table-width:" + kind)).Height(0).AlignSelf(ui.Stretch)
 	width := probe.Bounds().W
@@ -496,21 +478,49 @@ func (a *App) usageTable(c *ui.Context, kind string) {
 	}
 	if kind == "sessions" {
 		cols = usageSessionColumns(cols, t.List.Columns.Widths, width)
+	} else {
+		cols = usageDataColumns(cols, t.List.Columns.Widths, width, kind)
 	}
 	result := queryUsageTable(a.usageTableRows(kind), t, kind, s.metric, s.latencyMetric)
 	t.Page = result.Page
 	if t.Selected >= len(result.Rows) {
 		t.Selected = -1
 	}
-	t.List.Selected = &t.Selected
+	interactive := kind == "sessions" || kind == "series" || kind == "breakdown:models" || kind == "breakdown:providers" || kind == "breakdown:workspaces"
+	t.List.Selected = nil
+	if interactive {
+		t.List.Selected = &t.Selected
+	} else {
+		t.Selected = -1
+	}
+	for i, row := range result.Rows {
+		if kind == "sessions" && ((s.filter.SessionPath != "" && row.Path == s.filter.SessionPath) || (s.filter.Session != "" && row.ID == s.filter.Session)) {
+			t.Selected = i
+		}
+		if kind == "series" && row.Point != nil && s.filter.FocusStart.Equal(row.Point.At) && s.filter.FocusEnd.Equal(row.Point.End) {
+			t.Selected = i
+		}
+	}
 	t.List.Sort = &t.Sort
+	if kind == "breakdown:tools" {
+		t.List.Sort = nil
+	}
 	t.List.Key = func(i int) any { return result.Rows[i].Key }
 	t.List.Label = func(i int) string { return usageRowText(result.Rows[i], kind) }
-	t.List.CellMenu = func(m *ui.Menu, row, col int) { a.usageRowMenu(m, kind, result.Rows[row]) }
+	t.List.CellMenu = nil
+
 	baseTheme := c.Theme()
 	tableTheme := *baseTheme
 	tableTheme.Spacing = 5 // frozen Usage HEADER_H and ROW_H are 40 DIPs
 	c.SetTheme(&tableTheme)
+	rowBounds := make(map[int]*ui.Handle)
+	if t.rowHandles == nil {
+		t.rowHandles = map[int]*ui.Handle{}
+	}
+	frameRows := len(result.Rows)
+	if frameRows == 0 {
+		frameRows = 3
+	}
 	table := ui.Table(c.Key("usage-table:"+kind), &t.List, cols, len(result.Rows), func(row, col int) {
 		r := result.Rows[row]
 		if cols[col].ID == "open" {
@@ -519,10 +529,29 @@ func (a *App) usageTable(c *ui.Context, kind string) {
 			}
 			return
 		}
-		text := a.usageCell(r, cols[col].ID)
-		ui.Text(c, text).SingleLine().Tooltip(text)
-	}).Height(float32(max(3, len(result.Rows))*40 + 40)).AlignSelf(ui.Stretch).Label("Usage " + kind + " table")
+		text := a.usageCell(r, cols[col].ID, kind)
+		cell := ui.Text(c, text).SingleLine().Tooltip(text)
+		if cols[col].Align == ui.End {
+			cell.Font(a.Fonts.CodeFamily)
+		}
+		if col == 0 {
+			handle := t.rowHandles[row]
+			if handle == nil {
+				handle = &ui.Handle{}
+				t.rowHandles[row] = handle
+			}
+			cell.Bind(handle)
+			rowBounds[row] = handle
+			if kind == "sessions" && s.menu("context").Open && s.contextRow == row {
+				a.usageSessionContextPopup(c, cell, r)
+			}
+		}
+	}).Height(float32(frameRows*40+42)).Border(1, a.Theme.Border).Radius(a.Theme.Px(12)).AlignSelf(ui.Stretch).Label("Usage " + kind + " table")
 	c.SetTheme(baseTheme)
+	if kind == "sessions" {
+		table.Bind(&t.contextHandle)
+		a.usageSessionContext(c, table, &t.contextHandle, result.Rows, rowBounds)
+	}
 	if t.Selected >= 0 && t.Selected < len(result.Rows) {
 		r := result.Rows[t.Selected]
 		if table.Submitted() {
@@ -534,6 +563,10 @@ func (a *App) usageTable(c *ui.Context, kind string) {
 		} else if table.Changed() || (table.Clicked() && t.Sort == t.observedSort) {
 			switch kind {
 			case "sessions":
+				s.menu("context").Open = false
+				if s.filterMenu == "context" {
+					s.filterMenu = ""
+				}
 				s.filter.SessionPath = r.Path
 				s.filter.Session = ""
 				if r.Path == "" {
@@ -545,35 +578,45 @@ func (a *App) usageTable(c *ui.Context, kind string) {
 		}
 	}
 	if result.Total == 0 {
-		ui.Text(c, "No matching rows.").TextColor(a.Theme.TextMuted)
+		table.Children(func() {
+			ui.Box(c).Absolute().Top(40).Bottom(0).Left(0).Right(0).Center().Children(func() {
+				ui.Text(c, a.usageTableEmpty(kind, false)).FontSize(a.Theme.Px(12)).TextColor(a.Theme.TextMuted)
+			})
+		})
 	}
-	if kind == "breakdown:tools" {
-		ui.Text(c, fmt.Sprintf("%d calls · %d errors · %d measured", result.Totals.Requests, result.Totals.ToolFailures, result.Totals.Timed)).TextColor(a.Theme.TextMuted).FontSize(11)
-	} else if kind != "failures" {
-		ui.Text(c, fmt.Sprintf("Filtered: %d requests · %s tokens    Page: %d requests · %s tokens", result.Totals.Requests, compactCount(result.Totals.Tokens.Total), result.PageTotals.Requests, compactCount(result.PageTotals.Tokens.Total))).TextColor(a.Theme.TextMuted).FontSize(11)
-	}
+	filtered, pageTotals := a.usageTableTotals(kind, result)
+	ui.Row(c).AlignSelf(ui.Stretch).Gap(a.Theme.Space(12)).Children(func() {
+		ui.Text(c, filtered).TextColor(a.Theme.TextMuted).FontSize(a.Theme.Px(12))
+		ui.Spacer(c)
+		ui.Text(c, pageTotals).TextColor(a.Theme.TextMuted).FontSize(a.Theme.Px(12))
+	})
 	ui.Row(c.Key("usage-pager:" + kind)).Gap(8).AlignItems(ui.Center).Children(func() {
-		ui.Text(c, fmt.Sprintf("%d records · page %d of %d", result.Total, result.Page, result.Pages)).Grow(1).TextColor(a.Theme.TextMuted)
-		if a.button(c, "Previous", "icons/arrow-left.svg", false).Disabled(result.Page <= 1).Clicked() {
+		summary := a.usageTableEmpty(kind, true)
+		if result.Total > 0 {
+			first := (result.Page-1)*t.Size + 1
+			summary = a.usageText("usage.showing_range", "Showing %{first}–%{last} of %{total}", map[string]string{"first": fmt.Sprint(first), "last": fmt.Sprint(first + len(result.Rows) - 1), "total": usageCount(uint64(result.Total))})
+		}
+		ui.Text(c, summary).Grow(1).TextColor(a.Theme.TextMuted)
+		ui.Text(c, a.text("view.rows", "Rows")).FontSize(12).TextColor(a.Theme.TextMuted)
+		a.usagePageSizeControl(c, kind)
+		ui.Text(c, fmt.Sprintf("%d/%d", result.Page, result.Pages)).FontSize(12).TextColor(a.Theme.TextMuted)
+		if a.button(c, a.text("usage.previous", "Previous"), "icons/arrow-left.svg", false).Disabled(result.Page <= 1).Clicked() {
 			t.Page--
 			t.Selected = -1
 		}
-		if a.button(c, "Next", "icons/arrow-right.svg", false).Disabled(result.Page >= result.Pages).Clicked() {
+		if a.button(c, a.text("usage.next", "Next"), "icons/arrow-right.svg", false).Disabled(result.Page >= result.Pages).Clicked() {
 			t.Page++
 			t.Selected = -1
 		}
 	})
+	if kind == "failures" {
+		ui.Text(c, a.text("view.retries_are_unavailable_pi_records_automatic_ret", "Retries are unavailable: pi records automatic retries as live events, not in session files.")).FontSize(a.Theme.Px(12)).TextColor(a.Theme.TextMuted)
+	}
 }
 func (a *App) activateUsageRow(kind string, r usageTableRow) {
 	s := &a.usageState
 	switch kind {
-	case "sessions":
-		copy := r.usageAggregate
-		s.detailSession = &copy
-	case "failures":
-		copy := *r.Failure
-		s.detailError = &copy
-	case "series", "daily":
+	case "series":
 		if r.Point != nil {
 			a.focusUsageBucket(r.Point.At, r.Point.End)
 		}
@@ -583,39 +626,6 @@ func (a *App) activateUsageRow(kind string, r usageTableRow) {
 		s.toggleFilter("providers", usageFilterOption{Key: r.Provider})
 	case "breakdown:workspaces":
 		s.toggleFilter("workspaces", usageFilterOption{Key: r.Workspace})
-	}
-}
-func (a *App) usageRowMenu(m *ui.Menu, kind string, r usageTableRow) {
-	s := &a.usageState
-	if kind == "sessions" || kind == "failures" {
-		if m.Item("Open session").Disabled(r.Path == "").Chosen() {
-			a.Dispatch(Action{Kind: "SwitchSession", Value: r.Path})
-			a.Navigate("chat")
-		}
-		if m.Item("Scope to this session").Chosen() {
-			s.filter.SessionPath = r.Path
-			s.filter.Session = ""
-			if r.Path == "" {
-				s.filter.Session = r.ID
-			}
-		}
-		if m.Item("Copy session ID").Chosen() {
-			a.Dispatch(Action{Kind: "CopyText", Value: r.ID})
-		}
-		m.Separator()
-		if m.Item("Filter by provider: " + r.Provider).Chosen() {
-			toggleUsageString(&s.filter.Providers, r.Provider)
-		}
-		if m.Item("Filter by model: " + r.Model).Chosen() {
-			toggleUsageModel(&s.filter.ModelRefs, workbench.UsageModelRef{Provider: r.Provider, Model: r.Model})
-		}
-		if m.Item("Filter by workspace").Chosen() {
-			toggleUsageString(&s.filter.Workspaces, r.Workspace)
-		}
-	} else if kind != "breakdown:tools" {
-		if m.Item("Focus these results").Chosen() {
-			a.activateUsageRow(kind, r)
-		}
 	}
 }
 
@@ -667,4 +677,53 @@ func usageSessionColumns(columns []ui.TableColumn, resized map[string]float32, a
 		out = append(out, col)
 	}
 	return append(out, ui.TableColumn{ID: "open", Width: 38, MinWidth: 38, Align: ui.Center, Sortable: false})
+}
+
+// Non-session plans follow the frozen source's per-table reading registers.
+// Only the leading identity or trailing message absorbs available width.
+func usageDataColumns(cols []ui.TableColumn, widths map[string]float32, budget float32, kind string) []ui.TableColumn {
+	measures := map[string]float32{}
+	flex, low, high := cols[0].ID, float32(160), float32(480)
+	switch kind {
+	case "series":
+		measures = map[string]float32{"value": 112, "requests": 104, "tokens": 96}
+	case "daily":
+		measures = map[string]float32{"requests": 104, "tokens": 96, "cache-hit": 104, "errors": 84}
+	case "failures":
+		measures = map[string]float32{"when": 108, "kind": 96, "model": 150, "session": 200}
+		for _, col := range cols {
+			if col.ID == "message" {
+				flex, low, high = "message", 180, 560
+			}
+		}
+	case "breakdown:tools":
+		measures = map[string]float32{"calls": 76, "errors": 80, "avg": 76, "max": 76}
+		high = 460
+	default:
+		measures = map[string]float32{"requests": 92, "input": 80, "output": 80, "cache": 80, "tokens": 88, "share": 72}
+		high = 460
+	}
+	fixed := float32(0)
+	for _, col := range cols {
+		if col.ID == flex {
+			continue
+		}
+		w := measures[col.ID]
+		if !strings.HasPrefix(kind, "breakdown:") && widths[col.ID] > 0 {
+			w = widths[col.ID]
+		}
+		fixed += w
+	}
+	for i := range cols {
+		w := measures[cols[i].ID]
+		if cols[i].ID == flex {
+			w = max(low, min(high, budget-fixed))
+		}
+		cols[i].Width = w
+		if kind == "breakdown:tools" {
+			cols[i].Fixed = true
+			cols[i].Sortable = false
+		}
+	}
+	return cols
 }

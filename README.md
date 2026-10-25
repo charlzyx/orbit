@@ -9,6 +9,8 @@ This fork is migrating the complete Orbit v0.2.12 workbench to Go and MyGo nativ
 
 The canonical wrapper verifies the exact MyGo pin and applies the small, attributed composer caret/undo and opt-in transcript selection additions in a temporary source copy. It never edits the Go module cache. Plain `go run/build` omits these required additions; the application refuses to start rather than silently ship different undo or virtualized selection behavior. On Windows without Bash, use `python scripts/go-native-overlay.py run ./cmd/orbit`. See [composer provenance](third_party/mygo-composer/README.md) and [selection provenance](third_party/mygo-selection/README.md).
 
+The wrapper defaults to Go's `-trimpath` so temporary compatibility-copy paths do not invalidate dependency-cache reuse or leak into debug records. An explicit `-trimpath=false` remains available for local debugging; it does not disable either required compatibility patch.
+
 ## Original Orbit reference
 
 [![CI](https://github.com/imrj05/orbit/actions/workflows/ci.yml/badge.svg)](https://github.com/imrj05/orbit/actions/workflows/ci.yml)

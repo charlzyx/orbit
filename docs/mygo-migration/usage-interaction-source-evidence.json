@@ -1,58 +1,161 @@
 {
-  "scope": "Usage native source interaction checkpoint",
-  "timestamp_utc": "2026-10-25T05:46:31.812514+00:00",
+  "scope": "Usage source interaction checkpoint: painted Sessions context, source popup surfaces and table accounting/display semantics",
+  "timestamp_utc": "2026-10-25T07:35:14.392673+00:00",
   "baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
   "full_row_parity_verified": false,
-  "native_os": "not executed by this capture",
-  "matched_pixels": "OPEN; CPU fixture images are not matched Rust comparisons",
+  "native_os": "Not executed by CPU fixture captures",
+  "matched_pixels": "OPEN: no same-state Rust/Go native pair, font/DPI manifest or pixel difference proof",
+  "public_visual_case_count_changed": false,
   "commands": [
     {
-      "command": "./scripts/go-native.sh test -race ./internal/ui ./internal/workbench -run '^TestUsage|^TestSettingsBackend|^TestLatency' -count=1",
+      "command": "TZ=UTC ./scripts/go-native.sh test -race ./internal/ui ./internal/workbench -count=1",
       "result": "PASS",
-      "ui_seconds": 4.434,
-      "workbench_seconds": 1.442
+      "ui_seconds": 26.461,
+      "workbench_seconds": 2.2,
+      "scope": "PRIOR 07:06 checkpoint only, not current aggregate validation"
     },
     {
-      "command": "ORBIT_CAPTURE_DIR=$PWD/docs/mygo-migration/probes/usageui ./scripts/go-native.sh test ./internal/ui -run '^TestNativeUsageCapture$' -count=1",
-      "result": "PASS",
-      "seconds": 0.771
+      "command": "./scripts/go-native.sh vet ./internal/ui ./internal/workbench",
+      "result": "PASS"
+    },
+    {
+      "command": "TZ=UTC ORBIT_CAPTURE_DIR=$PWD/docs/mygo-migration/probes/usageui ./scripts/go-native.sh test ./internal/ui -run '^TestNativeUsage' -count=1",
+      "result": "FAILED_BEFORE_TEST: no space left on device in shared Go build cache"
+    },
+    {
+      "command": "TZ=UTC ORBIT_CAPTURE_DIR=$PWD/docs/mygo-migration/probes/usageui ./scripts/go-native.sh test ./internal/ui -run '^TestNativeUsage' -count=1",
+      "result": "PASS current regenerated captures; earlier ENOSPC and successful retry retained as history",
+      "seconds": 1.164
+    },
+    {
+      "command": "TZ=UTC ./scripts/go-native.sh test -race ./internal/ui ./internal/workbench -count=1",
+      "result": "FAIL current aggregate: unrelated TestSettingsSavedWorktreePolicyReachesNextCreate nil Store panic at settings_projection_test.go:34; Usage tests before that point not a whole-suite proof",
+      "ui_seconds": 16.996,
+      "workbench_result": "PASS",
+      "workbench_seconds": 2.34
+    },
+    {
+      "command": "TZ=UTC ./scripts/go-native.sh test -race ./internal/ui ./internal/workbench -run '^TestUsage|^TestSettingsBackend|^TestLatency' -count=1",
+      "result": "PASS current scoped source checkpoint",
+      "ui_seconds": 6.206,
+      "workbench_seconds": 1.578
+    },
+    {
+      "command": "./scripts/go-native.sh vet ./internal/ui ./internal/workbench",
+      "result": "PASS current source"
+    },
+    {
+      "command": "TZ=UTC ORBIT_CAPTURE_DIR=$PWD/docs/mygo-migration/probes/usageui ./scripts/go-native.sh test ./internal/ui -run '^TestNativeUsage' -count=1",
+      "result": "PASS current regenerated captures",
+      "seconds": 1.214
     }
   ],
   "files": {
-    "internal/ui/usage.go": "28e04a568025fff6a34b9ec22591580c2acf3547cf5bd777b490e8b06b6de1b6",
-    "internal/ui/usage_projection.go": "17aed671f4d787f3552be63e8eed6c099cffe2a8c422ca71dc6ae84d55c5587f",
-    "internal/ui/usage_analytics.go": "7e04f87d88d957a08d3c0d931bc5b62cfdbbf641016fc96ada4ceceb50158563",
-    "internal/ui/usage_tables.go": "b27bad0910b0dfaba984fc6f65c03dd1dcf1698bc39bb14caa5048e6f2b86762",
-    "internal/ui/usage_filters.go": "46c4b9db42e42438285dceadd7b14c912dd15947761610ca995cd93e6aac0ce8",
-    "internal/ui/usage_test.go": "ed49ebd9106ea094f1f693ef4f5b31fcd8b2e011e7a47f91b7e496d1dd0bf529",
-    "internal/ui/usage_interactions_test.go": "e7b3471094aab06f5999f5b1298ac84cde92db749d4b3ddfcfc42d4f8eb438b7",
-    "internal/workbench/usage.go": "f984a43f57d1f46625b870a3e78ecbe2098f2366752fcc7743e59043b5c28ea8",
-    "internal/workbench/usage_model_scope_test.go": "2b4aaae08df358da9eee6fd7c1f9bb817311beb57e45d43f94fa42fe0b447e1c",
     "crates/orbit-pi/src/usage/aggregate.rs": "8012398f96d0828a627aaafff8e804801429895299da02c431621a659d62e62c",
     "crates/orbit-pi/src/usage/chart.rs": "96efbbb05ecafdba4b2703d86a071af1307d184c1bc4e7a089a6706f1c4d9e13",
     "crates/orbit-pi/src/usage/collect.rs": "cac36e4b181153dd0c4fc59f4c2f807ce17799126dc5fd48d7c52968d3f0225d",
     "crates/orbit-pi/src/usage/filters.rs": "8c3d338230662e320a231c98dd4b566c9c182ad449be926c3a821d80c69e3a7f",
     "crates/orbit-pi/src/usage/format.rs": "794f28416c2747239d4bd3ae548c991acdbe577e18836b4b5caf03829d97bf8c",
     "crates/orbit-pi/src/usage/heatmap.rs": "f7dc308de1b1e0545c8697d6914285dad5ad63d1977bed4fad7b79f773e8c738",
+    "crates/orbit-pi/src/usage/mod.rs": "629f8cc69f7aa1e01d0667de605927a6c8e8e27fb61ef7f35f3d7952a8d89429",
     "crates/orbit-pi/src/usage/model.rs": "a7b84cd748e2971d399c94dc43a10b5e00ef3632a0edadc20b4b28b3cf760b3f",
     "crates/orbit-pi/src/usage/page.rs": "1a5ca8e0960e345e7cd7c146841d6993f455f6f8176280cdbbcdf782a419e24e",
     "crates/orbit-pi/src/usage/table.rs": "4525d6279ac9bdb2ca2b03f226e72530b17013585c59e5185de148ee4610daf2",
+    "crates/orbit-pi/src/usage/tests.rs": "08f1071e4c565157996ed098b5e087fa0b2307130fc65ea4c13356967981a32c",
+    "crates/orbit-pi/src/usage/tooltip.rs": "b6af865a95674dca277d5f4c2e7aa34413fd3c8ab3f38536334adf4fe02b1433",
     "crates/orbit-pi/src/usage/view.rs": "3a8620f8c55d9e3a053bda4bc789acc7a80fe2af4e45886a47278bb89e5772af",
-    "docs/mygo-migration/probes/usageui/usage-simple-fixture-dark.png": "f02b4656fa8eabb43eb01dc3528a03a966589b3e87ec3540ff1defb211aa3c38",
-    "docs/mygo-migration/probes/usageui/usage-details-fixture-dark.png": "c2f86d8fb4aca2fd7316c94a4740d2fcb7961722a42e3de8b92d28e586b2b152"
+    "docs/mygo-migration/usage-interaction-acceptance.md": "adf507a7ba794ce6350763d9a024a3d548cc26501dc9313a12028fb38b15fe47",
+    "docs/mygo-migration/usage-visual-source-review.json": "672a9052f0f56912753c6a9cdd0131c59bf4a301dcb59c2df42ac7b08789512c",
+    "internal/ui/settings_backend_integration_test.go": "6e2793ade8a3a58cf34d993f486af170ca46db63a55da8607b3057a937ef4894",
+    "internal/ui/usage.go": "69cafb930894916d3a4e8b776e842046008b0ad19293d42925b7ba6218d9589f",
+    "internal/ui/usage_analytics.go": "96b2341d5513a826c16796f9d1c0db4bab2a9e6f845b850fc0608d554aaea1cf",
+    "internal/ui/usage_filters.go": "a84ff60410a327da9a76b8e5e5e19714b85bdd00eb9acb324d79029eb1eff9fd",
+    "internal/ui/usage_format.go": "1dd4937b9086635f8d0454067aaf42feda82e4c994bfdac98813fc334475e02a",
+    "internal/ui/usage_interactions_test.go": "5ca4f84098f325bd9ad00ef7cecc90c24be6c6807fc2bd4ad6d1bce077038097",
+    "internal/ui/usage_projection.go": "c7c508c42e86d56f7c3adb12ddeca4e52e6e5a7d808b57e83c06c0eba53fc7a2",
+    "internal/ui/usage_tables.go": "e4223a6f3611dfbe673b599f7c21096ba624f9f5143c880a9f905a94aa6b83f5",
+    "internal/ui/usage_test.go": "d79bffdc87d10a1ded24a2ea4b7f40d4a8bcbd0d67c7a08c881f593a542f5410",
+    "internal/ui/usage_visual_test.go": "c27a6aaed9d0d2a5e9ff629299136beefcc51b2b67ed76a430a3565a6b142e34",
+    "internal/workbench/usage.go": "f226f170356fa129e6973f93ce8743b9868542b10206372037f912037ef20074",
+    "internal/workbench/usage_export.go": "c26ebfd619715dae458f12c04df61d074c18396148fd1fa3c079aeaf4e0cfe87",
+    "internal/workbench/usage_export_test.go": "e7722d7367046bcb088f24dd04d6b706021ed81c6e9f46e0f68dc968b8cc47d4",
+    "internal/workbench/usage_model_scope_test.go": "2b4aaae08df358da9eee6fd7c1f9bb817311beb57e45d43f94fa42fe0b447e1c",
+    "internal/workbench/usage_parity_test.go": "983015e52d15656568b15fa154a9ecea763ec24fea76c9625920772862950cc6",
+    "internal/workbench/usage_unreadable_test.go": "4c388d50dd8236b7baba791afda91d09ee12f4b9cb7904eda4e8ef6e48c35913",
+    "internal/ui/usage_metadata_test.go": "bd78f6a0658574f6b13a0e4eb9bba77abcf2638d3adc60f51a5bbf751811e907",
+    "internal/ui/usage_menus.go": "e756d3868cbd0497843373cc743a1516fd5c89cf6ed9835f931cac6d228d0b4d",
+    "internal/ui/usage_metadata.go": "045fd1e0578d745e0df9325e0a401b57cedcc67508a465878a16c83b57c54e71",
+    "internal/ui/usage_token_test.go": "15750f08d8cae44e0e6a374faedcf11a1c25047067fbc339e5bb2cd71582856d",
+    "internal/ui/usage_context.go": "9a0007d59e0017b131e5130153fb0ce97671b611dc4529e2e729eb466987932a",
+    "internal/ui/usage_table_semantics_test.go": "1343aa6562196419662fdb1bf51cb5529ea29efe8e91a6dbf91c941927518a49",
+    "internal/ui/theme.go": "a3aabd9d0590b9376d6b978e715fad1fc11425c34d13430f27e3031db5f7b90d"
   },
   "captures": {
-    "renderer": "MyGo CPU",
-    "width": 1470,
-    "height": 922,
-    "scale": 1,
-    "theme": "dark",
-    "fixture": "usageFixtureIndex; explicitly synthetic session store and paths",
-    "inspected": true,
-    "timezone_env": null,
-    "host_timezone": [
-      "JST",
-      "JST"
-    ]
-  }
+    "docs/mygo-migration/probes/usageui/usage-details-fixture-dark.png": "765e42420c12d0e9165628d2912dba818614f717418b1a80dd69cbaaebb9e155",
+    "docs/mygo-migration/probes/usageui/usage-export-menu-fixture-dark.png": "e23f557c65268bc81d08ddee1848ef39645deb5e4f4dedad889a7a410fd2f8a8",
+    "docs/mygo-migration/probes/usageui/usage-filters-models-fixture-dark.png": "16d2fc04b761f86f8f7fcc8ebce37960d0462a614d2daedcd4507cbed09c6564",
+    "docs/mygo-migration/probes/usageui/usage-filters-models-search-fixture-dark.png": "fc0f62ccd89cb8c71847fc23c20b60d31c3aa5d0afd08f6558f898d6fd66b91e",
+    "docs/mygo-migration/probes/usageui/usage-filters-no-matches-fixture-dark.png": "997822dce380cc751f69792021cf85c88a1551bf2f37bdaee1e533e5ea8e118e",
+    "docs/mygo-migration/probes/usageui/usage-health-narrow-fixture-dark.png": "3815c227a0aee9dbb61bb9a7fcf027e0d845d67ce70ed001a0900dda4fc2ce5c",
+    "docs/mygo-migration/probes/usageui/usage-health-unavailable-fixture-dark.png": "2f161eb3b19867a517a8fb4abe558a8b843750faad3c8cd6e81aa5dc47640525",
+    "docs/mygo-migration/probes/usageui/usage-health-wide-fixture-dark.png": "847cf71026e4caffab494a9fee6e4ad90bd9a402d5dc113ca57aa447368c4720",
+    "docs/mygo-migration/probes/usageui/usage-loading-fixture-dark.png": "622fe1fba7f574ce86b994d32bd11ef1831ecd3bbcc430cbaeda5dc984b5fb5d",
+    "docs/mygo-migration/probes/usageui/usage-page-size-fixture-dark.png": "7f2a67c74d51db6d311fedca38e53d758e33eb4101cd50be6b3a7ef3e90675c2",
+    "docs/mygo-migration/probes/usageui/usage-range-complete-fixture-dark.png": "0d9fbc5f4ca2efea94a26807e7b4aa5da68c1d1480ab82460254ee25ec31689a",
+    "docs/mygo-migration/probes/usageui/usage-range-presets-fixture-dark.png": "4f0706ab2c71e55ecc449d940d45360fdc50692fee0d19e25cba49f3f9478bc6",
+    "docs/mygo-migration/probes/usageui/usage-range-start-fixture-dark.png": "aee86b15868ec26be1de10f54ad97cfd6d849a5bab8e11c5771543faa371dc83",
+    "docs/mygo-migration/probes/usageui/usage-refresh-error-fixture-dark.png": "e5d640f9c41cd8afb3ec4889f28c76d20c658e58e72dc4101c8e7237ed4c6cf6",
+    "docs/mygo-migration/probes/usageui/usage-sessions-columns-fixture-dark.png": "60df3b000f1002361df644e81fa68e0461a05e4e8f32b16dd171ebf9823a9cfc",
+    "docs/mygo-migration/probes/usageui/usage-sessions-columns-native-menu.json": "a91ec63d27dc7b54f8ed2481923e4f4bd1c252e12fce1ce651d9de538aa561fb",
+    "docs/mygo-migration/probes/usageui/usage-sessions-context-fixture-dark.png": "f24559f7e03f71160e705c1db4fb681ec5c2fe35d65de17dceda9e8f9cad2b18",
+    "docs/mygo-migration/probes/usageui/usage-simple-fixture-dark.png": "6736319db3678e86b69e3e19a21db239a78fe68059ee8bf7cefad02f5c291efb",
+    "docs/mygo-migration/probes/usageui/usage-trend-cost-fixture-dark.png": "2f95e79eaa98c62eb937b78bcab50517dabbbfaa87be0f49a613d16d7cb58008",
+    "docs/mygo-migration/probes/usageui/usage-trend-keyboard-focus-fixture-dark.png": "654d9c3fff0a759842b911f5ae087f4f0a8fed1df34a2b59e231df08c74f8b7a",
+    "docs/mygo-migration/probes/usageui/usage-trend-latency-fixture-dark.png": "68acacc0f4221c6a737b4c75b49fd36b919b2ef6916150eebd293e8b32e71b90",
+    "docs/mygo-migration/probes/usageui/usage-trend-latency-p95-fixture-dark.png": "35d068bb257bdb4ac0c40dd4920537ed5efb0fc35617ab85721cdd98dee2a9cb",
+    "docs/mygo-migration/probes/usageui/usage-trend-tokens-fixture-dark.png": "3bcb3940289632d5461f1614c5d97a19e16a45a551d26adb7a19544303dfe81b"
+  },
+  "capture_scope": {
+    "timezone": "UTC",
+    "full_window": [
+      "usage-simple-fixture-dark.png",
+      "usage-details-fixture-dark.png"
+    ],
+    "components": "Other PNGs are explicitly labelled isolated components, not numbered canonical cases.",
+    "native_menu_limitation": "Export, Columns, page-size and Sessions context are painted native MyGo elements and captured. OS save dialogs/history are separate unverified gates; the legacy columns metadata JSON is not pixel proof.",
+    "nonbaseline_extensions": [
+      "trend-keyboard-focus: extra Go accessibility interaction; Rust chart has mouse handlers only",
+      "refresh-error: Go retained-index scan error state; no matching Rust scanner producer"
+    ],
+    "latency_p95": "Actual UsageRecord fixture samples, not inserted display-only percentiles; projection recomputes all totals and availability.",
+    "freshness": "22 current PNG fixture views, including three new painted popup variants; no canonical V-ID acceptance claim."
+  },
+  "remaining": [
+    "Exact source secondary localized strings and generic MyGo Table header/cell paint: source 16px padding, 500-weight primary header, edge carets, no column reorder, hover-only Open action",
+    "Matched-source chart hover readout geometry and breakdown bar clipping",
+    "Native save/cancel/overwrite and history navigation",
+    "All-platform native execution and matched Rust pixels",
+    "Root enumeration failures are reported by Go while Rust silently returns empty index; 64MiB Go single-line parser bound differs from Rust 256MiB total-file limit"
+  ],
+  "earlier_capture_retry": {
+    "timestamp_utc": "2026-10-25T06:52:01Z",
+    "result": "PASS after parent removed regenerable task cache",
+    "seconds": 1.433
+  },
+  "latest_source_corrections": [
+    "Painted native Export/Columns/page-size menus, not OS menu stand-ins.",
+    "Source one-row card titles/metadata and uppercase Details band; no invented descriptions.",
+    "Local table match metadata independent of page totals and scope; source failure provider/tool/stopped metadata.",
+    "Source per-table column widths; Tools static sorting/widths and Message nonsortable.",
+    "Source 400px centered empty state panel and icon; no-index/no-error remains skeleton.",
+    "Sessions context is source-painted at the row top-left, no right-click auto-scope, repeated Copy and filter toggles stay open, Scope closes; source outside-only dismissal and conditional Model row.",
+    "Actual token lookup resolves Large/Small to 16px/12px, correcting stale source comments; popup uses derived BorderStrong and four source ModalSurface shadow layers.",
+    "Table filtered/page totals, inside-frame no-match, short populated frame height, missing-price handling, cache-read-only cells and end-date Started sorting match the frozen source."
+  ],
+  "inspected_current_captures": [
+    "usage-sessions-context-fixture-dark.png",
+    "usage-export-menu-fixture-dark.png",
+    "usage-sessions-columns-fixture-dark.png",
+    "usage-details-fixture-dark.png"
+  ]
 }

@@ -33,9 +33,14 @@ func TestReviewNavigationUsesRenderedCollapsedSplitRows(t *testing.T) {
 		if len(hunks) != 1 || hunks[0].row != 2 {
 			t.Fatalf("split=%v wrong hunk row: %+v", split, hunks)
 		}
+		// Source Enter/Space on a tree file selects and expands it; only a
+		// directory is toggled. It is not the diff-header collapse action.
+		cursor := 1
+		s.treeCursor = &cursor
+		s.collapsed[1] = true
 		a.reviewCommand("ReviewTreeToggle")
-		if !s.collapsed[1] {
-			t.Fatal("tree toggle did not collapse")
+		if s.collapsed[1] {
+			t.Fatal("tree file selection did not expand its diff")
 		}
 	}
 }

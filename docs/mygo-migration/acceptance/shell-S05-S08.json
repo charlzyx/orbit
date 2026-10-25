@@ -457,6 +457,27 @@
           "evidence": "../native-ui-acceptance.json",
           "last_verified_sha": null,
           "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        },
+        {
+          "id": "UI-S08",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "pass_scoped",
+          "steps": [
+            "Open recent workspace chooser; filter, wrap arrows and select current or Browse.",
+            "Dismiss with Escape and outside press, then repeat immediately and after200ms.",
+            "Render source minimum viewport and inspect wordmark/primary-action geometry."
+          ],
+          "expected": "Current workspace pinned, recents deduplicated and bounded8; current choice does not create a task; keyboard selection/focus and200ms pointer guard behave correctly. Sidebar wordmark76px and NewTask32px source metrics.",
+          "tests": [
+            "TestWorkspacePickerSourceRecentOrderingAndFilter",
+            "TestNativeWorkspacePickerKeyboardFilteringNoopAndFocus",
+            "TestNativeWorkspacePickerWrapModalGuardAndBounds",
+            "TestSourceSidebarWordmarkAndNewTaskGeometry"
+          ],
+          "remaining": "These focused cases pass and1470x922CPU popup is inspected. Actual native folder dialog, workspace logo lookup, project mark customization, sidebar sticky headers and matched pixels remain open.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
         }
       ],
       "additional_evidence": [

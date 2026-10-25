@@ -12,6 +12,9 @@ import (
 )
 
 type nativeSettingsState struct {
+	selectMenu                         settingsSelectState
+	worktreeInputsLoaded               bool
+	worktreeDirectory, worktreeScript  string
 	dependencies                       []native.Dependency
 	installation                       native.PiInstallation
 	temp                               native.TempFiles
@@ -162,22 +165,90 @@ func (a *App) privacyNative(c *ui.Context) {
 		s.privacyLoaded = true
 		a.loadPrivacy()
 	}
-	a.section(c, "Temporary files", func() {
-		a.setting(c, "Orbit temporary data", fmt.Sprintf("%d entries · %d bytes", len(s.temp.Entries), s.temp.TotalBytes()), func() {
-			if a.button(c, "Clean…", "icons/trash.svg", false).Clicked() {
-				a.cleanTemp(false)
+	a.sourceTempSection(c, false)
+	a.sourceTempSection(c, true)
+}
+func (a *App) sourceTempSection(c *ui.Context, ai bool) {
+	s := &a.nativeSettings
+	prefix := "settings.temporary_files"
+	dir := s.temp.Directory
+	entries := s.temp.Entries
+	bytes := s.temp.TotalBytes()
+	if dir == "" {
+		dir = native.TempDirectory()
+	}
+	if ai {
+		prefix = "settings.ai_scratch_files"
+		dir = native.TempRoot()
+		entries = s.temp.AIEntries
+		bytes = s.temp.AITotalBytes()
+	}
+	a.sourceSettingsSection(c, a.Tr(prefix), a.Tr(prefix+"_description"), func() {
+		a.sourceSettingsRow(c, a.Tr(prefix+"_location"), a.Tr(prefix+"_location_description"), dir, func() {
+			if a.sourceSettingsButton(c, a.Tr("settings.temporary_files_open")).Label(map[bool]string{false: "Open Orbit temporary folder", true: "Open AI scratch folder"}[ai]).Height(a.Theme.Px(32)).Clicked() {
+				a.Dispatch(Action{Kind: "RevealPath", Value: dir})
 			}
 		})
-		a.setting(c, "Pi AI scratch files", fmt.Sprintf("%d entries · %d bytes", len(s.temp.AIEntries), s.temp.AITotalBytes()), func() {
-			if a.button(c, "Clean…", "icons/trash.svg", false).Clicked() {
-				a.cleanTemp(true)
-			}
-		})
-		ui.Text(c, "Active process files and recently modified AI files are protected. Cleanup does not touch credentials, projects, or saved sessions.").TextColor(a.Theme.TextMuted)
-		if a.button(c, "Refresh", "icons/refresh.svg", false).Clicked() {
-			a.loadPrivacy()
+		a.sourceSettingsDivider(c)
+		if len(entries) == 0 {
+			a.sourceSettingsRow(c, a.Tr(prefix+"_empty"), "", "", nil)
+			return
 		}
+		for i, entry := range entries {
+			if i >= 20 {
+				break
+			}
+			if i > 0 {
+				a.sourceSettingsDivider(c)
+			}
+			kind := a.Tr("settings.temporary_files_kind_file")
+			if entry.IsDir {
+				kind = a.Tr("settings.temporary_files_kind_folder")
+			}
+			meta := kind + " · " + sourceTempSize(entry.Bytes) + " · " + sourceTempAge(entry.Modified, time.Now())
+			if entry.Active {
+				meta += " · " + a.Tr("settings.temporary_files_in_use")
+			}
+			a.sourceSettingsRow(c, entry.Name, "", meta, nil)
+		}
+		if len(entries) > 20 {
+			a.sourceSettingsDivider(c)
+			a.sourceSettingsRow(c, strings.ReplaceAll(a.Tr("settings.temporary_files_more"), "%{count}", fmt.Sprint(len(entries)-20)), "", "", nil)
+		}
+		a.sourceSettingsDivider(c)
+		summary := strings.NewReplacer("%{count}", fmt.Sprint(len(entries)), "%{size}", sourceTempSize(bytes)).Replace(a.Tr("settings.temporary_files_summary"))
+		a.sourceSettingsRow(c, a.Tr(prefix+"_clean"), a.Tr(prefix+"_clean_description"), summary, func() {
+			if a.sourceSettingsButton(c, a.Tr(prefix+"_clean")).Label(map[bool]string{false: "Clean Orbit temporary files", true: "Clean AI scratch files"}[ai]).Height(a.Theme.Px(32)).Clicked() {
+				a.cleanTemp(ai)
+			}
+		})
 	})
+}
+func sourceTempSize(bytes uint64) string {
+	if bytes < 1024 {
+		return fmt.Sprintf("%d B", bytes)
+	}
+	if bytes < 1024*1024 {
+		return fmt.Sprintf("%.1f KB", float64(bytes)/1024)
+	}
+	return fmt.Sprintf("%.1f MB", float64(bytes)/(1024*1024))
+}
+func sourceTempAge(at, now time.Time) string {
+	seconds := int64(now.Sub(at).Seconds())
+	switch {
+	case seconds < 60:
+		return "now"
+	case seconds < 3600:
+		return fmt.Sprintf("%dm", seconds/60)
+	case seconds < 86400:
+		return fmt.Sprintf("%dh", seconds/3600)
+	case seconds < 2592000:
+		return fmt.Sprintf("%dd", seconds/86400)
+	case seconds < 31536000:
+		return fmt.Sprintf("%dmo", seconds/2592000)
+	default:
+		return fmt.Sprintf("%dy", seconds/31536000)
+	}
 }
 func (a *App) cleanTemp(ai bool) {
 	snapshot := a.nativeSettings.temp

@@ -1,0 +1,30 @@
+{
+  "W28": [
+    [
+      "TestGitHubSourceDefaultBase",
+      "Eight fixtures match unchanged Rust default_base, including main/master precedence, skip-current local fallback and empty fallback."
+    ],
+    [
+      "TestGitHubBaseFilterMatchesRustUnicodeAndStableSort",
+      "Local refs use trimmed full Unicode lowercase substring filtering and stable lowercase sort, including Greek final sigma and dotted capital I."
+    ],
+    [
+      "TestGitHubNativeBasePickerFiltersLocalBranchesWithoutImplicitSelection",
+      "Native anchored search excludes tags/remotes, focuses the query, sorts rows and selects only on pointer click; arrow/Enter do not mutate or submit."
+    ],
+    [
+      "TestGitHubBasePickerEmptyDismissRepeatAndErrorDoNotMutateDraft",
+      "Native 320px above-chip panel, no-match Enter, retained draft during injected loading/error, outside dismissal and 200ms reopening guard; Escape containment is tested but source GPUI dispatch remains unverified."
+    ],
+    [
+      "TestGitHubNativeSelectedBaseSurvivesCreateFailureAndExactArgvRetry",
+      "Pointer-selected Unicode base and draft flag survive actual fake-gh create failure; exact base/title/body/draft argv are repeated only on explicit retry."
+    ]
+  ],
+  "W24": [
+    [
+      "TestGitHubWorkspaceChangeRetainsSourceDraftsAndLabelCache",
+      "Changing real temporary repositories closes forms/clears templates but retains independent Issue/PR input drafts, PR draft flag and in-memory label cache; restart starts empty and no creation occurs."
+    ]
+  ]
+}

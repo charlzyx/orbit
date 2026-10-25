@@ -65,7 +65,7 @@ Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 **Executed narrow assertions:**
 - None assigned to this scope yet. Last verified SHA: none.
 
-**Owner challenge UI-C05 [PARTIAL]:** Keyboard picker works. Source favorites-only/provider filter/detail catalog page remains incomplete; existing simple model list is not full P08. [Scoped steps/tests](../native-ui-acceptance.json).
+**Owner challenge UI-C05 [PARTIAL]:** Source modelui catalog, filters/favorites, grouped model/thinking popovers and Agent/title searchable defaults are now mounted. Authoritative raw model capabilities retained. Configured update --models action serializes, cancels, restarts and resumes saved session with an explicit zero-inference RPC fixture. CPU captures inspected; exact native pixels and OS interaction remain unverified. [Scoped steps/tests](../native-ui-acceptance.json).
 
 **Remaining:** Native code exists; this row is not validated end to end.
 **Visual/OS gates:** No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state. This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.

@@ -1,0 +1,33 @@
+{
+  "scope": "display-free native text-engine specimen; no native app window or native capture",
+  "baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "mygo": "9c69cf829ece196c5b3a3601f1c7bbe70526376f",
+  "pristine_input_tree_sha256": {
+    "mygo": "96dae6d68d612b648267f72fdf90f2211698612d29f3c89ca923a314c23af110",
+    "gpui": "e19dd725f79a9e348c07388f12bae1f2c38e85660012a0e29c2d7a96e0bdcb51"
+  },
+  "checks": {
+    "python_unit_tests": 11,
+    "go_specimen_trace_on_race": "passed",
+    "go_specimen_trace_off_race": "passed",
+    "rust_diagnostic_compile_and_specimen": "passed",
+    "go_trace_invariance": true,
+    "rust_trace_invariance": true,
+    "mygo_ui_selection_regressions_race": "passed",
+    "mygo_internal_text_ui_vet": "passed",
+    "frozen_rust_source_assets_lockfile_diff": "zero"
+  },
+  "artifacts": {
+    "rust-enabled.json": "acc923699b31469290282b4970c9ad8c76f968025dbdf9a2908e8d881f02309e",
+    "go-enabled.json": "c4fd4e0aa650873aa03c9a189d401f6a845f366e88467bc19bfaf82a5a231953"
+  },
+  "trace_files": {
+    "go-trace/mygo-173-000001.json": "3ecde48e04250d7eb6812a73263f1c8ed4f4d2c64defb40147cd290fe8d52a2b",
+    "rust-trace/gpui-6-000001.json": "7b530f944f7afc777b8bda4a0cf221a58e6c461a70bd21284b92b1802fb9b60d"
+  },
+  "native_paint_capture": "not run; hosted coordinator only",
+  "toolchains": {
+    "go": "go1.27.3 linux/amd64",
+    "rustc": "1.94.0 (4a4ef493e 2026-03-02)"
+  }
+}

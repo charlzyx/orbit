@@ -2,7 +2,7 @@
 
 Baseline: [`299a32bc87fe3d4851bdb902d9c03dcf9bf99cac`](https://github.com/imrj05/orbit/tree/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac). Native Go + MyGo target; cloud-only fixtures.
 
-**139 feature scopes · 362 row-specific procedures · 611 explicitly unexpanded draft gates · 56 narrow assertions passed · 0 full feature passes.**
+**139 feature scopes · 362 row-specific procedures · 611 explicitly unexpanded draft gates · 62 narrow assertions passed · 0 full feature passes.**
 
 This is an initial checklist to expand and execute, not a completion report. Gates marked DRAFT_NEEDS_SOURCE_EXPANSION still need exact source-specific faults, files, timing and chords; they are not finished behavioral specifications. Every scope links pinned Rust handlers, row-specific behavior/edge actions, Go mapping and evidence. Functional, visual and native-OS verdicts are separate.
 
@@ -34,6 +34,7 @@ Visual procedure for each row: capture pinned Rust and Go at identical OS, scale
 
 ## First independently challenged cases
 
+- W24/W28: the PR base picker was absent, five default-base edge decisions differed, and workspace changes erased source-retained drafts. Six further Go regressions plus three unchanged-source Rust oracle tests pass after correction. [Bounded picker/state acceptance](github-base-picker-acceptance.md).
 - W21/W24/W25/W28: native cancel/create failure lost drafts and optional labels blocked successful GitHub lists; six named fake-gh/local-repository assertions now pass after bounded fixes. [Source procedures, failures and remaining gaps](github-acceptance.md).
 - W31/W32: Last Turn incorrectly targeted a new unfinished prompt and lost the prior diff. Separate completed state, pinned historical identity and safe recovery now pass20 narrow assertions; five original Rust checkpoint tests also pass. [Failure, correction and remaining cases](checkpoint-acceptance.md).
 - W34: fixed and regression-tested reversed numstat/file identity, suppressed raw diff metadata, synthetic unpositioned hunks, escaped paths and asymmetric compact gaps. 1,204 lexical oracle cases plus separate old/new carry and paint-only spans pass; W34 as a whole remains PARTIAL.
@@ -45,6 +46,7 @@ Visual procedure for each row: capture pinned Rust and Go at identical OS, scale
 
 ## Additional owner evidence, separately scoped
 
+- [GitHub base picker and retained workspace state](github-base-picker-acceptance.md), [exact latest scoped evidence](acceptance/github-state-evidence.json), and [standalone source oracle](acceptance/run-github-state-oracle.py).
 - [GitHub native failure-path source acceptance](github-acceptance.md) and [exact dirty-source evidence](acceptance/github-evidence.json).
 - [Settings/backend source checklist](settings-backend-implementation.md) and [exact source hashes](settings-backend-source-evidence.json).
 - [Native UI source challenges and corrected regressions](native-ui-acceptance.md).

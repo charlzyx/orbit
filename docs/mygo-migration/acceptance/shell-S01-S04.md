@@ -31,7 +31,7 @@ Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 **Executed narrow assertions:**
 - None assigned to this scope yet. Last verified SHA: none.
 
-**Owner challenge UI-S01 [PARTIAL]:** Source minimum/restore bounds and native traffic-light clearance pass. Native menus now auto-hide on Linux/Windows while retaining edit roles and shortcuts. Actual initial-maximize/Alt-F10/Dock lifetime on each OS remains separate acceptance. [Scoped steps/tests](../native-ui-acceptance.json).
+**Owner challenge UI-S01 [PARTIAL]:** Source minimum/restore bounds and native traffic-light clearance pass. Native menus now auto-hide on Linux/Windows while retaining edit roles and shortcuts. Actual initial-maximize/Alt-F10/Dock lifetime on each OS remains separate acceptance. Linux window buttons are now hidden like pinned source; initial composer focus and conditional Open-in controls are native-CPU tested. Actual recapture pending. [Scoped steps/tests](../native-ui-acceptance.json).
 
 **Remaining:** Native code exists; this row is not validated end to end.
 **Visual/OS gates:** No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state. This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.

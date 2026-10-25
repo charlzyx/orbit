@@ -296,9 +296,14 @@
           ],
           "expected": "Actual catalog/capabilities; no unsupported thinking choice; favorites/recent persistence and source model cards.",
           "tests": [
-            "TestFilteredPickersResetAndClampKeyboardSelection"
+            "TestFilteredPickersResetAndClampKeyboardSelection",
+            "TestModelsMountKeepsAuthoritativeCatalogAndSettingsControls",
+            "TestModelRefreshHostSerializesAndShowsFailureWithoutRestart",
+            "TestModelRefreshHostSuccessRestartsAndResumesSavedSession",
+            "TestModelPickerOpenQueriesOnceAndUsesSourceAnchor",
+            "TestAutomaticTitlePreferencesDoNotRestartRuntime"
           ],
-          "remaining": "Keyboard picker works. Source favorites-only/provider filter/detail catalog page remains incomplete; existing simple model list is not full P08.",
+          "remaining": "Source modelui catalog, filters/favorites, grouped model/thinking popovers and Agent/title searchable defaults are now mounted. Authoritative raw model capabilities retained. Configured update --models action serializes, cancels, restarts and resumes saved session with an explicit zero-inference RPC fixture. CPU captures inspected; exact native pixels and OS interaction remain unverified.",
           "evidence": "../native-ui-acceptance.json",
           "last_verified_sha": null,
           "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."

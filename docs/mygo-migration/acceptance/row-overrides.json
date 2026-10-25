@@ -1,8 +1,8 @@
 {
   "S01": {
     "behavior": [
-      "Launch against displays 1280×800 and 1920×1080 and a no-display-metadata fixture; inspect initial window options, then unmaximize.",
-      "Initially maximized and focused, minimum960×640. Restore bounds are min(displayWidth×0.85,1440) by min(displayHeight×0.9,920), centered; no-display fallback1240×840. Composer is focused and app id is dev.orbit.pi."
+      "Launch against displays 1280\u00d7800 and 1920\u00d71080 and a no-display-metadata fixture; inspect initial window options, then unmaximize.",
+      "Initially maximized and focused, minimum960\u00d7640. Restore bounds are min(displayWidth\u00d70.85,1440) by min(displayHeight\u00d70.9,920), centered; no-display fallback1240\u00d7840. Composer is focused and app id is dev.orbit.pi."
     ],
     "error": [
       "Inject failure from the native open_window adapter, then retry opening without creating another app controller.",
@@ -40,7 +40,7 @@
     ],
     "persistence": [
       "Persist sidebar_width248, sidepane_width460, explorer_width300, terminal_height260 in ~/.orbit-pi/layout.json; relaunch. Repeat with missing, text,10,99999 and nonfinite parsed fields.",
-      "Only those four sizes belong to this store. Numeric finite values in inclusive80…4000 survive parsing before panel-specific clamps; invalid fields become absent/default independently. Malformed file defaults all fields. Open panels, fonts and theme are not restored by this file."
+      "Only those four sizes belong to this store. Numeric finite values in inclusive80\u20264000 survive parsing before panel-specific clamps; invalid fields become absent/default independently. Malformed file defaults all fields. Open panels, fonts and theme are not restored by this file."
     ],
     "keyboard": [
       "After resizing use Cmd+B/Ctrl+B, Cmd+Shift+E/Ctrl+Shift+E and Cmd+J/Ctrl+J to toggle Sidebar, Explorer and Terminal; reopen each.",
@@ -232,7 +232,7 @@
   "W31": {
     "behavior": [
       "Create baseline HEAD plus one committed branch change, one staged file, one unstaged edit and one untracked file. Choose each of the six sources and compare both endpoints and exact changed paths.",
-      "Uncommitted=HEAD→worktree, Unstaged=index→worktree including untracked files, Staged=HEAD→index, Committed=main/master merge-base→HEAD, Branch=base→worktree. Last Turn uses immutable completed refs, not current live worktree or current prompt ordinal."
+      "Uncommitted=HEAD\u2192worktree, Unstaged=index\u2192worktree including untracked files, Staged=HEAD\u2192index, Committed=main/master merge-base\u2192HEAD, Branch=base\u2192worktree. Last Turn uses immutable completed refs, not current live worktree or current prompt ordinal."
     ],
     "edge": [
       "Complete turn1, select Last Turn, start turn2 but withhold its end checkpoint. Refresh three times, then complete turn2. Open the explicit turn1 card afterward.",
@@ -317,6 +317,110 @@
     "repeat": [
       "Perform three turns with a branch switch between1/2 and during2, editing one distinct file each time. Compare exact per-turn paths after turn3.",
       "Each turn compares its own start to its own end. A branch switch between turns is outside both turns; existing target changes are excluded; each new agent change appears once in its own completed turn."
+    ]
+  },
+  "W21": {
+    "behavior": [
+      "Open Issues in an authenticated fake-gh repository; return two issues with labels/comments; change state, label and query and refresh.",
+      "gh issue list uses source default limit50 and the current filters. Repository labels are requested with limit100 only while the in-memory cache is empty; there is no GitHub Load more pagination."
+    ],
+    "error": [
+      "Return a valid issue list but fail label list, then retry refresh; separately fail issue list with the same valid cached labels.",
+      "Optional labels failure does not reject the list. A primary list failure sets the issue error; previously loaded data is not falsely replaced by successful empty data."
+    ],
+    "loading": [
+      "Hold issue-list completion, inspect issues_loading, then release; hold the best-effort labels lookup independently.",
+      "Source sets loading immediately and clears it after completion; the issue list and nonempty label cache are adopted only by the matching completion path. Source itself does not implement a generation guard in spawn_data, so do not invent a source last-response ordering guarantee."
+    ],
+    "persistence": [
+      "Load labels, visit History and Pulls, return to Issues, change to a second temporary repository, refresh, then fully restart the application.",
+      "Within one GitPanel, nonempty issue_labels remains cached even across workspace changes. Lists/templates reset but label cache and creation inputs remain in memory. A new panel/process starts empty; no labels file is persisted."
+    ],
+    "keyboard": [
+      "Invoke the registered secondary-alt-5 GitTabIssues action while Git is visible, then open and dismiss the label picker.",
+      "Select Issues through the shared command registry. No invented issue-list Load more or dedicated create-issue shortcut. Exact pointer/focus behavior remains a native acceptance gate."
+    ],
+    "repeat": [
+      "Refresh Issues three times, navigating History\u2192Pulls\u2192Issues between loads; count fake label-list requests and preserve one returned issue.",
+      "One label fetch after first successful nonempty cache within the same repository; primary issues fetch still runs on refresh. A failed empty labels lookup may be retried later."
+    ]
+  },
+  "W25": {
+    "behavior": [
+      "Open Pulls with fake-gh data containing open/draft/merged metadata; change the source state/query filter and refresh.",
+      "gh pr list returns current filtered PRs with default limit50. This tab does not depend on issue label lookup and has no Load more pagination."
+    ],
+    "error": [
+      "Fail fake label list while PR list succeeds; separately fail PR list with a valid prior result.",
+      "The first case succeeds without even requesting labels. Primary PR failure sets pulls_error and does not fabricate a successful empty list."
+    ],
+    "loading": [
+      "Pause gh pr list after dispatch; inspect the active tab, then release success and repeat with failure.",
+      "pulls_loading is set before background work and cleared on completion. Exact source spinner/empty/error rendering is a separate visual gate."
+    ],
+    "persistence": [
+      "Set a PR filter, close/reopen the Git page in the same instance, then reconstruct GitPanel and switch repository context.",
+      "Filters live in memory; set_context resets pr_filter when workspace changes. No PR filter persistence file is invented."
+    ],
+    "keyboard": [
+      "Invoke registered secondary-alt-6 GitTabPulls; return with another Git tab action.",
+      "Shared command selects Pulls. Source has no dedicated pagination shortcut; platform chord labels and focus require actual host verification."
+    ],
+    "repeat": [
+      "Alternate Issues and Pulls three times while label lookup always fails and each list returns a valid item.",
+      "Both primary lists remain independently loadable. PR refresh does not issue a label request; label failure never replaces PR results with a global error."
+    ]
+  },
+  "W24": {
+    "behavior": [
+      "Open New Issue, enter title/body/notes, cancel, visit New PR/comment, and reopen Issue; then create with a whitespace-padded title.",
+      "Independent Issue text survives cancel/navigation. Title is trimmed for gh create. Only successful creation closes and clears title/body/notes and optionally opens the parsed created issue number."
+    ],
+    "error": [
+      "Fail gh issue create while the form is open; retry once after correcting the failure. Separately succeed create but fail the subsequent detail lookup.",
+      "Failed create keeps form/draft. Successful create plus failed detail still clears/closes and records the successful write; no generic retry may duplicate that mutation. Source refreshes its issue list after create completion; full fan-out remains unverified."
+    ],
+    "loading": [
+      "Delay creation and click native Create repeatedly; preserve the draft and inspect the form until response.",
+      "issue_busy is true; source submit control prevents duplicate user dispatch. Form remains open while pending and on failure; it closes only after success."
+    ],
+    "persistence": [
+      "Cancel/reopen each creation form, visit an unrelated comment form, change workspace, then fully restart. Apply a lone new-repository template separately.",
+      "Independent Issue/PR title/body/notes survive cancellation and workspace changes in the same panel; workspace changes close forms and clear templates. Reopening applies the source lone-template/Blank rule. A new panel has empty drafts."
+    ],
+    "keyboard": [
+      "Edit multiline body, use the registered Git close/Escape routing, then reopen New Issue by its button.",
+      "Closing the transient form does not clear its text. The source command registry has no dedicated GitHub create shortcut; do not invent Ctrl+Enter creation from the unrelated commit binding."
+    ],
+    "repeat": [
+      "With exactly one issue template, edit title/body/notes and reopen; select Blank with a known PR skeleton, then unrelated prose.",
+      "Reopen reapplies the sole template body but keeps nonempty title and notes. Blank clears any known Issue/PR skeleton and preserves unrelated user prose."
+    ]
+  },
+  "W28": {
+    "behavior": [
+      "Open New PR with main/master, only-current, no-refs and alternate-local-branch fixtures; open its anchored base chip, type a trimmed mixed-case query, choose a local row, enable Draft and submit through fake gh.",
+      "main wins, then master; otherwise the first local branch not equal to current wins, or main if none. The 320px above-chip picker shows local refs only in stable lowercase order. Pointer selection changes base, closes picker, and sends the selected --base plus --draft only after Create."
+    ],
+    "error": [
+      "Fail gh pr create while preserving the open form, correct the fake failure, then retry.",
+      "Failure does not close or clear the form. Successful retry clears/closes once; no second request is dispatched by repeated busy clicks."
+    ],
+    "loading": [
+      "Hold PR creation, attempt duplicate native Create and inspect draft/form before releasing.",
+      "Source pr_busy keeps form visible and disables duplicate submit. Full modal-vs-inline visual difference remains unresolved in Go."
+    ],
+    "persistence": [
+      "Cancel/reopen New PR in the same instance; reconstruct panel after full app restart.",
+      "Draft prose is in memory, not persisted in a new config file. On reopen, source chooses default base anew while existing draft toggle remains its stored field."
+    ],
+    "keyboard": [
+      "Focus the branch filter and type Unicode text; send Up, Down and Enter, including zero results, without clicking a branch. Separately inspect Escape dispatch on the original GPUI host.",
+      "GitPanel has no PickerConfirm/Prev/Next listener despite the Picker key context, so these actions must not select a branch or create a PR. Native Go containment is tested; original GPUI Escape propagation remains an explicit open gate, not assumed from MyGo PopoverBase."
+    ],
+    "repeat": [
+      "Run cancel/reopen, failed create/retry and Issue\u2194PR navigation three times, using different text for each form.",
+      "No cross-form draft replacement or duplicate creation. Template-on-open behavior remains source-specific rather than indiscriminate draft erasure."
     ]
   }
 }

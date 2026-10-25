@@ -7,6 +7,7 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"sync/atomic"
 	"testing"
@@ -187,7 +188,7 @@ func TestNativeUsageComponentCaptures(t *testing.T) {
 	if err := os.MkdirAll(out, 0755); err != nil {
 		t.Fatal(err)
 	}
-	for _, state := range []string{"trend-tokens", "trend-cost", "trend-latency", "trend-keyboard-focus", "health-wide", "health-narrow", "health-unavailable", "sessions-columns", "filters-models", "filters-models-search", "loading", "refresh-error"} {
+	for _, state := range []string{"trend-tokens", "trend-cost", "trend-latency", "trend-keyboard-focus", "health-wide", "health-narrow", "health-unavailable", "sessions-columns", "filters-models", "filters-models-search", "loading", "refresh-error", "range-presets", "range-start", "range-complete", "filters-no-matches", "trend-latency-p95", "sessions-context", "export-menu", "page-size"} {
 		t.Run(state, func(t *testing.T) {
 			a := fixtureUsageApp(t)
 			width, height := 1100, 700
@@ -199,10 +200,14 @@ func TestNativeUsageComponentCaptures(t *testing.T) {
 						a.usageChart(c)
 					case strings.HasPrefix(state, "health-"):
 						a.usageHealthDetails(c)
-					case state == "sessions-columns":
+					case state == "sessions-columns" || state == "sessions-context" || state == "page-size":
 						a.usageTable(c, "sessions")
+					case state == "export-menu":
+						a.usageExportControl(c)
 					case strings.HasPrefix(state, "filters-"):
 						a.usageDimensionFilter(c, "models")
+					case strings.HasPrefix(state, "range-"):
+						a.usageRangeControl(c)
 					case state == "loading":
 						a.usageSkeleton(c)
 					case state == "refresh-error":
@@ -215,6 +220,23 @@ func TestNativeUsageComponentCaptures(t *testing.T) {
 				a.usageState.metric = "cost"
 			case "trend-latency":
 				a.usageState.metric = "latency"
+			case "trend-latency-p95":
+				a.usageState.metric = "latency"
+				a.usageState.latencyMetric = "p95"
+				base := append([]workbench.UsageRecord(nil), a.usageState.index.Records...)
+				a.usageState.index.Records = nil
+				for _, record := range base {
+					for sample := 1; sample <= 20; sample++ {
+						r := record
+						r.At = r.At.Add(time.Duration(sample) * time.Millisecond)
+						r.Duration = time.Duration(sample) * time.Second
+						r.HasDuration = true
+						a.usageState.index.Records = append(a.usageState.index.Records, r)
+					}
+				}
+				a.usageState.projection = buildUsageProjection(a.usageState.index, a.usageState.filter, "day", time.UTC)
+			case "range-presets", "range-start", "range-complete":
+				width, height = 600, 922
 			case "health-narrow":
 				width, height = 650, 920
 			case "health-unavailable":
@@ -241,22 +263,51 @@ func TestNativeUsageComponentCaptures(t *testing.T) {
 				tt.Click("Usage trend")
 				tt.Key(0, ui.KeyHome)
 				tt.Key(0, ui.KeyEnter)
+			case "sessions-context":
+				if err := tt.RightClick("Fixture task fixture-1"); err != nil {
+					t.Fatal(err)
+				}
+				if !tt.HasText("Copy session ID") || tt.Menu() != nil {
+					t.Fatal("painted context unavailable")
+				}
+			case "export-menu":
+				tt.Click("Export")
+			case "page-size":
+				tt.Click("Rows per page sessions")
 			case "sessions-columns":
 				tt.Click("Columns")
-				if len(tt.Menu()) == 0 {
-					t.Fatal("columns menu did not open")
+				if !a.usageState.menu("columns:sessions").Open || !tt.HasText("Show all") {
+					t.Fatal("painted source columns panel did not open")
 				}
-				b, _ := json.MarshalIndent(map[string]any{"note": "CPU Tester does not paint OS-native menus", "native_menu": tt.Menu()}, "", "  ")
+				bounds, ok := tt.Find("Usage columns:sessions menu")
+				if !ok || bounds.W < 100 || bounds.H < 200 {
+					t.Fatal("column popup lacks painted geometry")
+				}
+				b, _ := json.MarshalIndent(map[string]any{"note": "Current source columns popup is painted by MyGo; supersedes prior OS-menu metadata-only capture", "panel_bounds": bounds}, "", "  ")
 				if err := os.WriteFile(filepath.Join(out, "usage-sessions-columns-native-menu.json"), b, 0644); err != nil {
 					t.Fatal(err)
 				}
-			case "filters-models", "filters-models-search":
+			case "filters-models", "filters-models-search", "filters-no-matches":
 				tt.Click("All models")
+				if state == "filters-no-matches" {
+					tt.Type("zz-no-match")
+				}
 				if state == "filters-models-search" {
 					tt.Type("fixture-large")
 					if a.usageState.filterViews["models"].Search != "fixture-large" {
 						t.Fatal("filter search did not own focus")
 					}
+				}
+			case "range-presets", "range-start", "range-complete":
+				tt.Click("All time")
+				if state != "range-presets" {
+					tt.Click("Custom…")
+					tt.Click("Choose date 2026-10-18")
+				}
+				if state == "range-complete" {
+					tt.Click("Choose date 2026-10-20")
+					tt.Click("Oct 18 – Oct 20, 2026")
+					tt.Click("Custom…")
 				}
 			}
 			f, err := os.Create(filepath.Join(out, "usage-"+state+"-fixture-dark.png"))
@@ -393,5 +444,242 @@ func TestUsageNativeLatencySegmentsAndUnavailableReason(t *testing.T) {
 	summary.PricedRequests, summary.TimedRequests = 1, 1
 	if got := a.usageUnavailableReason(summary); got != "" {
 		t.Fatalf("partial pricing invented warning: %s", got)
+	}
+}
+
+func TestUsageNativeRangePopoverCalendarSourceFlow(t *testing.T) {
+	a := fixtureUsageApp(t)
+	s := &a.usageState
+	tt := ui.NewTester(func(c *ui.Context) { ui.Column(c).Fill().Padding(20).Children(func() { a.usageRangeControl(c) }) }, 600, 922)
+	tt.Frame()
+	if err := tt.Click("All time"); err != nil {
+		t.Fatal(err)
+	}
+	if err := tt.Click("Custom…"); err != nil {
+		t.Fatal(err)
+	}
+	if !s.rangeOpen || !s.customOpen || s.customMonth.Year() != 2026 || s.customMonth.Month() != 10 {
+		t.Fatal("custom calendar did not seed from actual all-time data")
+	}
+	if tt.HasText("Apply date range") || tt.HasText("Start date (YYYY-MM-DD)") {
+		t.Fatal("invented modal controls")
+	}
+	if !tt.HasText("Today") || !tt.HasText("Last 7 days") {
+		t.Fatal("preset rows disappeared when calendar expanded")
+	}
+	if _, ok := tt.Find("Choose date 2026-09-30"); ok {
+		t.Fatal("out-of-month day is an interactive date instead of padding")
+	}
+	before := s.filter
+	tt.Click("Choose date 2026-10-20")
+	if !s.customPicking || !tt.HasText("Pick the end date") || !s.filter.Start.Equal(before.Start) {
+		t.Fatal("first click applied instead of staging")
+	}
+	tt.Key(0, ui.KeyEnter)
+	if s.rangeOpen || s.customOpen || !s.filter.Start.Equal(before.Start) {
+		t.Fatalf("Enter should dismiss staged calendar without changing range: open=%v custom=%v start=%v before=%v", s.rangeOpen, s.customOpen, s.filter.Start, before.Start)
+	}
+	tt.Click("All time")
+	tt.Click("Custom…")
+	tt.Click("Choose date 2026-10-20")
+	tt.Click("Choose date 2026-10-18")
+	if s.rangeOpen || s.customOpen || s.filterMenu != "" || s.customStart != "2026-10-18" || s.customEnd != "2026-10-20" {
+		t.Fatal("second click did not normalize/apply/close")
+	}
+	if s.filter.End.Format("2006-01-02") != "2026-10-21" {
+		t.Fatal("inclusive end not converted to exclusive next civil day")
+	}
+	tt.Click("Oct 18 – Oct 20, 2026")
+	tt.Click("Custom…")
+	if !s.customOpen || s.customPicking || !tt.HasText("Oct 18 – Oct 20, 2026") {
+		t.Fatal("completed range did not reopen as selected range")
+	}
+	tt.Click("Calendar previous month")
+	if s.customMonth.Month() != 9 {
+		t.Fatal("previous month did not advance calendar")
+	}
+	tt.Click("Calendar next month")
+	if s.customMonth.Month() != 10 {
+		t.Fatal("next month did not return")
+	}
+	tt.Key(0, ui.KeyEscape)
+	if a.modalOpen() {
+		t.Fatal("calendar left modal guard set")
+	}
+}
+
+func TestUsageSourceSummaryAndCacheActionsAreExclusive(t *testing.T) {
+	a := fixtureUsageApp(t)
+	s := &a.usageState
+	s.index.Records[0].Outcome = "error"
+	s.index.Records[0].Error = "Fixture provider failure"
+	s.projection = buildUsageProjection(s.index, s.filter, "day", time.UTC)
+	tt := ui.NewTester(func(c *ui.Context) { ui.Column(c).Fill().Children(func() { a.usageSummary(c) }) }, 1100, 500)
+	tt.Frame()
+	if err := tt.Click(a.text("usage.view_failures", "View failures")); err != nil {
+		t.Fatal(err)
+	}
+	if !s.filter.ErrorsOnly || s.filter.CachedOnly {
+		t.Fatal("failed action did not set exclusive source filter")
+	}
+	tt = ui.NewTester(func(c *ui.Context) { ui.Column(c).Fill().Children(func() { a.usageHealthDetails(c) }) }, 1100, 700)
+	tt.Frame()
+	if err := tt.Click(a.text("usage.show_cached_only", "Show cached only")); err != nil {
+		t.Fatal(err)
+	}
+	if !s.filter.CachedOnly || s.filter.ErrorsOnly {
+		t.Fatal("cache action did not clear failure filter")
+	}
+	if err := tt.Click(a.text("usage.show_all_requests", "Show all requests")); err != nil {
+		t.Fatal(err)
+	}
+	if s.filter.CachedOnly || s.filter.ErrorsOnly {
+		t.Fatal("cache toggle did not restore all requests")
+	}
+}
+
+func TestUsageSourceEmptyUnreadableFilteredStatesAndHeader(t *testing.T) {
+	a := fixtureUsageApp(t)
+	s := &a.usageState
+	for _, tc := range []struct {
+		name   string
+		index  workbench.UsageIndex
+		filter workbench.UsageFilter
+		want   string
+	}{
+		{"empty", workbench.UsageIndex{}, s.filter, "empty"},
+		{"unreadable", workbench.UsageIndex{UnreadableFiles: 2}, s.filter, "unreadable"},
+		{"warning-not-unreadable", workbench.UsageIndex{Warnings: []string{"enumeration warning"}}, s.filter, "empty"},
+		{"errors-alone", workbench.UsageIndex{Errors: s.index.Errors}, s.filter, "empty"},
+		{"scope", s.index, workbench.UsageFilter{Start: s.filter.Start, End: s.filter.End, Provider: "missing"}, "filtered"},
+		{"outside-range", s.index, workbench.UsageFilter{Start: s.fixtureNow.AddDate(1, 0, 0), End: s.fixtureNow.AddDate(1, 0, 1)}, "empty"},
+	} {
+		p := buildUsageProjection(tc.index, tc.filter, "day", time.UTC)
+		if got := usageEmptyState(tc.index, p); got != tc.want {
+			t.Fatalf("%s: %s != %s", tc.name, got, tc.want)
+		}
+	}
+	for _, tc := range []struct {
+		age  time.Duration
+		want string
+	}{{0, "just now"}, {44 * time.Second, "just now"}, {45 * time.Second, "0m ago"}, {90 * time.Minute, "1h ago"}, {49 * time.Hour, "2d ago"}} {
+		if got := a.usageAge(tc.age); got != tc.want {
+			t.Fatalf("age %v: %s", tc.age, got)
+		}
+	}
+	s.index = workbench.UsageIndex{UnreadableFiles: 2}
+	s.projection = buildUsageProjection(s.index, s.filter, "day", time.UTC)
+	tt := ui.NewTester(a.View, 1470, 922)
+	tt.Frame()
+	if !tt.HasText("Unable to read usage data") || tt.HasText("Try again") {
+		t.Fatal("all-unreadable branch mixed with retry state")
+	}
+	tt.Click("Export")
+	if len(tt.Menu()) > 0 {
+		t.Fatal("empty data export enabled")
+	}
+	s.index = workbench.UsageIndex{}
+	s.projection = buildUsageProjection(s.index, s.filter, "day", time.UTC)
+	tt.Frame()
+	if !tt.HasText("No usage data yet") {
+		t.Fatal("empty store message missing")
+	}
+	s.loaded = false
+	s.err = "Explicit fixture: could not scan"
+	tt.Frame()
+	if !tt.HasText("Unable to load usage data") {
+		t.Fatal("first error missing")
+	}
+	if _, ok := tt.Find("Try again"); !ok {
+		t.Fatal("first error retry missing")
+	}
+}
+
+func TestUsageStaticSourceRowsHaveNoInventedActions(t *testing.T) {
+	for _, kind := range []string{"daily", "failures", "breakdown:tools"} {
+		t.Run(kind, func(t *testing.T) {
+			a := fixtureUsageApp(t)
+			s := &a.usageState
+			tt := ui.NewTester(func(c *ui.Context) { ui.Column(c).Fill().Padding(12).Children(func() { a.usageTable(c, kind) }) }, 1100, 700)
+			tt.Frame()
+			if s.table(kind).List.Selected != nil || s.table(kind).List.CellMenu != nil {
+				t.Fatal("static source rows gained selection/context menu")
+			}
+			tt.Click("Usage " + kind + " table")
+			tt.Key(0, ui.KeyEnd)
+			tt.Key(0, ui.KeyEnter)
+			if s.detailError != nil || s.detailSession != nil || !s.filter.FocusStart.IsZero() {
+				t.Fatal("static row created details or focus")
+			}
+		})
+	}
+}
+
+func TestUsagePaintedTableAndExportPopovers(t *testing.T) {
+	a := fixtureUsageApp(t)
+	s := &a.usageState
+	tt := ui.NewTester(func(c *ui.Context) { ui.Column(c).Fill().Padding(20).Children(func() { a.usageTable(c, "sessions") }) }, 1100, 800)
+	tt.Frame()
+	tt.Click("Columns")
+	if !s.menu("columns:sessions").Open || len(tt.Menu()) > 0 {
+		t.Fatal("Columns should use painted popup, not OS menu")
+	}
+	if _, ok := tt.Find("Toggle sessions column title"); ok {
+		t.Fatal("fixed title included in column menu")
+	}
+	if _, ok := tt.Find("Toggle sessions column tools"); ok {
+		t.Fatal("unused source Tools enum included in menu")
+	}
+	if tt.HasText("Reset column widths") {
+		t.Fatal("invented reset-widths menu action")
+	}
+	tt.Click("Toggle sessions column workspace")
+	if !slices.Contains(s.table("sessions").Hidden, "workspace") || !s.menu("columns:sessions").Open {
+		t.Fatal("column toggle did not apply and stay open")
+	}
+	tt.Click("Show all")
+	if len(s.table("sessions").Hidden) > 0 || !s.menu("columns:sessions").Open {
+		t.Fatal("show all should restore and stay open")
+	}
+	tt.Key(0, ui.KeyEnter)
+	if a.modalOpen() {
+		t.Fatal("Enter did not dismiss table popover")
+	}
+	tt.Click("Rows per page sessions")
+	if !s.menu("page-size:sessions").Open {
+		t.Fatal("footer rows popup missing")
+	}
+	tt.Click("Rows per page 25")
+	if !s.menu("page-size:sessions").Open {
+		t.Fatal("choosing existing size should leave source menu open")
+	}
+	tt.Click("Rows per page 10")
+	if s.table("sessions").Size != 10 || s.table("sessions").Page != 1 || s.menu("page-size:sessions").Open {
+		t.Fatal("new page size did not apply/reset/close")
+	}
+	if s.table("daily").Size != 25 {
+		t.Fatal("page size leaked to independent table")
+	}
+	tt.Click("Columns")
+	tt.Key(0, ui.KeyEscape)
+	if a.modalOpen() {
+		t.Fatal("Escape left table menu guard set")
+	}
+	var actions []Action
+	a.Options.OnAction = func(x Action) { actions = append(actions, x) }
+	tt = ui.NewTester(func(c *ui.Context) { ui.Column(c).Fill().Padding(20).Children(func() { a.usageExportControl(c) }) }, 600, 400)
+	tt.Frame()
+	tt.Click("Export")
+	if !s.menu("export").Open || len(tt.Menu()) > 0 {
+		t.Fatal("export should be painted popup")
+	}
+	tt.Key(0, ui.KeyEnter)
+	if len(actions) != 0 || s.menu("export").Open {
+		t.Fatal("Enter exported instead of dismissing")
+	}
+	tt.Click("Export")
+	tt.Click(a.text("usage.export_csv", "Filtered requests (CSV)"))
+	if len(actions) != 1 || actions[0].Kind != "ExportUsage" || actions[0].Value != "csv" || s.menu("export").Open {
+		t.Fatal("CSV action/close mismatch", actions)
 	}
 }

@@ -1,0 +1,75 @@
+// Diagnostic-only Linux observer. Never linked by the stock reference build.
+use crate::{FontId, LineLayout, Pixels, Point, TextRun};
+use serde_json::{Value, json};
+use sha2::{Digest, Sha256};
+use std::os::unix::fs::OpenOptionsExt;
+use std::{collections::HashSet, fs, io::Write, path::PathBuf, sync::{Mutex, OnceLock, mpsc}};
+
+struct State { allow: HashSet<String>, seen: HashSet<String>, faces: HashSet<usize>, events: Vec<Value>, count: usize, dropped: usize, frame: u64, tx: mpsc::SyncSender<(u64,Vec<Value>,usize,String)> }
+static STATE: OnceLock<Option<Mutex<State>>> = OnceLock::new();
+fn state() -> Option<&'static Mutex<State>> {
+    STATE.get_or_init(|| {
+        let dir = PathBuf::from(std::env::var("ORBIT_FONT_TRACE_DIR").ok()?);
+        let case_id = std::env::var("ORBIT_FONT_TRACE_CASE").ok()?;
+        if case_id.is_empty() || case_id.len()>128 || !dir.is_dir() { return None; }
+        let path=std::env::var("ORBIT_FONT_TRACE_TEXTS").ok()?;
+        if fs::metadata(&path).ok()?.len()>65536 {return None;}
+        let raw = fs::read(path).ok()?;
+        let texts: Vec<String> = serde_json::from_slice(&raw).ok()?;
+        if texts.len()>64 {return None;}
+        let allow: HashSet<_> = texts.into_iter().filter(|s| !s.is_empty() && s.len()<=512).collect();
+        if allow.is_empty() {return None;}
+        let (tx,rx) = mpsc::sync_channel::<(u64,Vec<Value>,usize,String)>(8);
+        std::thread::Builder::new().name("orbit-font-trace".into()).spawn(move || {
+            for (frame,mut events,dropped,boundary) in rx {
+                for e in &mut events {
+                    if let Some(path) = e.get("font_file").and_then(Value::as_str).map(str::to_owned) {
+                        let bytes = fs::metadata(&path).ok().filter(|m|m.len()<=64<<20).and_then(|_|fs::read(&path).ok());
+                        match bytes { Some(bytes)=>e["font_file_sha256"]=json!(sum(&bytes)), None=>e["font_file_error"]=json!("unavailable or larger than 64 MiB") }
+                    }
+                }
+                let payload=json!({"schema":1,"renderer":"gpui-cosmic","diagnostic":true,"case_id":case_id,"completed_present_call":frame,"presentation_semantics":boundary,"events":events,"dropped_events":dropped});
+                let file=dir.join(format!("gpui-{}-{:06}.json",std::process::id(),frame));
+                let result=(||->std::io::Result<()> {let mut f=fs::OpenOptions::new().write(true).create_new(true).mode(0o600).open(&file)?; f.write_all(&serde_json::to_vec_pretty(&payload)?)?;f.write_all(b"\n")})();
+                if let Err(e)=result {eprintln!("orbit-font-trace: {e}");}
+            }
+        }).ok()?;
+        Some(Mutex::new(State{allow,seen:HashSet::new(),faces:HashSet::new(),events:Vec::new(),count:0,dropped:0,frame:0,tx}))
+    }).as_ref()
+}
+fn sum(bytes:&[u8])->String {format!("{:x}",Sha256::digest(bytes))}
+pub(crate) fn allowed(text:&str)->bool {state().and_then(|s|s.lock().ok()).is_some_and(|s|s.allow.contains(text))}
+pub(crate) fn record(event:Value) {
+    let Some(st)=state() else{return};
+    let Ok(bytes)=serde_json::to_vec(&event) else{return};let key=sum(&bytes);
+    let Ok(mut s)=st.lock() else{return};
+    if s.seen.contains(&key) {return;}
+    if s.count>=4096 {s.dropped+=1;return;}
+    s.seen.insert(key);s.count+=1;s.events.push(event);
+}
+pub(crate) fn present() {flush("platform_window.draw returned; not GPU fence or display scanout")}
+pub(crate) fn flush(boundary:&str) {
+    let Some(st)=state() else{return};let Ok(mut s)=st.lock() else{return};s.frame+=1;
+    if s.events.is_empty() && s.dropped==0 {return;}
+    let events=std::mem::take(&mut s.events);let dropped=s.dropped;s.dropped=0;
+    if let Err(e)=s.tx.try_send((s.frame,events,dropped,boundary.to_owned())) {match e {mpsc::TrySendError::Full((_,events,dropped,_))|mpsc::TrySendError::Disconnected((_,events,dropped,_))=>{s.events=events;s.dropped=dropped+1;}}}
+}
+pub(crate) fn request(text:&str,size:Pixels,runs:&[TextRun]) {
+    if !allowed(text){return;}let mut start=0;
+    for run in runs {let end=start+run.len;record(json!({"kind":"request_run","text":text,"start_byte":start,"end_byte":end,"size":size.0,"family":run.font.family.as_ref(),"weight":run.font.weight.0,"style":format!("{:?}",run.font.style),"features":format!("{:?}",run.font.features),"fallbacks":format!("{:?}",run.font.fallbacks),"language":"CosmicText FontSystem locale; logged in shape events"}));start=end;}
+}
+pub(crate) fn face(id:FontId,font:&cosmic_text::Font,face:&cosmic_text::fontdb::FaceInfo) {
+    let Some(st)=state() else{return};
+    {let Ok(mut s)=st.lock() else{return};if s.faces.contains(&id.0){return;}if s.faces.len()>=256{s.dropped+=1;return;}s.faces.insert(id.0);}
+    let path=match &face.source {cosmic_text::fontdb::Source::File(path)|cosmic_text::fontdb::Source::SharedFile(path,_)=>Some(path.to_string_lossy().to_string()),_=>None};
+    let bytes=font.data();
+    record(json!({"kind":"face","font_id":id.0,"face_index":face.index,"font_file":path,"font_file_sha256":null,"loaded_bytes_sha256":sum(bytes),"loaded_bytes_length":bytes.len(),"loaded_bytes_status":"CosmicTextFont::data complete backing font bytes","postscript_name":face.post_script_name,"families":face.families.iter().map(|x|x.0.clone()).collect::<Vec<_>>(),"resolved_weight":face.weight.0,"style":format!("{:?}",face.style),"stretch":format!("{:?}",face.stretch),"swash_hinting":true,"subpixel_variants":[crate::SUBPIXEL_VARIANTS_X,crate::SUBPIXEL_VARIANTS_Y]}));
+}
+pub(crate) fn paint(text:&str,layout:&LineLayout,origin:Point<Pixels>,height:Pixels,scale:f32) {
+    if !allowed(text){return;}
+    record(json!({"kind":"paint_line","text":text,"origin":[origin.x.0,origin.y.0],"width":layout.width.0,"line_height":height.0,"ascent":layout.ascent.0,"descent":layout.descent.0,"first_baseline_logical":origin.y.0+(height.0-layout.ascent.0-layout.descent.0)/2.0+layout.ascent.0,"scale":scale,"baseline_policy":"preserve logical float; window glyph atlas origin floors physical pixels","cluster_units":"UTF-8 byte index"}));
+}
+pub(crate) fn glyph(text:&str,font_id:FontId,glyph:&crate::ShapedGlyph,origin:Point<Pixels>,scale:f32) {
+    if !allowed(text){return;}
+    record(json!({"kind":"paint_glyph","text":text,"font_id":font_id.0,"id":glyph.id.0,"cluster_byte":glyph.index,"pen_logical":origin.x.0,"baseline_logical":origin.y.0,"pen_physical":origin.x.0*scale,"baseline_physical":origin.y.0*scale,"scale":scale,"emoji":glyph.is_emoji}));
+}

@@ -71,7 +71,7 @@ These dirty-source results are not attributed to the published1821f982 commit.
 - Observed red during independent follow-up: two label requests occurred because
   another tab's refresh replaced the aggregate Go data without preserving labels.
 - Correction: immutable load specification carries the repository-local cache
-  across tab data replacement. Go workspace changes still reset the cache. Pinned set_context does not explicitly clear issue_labels; cross-workspace isolation is therefore a known source difference, not part of this within-repository PASS.
+  across tab data replacement. The original run still reset cache on workspace changes. That separately challenged difference is corrected and tested in [the later source-state supplement](github-base-picker-acceptance.md); this historical assertion remains within-repository only.
 - Ordinary regression: `TestGitHubLabelCacheSurvivesTabRoundTrip`.
 
 ### GH-A05 · Sole template and Blank preserve the exact source distinction (W24, W28)
@@ -87,9 +87,9 @@ These dirty-source results are not attributed to the published1821f982 commit.
 - Correction: separated draft storage does not accidentally override the source
   template-on-open behavior; Blank recognizes both template collections.
 - Ordinary regression: `TestGitHubTemplateReopenAndBlankMatchSource`.
-  The extra workspace-reset assertion verifies Go repository isolation. Pinned
-  set_context hides new forms but does not clear their text, so Go draft clearing
-  at that boundary is a known difference, not exact source equivalence.
+  The old extra workspace-reset assertion verified Go isolation, not source parity.
+  It has now been corrected to source retention in the separately hashed
+  [later source-state supplement](github-base-picker-acceptance.md).
 
 ### GH-A06 · Mutation succeeded, follow-up read failed (W24)
 
@@ -136,8 +136,9 @@ success does not convert these broad feature scopes into full PASS.
 - W24/W28: Go uses a modal where Rust uses an inline form; extra native fields
   are not source pixel parity. After failed creation, Rust refreshes its list;
   that entire fan-out is not asserted here.
-- W28: Go's free-text base field is not the Rust anchored searchable local-branch
-  picker. This is an explicit remaining interaction/visual gap.
+- W28: the free-text base field was replaced by the source-derived anchored
+  picker in [later bounded acceptance](github-base-picker-acceptance.md). Original
+  GPUI Escape dispatch and matched native pixels remain open.
 - W29: draft-generation cancellation and cross-form late callbacks need their own
   independent fixture. These retention tests do not prove model generation.
 - W30: Git-to-Review action wiring, exact selected-file identity and native visual

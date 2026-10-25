@@ -1,0 +1,207 @@
+//go:build linux && (amd64 || arm64)
+
+package text
+
+import (
+	"fmt"
+	"github.com/ebitengine/purego"
+	"sync"
+	"unsafe"
+)
+
+type orbitFCMatrix struct{ xx, xy, yx, yy float64 }
+
+var orbitNativeOnce sync.Once
+var orbitNative struct {
+	pattern                                 func(uintptr) uintptr
+	getInt                                  func(uintptr, string, int32, *int32) int32
+	getBool                                 func(uintptr, string, int32, *int32) int32
+	getMatrix                               func(uintptr, string, int32, **orbitFCMatrix) int32
+	contextLanguage                         func(uintptr) uintptr
+	languageString                          func(uintptr) *byte
+	getString                               func(uintptr, string, int32, **byte) int32
+	descWeight                              func(uintptr) int32
+	descStyle                               func(uintptr) int32
+	hbFace                                  func(uintptr) uintptr
+	hbIndex                                 func(uintptr) uint32
+	hbBlob                                  func(uintptr) uintptr
+	hbData                                  func(uintptr, *uint32) *byte
+	hbDestroy                               func(uintptr)
+	optAA, optHint, optMetrics, optSubpixel func(uintptr) int32
+}
+
+func orbitLoadNative() {
+	orbitNativeOnce.Do(func() {
+		bind := func(lib, name string, fn any) {
+			h, err := purego.Dlopen(lib, purego.RTLD_NOW|purego.RTLD_GLOBAL)
+			if err != nil {
+				return
+			}
+			sym, err := purego.Dlsym(h, name)
+			if err == nil && sym != 0 {
+				purego.RegisterFunc(fn, sym)
+			}
+		}
+		n := &orbitNative
+		bind("libpangoft2-1.0.so.0", "pango_fc_font_get_pattern", &n.pattern)
+		bind("libfontconfig.so.1", "FcPatternGetInteger", &n.getInt)
+		bind("libfontconfig.so.1", "FcPatternGetBool", &n.getBool)
+		bind("libfontconfig.so.1", "FcPatternGetMatrix", &n.getMatrix)
+		bind("libpango-1.0.so.0", "pango_context_get_language", &n.contextLanguage)
+		bind("libpango-1.0.so.0", "pango_language_to_string", &n.languageString)
+		bind("libfontconfig.so.1", "FcPatternGetString", &n.getString)
+		bind("libpango-1.0.so.0", "pango_font_description_get_weight", &n.descWeight)
+		bind("libpango-1.0.so.0", "pango_font_description_get_style", &n.descStyle)
+		bind("libharfbuzz.so.0", "hb_font_get_face", &n.hbFace)
+		bind("libharfbuzz.so.0", "hb_face_get_index", &n.hbIndex)
+		bind("libharfbuzz.so.0", "hb_face_reference_blob", &n.hbBlob)
+		bind("libharfbuzz.so.0", "hb_blob_get_data", &n.hbData)
+		bind("libharfbuzz.so.0", "hb_blob_destroy", &n.hbDestroy)
+		bind("libcairo.so.2", "cairo_font_options_get_antialias", &n.optAA)
+		bind("libcairo.so.2", "cairo_font_options_get_hint_style", &n.optHint)
+		bind("libcairo.so.2", "cairo_font_options_get_hint_metrics", &n.optMetrics)
+		bind("libcairo.so.2", "cairo_font_options_get_subpixel_order", &n.optSubpixel)
+	})
+}
+func (e *pangoEngine) orbitFace(f *Font) string {
+	if id := orbitFontID(f); id != "" {
+		return id
+	}
+	st := orbitState()
+	if st == nil || f == nil {
+		return ""
+	}
+	st.Lock()
+	if len(st.fonts) >= 256 {
+		st.dropped++
+		st.Unlock()
+		return ""
+	}
+	id := fmt.Sprintf("f%d", len(st.fonts)+1)
+	st.fonts[f] = id
+	st.Unlock()
+	orbitLoadNative()
+	n := &orbitNative
+	rec := orbitEvent{"kind": "face", "font_id": id, "ascent": f.Ascent, "descent": f.Descent, "line_gap": f.LineGap, "size": f.Size, "font_file_sha256": nil, "loaded_bytes_sha256": nil, "loaded_bytes_status": "unavailable", "face_index": nil}
+	if n.pattern != nil {
+		pattern := n.pattern(f.native)
+		if pattern != 0 {
+			if n.getMatrix != nil {
+				var m *orbitFCMatrix
+				if n.getMatrix(pattern, "matrix", 0, &m) == fcResultMatch && m != nil {
+					rec["fontconfig_matrix"] = [4]float64{m.xx, m.xy, m.yx, m.yy}
+				}
+			}
+			if n.getString != nil {
+				for _, key := range []string{"file", "family", "postscriptname", "fontvariations"} {
+					var p *byte
+					if n.getString(pattern, key, 0, &p) == fcResultMatch {
+						rec["font_"+key] = cString(p)
+					}
+				}
+			}
+			if n.getInt != nil {
+				for _, key := range []string{"index", "weight", "slant", "hintstyle", "antialias", "hinting"} {
+					var v int32
+					if n.getInt(pattern, key, 0, &v) == fcResultMatch {
+						rec["fontconfig_"+key] = v
+						if key == "index" {
+							rec["face_index"] = v
+						}
+					}
+				}
+			}
+			if n.getBool != nil {
+				for _, key := range []string{"embolden", "antialias", "hinting"} {
+					var v int32
+					if n.getBool(pattern, key, 0, &v) == fcResultMatch {
+						rec["fontconfig_"+key] = v != 0
+					}
+				}
+			}
+		}
+	}
+	if d := pangoLib.fontDescribeAbsolute(f.native); d != 0 {
+		if n.descWeight != nil {
+			rec["resolved_pango_weight"] = n.descWeight(d)
+		}
+		if n.descStyle != nil {
+			rec["resolved_pango_style"] = n.descStyle(d)
+		}
+		pangoLib.descFree(d)
+	}
+	if pangoLib.fontGetHBFont != nil && n.hbFace != nil && n.hbIndex != nil && n.hbBlob != nil && n.hbData != nil && n.hbDestroy != nil {
+		hb := pangoLib.fontGetHBFont(f.native)
+		if hb != 0 {
+			face := n.hbFace(hb)
+			if face != 0 {
+				rec["harfbuzz_face_index"] = n.hbIndex(face)
+				blob := n.hbBlob(face)
+				if blob != 0 {
+					var length uint32
+					data := n.hbData(blob, &length)
+					if data != nil && length > 0 && length <= 64<<20 {
+						rec["loaded_bytes_sha256"] = orbitSum(unsafe.Slice(data, int(length)))
+						rec["loaded_bytes_length"] = length
+						rec["loaded_bytes_status"] = "complete referenced HarfBuzz face blob"
+					}
+					n.hbDestroy(blob)
+				}
+			}
+		}
+	}
+	rec["fontconfig_weight_units"] = "Fontconfig enum, not CSS/Pango weight"
+	orbitRecord(rec)
+	return id
+}
+func (e *pangoEngine) orbitShape(text []rune, style Style, spans []Span, width float32, rtl, wholeWords bool, lines []shapedLine) {
+	if orbitState() == nil {
+		return
+	}
+	value := string(text)
+	if !orbitAllowed(value) {
+		return
+	}
+	orbitLoadNative()
+	language := "unavailable"
+	if orbitNative.contextLanguage != nil && orbitNative.languageString != nil {
+		language = cString(orbitNative.languageString(orbitNative.contextLanguage(e.context)))
+	}
+	for li, line := range lines {
+		for ri, run := range line.runs {
+			id := e.orbitFace(run.font)
+			requested := style
+			for _, span := range spans {
+				if run.start < span.End {
+					requested = span.style(style)
+					break
+				}
+			}
+			glyphs := make([]orbitEvent, 0, len(run.glyphs))
+			for _, g := range run.glyphs {
+				glyphs = append(glyphs, orbitEvent{"id": g.ID, "cluster_rune": g.Cluster, "x": g.X, "y": g.Y, "advance": g.Advance, "rtl": g.RTL})
+			}
+			orbitRecord(orbitEvent{"kind": "shape_run", "text": value, "line": li, "run": ri, "request": requested, "font_id": id, "start_rune": run.start, "end_rune": run.end, "width_constraint": width, "rtl": rtl, "whole_words": wholeWords, "glyphs": glyphs, "round_positions": pangoLib.contextSetRoundPositions != nil, "context_language": language, "context_antialias": e.antialias, "context_hint_style": e.hintStyle, "context_subpixel_order": e.subpixels, "context_hint_metrics": cairoHintMetricsOn})
+		}
+	}
+}
+func (e *pangoEngine) orbitScaled(f *Font, sf uintptr, scale float32, subpixel bool) {
+	id := orbitFontID(f)
+	if id == "" {
+		return
+	}
+	orbitLoadNative()
+	n := &orbitNative
+	var matrix cairoMatrix
+	pangoLib.cairoScaledFontMatrix(sf, &matrix)
+	opts := pangoLib.cairoFontOptionsCreate()
+	defer pangoLib.cairoFontOptionsDestroy(opts)
+	pangoLib.cairoScaledFontOptions(sf, opts)
+	rec := orbitEvent{"kind": "scaled_font", "font_id": id, "scale": scale, "subpixel_requested": subpixel, "font_matrix": [6]float64{matrix.xx, matrix.yx, matrix.xy, matrix.yy, matrix.x0, matrix.y0}}
+	for key, fn := range map[string]func(uintptr) int32{"antialias": n.optAA, "hint_style": n.optHint, "hint_metrics": n.optMetrics, "subpixel_order": n.optSubpixel} {
+		if fn != nil {
+			rec[key] = fn(opts)
+		}
+	}
+	orbitRecord(rec)
+}

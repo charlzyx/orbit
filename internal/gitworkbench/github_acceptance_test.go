@@ -252,8 +252,8 @@ func TestGitHubTemplateReopenAndBlankMatchSource(t *testing.T) {
 	}
 	s.SetWorkspace(t.TempDir())
 	s.openDialog("new-issue")
-	if s.title != "" || s.body != "" || s.notes != "" {
-		t.Fatal("draft leaked to another repository")
+	if s.title != "User title" || s.body != "Unrelated prose" || s.notes != "Notes" {
+		t.Fatal("source keeps draft inputs across workspace changes")
 	}
 }
 func TestGitHubCreatedMutationNotRetriedWhenDetailRefreshFails(t *testing.T) {

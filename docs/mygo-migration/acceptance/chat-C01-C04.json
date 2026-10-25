@@ -143,9 +143,11 @@
           "expected": "No prompt during composition; native text editing and multiline text remain intact.",
           "tests": [
             "TestIMECompositionDoesNotSubmit",
-            "TestComposerRepeatedEnterShiftAlternateAndRejection"
+            "TestComposerRepeatedEnterShiftAlternateAndRejection",
+            "TestSourceComposerGeometryAndConditionalChips",
+            "TestSourceComposerCompactKeepsSendReachable"
           ],
-          "remaining": "Headless composition event and multiline submission pass. Real Chinese/Japanese/Korean OS IME candidates, clipboard and accessibility remain unexecuted.",
+          "remaining": "Headless composition event and multiline submission pass. Real Chinese/Japanese/Korean OS IME candidates, clipboard and accessibility remain unexecuted. Source22/28px frames, compact omission, one-to-eight lines, surface_secondary, terse full-access and absent unavailable thinking now covered; current native recapture pending.",
           "evidence": "../native-ui-acceptance.json",
           "last_verified_sha": null,
           "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."

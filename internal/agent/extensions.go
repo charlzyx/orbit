@@ -18,6 +18,7 @@ import (
 
 	orbitassets "github.com/charlzyx/orbit"
 	"github.com/charlzyx/orbit/internal/pirpc"
+	"github.com/charlzyx/orbit/internal/preferences"
 	"github.com/charlzyx/orbit/internal/runtimepath"
 )
 
@@ -57,7 +58,7 @@ func prepareExtensions(options Options) ([]string, ExtensionStatus) {
 			}
 		}
 	}
-	if !options.DisablePatches && os.Getenv("ORBIT_NO_RPC_PATCHES") == "" {
+	if !options.DisablePatches && !patchEnvironmentDisabled(options) {
 		status.Patches = applyPatches(options, resources)
 	}
 	return paths, status
@@ -144,14 +145,8 @@ func applyPatches(options Options, resources fs.FS) PatchStatus {
 	defer patchLock.Unlock()
 	status := PatchStatus{Enabled: true}
 	base := filepath.Join(options.Home, ".orbit-pi", "rpc-patches")
-	var config struct {
-		Enabled     *bool  `json:"enabled"`
-		PackageRoot string `json:"package_root"`
-	}
-	if data, err := os.ReadFile(filepath.Join(base, "config.json")); err == nil {
-		_ = json.Unmarshal(data, &config)
-	}
-	if config.Enabled != nil && !*config.Enabled {
+	config := preferences.New(options.Home).RPCPatches()
+	if !config.Enabled {
 		status.Enabled = false
 		return status
 	}

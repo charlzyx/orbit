@@ -12,19 +12,27 @@ import (
 )
 
 type reviewState struct {
-	turn                       int // Zero follows latest completed turn; positive pins historical review.
-	source                     workspace.ReviewSource
-	data                       workspace.ReviewSnapshot
-	list                       ui.ListState
-	loading, split, wrap, tree bool
-	err, root, ref, path       string
-	selected                   int
-	generation                 uint64
-	pending                    bool
-	handle                     ui.Handle
-	collapsed                  map[int]bool
-	dataIdentity               string
-	refreshSpinUntil           time.Time
+	turn                                  int // Zero follows latest completed turn; positive pins historical review.
+	source                                workspace.ReviewSource
+	data                                  workspace.ReviewSnapshot
+	list                                  ui.ListState
+	loading, split, wrap, tree            bool
+	err, root, ref, path                  string
+	pendingPath, pendingRoot              string
+	selected                              int
+	diffCursor                            *int // Original snapshot index, independent of viewport and split rows.
+	treeCursor                            *int
+	treeRows                              []reviewTreeRow
+	treeList                              ui.ListState
+	treeQuery, treeLastQuery, treeFileKey string
+	treeDirs, expandedDirs                map[string]bool
+	treeDirty                             bool
+	generation                            uint64
+	pending                               bool
+	handle, treeHandle                    ui.Handle
+	collapsed                             map[int]bool
+	dataIdentity                          string
+	refreshSpinUntil                      time.Time
 }
 
 const reviewRefreshFeedback = 650 * time.Millisecond
@@ -70,12 +78,21 @@ func (a *App) RefreshReview() {
 	}
 	s.loading = true
 	root := a.Model.Workspace
+	if s.pendingRoot != root {
+		s.pendingPath, s.pendingRoot = "", ""
+	}
 	ref, path := s.ref, s.path
 	req := workspace.ReviewRequest{Source: s.source, Session: a.Model.SessionID, Turn: a.reviewTurn()}
 	identity := fmt.Sprintf("%s\x00%s\x00%s\x00%d\x00%s\x00%s", root, req.Source, req.Session, req.Turn, ref, path)
 	if s.dataIdentity != identity {
 		s.data = workspace.ReviewSnapshot{}
 		s.err = ""
+		// Source clear_diff resets directory/cursor state, but keeps the
+		// filter text. A refresh of the same source retains expansions.
+		s.treeDirs, s.expandedDirs = nil, nil
+		s.treeFileKey, s.treeRows = "", nil
+		s.treeCursor = nil
+		s.treeDirty = true
 	}
 	a.Async(func() func() {
 		g := workspace.Git{Dir: root}
@@ -111,10 +128,8 @@ func (a *App) RefreshReview() {
 			if err != nil {
 				s.err = err.Error()
 			} else {
-				s.data = result
+				a.applyReviewSnapshot(result)
 				s.dataIdentity = identity
-				s.collapsed = map[int]bool{}
-				s.list = ui.ListState{}
 			}
 		}
 	})
@@ -125,108 +140,81 @@ func (a *App) review(c *ui.Context) {
 	if s.root != a.Model.Workspace && !s.loading {
 		a.RefreshReview()
 	}
-	ui.Column(c.Key("review-pane")).Bind(&s.handle).Width(max(360, a.ReviewWidth)).FillHeight().BorderWidth(0, 0, 0, 1).BorderColor(t.Border).Children(func() {
-		ui.Row(c).Height(40).PaddingX(10).Gap(6).AlignItems(ui.Center).Children(func() {
-			ui.MenuButton(c, a.currentReviewLabel(), func(m *ui.Menu) {
-				for _, src := range []workspace.ReviewSource{workspace.ReviewLastTurn, workspace.ReviewUncommitted, workspace.ReviewUnstaged, workspace.ReviewStaged, workspace.ReviewCommitted, workspace.ReviewBranch} {
-					if m.Item(reviewLabel(src)).Checked(src == s.source).Disabled(src == workspace.ReviewLastTurn && a.Model.LatestTurn == 0).Chosen() {
-						s.source = src
-						s.turn = 0
-						if src == workspace.ReviewLastTurn {
-							s.turn = a.Model.LatestTurn
+	ui.Column(c.Key("review-pane")).Bind(&s.handle).Width(a.reviewPaneWidth()).FillHeight().Padding(0, 0, 0, t.Space(12)).Children(func() {
+		// The source dock is an opaque rounded card with a separate left
+		// resize gutter, not a transparent overlay on the new-task backdrop.
+		ui.Column(c.Key("review-card")).Label("Review card").Fill().MinHeight(0).Background(t.Background).Border(1, t.Border).Radius(t.Px(12)).Clip().Children(func() {
+			ui.Row(c).Height(40).PaddingX(10).Gap(6).AlignItems(ui.Center).Children(func() {
+				ui.MenuButton(c, a.currentReviewLabel(), func(m *ui.Menu) {
+					for _, src := range []workspace.ReviewSource{workspace.ReviewLastTurn, workspace.ReviewUncommitted, workspace.ReviewUnstaged, workspace.ReviewStaged, workspace.ReviewCommitted, workspace.ReviewBranch} {
+						if m.Item(reviewLabel(src)).Checked(src == s.source).Disabled(src == workspace.ReviewLastTurn && a.Model.LatestTurn == 0).Chosen() {
+							s.source = src
+							s.turn = 0
+							if src == workspace.ReviewLastTurn {
+								s.turn = a.Model.LatestTurn
+							}
+							s.ref = ""
+							s.path = ""
+							s.pendingPath, s.pendingRoot = "", ""
+							a.RefreshReview()
 						}
-						s.ref = ""
-						s.path = ""
-						a.RefreshReview()
 					}
+				})
+				ui.Spacer(c)
+				if s.refreshFeedback(time.Now()) {
+					ui.Spinner(c).Size(12, 12).Label("Refreshing review")
+				}
+				if a.iconButton(c, "Refresh review", "icons/refresh.svg").Clicked() {
+					a.refreshReviewFromButton(time.Now())
+				}
+				if a.iconButton(c, "Review options", "icons/more.svg").Menu(func(m *ui.Menu) {
+					if m.Item("Split diff").Checked(s.split).Chosen() {
+						a.toggleReviewSplit()
+					}
+					if m.Item("Wrap lines").Checked(s.wrap).Chosen() {
+						s.wrap = !s.wrap
+					}
+					if m.Item("File list").Checked(s.tree).Chosen() {
+						s.tree = !s.tree
+					}
+				}).Clicked() {
+				}
+				if a.iconButton(c, "Close review", "icons/x.svg").Clicked() {
+					a.ReviewVisible = false
 				}
 			})
-			ui.Spacer(c)
-			if s.refreshFeedback(time.Now()) {
-				ui.Spinner(c).Size(12, 12).Label("Refreshing review")
-			}
-			if a.iconButton(c, "Refresh review", "icons/refresh.svg").Clicked() {
-				a.refreshReviewFromButton(time.Now())
-			}
-			if a.iconButton(c, "Review options", "icons/more.svg").Menu(func(m *ui.Menu) {
-				if m.Item("Split diff").Checked(s.split).Chosen() {
-					s.split = !s.split
+			ui.Row(c).Padding(6, 12).Gap(8).Children(func() {
+				ui.Text(c, fmt.Sprintf("%d files", len(s.data.Files))).TextColor(t.TextMuted)
+				ui.Text(c, fmt.Sprintf("+%d", s.data.Additions)).TextColor(t.Success)
+				ui.Text(c, fmt.Sprintf("−%d", s.data.Deletions)).TextColor(t.Error)
+			})
+			if s.err != "" {
+				if len(s.data.Lines) == 0 {
+					a.Empty(c, "Review unavailable", s.err)
+					return
 				}
-				if m.Item("Wrap lines").Checked(s.wrap).Chosen() {
-					s.wrap = !s.wrap
-				}
-				if m.Item("File list").Checked(s.tree).Chosen() {
-					s.tree = !s.tree
-				}
-			}).Clicked() {
+				ui.Text(c, "Refresh failed; showing the previous snapshot. "+s.err).TextColor(t.Warning).Padding(8).Selectable()
 			}
-			if a.iconButton(c, "Close review", "icons/x.svg").Clicked() {
-				a.ReviewVisible = false
-			}
-		})
-		ui.Row(c).Padding(6, 12).Gap(8).Children(func() {
-			ui.Text(c, fmt.Sprintf("%d files", len(s.data.Files))).TextColor(t.TextMuted)
-			ui.Text(c, fmt.Sprintf("+%d", s.data.Additions)).TextColor(t.Success)
-			ui.Text(c, fmt.Sprintf("−%d", s.data.Deletions)).TextColor(t.Error)
-		})
-		if s.err != "" {
 			if len(s.data.Lines) == 0 {
-				a.Empty(c, "Review unavailable", s.err)
+				a.Empty(c, "No changes", "No changes in this review source.")
 				return
 			}
-			ui.Text(c, "Refresh failed; showing the previous snapshot. "+s.err).TextColor(t.Warning).Padding(8).Selectable()
-		}
-		if len(s.data.Lines) == 0 {
-			a.Empty(c, "No changes", "No changes in this review source.")
-			return
-		}
-		if s.tree {
-			ui.Scroll(c).MaxHeight(180).Children(func() {
-				for i, f := range s.data.Files {
-					f := f
-					if a.button(c, f.Path, "icons/file.svg", false).AlignSelf(ui.Stretch).Clicked() {
-						s.selected = i
-						a.reviewFile(0)
-					}
+			ui.Row(c).Grow(1).MinHeight(0).Children(func() {
+				ui.Column(c).Grow(1).MinWidth(0).FillHeight().Children(func() { a.reviewDiff(c) })
+				if s.tree && a.reviewPaneWidth() >= 440 {
+					a.reviewTree(c)
 				}
 			})
-		}
-		if s.split {
-			visible, indexes := s.visible()
-			_ = indexes
-			rows := workspace.SplitReview(visible)
-			ui.List(c.Key("split-review"), &s.list, len(rows), func(i int) {
-				r := rows[i]
-				if r.Full != nil {
-					a.reviewLine(c, *r.Full, -1)
-				} else {
-					ui.Row(c).Children(func() {
-						ui.Column(c).WidthPercent(50).MinWidth(0).Children(func() {
-							if r.Left != nil {
-								a.reviewLine(c, *r.Left, -1)
-							}
-						})
-						ui.Column(c).WidthPercent(50).MinWidth(0).Children(func() {
-							if r.Right != nil {
-								a.reviewLine(c, *r.Right, -1)
-							}
-						})
-					})
-				}
-			}).Grow(1).MinHeight(0)
-		} else {
-			visible, indexes := s.visible()
-			ui.List(c.Key("unified-review"), &s.list, len(visible), func(i int) { a.reviewLine(c, visible[i], indexes[i]) }).Grow(1).MinHeight(0)
-		}
-		if s.data.Truncated {
-			ui.Text(c, "Diff display limited to 50,000 lines.").Padding(8).TextColor(t.Warning)
-		}
-		if c.Shortcut(ui.Alt, ui.KeyDown) {
-			a.reviewFile(1)
-		}
-		if c.Shortcut(ui.Alt, ui.KeyUp) {
-			a.reviewFile(-1)
-		}
+			if s.data.Truncated {
+				ui.Text(c, "Diff display limited to 50,000 lines.").Padding(8).TextColor(t.Warning)
+			}
+			if c.Shortcut(ui.Alt, ui.KeyDown) {
+				a.reviewFile(1)
+			}
+			if c.Shortcut(ui.Alt, ui.KeyUp) {
+				a.reviewFile(-1)
+			}
+		})
 	})
 }
 func reviewLabel(s workspace.ReviewSource) string {
@@ -250,7 +238,9 @@ func (a *App) reviewFile(delta int) {
 	if len(s.data.Files) == 0 {
 		return
 	}
-	s.selected = (s.selected + delta + len(s.data.Files)) % len(s.data.Files)
+	// sidepane.rs::review_move_file clamps at the ends rather than wrapping.
+	s.selected = max(0, min(s.selected+delta, len(s.data.Files)-1))
+	s.diffCursor = nil
 	if s.collapsed == nil {
 		s.collapsed = map[int]bool{}
 	}
@@ -261,6 +251,97 @@ func (a *App) reviewFile(delta int) {
 			break
 		}
 	}
+}
+
+// Source apply_snapshot keeps the selected path across a refreshed/reordered
+// snapshot, then resets its hunk cursor and expands the docked review body.
+func (a *App) applyReviewSnapshot(data workspace.ReviewSnapshot) {
+	s := &a.reviewState
+	path := ""
+	if s.selected >= 0 && s.selected < len(s.data.Files) {
+		path = s.data.Files[s.selected].Path
+	}
+	s.data = data
+	s.selected = 0
+	// show_file selects a path inside the complete review, not a filtered diff.
+	// A missing pending path falls back to the prior selection, as Rust does.
+	for _, wanted := range []string{s.pendingPath, path} {
+		found := false
+		for i, file := range data.Files {
+			if wanted != "" && file.Path == wanted {
+				s.selected, found = i, true
+				break
+			}
+		}
+		if found {
+			break
+		}
+	}
+	s.pendingPath, s.pendingRoot = "", ""
+	s.collapsed = map[int]bool{}
+	s.list = ui.ListState{}
+	s.treeCursor = nil
+	a.reviewFile(0)
+}
+
+// Full-context snapshots suppress @@ metadata. The source also treats the
+// first addition/deletion in each same-file change run as a hunk boundary.
+func reviewHunkStart(lines []workspace.ReviewLine, i int) bool {
+	l := lines[i]
+	if l.Kind == "hunk_header" {
+		return true
+	}
+	if l.Kind != "addition" && l.Kind != "deletion" {
+		return false
+	}
+	return i == 0 || lines[i-1].File != l.File || (lines[i-1].Kind != "addition" && lines[i-1].Kind != "deletion")
+}
+
+// Convert a semantic snapshot index to the current virtual row. In split
+// mode a deletion/addition pair occupies one row; collapsed content maps to
+// its retained header, rather than to an unrelated later file.
+func (s *reviewState) renderedIndex(index int) (int, bool) {
+	if index < 0 || index >= len(s.data.Lines) {
+		return 0, false
+	}
+	if s.collapsed[s.data.Lines[index].File] && s.data.Lines[index].Kind != "file_header" {
+		file := s.data.Lines[index].File
+		for i, l := range s.data.Lines {
+			if l.Kind == "file_header" && l.File == file {
+				index = i
+				break
+			}
+		}
+	}
+	lines, indexes := s.visible()
+	row := 0
+	for i := 0; i < len(lines); {
+		if s.split && (lines[i].Kind == "addition" || lines[i].Kind == "deletion") {
+			file := lines[i].File
+			var deletes, adds []int
+			for i < len(lines) && lines[i].File == file && (lines[i].Kind == "addition" || lines[i].Kind == "deletion") {
+				if lines[i].Kind == "deletion" {
+					deletes = append(deletes, indexes[i])
+				} else {
+					adds = append(adds, indexes[i])
+				}
+				i++
+			}
+			for pair := 0; pair < max(len(deletes), len(adds)); pair++ {
+				if (pair < len(deletes) && deletes[pair] == index) || (pair < len(adds) && adds[pair] == index) {
+					return row, true
+				}
+				row++
+			}
+		} else {
+			if indexes[i] == index {
+				return row, true
+			}
+			i++
+			row++
+		}
+	}
+	return 0, false
 }
 func (a *App) reviewLine(c *ui.Context, l workspace.ReviewLine, index int) {
 	t := a.Theme
@@ -356,6 +437,49 @@ func (s *reviewState) visible() ([]workspace.ReviewLine, []int) {
 
 type reviewMarker struct{ row, file int }
 
+type reviewLineIdentity struct {
+	file, old, next int
+	kind, content   string
+}
+
+func reviewLineKey(l workspace.ReviewLine) reviewLineIdentity {
+	return reviewLineIdentity{l.File, l.OldLine, l.NewLine, l.Kind, l.Content}
+}
+
+func (a *App) toggleReviewSplit() {
+	s := &a.reviewState
+	first, _ := s.list.Visible()
+	index := -1
+	visible, indexes := s.visible()
+	if !s.split && first >= 0 && first < len(indexes) {
+		index = indexes[first]
+	} else if s.split {
+		rows := workspace.SplitReview(visible)
+		if first >= 0 && first < len(rows) {
+			line := rows[first].Full
+			if line == nil {
+				line = rows[first].Left
+			}
+			if line == nil {
+				line = rows[first].Right
+			}
+			if line != nil {
+				key := reviewLineKey(*line)
+				for i, l := range s.data.Lines {
+					if reviewLineKey(l) == key {
+						index = i
+						break
+					}
+				}
+			}
+		}
+	}
+	s.split = !s.split
+	if row, ok := s.renderedIndex(index); ok {
+		s.list.ScrollTo(row, ui.Start)
+	}
+}
+
 // List navigation addresses the actual rendered rows, not original diff
 // offsets: collapsed bodies and split deletion/addition pairs change indexes.
 func (s *reviewState) markers(kind string) []reviewMarker {
@@ -382,15 +506,36 @@ func (a *App) reviewCommand(id string) {
 	case "ReviewClose":
 		a.ReviewVisible = false
 		a.composer.Focus()
-	case "ReviewFileNext", "ReviewTreeNext":
+	case "ReviewFileNext":
 		a.reviewFile(1)
-	case "ReviewFilePrev", "ReviewTreePrev":
+	case "ReviewFilePrev":
 		a.reviewFile(-1)
-	case "ReviewTreeToggle":
-		if s.collapsed == nil {
-			s.collapsed = map[int]bool{}
+	case "ReviewTreeNext", "ReviewTreePrev":
+		s.syncTreeRows()
+		if len(s.treeRows) == 0 {
+			return
 		}
-		s.collapsed[s.selected] = !s.collapsed[s.selected]
+		next := 0
+		if s.treeCursor != nil {
+			delta := 1
+			if id == "ReviewTreePrev" {
+				delta = -1
+			}
+			next = max(0, min(*s.treeCursor+delta, len(s.treeRows)-1))
+		}
+		s.treeCursor = &next
+		s.treeList.ScrollIntoView(next)
+	case "ReviewTreeToggle":
+		s.syncTreeRows()
+		if s.treeCursor != nil && *s.treeCursor >= 0 && *s.treeCursor < len(s.treeRows) {
+			r := s.treeRows[*s.treeCursor]
+			if r.directory {
+				s.toggleTreeDirectory(r.path)
+			} else {
+				s.selected = r.file
+				a.reviewFile(0)
+			}
+		}
 	case "ReviewExpandAll":
 		s.collapsed = map[int]bool{}
 	case "ReviewCollapseAll":
@@ -403,22 +548,22 @@ func (a *App) reviewCommand(id string) {
 		if id == "ReviewHunkPrev" {
 			delta = -1
 		}
-		first, _ := s.list.Visible()
-		markers := s.markers("hunk_header")
-		if delta > 0 {
-			for _, m := range markers {
-				if m.row > first {
-					s.list.ScrollTo(m.row, ui.Start)
-					break
-				}
+		current := 0
+		if s.diffCursor != nil {
+			current = *s.diffCursor
+		} else if s.selected >= 0 && s.selected < len(s.data.Files) {
+			current = max(0, s.data.Files[s.selected].DiffLine)
+		}
+		for i := current + delta; i >= 0 && i < len(s.data.Lines); i += delta {
+			if !reviewHunkStart(s.data.Lines, i) {
+				continue
 			}
-		} else {
-			for i := len(markers) - 1; i >= 0; i-- {
-				if markers[i].row < first {
-					s.list.ScrollTo(markers[i].row, ui.Start)
-					break
-				}
+			s.diffCursor = &i
+			s.selected = s.data.Lines[i].File
+			if row, ok := s.renderedIndex(i); ok {
+				s.list.ScrollTo(row, ui.Start)
 			}
+			break
 		}
 	}
 }
@@ -464,8 +609,69 @@ func (a *App) OpenTurnReview(turn int) {
 	a.reviewState.source = workspace.ReviewLastTurn
 	a.reviewState.ref = ""
 	a.reviewState.path = ""
+	a.reviewState.pendingPath, a.reviewState.pendingRoot = "", ""
 	a.Navigate("chat")
 	a.ReviewVisible = true
 	a.ExplorerVisible = false
 	a.RefreshReview()
+}
+
+// OpenReviewDiff routes Git's working-tree file action through show_file's
+// full-snapshot/pending-selection semantics. An explicit commit ref retains
+// the deliberate committed-file comparison API.
+func (a *App) OpenReviewDiff(source, ref, path string) {
+	s := &a.reviewState
+	s.source, s.ref, s.path = workspace.ReviewSource(source), ref, path
+	s.turn = 0
+	s.pendingPath, s.pendingRoot = "", ""
+	if ref == "" && path != "" {
+		s.source = workspace.ReviewUncommitted
+		s.path = ""
+		s.pendingPath, s.pendingRoot = filepath.ToSlash(path), a.Model.Workspace
+	}
+	a.Navigate("chat")
+	a.ReviewVisible, a.ExplorerVisible = true, false
+	a.RefreshReview()
+}
+
+func (a *App) reviewDiff(c *ui.Context) {
+	s := &a.reviewState
+	if s.split {
+		visible, indexes := s.visible()
+		_ = indexes
+		rows := workspace.SplitReview(visible)
+		s.list.Key = func(i int) any {
+			r := rows[i]
+			if r.Full != nil {
+				return reviewLineKey(*r.Full)
+			}
+			if r.Left != nil {
+				return reviewLineKey(*r.Left)
+			}
+			return reviewLineKey(*r.Right)
+		}
+		ui.List(c.Key("review-lines"), &s.list, len(rows), func(i int) {
+			r := rows[i]
+			if r.Full != nil {
+				a.reviewLine(c, *r.Full, -1)
+			} else {
+				ui.Row(c).Children(func() {
+					ui.Column(c).WidthPercent(50).MinWidth(0).Children(func() {
+						if r.Left != nil {
+							a.reviewLine(c, *r.Left, -1)
+						}
+					})
+					ui.Column(c).WidthPercent(50).MinWidth(0).Children(func() {
+						if r.Right != nil {
+							a.reviewLine(c, *r.Right, -1)
+						}
+					})
+				})
+			}
+		}).Grow(1).MinHeight(0)
+	} else {
+		visible, indexes := s.visible()
+		s.list.Key = func(i int) any { return reviewLineKey(visible[i]) }
+		ui.List(c.Key("review-lines"), &s.list, len(visible), func(i int) { a.reviewLine(c, visible[i], indexes[i]) }).Grow(1).MinHeight(0)
+	}
 }

@@ -38,6 +38,37 @@ func NewTheme(id string, prefs preferences.UI, fonts preferences.Fonts) Theme {
 	return Theme{Palette: p, ID: id, Dark: !strings.Contains(id, "light") && id != "orbit-paper" && id != "orbit-contrast", FontSize: float32(prefs.UIFontSize), CodeSize: float32(prefs.EditorFontSize), Density: prefs.SpacingDensity, Font: fonts.UIFamily, CodeFont: fonts.CodeFamily}
 }
 func (t Theme) Px(n float32) float32 { return n * t.FontSize / 14 }
+
+// The composer's source contact shadow is deliberately independent of font
+// size and density; its border supplies the definition, not a wide ambient.
+func (t Theme) composerContact() ui.Color {
+	if t.Dark {
+		return ui.RGBA(0, 0, 0, .32)
+	}
+	return ui.RGBA(0, 0, 0, .10)
+}
+
+func (t Theme) overlay() ui.Color {
+	if t.Dark {
+		return t.Text.Alpha(.05)
+	}
+	return t.Text.Alpha(.06)
+}
+
+// Derived source tokens, not stored palette swatches (theme.rs::Theme::build).
+func (t Theme) BorderStrong() ui.Color {
+	if t.Dark {
+		return t.Text.Alpha(.14)
+	}
+	return t.Text.Alpha(.16)
+}
+func (t Theme) OverlayStrong() ui.Color {
+	if t.Dark {
+		return t.Text.Alpha(.09)
+	}
+	return t.Text.Alpha(.10)
+}
+
 func (t Theme) Space(n int) float32 {
 	table := map[int][3]float32{0: {0, 0, 0}, 1: {1, 1, 2}, 2: {1, 2, 4}, 3: {2, 3, 4}, 4: {2, 4, 6}, 6: {3, 6, 8}, 8: {4, 8, 10}, 12: {10, 12, 14}, 16: {14, 16, 18}, 20: {18, 20, 22}, 24: {20, 24, 28}, 32: {28, 32, 36}, 40: {36, 40, 44}, 48: {44, 48, 52}}
 	v, ok := table[n]

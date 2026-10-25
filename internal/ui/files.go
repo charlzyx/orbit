@@ -29,6 +29,15 @@ type filesState struct {
 	desired               string
 	openGeneration        uint64
 	mutating              bool
+	focusPending          string
+	handle                ui.Handle
+	closing               map[string]*fileClose
+}
+
+type fileClose struct {
+	reopen     bool
+	root       string
+	generation uint64
 }
 
 func (a *App) initFiles() {
@@ -85,8 +94,25 @@ func (a *App) OpenFile(path string) {
 	s.openGeneration++
 	generation := s.openGeneration
 	a.Navigate("files")
+	if operation := s.closing[path]; operation != nil {
+		operation.reopen, operation.root = true, root
+		operation.generation = generation
+		return
+	}
+	// Source open(existing) activates the existing buffer synchronously. A
+	// background copy can arrive after another keystroke and rewind that draft.
+	for _, d := range s.editor.Documents() {
+		if d.Content.Path == path {
+			a.save(s.editor.Activate(path))
+			if s.states[path] == nil {
+				a.syncDocument(d)
+			}
+			s.focusPending = path
+			return
+		}
+	}
 	a.Async(func() func() {
-		d, e := s.editor.OpenInactive(path)
+		_, e := s.editor.OpenInactive(path)
 		return func() {
 			if generation != s.openGeneration || root != a.Model.Workspace {
 				return
@@ -99,7 +125,13 @@ func (a *App) OpenFile(path string) {
 				a.save(e)
 				return
 			}
-			a.syncDocument(d)
+			// A watcher may have reloaded the registered document while the
+			// UI completion was queued. Use its current state, not the worker's
+			// stale value copy from before that reload.
+			if d, ok := s.editor.Active(); ok && d.Content.Path == path {
+				a.syncDocument(d)
+			}
+			s.focusPending = path
 		}
 	})
 }
@@ -368,6 +400,35 @@ func (a *App) filesPage(c *ui.Context) {
 }
 func (a *App) fileEditor(c *ui.Context) {
 	s := a.files
+	root := ui.Column(c.Key("file-viewer")).Bind(&s.handle).Focusable().Fill().MinWidth(0)
+	root.Children(func() { a.fileEditorContent(c) })
+	// Like FileViewer's deferred focus target, previews/non-editor content
+	// focus the viewer root; source mode consumes this in the editor below.
+	if d, ok := s.editor.Active(); ok && s.focusPending == d.Content.Path {
+		if d.Preview || d.Content.Mode == workspace.FileImage || d.Content.Mode == workspace.FileBinary || d.Content.Mode == workspace.FileTooLarge || d.Content.Error != "" {
+			root.Focus()
+			s.focusPending = ""
+		} else {
+			// A tab click can change Active after this frame captured the old
+			// document. Let the next build focus the newly mounted editor.
+			c.AnimationFrame()
+		}
+	}
+	if !a.modalOpen() && s.handle.FocusWithin(c) {
+		if c.Shortcut(ui.Cmd|ui.Shift, ui.KeyW) {
+			a.Navigate("chat")
+		} else if c.Shortcut(ui.Cmd, ui.KeyW) {
+			if d, ok := s.editor.Active(); ok {
+				a.closeFile(d.Content.Path)
+			}
+		} else if c.Shortcut(ui.Cmd, ui.KeyS) {
+			a.saveFiles()
+		}
+	}
+}
+
+func (a *App) fileEditorContent(c *ui.Context) {
+	s := a.files
 	t := a.Theme
 	docs := s.editor.Documents()
 	d, ok := s.editor.Active()
@@ -375,41 +436,58 @@ func (a *App) fileEditor(c *ui.Context) {
 		a.Empty(c, "Open a file", "Select a file in the explorer to view or edit it.")
 		return
 	}
-	ui.Row(c).Height(36).Background(t.Surface).Children(func() {
-		for _, tab := range docs {
-			tab := tab
-			name := tab.Content.Display
-			if tab.Dirty {
-				name += " •"
-			}
-			b := a.button(c, name, "", tab.Content.Path == d.Content.Path)
-			if b.Clicked() {
-				a.save(s.editor.Activate(tab.Content.Path))
-			}
-			b.ContextMenu(func(m *ui.Menu) {
-				if m.Item("Close").Chosen() {
-					a.closeFile(tab.Content.Path)
-				}
-				if m.Item("Reveal").Chosen() {
-					a.Dispatch(Action{Kind: "RevealPath", Value: tab.Content.Path})
+	ui.Row(c).Height(40).Gap(t.Space(6)).Padding(0, t.Space(16), 0, 0).Background(t.Surface).Children(func() {
+		ui.ScrollHorizontal(c.Key("file-tabs")).Label("File tabs").Grow(1).MinWidth(0).FillHeight().Children(func() {
+			ui.Row(c).FillHeight().Gap(t.Space(6)).AlignItems(ui.Center).Children(func() {
+				for _, tab := range docs {
+					tab := tab
+					name := tab.Content.Display
+					if tab.Dirty {
+						name += " •"
+					}
+					ui.Row(c.Key(tab.Content.Path)).Shrink(0).AlignItems(ui.Center).Children(func() {
+						b := a.button(c, name, "", tab.Content.Path == d.Content.Path).Shrink(0)
+						if b.Clicked() {
+							a.activateFile(tab.Content.Path)
+						}
+						b.ContextMenu(func(m *ui.Menu) {
+							if m.Item("Close").Chosen() {
+								a.closeFile(tab.Content.Path)
+							}
+							if m.Item("Reveal").Chosen() {
+								a.Dispatch(Action{Kind: "RevealPath", Value: tab.Content.Path})
+							}
+						})
+						label := "Close " + tab.Content.Display
+						if tab.Content.Path == d.Content.Path {
+							label = "Close file"
+						}
+						if a.iconButton(c, label, "icons/x.svg").Size(t.Px(16), t.Px(16)).Clicked() {
+							a.closeFile(tab.Content.Path)
+						}
+					})
 				}
 			})
-		}
-		ui.Spacer(c)
-		if a.iconButton(c, "Close file", "icons/x.svg").Clicked() {
-			a.closeFile(d.Content.Path)
+		})
+		if a.iconButton(c, "Close files", "icons/x.svg").Size(t.Px(22), t.Px(22)).Clicked() {
+			a.Navigate("chat")
 		}
 	})
 	ui.Row(c).Height(34).PaddingX(10).Gap(6).AlignItems(ui.Center).Children(func() {
 		ui.Text(c, d.Content.Path).MaxLines(1).FontSize(12).TextColor(t.TextMuted).Grow(1)
 		if d.Content.Mode == workspace.FileMarkdown {
-			if a.button(c, "Preview", "", d.Preview).Clicked() {
-				a.save(s.editor.SetPreview(d.Content.Path, !d.Preview))
+			if a.button(c, "Preview", "", d.Preview).Clicked() && a.syncFileBuffers() {
+				if err := s.editor.SetPreview(d.Content.Path, !d.Preview); err != nil {
+					a.save(err)
+				} else {
+					d.Preview = !d.Preview
+					s.focusPending = d.Content.Path
+				}
 			}
 		}
 		if d.Content.Editable() {
 			if a.button(c, "Save", "icons/save.svg", false).Clicked() {
-				a.Async(func() func() { e := s.editor.SaveAll(); return func() { a.save(e) } })
+				a.saveFiles()
 			}
 		}
 		ui.Switch(c, &s.wrap).Label("Wrap lines")
@@ -455,7 +533,11 @@ func (a *App) fileEditor(c *ui.Context) {
 	st.Theme = t.Code()
 	st.ReadOnly = !d.Content.Editable() || s.mutating
 	st.SoftWrap = s.wrap
-	editor.View(c.Key(d.Content.Path), st).Label("File editor").Grow(1).FillWidth()
+	view := editor.View(c.Key(d.Content.Path), st).Label("File editor").Grow(1).FillWidth()
+	if s.focusPending == d.Content.Path {
+		view.Focus()
+		s.focusPending = ""
+	}
 	if st.Buffer.Version() != s.versions[d.Content.Path] {
 		a.save(s.editor.SetText(d.Content.Path, st.Buffer.String()))
 		s.versions[d.Content.Path] = st.Buffer.Version()
@@ -472,19 +554,83 @@ func (a *App) fileEditor(c *ui.Context) {
 		status += " · Preview truncated"
 	}
 	ui.Text(c, status).FontSize(12).TextColor(t.TextMuted).Padding(4, 10)
-	if c.Shortcut(ui.Cmd, ui.KeyS) {
-		a.Async(func() func() { e := s.editor.SaveAll(); return func() { a.save(e) } })
-	}
 }
+
+func (a *App) activateFile(path string) {
+	s := a.files
+	s.openGeneration++ // A tab click supersedes an older asynchronous open.
+	s.desired = path
+	a.save(s.editor.Activate(path))
+	s.focusPending = path
+}
+
+// A button action can be processed before the editor's build observes its
+// latest buffer version. Flush that native buffer before scheduling disk I/O.
+func (a *App) syncFileBuffers() bool {
+	s := a.files
+	for _, d := range s.editor.Documents() {
+		st := s.states[d.Content.Path]
+		if st == nil || !d.Content.Editable() || st.Buffer.Version() == s.versions[d.Content.Path] {
+			continue
+		}
+		if err := s.editor.SetText(d.Content.Path, st.Buffer.String()); err != nil {
+			a.save(err)
+			return false
+		}
+		s.versions[d.Content.Path] = st.Buffer.Version()
+	}
+	return true
+}
+
+func (a *App) saveFiles() {
+	if a.files == nil || !a.syncFileBuffers() {
+		return
+	}
+	ed := a.files.editor
+	a.Async(func() func() { err := ed.SaveAll(); return func() { a.save(err) } })
+}
+
 func (a *App) closeFile(path string) {
+	s := a.files
+	if !a.syncFileBuffers() {
+		return
+	}
+	if s.closing == nil {
+		s.closing = map[string]*fileClose{}
+	}
+	if s.closing[path] != nil {
+		return
+	}
+	op := &fileClose{}
+	s.closing[path] = op
 	a.Async(func() func() {
-		e := a.files.editor.Close(path)
+		e := s.editor.Close(path)
 		return func() {
+			if s.closing[path] != op {
+				return
+			}
+			delete(s.closing, path)
 			a.save(e)
 			if e == nil {
-				delete(a.files.states, path)
-				delete(a.files.images, path)
-				if len(a.files.editor.Documents()) == 0 && a.page == "files" {
+				stillOpen := false
+				for _, d := range s.editor.Documents() {
+					if d.Content.Path == path {
+						stillOpen = true
+						break
+					}
+				}
+				if !stillOpen {
+					delete(s.states, path)
+					delete(s.images, path)
+				}
+				if op.reopen && op.root == a.Model.Workspace && op.generation == s.openGeneration && s.desired == path {
+					a.OpenFile(path)
+					return
+				}
+				if d, ok := s.editor.Active(); ok {
+					s.focusPending = d.Content.Path
+				}
+				if len(s.editor.Documents()) == 0 && a.page == "files" {
 					a.Navigate("chat")
 				}
 			}

@@ -150,9 +150,10 @@
           "tests": [
             "TestSourceWindowRestoreBounds",
             "TestHiddenSidebarReservesNativeTrafficLights",
-            "TestSourceNativeMenuDoesNotAllocatePersistentWindowStrip"
+            "TestSourceNativeMenuDoesNotAllocatePersistentWindowStrip",
+            "TestSourceHeaderNoOpenInWithoutAppsAndInitialComposerFocus"
           ],
-          "remaining": "Source minimum/restore bounds and native traffic-light clearance pass. Native menus now auto-hide on Linux/Windows while retaining edit roles and shortcuts. Actual initial-maximize/Alt-F10/Dock lifetime on each OS remains separate acceptance.",
+          "remaining": "Source minimum/restore bounds and native traffic-light clearance pass. Native menus now auto-hide on Linux/Windows while retaining edit roles and shortcuts. Actual initial-maximize/Alt-F10/Dock lifetime on each OS remains separate acceptance. Linux window buttons are now hidden like pinned source; initial composer focus and conditional Open-in controls are native-CPU tested. Actual recapture pending.",
           "evidence": "../native-ui-acceptance.json",
           "last_verified_sha": null,
           "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."

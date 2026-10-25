@@ -294,7 +294,7 @@
       "expected_visible": [
         "Failures selected",
         "Provider/tool/stopped metadata",
-        "When/session/provider/model/type/message source columns",
+        "Five source columns: When, Type, Model, Session, Message (no separate Provider column)",
         "Search, Columns, totals, pager and retry explanation"
       ],
       "must_not_claim": [
@@ -785,16 +785,17 @@
       "verdict": "KEEP_WITH_RECIPE",
       "fixture": "core",
       "capture_steps": [
-        "Open Provider; select provider A; leave menu open and focus a list row with ArrowDown."
+        "Open Provider; select provider A; leave menu open and hover another row with the pointer."
       ],
       "expected_visible": [
         "Focused search",
         "All row",
-        "Provider rows with checks and keyboard highlight",
+        "Provider rows with checks and pointer hover highlight",
         "Select all and Clear footer"
       ],
       "must_not_claim": [
-        "Exclusive single-select behavior"
+        "Exclusive single-select behavior",
+        "Enter toggles selection: source confirms by dismissing without changing filters"
       ],
       "source": [
         {
@@ -1249,7 +1250,7 @@
       "expected_visible": [
         "Source Sessions column titles",
         "Shown checkmarks",
-        "Reset columns action"
+        "Show all action"
       ],
       "must_not_claim": [
         "Headless MyGoTester Menu() metadata counts as painted native popup"

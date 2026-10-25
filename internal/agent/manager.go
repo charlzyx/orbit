@@ -55,23 +55,26 @@ func (s *liveSession) busy() bool {
 // Manager keeps active and background Pi processes alive independently of any
 // window. Tick is nonblocking; Open/Send/ReloadSessions perform I/O in workers.
 type Manager struct {
-	workflowStore    *preferences.Store
-	workflowMu       sync.Mutex
-	sessionIndex     SessionIndex
-	configuredBinary atomic.Value
-	options          Options
-	mu               sync.Mutex
-	sessions         map[string]*liveSession
-	diskRows         []SessionRow
-	active           string
-	sequence         uint64
-	lastError        string
-	closed           bool
-	scanning         bool
-	lastScan         time.Time
-	ctx              context.Context
-	cancel           context.CancelFunc
-	workers          sync.WaitGroup
+	patchPolicyEnabled bool
+	patchPolicyVersion uint64
+	patchPolicyMu      sync.Mutex
+	workflowStore      *preferences.Store
+	workflowMu         sync.Mutex
+	sessionIndex       SessionIndex
+	configuredBinary   atomic.Value
+	options            Options
+	mu                 sync.Mutex
+	sessions           map[string]*liveSession
+	diskRows           []SessionRow
+	active             string
+	sequence           uint64
+	lastError          string
+	closed             bool
+	scanning           bool
+	lastScan           time.Time
+	ctx                context.Context
+	cancel             context.CancelFunc
+	workers            sync.WaitGroup
 }
 
 func NewManager(options Options) *Manager {
@@ -102,6 +105,7 @@ func NewManager(options Options) *Manager {
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	manager := &Manager{options: options, sessions: map[string]*liveSession{}, ctx: ctx, cancel: cancel, workflowStore: preferences.New(options.Home)}
+	manager.patchPolicyEnabled = manager.workflowStore.RPCPatches().Enabled && !options.DisablePatches && !patchEnvironmentDisabled(options)
 	manager.configuredBinary.Store(options.PiBinary)
 	manager.ReloadSessions()
 	return manager
@@ -186,6 +190,7 @@ func (m *Manager) start(key string, entry *liveSession, workspace, path string) 
 	options.PiBinary = m.PiBinary()
 	m.mu.Lock()
 	entry.launcher = options.PiBinary
+	patchVersion := m.patchPolicyVersion
 	m.mu.Unlock()
 	if path != "" {
 		row, rowErr := ReadSession(path)
@@ -274,6 +279,7 @@ func (m *Manager) start(key string, entry *liveSession, workspace, path string) 
 		return
 	}
 	entry.client = client
+	m.adoptPatchStatusLocked(&status, patchVersion)
 	entry.state.snapshot.Extensions = status
 	entry.state.snapshot.AccessMode = readAccess(m.options.Home)
 	m.mu.Unlock()
@@ -444,6 +450,7 @@ func (m *Manager) Send(kind string, params map[string]any) error {
 	}
 	client := entry.client
 	m.mu.Unlock()
+	authSession, _ := params["sessionId"].(string)
 	command := pirpc.NewCommand(kind, params)
 	// Freeze caller-owned maps before the asynchronous worker starts.
 	raw, err := json.Marshal(command)
@@ -504,6 +511,13 @@ func (m *Manager) Send(kind string, params map[string]any) error {
 		_, err := client.Call(ctx, command)
 		cancel()
 		if err != nil {
+			if kind == pirpc.AuthLogin {
+				m.mu.Lock()
+				if current := m.sessions[key]; current == entry {
+					failAuthLogin(&current.state.snapshot.Auth, authSession, err)
+				}
+				m.mu.Unlock()
+			}
 			if (kind == pirpc.Prompt || kind == pirpc.Steer || kind == pirpc.FollowUp) && errors.Is(err, context.Canceled) {
 				m.mu.Lock()
 				entry.state.awaiting = false
@@ -922,6 +936,7 @@ func (m *Manager) Snapshot() Snapshot {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	snapshot := Snapshot{Status: "Disconnected", StatusEntries: map[string]string{}}
+	snapshot.Extensions.Patches.Enabled = m.patchPolicyEnabled
 	if entry := m.sessions[m.active]; entry != nil {
 		snapshot = entry.state.snapshot
 		snapshot.Awaiting = entry.state.awaiting
@@ -1122,9 +1137,17 @@ func (m *Manager) StartLogin(provider, method string) error {
 	entry.state.snapshot.Auth.Method = method
 	entry.state.snapshot.Auth.Status = "pending"
 	entry.state.snapshot.Auth.Error = ""
+	clearAuthChallenge(&entry.state.snapshot.Auth)
 	entry.state.snapshot.Auth.ExpiresAt = time.Now().Add(5 * time.Minute).UnixMilli()
 	m.mu.Unlock()
-	return m.Send(pirpc.AuthLogin, map[string]any{"provider": provider, "method": method, "sessionId": sessionID})
+	err := m.Send(pirpc.AuthLogin, map[string]any{"provider": provider, "method": method, "sessionId": sessionID})
+	if err != nil {
+		m.mu.Lock()
+		failAuthLogin(&entry.state.snapshot.Auth, sessionID, err)
+		m.mu.Unlock()
+		m.changed()
+	}
+	return err
 }
 func (m *Manager) CancelLogin() error {
 	m.mu.Lock()

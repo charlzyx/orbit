@@ -1,7 +1,9 @@
 package orbitui
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -44,28 +46,53 @@ func TestSettingsBackendTrendDoesNotCompressMissingDays(t *testing.T) {
 		t.Fatal("gap is not a zero-valued day")
 	}
 }
-func TestSettingsBackendNativeUnbilledErrorsRemainVisible(t *testing.T) {
-	a := fixtureUsageApp(t)
-	at := a.usageState.fixtureNow
-	a.usageState.index = workbench.UsageIndex{Errors: []workbench.UsageError{{At: at, Session: "fixture", SessionPath: "/fixture/session.jsonl", Kind: "provider", Message: "Unbilled fixture failure"}}}
-	a.usageState.projection = buildUsageProjection(a.usageState.index, a.usageState.filter, "day", time.UTC)
-	a.usageState.mode = "details"
-	a.usageState.detail = "failures"
-	tt := ui.NewTester(a.View, 1470, 922)
-	tt.Frame()
-	if tt.HasText("No usage in this range") {
-		t.Fatal("unbilled failure was hidden by the no-request empty state")
-	}
-	if !tt.HasText("Failure details") {
-		found := false
-		for _, text := range tt.Texts() {
-			if strings.Contains(text, "Unbilled fixture failure") {
-				found = true
+
+// Pinned Rust considers requests and tools, not standalone error rows, when
+// deciding whether the dashboard is empty (model.rs:614, aggregate.rs:1150).
+func TestSettingsBackendNativeUnbilledErrorsRespectSourceEmptyGate(t *testing.T) {
+	for _, mixed := range []bool{false, true} {
+		t.Run(fmt.Sprint("mixed=", mixed), func(t *testing.T) {
+			a := fixtureUsageApp(t)
+			s := &a.usageState
+			at := s.fixtureNow
+			s.index = workbench.UsageIndex{Errors: []workbench.UsageError{{At: at, Session: "fixture", SessionPath: "/fixture/session.jsonl", Kind: "provider", Message: "Unbilled fixture failure"}}}
+			if mixed {
+				s.index.Records = []workbench.UsageRecord{{At: at, Session: "fixture", SessionPath: "/fixture/session.jsonl", Tokens: workbench.Tokens{Input: 5, Output: 2, Total: 7}}}
 			}
-		}
-		if !found {
-			t.Fatal("unbilled failure did not reach native records")
-		}
+			s.projection = buildUsageProjection(s.index, s.filter, "day", time.UTC)
+			s.mode = "details"
+			s.detail = "failures"
+			tt := ui.NewTester(a.View, 1470, 922)
+			tt.Frame()
+			if len(s.index.Errors) != 1 || len(s.projection.Errors) != 1 {
+				t.Fatal("empty gate deleted actual error data")
+			}
+			visible := false
+			for _, text := range tt.Texts() {
+				if strings.Contains(text, "Unbilled fixture failure") {
+					visible = true
+				}
+			}
+			if mixed {
+				if !visible || tt.HasText("No usage data yet") {
+					t.Fatal("mixed real-request/unbilled-error data was hidden")
+				}
+			} else {
+				if visible || !tt.HasText("No usage data yet") {
+					t.Fatal("error-only store does not match source empty gate")
+				}
+			}
+			if s.projection.Summary.PricedRequests != 0 || s.projection.Summary.Cost != 0 {
+				t.Fatal("unpriced activity fabricated cost")
+			}
+			var exported bytes.Buffer
+			if err := s.index.ExportJSON(&exported, s.filter, workbench.UsageExportOptions{Now: at, Location: time.UTC}); err != nil {
+				t.Fatal(err)
+			}
+			if !strings.Contains(exported.String(), "Unbilled fixture failure") {
+				t.Fatal("empty visible gate lost exportable error")
+			}
+		})
 	}
 }
 func TestSettingsBackendUsagePreferencesPreserveUnknownAndDefaultDescending(t *testing.T) {

@@ -340,7 +340,7 @@ func (s *State) createDialog(c *ui.Context) {
 		s.generateDraft(pull)
 	}
 	if pull {
-		ui.TextInput(c, &s.base).Label("Base branch").Placeholder("Base branch (repository default if empty)").AlignSelf(ui.Stretch)
+		s.baseBranchSelector(c.Key("pr-base-selector"))
 		ui.Checkbox(c, &s.draft, "Create as draft")
 	} else {
 		ui.TextInput(c, &s.assignees).Label("Assignees").Placeholder("Assignees, comma separated").AlignSelf(ui.Stretch)

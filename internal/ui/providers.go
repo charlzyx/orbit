@@ -2,21 +2,20 @@ package orbitui
 
 import (
 	"context"
-	"fmt"
-	"github.com/charlzyx/orbit/internal/agent"
 	"github.com/charlzyx/orbit/internal/workbench"
 	"github.com/egoist/mygo/ui"
-	"sort"
 	"strings"
 )
 
 type providerState struct {
-	catalog                  workbench.ProviderCatalog
-	query                    string
-	connectedOnly            bool
-	editor                   *providerDraft
-	secretBusy, secretCookie bool
-	secretError              string
+	catalog                   workbench.ProviderCatalog
+	query                     string
+	connectedOnly             bool
+	editor                    *providerDraft
+	secretBusy, secretCookie  bool
+	secretError               string
+	authTarget, usageProvider string
+	dismissedAuthSession      string
 }
 type providerDraft struct {
 	edit                           workbench.ProviderEdit
@@ -45,183 +44,6 @@ func (a *App) refreshProviders() {
 		}
 	})
 	a.Dispatch(Action{Kind: "RefreshProviders"})
-}
-func (a *App) providerRows(c *ui.Context) {
-	s := &a.providerState
-	ui.Row(c).Wrap().Gap(8).Children(func() {
-		ui.TextInput(c, &s.query).Label("Search providers").Placeholder(a.text("settings.providers_search", "Search providers…")).Grow(1).MinWidth(180)
-		if a.button(c, a.text("common.refresh", "Refresh"), "icons/refresh.svg", false).Disabled(a.settingsLoading).Clicked() {
-			a.refreshProviders()
-		}
-		if a.button(c, a.text("settings.providers_add", "Add provider…"), "icons/plus.svg", false).Clicked() {
-			a.editProvider(workbench.Provider{})
-		}
-	})
-	ui.Checkbox(c, &s.connectedOnly, "Configured providers only")
-	configs := map[string]workbench.Provider{}
-	metadata := map[string]workbench.ProviderMetadata{}
-	auth := map[string]agent.AuthProvider{}
-	for _, p := range a.providers {
-		configs[p.ID] = p
-	}
-	for _, p := range s.catalog.Providers {
-		metadata[p.ID] = p
-	}
-	for _, p := range a.Model.AuthProviders {
-		auth[p.ID] = p
-		if _, ok := metadata[p.ID]; !ok {
-			metadata[p.ID] = workbench.ProviderMetadata{ID: p.ID, Name: p.Name}
-		}
-	}
-	for id, p := range configs {
-		if _, ok := metadata[id]; !ok {
-			metadata[id] = workbench.ProviderMetadata{ID: id, Name: p.Name, APIKey: true}
-		}
-	}
-	ids := make([]string, 0, len(metadata))
-	for id := range metadata {
-		ids = append(ids, id)
-	}
-	sort.Strings(ids)
-	shown := 0
-	for _, id := range ids {
-		meta := metadata[id]
-		p, custom := configs[id]
-		authp := auth[id]
-		cred := a.credentials[id]
-		name := meta.Name
-		if p.Name != "" {
-			name = p.Name
-		}
-		if name == "" {
-			name = id
-		}
-		if s.query != "" && !strings.Contains(strings.ToLower(name+" "+id+" "+meta.Note), strings.ToLower(s.query)) {
-			continue
-		}
-		configured := cred.Configured || authp.Authenticated || p.HasAPIKey
-		if s.connectedOnly && !configured {
-			continue
-		}
-		shown++
-		status := "Not configured"
-		if configured {
-			status = "Configured"
-		}
-		if authp.Authenticated {
-			status = "Authenticated"
-		}
-		if cred.Configured {
-			status += " · " + cred.Kind
-		}
-		if meta.HasCatalogCount {
-			status += fmt.Sprintf(" · %d catalog models", meta.CatalogCount)
-		}
-		if custom {
-			status += " · custom configuration"
-		}
-		ui.Column(c.Key("provider:"+id)).Border(1, a.Theme.Border).Radius(8).Padding(12).Gap(8).Children(func() {
-			a.setting(c, name, status, func() {
-				a.button(c, "Configure", "icons/settings.svg", false).Menu(func(m *ui.Menu) {
-					if m.Item("Edit provider…").Chosen() {
-						if !custom {
-							p.ID = id
-							p.Name = name
-						}
-						a.editProvider(p)
-					}
-					if meta.APIKey || custom {
-						if m.Item("API key…").Chosen() {
-							a.openProviderSecret(id, false)
-						}
-					}
-					if id == "ollama" || id == "ollama-cloud" {
-						if m.Item("Ollama web session…").Chosen() {
-							a.openProviderSecret(id, true)
-						}
-					}
-					for _, method := range authp.Methods {
-						if m.Item(method.Label).Chosen() {
-							a.Dispatch(Action{Kind: "Login", Value: id, Data: map[string]any{"method": method.ID}})
-						}
-					}
-					if authp.Authenticated {
-						if m.Item("Sign out…").Chosen() {
-							a.Confirm("Sign out?", name, func() { a.Dispatch(Action{Kind: "Logout", Value: id}) })
-						}
-					}
-					if cred.Configured {
-						if m.Item("Remove saved credential…").Chosen() {
-							a.Confirm("Remove saved credential?", name+" will no longer use this locally saved credential. Environment credentials are not changed.", func() {
-								svc := a.Service()
-								a.Async(func() func() {
-									var e error
-									if cred.Kind == "ollama_cloud_session" {
-										e = svc.RemoveOllamaSession()
-									} else {
-										e = svc.RemoveCredential(id)
-									}
-									return func() {
-										a.save(e)
-										if e == nil {
-											a.Dispatch(Action{Kind: "RuntimeConfigChanged"})
-										}
-										a.refreshProviders()
-									}
-								})
-							})
-						}
-					}
-					if custom {
-						if m.Item("Remove provider configuration…").Chosen() {
-							a.Confirm("Remove provider configuration?", id+" overrides and custom models will be removed. Saved authentication is kept.", func() {
-								svc := a.Service()
-								a.Async(func() func() {
-									e := svc.RemoveProvider(id)
-									return func() {
-										a.save(e)
-										if e == nil {
-											a.Dispatch(Action{Kind: "RuntimeConfigChanged"})
-										}
-										a.refreshProviders()
-									}
-								})
-							})
-						}
-					}
-				})
-			})
-			if custom && p.BaseURL != "" {
-				ui.Text(c, p.BaseURL).TextColor(a.Theme.TextMuted).Selectable()
-			}
-			if meta.Note != "" {
-				ui.Text(c, meta.Note).TextColor(a.Theme.TextMuted).FontSize(12)
-			}
-			if len(meta.EnvVars) > 0 {
-				ui.Text(c, "Environment: "+strings.Join(meta.EnvVars, ", ")).TextColor(a.Theme.TextMuted).Font(a.Fonts.CodeFamily).FontSize(11)
-			}
-			if meta.OAuth && len(authp.Methods) == 0 && !a.Model.Connected {
-				ui.Text(c, "Connect pi to discover available sign-in methods.").TextColor(a.Theme.TextMuted).FontSize(11)
-			}
-		})
-	}
-	if a.Model.AuthURL != "" || a.Model.AuthStatus != "" {
-		ui.Column(c).Padding(12).Border(1, a.Theme.Border).Gap(8).Children(func() {
-			ui.Text(c, a.Model.AuthStatus).TextColor(a.Theme.TextMuted)
-			if a.Model.AuthURL != "" && a.button(c, "Open authentication page", "icons/external-link.svg", false).Clicked() {
-				a.Dispatch(Action{Kind: "OpenLink", Value: a.Model.AuthURL})
-			}
-			if a.Model.AuthCode != "" {
-				ui.Text(c, a.Model.AuthCode).Font(a.Fonts.CodeFamily).FontSize(20).Selectable()
-			}
-			if a.button(c, "Cancel sign in", "", false).Clicked() {
-				a.Dispatch(Action{Kind: "CancelLogin"})
-			}
-		})
-	}
-	if shown == 0 && !a.settingsLoading {
-		ui.Text(c, "No providers match these filters.").TextColor(a.Theme.TextMuted)
-	}
 }
 func (a *App) isCatalogProvider(id string) bool {
 	for _, p := range a.providerState.catalog.Providers {

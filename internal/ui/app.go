@@ -59,6 +59,8 @@ type Usage struct {
 	ContextTokens, ContextWindow                     int64
 }
 type Snapshot struct {
+	Auth                                                                                                    agent.AuthState
+	Retrying                                                                                                bool
 	ModelCatalog                                                                                            []agent.ModelChoice
 	CurrentModel                                                                                            agent.ModelChoice
 	LatestTurn                                                                                              int
@@ -123,6 +125,7 @@ type Notice struct {
 	Until time.Time
 }
 type App struct {
+	rpcPatchSaving                                                  bool
 	Models                                                          *modelui.State
 	modelDismissedAt                                                time.Time
 	workspacePicker                                                 workspacePickerState
@@ -228,6 +231,8 @@ func New(o Options) *App {
 	}
 	a.ExplorerWidth = float32(a.Layout.ExplorerWidth)
 	a.ReviewWidth = float32(a.Layout.SidepaneWidth)
+	a.reviewState.wrap = true
+	a.reviewState.tree = true
 	a.access = o.Store.Access()
 	a.workflow = o.Store.Workflow("")
 	a.settingsScroll = map[string]*ui.ScrollState{}
@@ -256,7 +261,7 @@ func New(o Options) *App {
 func (a *App) reloadLocale() {
 	lang := a.Prefs.Language
 	if lang == "system" || lang == "" {
-		lang = "en"
+		lang = systemLanguage()
 	}
 	a.catalog, _ = orbitassets.Locale(lang)
 }
@@ -368,8 +373,7 @@ func (a *App) goHistory(delta int) {
 }
 func (a *App) flushFilesOnLeave(next string) {
 	if a.page == "files" && next != "files" && a.files != nil {
-		ed := a.files.editor
-		a.Async(func() func() { err := ed.SaveAll(); return func() { a.save(err) } })
+		a.saveFiles()
 	}
 }
 func (a *App) View(c *ui.Context) {

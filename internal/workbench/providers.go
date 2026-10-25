@@ -219,6 +219,23 @@ func (s *Service) ProviderCatalog(ctx context.Context) (ProviderCatalog, error) 
 			catalog.Dynamic = true
 		}
 	}
+
+	// Catalog files can precede dynamically advertised provider metadata. Keep
+	// these providers visible without inventing OAuth or API-key capabilities.
+	seen := make(map[string]bool, len(catalog.Providers))
+	for _, p := range catalog.Providers {
+		seen[p.ID] = true
+	}
+	missing := []string{}
+	for id := range counts {
+		if !seen[id] {
+			missing = append(missing, id)
+		}
+	}
+	sort.Strings(missing)
+	for _, id := range missing {
+		catalog.Providers = append(catalog.Providers, ProviderMetadata{ID: id, Name: id})
+	}
 	for n := range catalog.Providers {
 		p := &catalog.Providers[n]
 		p.CatalogCount, p.HasCatalogCount = counts[p.ID]
@@ -301,7 +318,7 @@ func readProviderCatalogCounts(dir string) map[string]int {
 	out := map[string]int{}
 	entries, _ := os.ReadDir(dir)
 	for _, entry := range entries {
-		if entry.IsDir() || filepath.Ext(entry.Name()) != ".json" {
+		if entry.IsDir() || entry.Name() == ".manifest.json" || filepath.Ext(entry.Name()) != ".json" {
 			continue
 		}
 		m, e := readObject(filepath.Join(dir, entry.Name()))

@@ -101,6 +101,8 @@ Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 
 **Owner challenge UI-S05 [PARTIAL]:** Draft/inactive file generation tests pass. Whole native controller repository-switch interaction with fake Pi and all domain mutations still needs a dedicated end-to-end fixture. [Scoped steps/tests](../native-ui-acceptance.json).
 
+**Owner challenge UI-S08 [PARTIAL]:** These focused cases pass and1470x922CPU popup is inspected. Actual native folder dialog, workspace logo lookup, project mark customization, sidebar sticky headers and matched pixels remain open. [Scoped steps/tests](../native-ui-acceptance.json).
+
 **Additional source-specific procedures:** [../background-acceptance.md](../background-acceptance.md)
 
 **Remaining:** Native code exists; this row is not validated end to end.

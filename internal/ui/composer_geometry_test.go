@@ -72,3 +72,48 @@ func TestSourceComposerCompactKeepsSendReachable(t *testing.T) {
 		t.Fatal("send clipped", r)
 	}
 }
+
+func TestSourceComposerContactShadowPaintsOutsideOpaqueBox(t *testing.T) {
+	for _, dark := range []bool{true, false} {
+		t.Run(map[bool]string{true: "dark", false: "light"}[dark], func(t *testing.T) {
+			a := fixture(t)
+			drainRegressionUpdates(t, a, func() bool { return !a.backdrop.loading })
+			a.backdrop.field = nil // Isolate the shadow from the animated field.
+			if !dark {
+				a.Appearance.Mode = "light"
+				a.Theme = NewTheme("orbit-azure-light", a.Prefs, a.Fonts)
+			}
+			alpha := float32(.05)
+			if !dark {
+				alpha = .06
+			}
+			if a.Theme.overlay() != a.Theme.Text.Alpha(alpha) {
+				t.Fatal("quiet send overlay differs from source theme wash")
+			}
+			tt := ui.NewTester(a.View, 1470, 922)
+			tt.SetDark(dark)
+			tt.Frame()
+			box, ok := tt.Find("Composer box")
+			if !ok {
+				t.Fatal("composer missing")
+			}
+			pixels, x := tt.Image(), int(box.X+box.W/2)
+			shadow := false
+			for y := int(math.Ceil(float64(box.Y + box.H))); y < int(box.Y+box.H)+8; y++ {
+				r, g, b, alpha := pixels.At(x, y).RGBA()
+				bg := a.Theme.Background
+				if r>>8 < uint32(bg.R) && g>>8 < uint32(bg.G) && b>>8 < uint32(bg.B) && alpha == 65535 {
+					shadow = true
+				}
+			}
+			if !shadow {
+				t.Fatal("source contact shadow missing below composer", box)
+			}
+			r, g, b, _ := pixels.At(x, int(box.Y+10)).RGBA()
+			want := a.Theme.SurfaceSecondary
+			if r>>8 != uint32(want.R) || g>>8 != uint32(want.G) || b>>8 != uint32(want.B) {
+				t.Fatal("shadow changed the opaque composer fill")
+			}
+		})
+	}
+}

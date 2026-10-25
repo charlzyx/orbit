@@ -125,3 +125,18 @@ permission to change further product behavior without source review.
 - Narrow evidence: `TestCheckpointStartPrecedesImmediatePiToolMutation` makes an actual
   fixture Pi child write immediately on receiving prompt, before emitting
   `agent_start`, and verifies that write appears in the completed diff.
+
+## D09 — Provider metadata does not turn the catalog manifest into a provider (P05)
+
+- Source `providers.rs::read_catalog_counts`, lines587–619, reads every JSON file
+  and counts object-valued members. `app/settings.rs::provider_views` then adds
+  each count-map key as a provider with an assumed API-key capability. The actual
+  native reference therefore shows `.manifest` and a count of42.
+- Go's metadata join displays actual Pi provider metadata rather than promoting
+  `.manifest.json` bookkeeping to a usable authentication target. This source
+  defect correction is not a visual parity PASS or authorization to invent other
+  provider capabilities.
+- Valid future catalog-only providers are retained separately, with unknown
+  authentication capabilities until Pi confirms them. The real package/catalog
+  fixture test fails if they disappear or receive invented capabilities. See
+  [Settings reconstruction evidence](settings-source-reconstruction.md).

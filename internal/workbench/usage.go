@@ -18,6 +18,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"unicode/utf8"
 )
 
 type Tokens struct{ Input, Output, CacheRead, CacheWrite, Reasoning, Total uint64 }
@@ -68,11 +69,14 @@ type UsageIndex struct {
 	Turns                  []UsageTurn
 	Warnings               []string
 	Files, Parsed, Skipped int
+	UnreadableFiles        int `json:"-"`
 }
 type usageFile struct {
-	size     int64
-	modified time.Time
-	index    UsageIndex
+	size       int64
+	modified   time.Time
+	index      UsageIndex
+	unreadable bool
+	warning    string
 }
 type UsageScanner struct {
 	Root  string
@@ -119,7 +123,7 @@ func (s *UsageScanner) Scan(ctx context.Context) (UsageIndex, error) {
 		if ctx.Err() != nil {
 			break
 		}
-		st, err := os.Lstat(path)
+		st, err := os.Stat(path)
 		if err != nil {
 			continue
 		}
@@ -134,13 +138,24 @@ func (s *UsageScanner) Scan(ctx context.Context) (UsageIndex, error) {
 		if !ok || f.size != st.Size() || !f.modified.Equal(st.ModTime()) {
 			index, err := readUsageFile(ctx, path)
 			if err != nil {
-				out.Warnings = append(out.Warnings, filepath.Base(path)+": "+err.Error())
-				out.Skipped++
-				continue
+				if ctx.Err() != nil {
+					break
+				}
+				f = usageFile{size: st.Size(), modified: st.ModTime(), unreadable: true, warning: filepath.Base(path) + ": " + err.Error()}
+				s.cache[path] = f
+			} else {
+				f = usageFile{size: st.Size(), modified: st.ModTime(), index: index}
+				s.cache[path] = f
+				out.Parsed++
 			}
-			f = usageFile{st.Size(), st.ModTime(), index}
-			s.cache[path] = f
-			out.Parsed++
+		}
+		if f.unreadable {
+			out.UnreadableFiles++
+			out.Skipped++
+			if f.warning != "" {
+				out.Warnings = append(out.Warnings, f.warning)
+			}
+			continue
 		}
 		out.Records = append(out.Records, f.index.Records...)
 		out.Tools = append(out.Tools, f.index.Tools...)
@@ -260,7 +275,13 @@ func readUsageFile(ctx context.Context, path string) (UsageIndex, error) {
 		return UsageIndex{}, e
 	}
 	defer f.Close()
-	scanner := bufio.NewScanner(f)
+	return readUsageStream(ctx, path, f)
+}
+
+// The pinned collector retains a valid prefix after a reader failure. A missing
+// or wrong first valid JSON header is unreadable; malformed lines alone are not.
+func readUsageStream(ctx context.Context, path string, reader io.Reader) (UsageIndex, error) {
+	scanner := bufio.NewScanner(reader)
 	scanner.Buffer(make([]byte, 64<<10), 64<<20)
 	var out UsageIndex
 	session, workspace, title := "", "", ""
@@ -275,12 +296,16 @@ func readUsageFile(ctx context.Context, path string) (UsageIndex, error) {
 		if ctx.Err() != nil {
 			return out, ctx.Err()
 		}
-		var entry map[string]any
+		if !utf8.Valid(scanner.Bytes()) {
+			break
+		}
+		var value any
 		dec := json.NewDecoder(bytes.NewReader(scanner.Bytes()))
 		dec.UseNumber()
-		if dec.Decode(&entry) != nil || dec.Decode(new(any)) != io.EOF {
+		if dec.Decode(&value) != nil || dec.Decode(new(any)) != io.EOF {
 			continue
 		}
+		entry, _ := value.(map[string]any)
 		if !sawHeader {
 			if stringValue(entry["type"]) != "session" {
 				return out, errors.New("missing session header")
@@ -421,7 +446,7 @@ func readUsageFile(ctx context.Context, path string) (UsageIndex, error) {
 	}
 	out.Sessions = []UsageSession{{ID: session, Path: path, Title: title, Workspace: workspace, Started: sessionStarted, Ended: ended}}
 	out.markPricing()
-	return out, scanner.Err()
+	return out, nil
 }
 
 func usageTextCap(text string, limit int) string {

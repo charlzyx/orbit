@@ -33,6 +33,8 @@ Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 
 **Owner challenge UI-S06 [PARTIAL]:** Fresh cwd no longer manufactures a sidebar project; saved workspaces and actual sessions still populate groups. Source empty-state geometry is mounted. Full marks/icons/sticky active reveal/sort-state persistence remains incomplete. [Scoped steps/tests](../native-ui-acceptance.json).
 
+**Owner challenge UI-S08 [PARTIAL]:** These focused cases pass and1470x922CPU popup is inspected. Actual native folder dialog, workspace logo lookup, project mark customization, sidebar sticky headers and matched pixels remain open. [Scoped steps/tests](../native-ui-acceptance.json).
+
 **Remaining:** Native code exists; this row is not validated end to end.
 **Visual/OS gates:** No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state. This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.
 

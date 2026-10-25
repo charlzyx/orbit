@@ -306,9 +306,10 @@
           "expected": "Source structured tool presentation, cross-block selection, context menu and turn metrics.",
           "tests": [
             "TestLogicalTranscriptKeepsAssistantProseAndToolResult",
-            "TestHostCrossMessageMarkdownAndAlertSelection"
+            "TestHostCrossMessageMarkdownAndAlertSelection",
+            "TestHostRetainedTranscriptSelectionUnmountAndSessionReset"
           ],
-          "remaining": "Typed tools, logical turns, observed-live elapsed time, source tail/usage footer and shared user/Markdown/alert selection are mounted and native-tested. C11 remains a concrete framework gap: selection clears when a virtualized endpoint unmounts; Rust retains SelectedBlock snapshots. Do not equate mounted-row selection with full parity.",
+          "remaining": "Typed tools, logical turns, observed-live elapsed, tail/usage footer and shared Markdown/alert selection are mounted. C10 upstream endpoint-unmount limitation is covered by approved narrow opt-in retention overlay: mounted host native test now verifies exact copy after virtual endpoints unmount and reset on session switch. Full mixed selection/OS gesture corpus and matched native visuals remain open.",
           "evidence": "../native-ui-acceptance.json",
           "last_verified_sha": null,
           "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
@@ -463,9 +464,10 @@
           "expected": "Source structured tool presentation, cross-block selection, context menu and turn metrics.",
           "tests": [
             "TestLogicalTranscriptKeepsAssistantProseAndToolResult",
-            "TestHostCrossMessageMarkdownAndAlertSelection"
+            "TestHostCrossMessageMarkdownAndAlertSelection",
+            "TestHostRetainedTranscriptSelectionUnmountAndSessionReset"
           ],
-          "remaining": "Typed tools, logical turns, observed-live elapsed time, source tail/usage footer and shared user/Markdown/alert selection are mounted and native-tested. C11 remains a concrete framework gap: selection clears when a virtualized endpoint unmounts; Rust retains SelectedBlock snapshots. Do not equate mounted-row selection with full parity.",
+          "remaining": "Typed tools, logical turns, observed-live elapsed, tail/usage footer and shared Markdown/alert selection are mounted. C10 upstream endpoint-unmount limitation is covered by approved narrow opt-in retention overlay: mounted host native test now verifies exact copy after virtual endpoints unmount and reset on session switch. Full mixed selection/OS gesture corpus and matched native visuals remain open.",
           "evidence": "../native-ui-acceptance.json",
           "last_verified_sha": null,
           "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
@@ -620,9 +622,10 @@
           "expected": "Source structured tool presentation, cross-block selection, context menu and turn metrics.",
           "tests": [
             "TestLogicalTranscriptKeepsAssistantProseAndToolResult",
-            "TestHostCrossMessageMarkdownAndAlertSelection"
+            "TestHostCrossMessageMarkdownAndAlertSelection",
+            "TestHostRetainedTranscriptSelectionUnmountAndSessionReset"
           ],
-          "remaining": "Typed tools, logical turns, observed-live elapsed time, source tail/usage footer and shared user/Markdown/alert selection are mounted and native-tested. C11 remains a concrete framework gap: selection clears when a virtualized endpoint unmounts; Rust retains SelectedBlock snapshots. Do not equate mounted-row selection with full parity.",
+          "remaining": "Typed tools, logical turns, observed-live elapsed, tail/usage footer and shared Markdown/alert selection are mounted. C10 upstream endpoint-unmount limitation is covered by approved narrow opt-in retention overlay: mounted host native test now verifies exact copy after virtual endpoints unmount and reset on session switch. Full mixed selection/OS gesture corpus and matched native visuals remain open.",
           "evidence": "../native-ui-acceptance.json",
           "last_verified_sha": null,
           "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."

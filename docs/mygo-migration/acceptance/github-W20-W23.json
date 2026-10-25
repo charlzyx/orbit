@@ -146,7 +146,12 @@
       "known_remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending.",
       "full_parity_verified": false,
       "supplemental_cases": [],
-      "additional_evidence": []
+      "additional_evidence": [
+        "../github-acceptance.md",
+        "github-evidence.json",
+        "../github-base-picker-acceptance.md",
+        "github-state-evidence.json"
+      ]
     },
     {
       "id": "W21",
@@ -189,8 +194,8 @@
         {
           "id": "W21.behavior",
           "dimension": "functional",
-          "action": "Filter issue list by state, text and labels; clear filters; open an issue and inspect metadata.",
-          "expected": "Issue list has Open/Closed/All, search, label filter, clear filters, status/author/label/time/comment metadata and detail selection.",
+          "action": "Open Issues in an authenticated fake-gh repository; return two issues with labels/comments; change state, label and query and refresh.",
+          "expected": "gh issue list uses source default limit50 and the current filters. Repository labels are requested with limit100 only while the in-memory cache is empty; there is no GitHub Load more pagination.",
           "status": "UNTESTED",
           "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
@@ -207,46 +212,46 @@
         {
           "id": "W21.error",
           "dimension": "error",
-          "action": "Return nonzero/malformed/empty fixture gh results and a late response after filter/repository change.",
-          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: gh fetch limit 50, label catalog limit 100; empty/loading/error displayed. Backend assignee filter exists but no assignee picker found in list UI. No continuous issue monitoring or list pagination beyond this fetched window.",
+          "action": "Return a valid issue list but fail label list, then retry refresh; separately fail issue list with the same valid cached labels.",
+          "expected": "Optional labels failure does not reject the list. A primary list failure sets the issue error; previously loaded data is not falsely replaced by successful empty data.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W21.loading",
           "dimension": "loading",
-          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
-          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "action": "Hold issue-list completion, inspect issues_loading, then release; hold the best-effort labels lookup independently.",
+          "expected": "Source sets loading immediately and clears it after completion; the issue list and nonempty label cache are adopted only by the matching completion path. Source itself does not implement a generation guard in spawn_data, so do not invent a source last-response ordering guarantee.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W21.persistence",
           "dimension": "persistence",
-          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
-          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "action": "Load labels, visit History and Pulls, return to Issues, change to a second temporary repository, refresh, then fully restart the application.",
+          "expected": "Within one GitPanel, nonempty issue_labels remains cached even across workspace changes. Lists/templates reset but label cache and creation inputs remain in memory. A new panel/process starts empty; no labels file is persisted.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W21.keyboard",
           "dimension": "keyboard",
-          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
-          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "action": "Invoke the registered secondary-alt-5 GitTabIssues action while Git is visible, then open and dismiss the label picker.",
+          "expected": "Select Issues through the shared command registry. No invented issue-list Load more or dedicated create-issue shortcut. Exact pointer/focus behavior remains a native acceptance gate.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W21.repeat",
           "dimension": "repeat",
-          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
-          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "action": "Refresh Issues three times, navigating History→Pulls→Issues between loads; count fake label-list requests and preserve one returned issue.",
+          "expected": "One label fetch after first successful nonempty cache within the same repository; primary issues fetch still runs on refresh. A failed empty labels lookup may be retried later.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         }
       ],
@@ -271,10 +276,10 @@
       "source_test_inventory": "`gh.rs::{parses_issue_json,parses_labels_json,relative_time_handles_unknown_formats}`",
       "verdicts": {
         "functional": {
-          "status": "UNTESTED",
-          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "status": "PARTIAL",
+          "reason": "Named narrow assertions pass; remaining row steps are unverified.",
           "last_verified_sha": null,
-          "last_partial_evidence_sha": null
+          "last_partial_evidence_sha": "c80aaa612b72d9a162821cc26a51bd0d5997a2954b2f974bb6d7307203f1f8e3"
         },
         "visual": {
           "status": "UNTESTED",
@@ -287,11 +292,30 @@
           "last_verified_sha": null
         }
       },
-      "assertion_results": [],
+      "assertion_results": [
+        {
+          "id": "W21.assert.TestGitHubLabelCacheSurvivesTabRoundTrip",
+          "status": "PASS",
+          "expected": "Within one repository, successful label cache survives History/Pulls/Issues roundtrips and repeated refresh with exactly one label lookup.",
+          "test": "TestGitHubLabelCacheSurvivesTabRoundTrip",
+          "package": "github.com/charlzyx/orbit/internal/gitworkbench",
+          "command": "scripts/go-native.sh test -race -json ./internal/gitworkbench",
+          "evidence": "github-evidence.json",
+          "last_verified_sha": "c80aaa612b72d9a162821cc26a51bd0d5997a2954b2f974bb6d7307203f1f8e3",
+          "sha_kind": "scoped dirty-source manifest; not a published Git commit",
+          "verified_at_utc": "2026-10-25T15:28:23.704424654+09:00",
+          "limits": "Named native CPU/fake-gh/local-repository assertion only. No authenticated remote mutation, full-scope or visual/native-OS PASS."
+        }
+      ],
       "known_remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending.",
       "full_parity_verified": false,
       "supplemental_cases": [],
-      "additional_evidence": []
+      "additional_evidence": [
+        "../github-acceptance.md",
+        "github-evidence.json",
+        "../github-base-picker-acceptance.md",
+        "github-state-evidence.json"
+      ]
     },
     {
       "id": "W22",
@@ -436,7 +460,12 @@
       "known_remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending.",
       "full_parity_verified": false,
       "supplemental_cases": [],
-      "additional_evidence": []
+      "additional_evidence": [
+        "../github-acceptance.md",
+        "github-evidence.json",
+        "../github-base-picker-acceptance.md",
+        "github-state-evidence.json"
+      ]
     },
     {
       "id": "W23",
@@ -581,7 +610,12 @@
       "known_remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending.",
       "full_parity_verified": false,
       "supplemental_cases": [],
-      "additional_evidence": []
+      "additional_evidence": [
+        "../github-acceptance.md",
+        "github-evidence.json",
+        "../github-base-picker-acceptance.md",
+        "github-state-evidence.json"
+      ]
     }
   ]
 }

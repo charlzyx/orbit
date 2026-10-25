@@ -1,21 +1,9 @@
 {
-  "native_menu": [
-    "Session",
-    "Workspace",
-    "Provider",
-    "Model",
-    "Started",
-    "Duration",
-    "Requests",
-    "Input",
-    "Output",
-    "Cache",
-    "Tokens",
-    "Errors",
-    "Tools",
-    "-",
-    "Show all columns",
-    "Reset column widths"
-  ],
-  "note": "CPU Tester does not paint OS-native menus"
+  "note": "Current source columns popup is painted by MyGo; supersedes prior OS-menu metadata-only capture",
+  "panel_bounds": {
+    "X": 855,
+    "Y": 87,
+    "W": 220,
+    "H": 411
+  }
 }

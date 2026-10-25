@@ -1,0 +1,607 @@
+{
+  "reference_source": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "implementation_source": "f61e00fdeea806d58fc692c35675401bd095a130",
+  "metadata_mismatches": {},
+  "normalized_fixture_gate": "BLOCKED",
+  "normalization_gaps": [
+    {
+      "application": 0,
+      "unverified": "resolvedFontFaces"
+    },
+    {
+      "application": 0,
+      "unverified": "clockFrozen"
+    },
+    {
+      "application": 0,
+      "unverified": "animationPhaseFrozen"
+    },
+    {
+      "application": 0,
+      "unverified": "focusAndCaretPhaseVerified"
+    },
+    {
+      "application": 1,
+      "unverified": "resolvedFontFaces"
+    },
+    {
+      "application": 1,
+      "unverified": "clockFrozen"
+    },
+    {
+      "application": 1,
+      "unverified": "animationPhaseFrozen"
+    },
+    {
+      "application": 1,
+      "unverified": "focusAndCaretPhaseVerified"
+    }
+  ],
+  "criteria": "Exact pixel equality: changed_pixels == 0. No tolerance, resizing, crop alignment or masking is applied. Manual semantic review remains independent.",
+  "cases": [
+    {
+      "name": "new-task-dark.png",
+      "reference": "reference/new-task-dark.png",
+      "implementation": "go/new-task-dark.png",
+      "manual_semantic_review": "REVIEWED_DIFFERENCES",
+      "sha256": [
+        "4bd88eaab2f73fe2e56263e27a6598a1b0beebc63e862eaf8a7019679c67b783",
+        "08f0bf93271952a77f149d00d8a6efdf4fb7a0a931e7529c2bfa1ba7f6442bc3"
+      ],
+      "dimensions": [
+        [
+          1470,
+          922
+        ],
+        [
+          1470,
+          922
+        ]
+      ],
+      "status": "DIFFERENT",
+      "changed_pixels": 64096,
+      "changed_percent": 4.729145454277155,
+      "mae": 0.521009857305178,
+      "normalized_rmse": 0.023054255040910555,
+      "max_channel_delta": 210,
+      "difference_bbox": [
+        0,
+        8,
+        1460,
+        922
+      ],
+      "candidate_id": "V001",
+      "manual_finding": "Empty new task, connected real offline Pi. Sidebar/header alignment improved; composer is 3px shorter and hero/text positions differ; caret phase differs.",
+      "reviewed_at": "2026-10-25T07:02:28Z",
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "native_os_scope": "Actual Linux hosted native window only; macOS/Windows unexecuted"
+    },
+    {
+      "name": "settings-about-dark.png",
+      "reference": "reference/settings-about-dark.png",
+      "implementation": "go/settings-about-dark.png",
+      "manual_semantic_review": "REVIEWED_DIFFERENCES",
+      "sha256": [
+        "ae440daf20c520adf868aaba6d3e64268826978ac9a7498d2537f2c2bf6dfa0b",
+        "00e81168f3331a0dac35c47f9ed4ac4c841b3c8af1fde8a89794e6de49429039"
+      ],
+      "dimensions": [
+        [
+          1470,
+          922
+        ],
+        [
+          1470,
+          922
+        ]
+      ],
+      "status": "DIFFERENT",
+      "changed_pixels": 354960,
+      "changed_percent": 26.189738368232327,
+      "mae": 2.820021175498399,
+      "normalized_rmse": 0.04778629988486936,
+      "max_channel_delta": 230,
+      "difference_bbox": [
+        0,
+        24,
+        1311,
+        907
+      ],
+      "candidate_id": "V078",
+      "manual_finding": "FAIL: source icon, star banner and version/component row structure absent. Go/framework/development identity should remain truthful, not falsely claim GPUI.",
+      "reviewed_at": "2026-10-25T07:02:28Z",
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "native_os_scope": "Actual Linux hosted native window only; macOS/Windows unexecuted"
+    },
+    {
+      "name": "settings-agent-dark.png",
+      "reference": "reference/settings-agent-dark.png",
+      "implementation": "go/settings-agent-dark.png",
+      "manual_semantic_review": "REVIEWED_DIFFERENCES",
+      "sha256": [
+        "6c291c63877817ec3b36d6e80bdf90ce64c0c96e59bb2f38f24e072dbd3b8b46",
+        "a0ec2b34ce55f112d2633a3d42f6d8520c24761526dc142418c84621e13988ea"
+      ],
+      "dimensions": [
+        [
+          1470,
+          922
+        ],
+        [
+          1470,
+          922
+        ]
+      ],
+      "status": "DIFFERENT",
+      "changed_pixels": 671508,
+      "changed_percent": 49.54535393333038,
+      "mae": 4.742907314769726,
+      "normalized_rmse": 0.06706501690623766,
+      "max_channel_delta": 231,
+      "difference_bbox": [
+        0,
+        25,
+        1311,
+        922
+      ],
+      "candidate_id": "V075",
+      "manual_finding": "FAIL: source Behavior/Titles/Defaults ordering and segmented controls are absent. Unknown retry state is a separately documented deliberate difference, not a pass.",
+      "reviewed_at": "2026-10-25T07:02:28Z",
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "native_os_scope": "Actual Linux hosted native window only; macOS/Windows unexecuted"
+    },
+    {
+      "name": "settings-appearance-dark.png",
+      "reference": "reference/settings-appearance-dark.png",
+      "implementation": "go/settings-appearance-dark.png",
+      "manual_semantic_review": "REVIEWED_DIFFERENCES",
+      "sha256": [
+        "6c52edc473c876570f18260f6c340f429733cb0472b7f3c89b6792be0430c437",
+        "3b958eb8c93334990635f9264693b3d62b6792f17f3932b5f8ac3c013b63ba5b"
+      ],
+      "dimensions": [
+        [
+          1470,
+          922
+        ],
+        [
+          1470,
+          922
+        ]
+      ],
+      "status": "DIFFERENT",
+      "changed_pixels": 717972,
+      "changed_percent": 52.97357120722476,
+      "mae": 4.20218579839745,
+      "normalized_rmse": 0.05612837662253635,
+      "max_channel_delta": 208,
+      "difference_bbox": [
+        0,
+        25,
+        1311,
+        922
+      ],
+      "candidate_id": "V071",
+      "manual_finding": "FAIL: generic separate theme rows replace source segmented appearance/active theme; missing source preview tiles, source language placement, labels and ordering.",
+      "reviewed_at": "2026-10-25T07:02:28Z",
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "native_os_scope": "Actual Linux hosted native window only; macOS/Windows unexecuted"
+    },
+    {
+      "name": "settings-general-dark.png",
+      "reference": "reference/settings-general-dark.png",
+      "implementation": "go/settings-general-dark.png",
+      "manual_semantic_review": "REVIEWED_DIFFERENCES",
+      "sha256": [
+        "97b2186bf23698998f9eb66c6fd67762e7720acfb347a2c87485265f9a0fee70",
+        "fcd9307ebcece937dbed27c3174668b7ab86ab9f25d9ec7067e2803c5ee96f54"
+      ],
+      "dimensions": [
+        [
+          1470,
+          922
+        ],
+        [
+          1470,
+          922
+        ]
+      ],
+      "status": "DIFFERENT",
+      "changed_pixels": 28686,
+      "changed_percent": 2.1165168887511623,
+      "mae": 0.7444263063142827,
+      "normalized_rmse": 0.03045399467269625,
+      "max_channel_delta": 205,
+      "difference_bbox": [
+        0,
+        24,
+        1311,
+        907
+      ],
+      "candidate_id": "V070",
+      "manual_finding": "Expected General groups, paths and switches are visible. Remaining baseline/row geometry and glyph differences; development version differs.",
+      "reviewed_at": "2026-10-25T07:02:28Z",
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "native_os_scope": "Actual Linux hosted native window only; macOS/Windows unexecuted"
+    },
+    {
+      "name": "settings-mcp-dark.png",
+      "reference": "reference/settings-mcp-dark.png",
+      "implementation": "go/settings-mcp-dark.png",
+      "manual_semantic_review": "REVIEWED_DIFFERENCES",
+      "sha256": [
+        "ca7f3cfb8a5caad6ccdbca057a5d5ae1de3918eb199a49a8094ed67cce581cf9",
+        "27ec9ee41e6dbd9251ee9060ad2948fe761b2c693c19ff3624f8f3e8cefc4df3"
+      ],
+      "dimensions": [
+        [
+          1470,
+          922
+        ],
+        [
+          1470,
+          922
+        ]
+      ],
+      "status": "DIFFERENT",
+      "changed_pixels": 57671,
+      "changed_percent": 4.255094662593888,
+      "mae": 1.3433961220062862,
+      "normalized_rmse": 0.049189401884518674,
+      "max_channel_delta": 231,
+      "difference_bbox": [
+        0,
+        25,
+        1312,
+        907
+      ],
+      "candidate_id": "V235",
+      "manual_finding": "Empty MCP, NOT populated V234. Source icon and unboxed centered state replaced by bordered card; header checked-time/path formatting differs and clock is volatile.",
+      "reviewed_at": "2026-10-25T07:02:28Z",
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "native_os_scope": "Actual Linux hosted native window only; macOS/Windows unexecuted"
+    },
+    {
+      "name": "settings-models-dark.png",
+      "reference": "reference/settings-models-dark.png",
+      "implementation": "go/settings-models-dark.png",
+      "manual_semantic_review": "REVIEWED_DIFFERENCES",
+      "sha256": [
+        "deb2b6a623a431c130e407a401681727e1825e1c4d4c65d3fbcc0f21a2115218",
+        "96b2b3413d058dc28036800c232a692726a911388ba2b62e294bffcc3eeb86fb"
+      ],
+      "dimensions": [
+        [
+          1470,
+          922
+        ],
+        [
+          1470,
+          922
+        ]
+      ],
+      "status": "DIFFERENT",
+      "changed_pixels": 234810,
+      "changed_percent": 17.324804108194254,
+      "mae": 1.8604862986409314,
+      "normalized_rmse": 0.03370666494031036,
+      "max_channel_delta": 205,
+      "difference_bbox": [
+        0,
+        24,
+        1312,
+        907
+      ],
+      "candidate_id": "V125",
+      "manual_finding": "Empty catalog, NOT populated V124. FAIL: source centered icon/large empty panel replaced by compact left-aligned text; toolbar geometry differs.",
+      "reviewed_at": "2026-10-25T07:02:28Z",
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "native_os_scope": "Actual Linux hosted native window only; macOS/Windows unexecuted"
+    },
+    {
+      "name": "settings-plugins-dark.png",
+      "reference": "reference/settings-plugins-dark.png",
+      "implementation": "go/settings-plugins-dark.png",
+      "manual_semantic_review": "REVIEWED_DIFFERENCES",
+      "sha256": [
+        "50e2582ad77738cea1dca2808c39be8586f7d3751a4c41584e0e26ce7801b8d6",
+        "d85fb607ee31befa648e775a7418e65562eaef43745e118634218a47fd3ea0e5"
+      ],
+      "dimensions": [
+        [
+          1470,
+          922
+        ],
+        [
+          1470,
+          922
+        ]
+      ],
+      "status": "DIFFERENT",
+      "changed_pixels": 246543,
+      "changed_percent": 18.190490946921066,
+      "mae": 2.231937373647941,
+      "normalized_rmse": 0.0368577043686021,
+      "max_channel_delta": 223,
+      "difference_bbox": [
+        0,
+        24,
+        1312,
+        907
+      ],
+      "candidate_id": "V225",
+      "manual_finding": "Empty plugins, NOT populated V222. Source icon tile, larger filled empty card, input icon and toolbar geometry differ.",
+      "reviewed_at": "2026-10-25T07:02:28Z",
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "native_os_scope": "Actual Linux hosted native window only; macOS/Windows unexecuted"
+    },
+    {
+      "name": "settings-privacy-dark.png",
+      "reference": "reference/settings-privacy-dark.png",
+      "implementation": "go/settings-privacy-dark.png",
+      "manual_semantic_review": "REVIEWED_DIFFERENCES",
+      "sha256": [
+        "fbd9372aee33d37362e2dd66b1132b6da63bea35ce1d0347931faaf4c579e507",
+        "a819b2e669b2d72e7bbc6880394bd33b4bbdc29a7970e6c8d4dc172e1f8f809b"
+      ],
+      "dimensions": [
+        [
+          1470,
+          922
+        ],
+        [
+          1470,
+          922
+        ]
+      ],
+      "status": "DIFFERENT",
+      "changed_pixels": 678459,
+      "changed_percent": 50.05821417504095,
+      "mae": 4.268512329009695,
+      "normalized_rmse": 0.05895140436332379,
+      "max_channel_delta": 219,
+      "difference_bbox": [
+        0,
+        24,
+        1311,
+        918
+      ],
+      "candidate_id": "V073",
+      "manual_finding": "FAIL: retention labels/control layout and scratch-file inventory differ. Actual temporary build trees differ between jobs, so dynamic inventory is not a normalized fixture.",
+      "reviewed_at": "2026-10-25T07:02:28Z",
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "native_os_scope": "Actual Linux hosted native window only; macOS/Windows unexecuted"
+    },
+    {
+      "name": "settings-providers-dark.png",
+      "reference": "reference/settings-providers-dark.png",
+      "implementation": "go/settings-providers-dark.png",
+      "manual_semantic_review": "REVIEWED_DIFFERENCES",
+      "sha256": [
+        "ef317eda1adc1e37633d463b0f3eb7eab19b244f62900570300c1509d6dfce87",
+        "35a40ab79c86b9f8f86f57fffab4afbf33d50bd1255a4c417f1fb9151f4675e7"
+      ],
+      "dimensions": [
+        [
+          1470,
+          922
+        ],
+        [
+          1470,
+          922
+        ]
+      ],
+      "status": "DIFFERENT",
+      "changed_pixels": 738620,
+      "changed_percent": 54.49702657635722,
+      "mae": 5.827093386161406,
+      "normalized_rmse": 0.08154233635942626,
+      "max_channel_delta": 224,
+      "difference_bbox": [
+        0,
+        24,
+        1312,
+        922
+      ],
+      "candidate_id": "V077",
+      "manual_finding": "FAIL: source responsive provider card grid/icons/auth actions is replaced by a vertical Configure list. Runtime catalog parsing also differs; no credentials used.",
+      "reviewed_at": "2026-10-25T07:02:28Z",
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "native_os_scope": "Actual Linux hosted native window only; macOS/Windows unexecuted"
+    },
+    {
+      "name": "settings-report-bug-dark.png",
+      "reference": "reference/settings-report-bug-dark.png",
+      "implementation": "go/settings-report-bug-dark.png",
+      "manual_semantic_review": "REVIEWED_DIFFERENCES",
+      "sha256": [
+        "e6c8469e5d4f2393cc808b05a2937ffe49bce35eccf8fa5e0187da5509553397",
+        "1115e7065016cde090f45a419719cdfd7ddf6e9cec6f940cbcdcece9ae031017"
+      ],
+      "dimensions": [
+        [
+          1470,
+          922
+        ],
+        [
+          1470,
+          922
+        ]
+      ],
+      "status": "DIFFERENT",
+      "changed_pixels": 659900,
+      "changed_percent": 48.68888987265188,
+      "mae": 5.5859671742883705,
+      "normalized_rmse": 0.06967016808162252,
+      "max_channel_delta": 231,
+      "difference_bbox": [
+        0,
+        24,
+        1312,
+        912
+      ],
+      "candidate_id": "V253",
+      "manual_finding": "FAIL: form width/grouping, segmented Issue type, Generate draft placement and footer differ; Go adds privacy/diagnostic controls. No issue submission or external communication executed.",
+      "reviewed_at": "2026-10-25T07:02:28Z",
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "native_os_scope": "Actual Linux hosted native window only; macOS/Windows unexecuted"
+    },
+    {
+      "name": "settings-runtime-dark.png",
+      "reference": "reference/settings-runtime-dark.png",
+      "implementation": "go/settings-runtime-dark.png",
+      "manual_semantic_review": "REVIEWED_DIFFERENCES",
+      "sha256": [
+        "e06f3ec062e6255d7eeeee385a7bbba0f5fa6cf56574185370fd047dd246b5f1",
+        "4eea35432c246ebff12b0b622751480d61399378893b8cef4b550304002758cc"
+      ],
+      "dimensions": [
+        [
+          1470,
+          922
+        ],
+        [
+          1470,
+          922
+        ]
+      ],
+      "status": "DIFFERENT",
+      "changed_pixels": 635548,
+      "changed_percent": 46.89214514439181,
+      "mae": 3.5065330470583027,
+      "normalized_rmse": 0.051996423209414284,
+      "max_channel_delta": 209,
+      "difference_bbox": [
+        0,
+        24,
+        1311,
+        907
+      ],
+      "candidate_id": "V074",
+      "manual_finding": "FAIL: source RPC-patch switch absent from this Go surface; status/transport labels, extra dependency rows and stderr card differ. PID/uptime are volatile.",
+      "reviewed_at": "2026-10-25T07:02:28Z",
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "native_os_scope": "Actual Linux hosted native window only; macOS/Windows unexecuted"
+    },
+    {
+      "name": "settings-shortcuts-dark.png",
+      "reference": "reference/settings-shortcuts-dark.png",
+      "implementation": "go/settings-shortcuts-dark.png",
+      "manual_semantic_review": "REVIEWED_DIFFERENCES",
+      "sha256": [
+        "d1a38fcd98bcafb3ed16d9f27f9ea86d0ebf15d107149275aa37e616194cd95f",
+        "0cc3161bb8da9f3dee92cc71d812739323227a3e97d5cbb862a97c474ca3f605"
+      ],
+      "dimensions": [
+        [
+          1470,
+          922
+        ],
+        [
+          1470,
+          922
+        ]
+      ],
+      "status": "DIFFERENT",
+      "changed_pixels": 713123,
+      "changed_percent": 52.61580120117461,
+      "mae": 4.009381040919622,
+      "normalized_rmse": 0.06173090136454879,
+      "max_channel_delta": 205,
+      "difference_bbox": [
+        0,
+        24,
+        1311,
+        922
+      ],
+      "candidate_id": "V072",
+      "manual_finding": "FAIL: Go lists palette-only commands and expanded 1\u20139 chords where source uses shorter reference rows; wrong row heights/dividers and chip case.",
+      "reviewed_at": "2026-10-25T07:02:28Z",
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "native_os_scope": "Actual Linux hosted native window only; macOS/Windows unexecuted"
+    },
+    {
+      "name": "settings-skills-dark.png",
+      "reference": "reference/settings-skills-dark.png",
+      "implementation": "go/settings-skills-dark.png",
+      "manual_semantic_review": "REVIEWED_DIFFERENCES",
+      "sha256": [
+        "fd90987079d18a850670d535f6f2f6bafd94370c764575e3a03597a2b32c1d5a",
+        "27783a12f6219c53894af4cd5ad0956b86448f854ef32b98288e4d068ea63d44"
+      ],
+      "dimensions": [
+        [
+          1470,
+          922
+        ],
+        [
+          1470,
+          922
+        ]
+      ],
+      "status": "DIFFERENT",
+      "changed_pixels": 17960,
+      "changed_percent": 1.3251287499815545,
+      "mae": 0.3665369944073074,
+      "normalized_rmse": 0.02082863942534492,
+      "max_channel_delta": 205,
+      "difference_bbox": [
+        0,
+        21,
+        1158,
+        912
+      ],
+      "candidate_id": "V216",
+      "manual_finding": "Empty skills, NOT populated V213. Source no-match search icon missing, search row/empty-state offsets differ. Master/detail split is present.",
+      "reviewed_at": "2026-10-25T07:02:28Z",
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "native_os_scope": "Actual Linux hosted native window only; macOS/Windows unexecuted"
+    },
+    {
+      "name": "settings-worktrees-dark.png",
+      "reference": "reference/settings-worktrees-dark.png",
+      "implementation": "go/settings-worktrees-dark.png",
+      "manual_semantic_review": "REVIEWED_DIFFERENCES",
+      "sha256": [
+        "f01559d14a8e1b32335f3acc3766d6b83a6ae0d2452b38822a6fd0ddffd4dc3e",
+        "9263dbb7e9e6a5bdfaff804f31a4476aeced7b441820d873d0871944ce06750e"
+      ],
+      "dimensions": [
+        [
+          1470,
+          922
+        ],
+        [
+          1470,
+          922
+        ]
+      ],
+      "status": "DIFFERENT",
+      "changed_pixels": 379681,
+      "changed_percent": 28.01370873729101,
+      "mae": 2.8916443475437896,
+      "normalized_rmse": 0.051704543466246866,
+      "max_channel_delta": 231,
+      "difference_bbox": [
+        0,
+        24,
+        1311,
+        907
+      ],
+      "candidate_id": "V076",
+      "manual_finding": "FAIL: missing Manage worktrees navigation row, inline editable location fields, source group structure and labels.",
+      "reviewed_at": "2026-10-25T07:02:28Z",
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "native_os_scope": "Actual Linux hosted native window only; macOS/Windows unexecuted"
+    }
+  ],
+  "counts": {
+    "MISSING": 0,
+    "RESHOOT": 0,
+    "DIFFERENT": 15,
+    "EXACT_PIXELS": 0,
+    "fully_normalized_pairs": 0,
+    "visual_pass": 0
+  },
+  "ci_run": "https://github.com/charlzyx/orbit/actions/runs/40170731635"
+}

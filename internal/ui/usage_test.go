@@ -110,25 +110,16 @@ func TestUsageNativeLoadedEmptyErrorAndModal(t *testing.T) {
 	if !strings.Contains(strings.Join(tt.Texts(), " "), "provider unavailable") {
 		t.Fatal("unbilled failure hidden")
 	}
-	a.usageState.detailError = &a.usageState.projection.Errors[0]
-	tt.Frame()
-	if !a.modalOpen() {
-		t.Fatal("usage detail didn't block native menus")
-	}
-	tt.Key(0, ui.KeyEscape)
-	if a.usageState.detailError != nil {
-		t.Fatal("failure detail Escape failed")
-	}
 	a.usageState.index = workbench.UsageIndex{}
 	a.usageState.projection = buildUsageProjection(a.usageState.index, a.usageState.filter, "day", time.UTC)
 	tt.Frame()
-	if !tt.HasText("No usage in this range") {
+	if !tt.HasText("No usage data yet") {
 		t.Fatal("empty data not honest")
 	}
 	a.usageState.loaded = false
 	a.usageState.err = "Test fixture: permission denied"
 	tt.Frame()
-	if !tt.HasText("Usage unavailable") {
+	if !tt.HasText("Unable to load usage data") {
 		t.Fatal("error disguised as zero usage")
 	}
 }
@@ -142,18 +133,20 @@ func TestUsageNativeMinimumWindowControls(t *testing.T) {
 			t.Fatalf("%s clipped at minimum window: %+v", label, r)
 		}
 	}
-	a.usageState.customOpen = true
-	a.usageState.customStart = "2026-10-01"
-	a.usageState.customEnd = "2026-10-25"
-	tt.Frame()
-	r, ok := tt.Find("Apply date range")
-	if !ok || r.Y+r.H > 560.5 {
-		t.Fatal("custom date apply unreachable")
+	if tt.HasText("Filters") {
+		t.Fatal("invented Filters dropdown remains")
+	}
+	if err := tt.Click("All time"); err != nil {
+		t.Fatal(err)
+	}
+	if !a.modalOpen() {
+		t.Fatal("range popover does not own focus")
 	}
 	tt.Key(0, ui.KeyEscape)
-	if a.usageState.customOpen {
-		t.Fatal("date Escape failed")
+	if a.usageState.rangeOpen || a.usageState.customOpen || a.modalOpen() {
+		t.Fatal("range Escape failed")
 	}
+
 }
 func TestNativeUsageCapture(t *testing.T) {
 	out := os.Getenv("ORBIT_CAPTURE_DIR")

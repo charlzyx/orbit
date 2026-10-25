@@ -8,9 +8,9 @@
   },
   "row_count": 139,
   "step_count": 973,
-  "expanded_row_specific_steps": 342,
-  "unexpanded_draft_gates": 631,
-  "narrow_assertions_passed": 50,
+  "expanded_row_specific_steps": 362,
+  "unexpanded_draft_gates": 611,
+  "narrow_assertions_passed": 62,
   "full_feature_pass_count": 0,
   "status_enum": [
     "NOT_IMPLEMENTED",
@@ -362,7 +362,8 @@
       "count": 11,
       "verdict_totals": {
         "functional": {
-          "UNTESTED": 11
+          "UNTESTED": 7,
+          "PARTIAL": 4
         },
         "visual": {
           "UNTESTED": 11
@@ -594,5 +595,6 @@
   ],
   "manifest_evidence": "workspace-evidence.json",
   "checkpoint_manifest_evidence": "checkpoint-evidence.json",
+  "github_manifest_evidence": "github-evidence.json",
   "rules": "PASS requires the named complete acceptance scope, exact tested revision and evidence. Visual and native OS verdicts are independent. Pending/blocked source captures never inherit domain-test PASS."
 }

@@ -15,6 +15,9 @@ import (
 )
 
 type usageState struct {
+	contextRow                               int
+	contextFresh                             bool
+	menus                                    map[string]*usageMenuState
 	project                                  func(workbench.UsageIndex, workbench.UsageFilter, string, *time.Location) usageProjection
 	lastRequest                              time.Time
 	sourceFingerprint, scopeNotice           string
@@ -50,7 +53,7 @@ type usageState struct {
 	descending                                                bool
 	detailRecord                                              *workbench.UsageRecord
 	detailSession                                             *usageAggregate
-	customOpen                                                bool
+	customOpen, rangeOpen                                     bool
 	customStart, customEnd, customError                       string
 }
 
@@ -180,8 +183,8 @@ func (a *App) refreshUsage() {
 				s.index = v
 				s.granularity = usageAutoGranularity(s.filter, s.index)
 				if pruneUsageFilter(v, &s.filter) {
-					s.scopeNotice = "A removed session scope was cleared."
-					s.noticeUntil = time.Now().Add(6 * time.Second)
+					s.scopeNotice = a.text("usage.session_scope_cleared", "That session is no longer in the store — scope cleared")
+					s.noticeUntil = s.now().Add(6 * time.Second)
 				}
 				s.loaded = true
 				s.revision++
@@ -244,67 +247,31 @@ func (a *App) usagePage(c *ui.Context) {
 	a.projectUsage()
 	ui.Column(c.Key("usage-page")).Fill().MinHeight(0).Children(func() {
 		ui.Row(c).Height(44).PaddingX(12).Gap(8).AlignItems(ui.Center).BorderWidth(0, 0, 1, 0).BorderColor(t.Border).Children(func() {
-			status := "Not scanned"
-			if s.loading {
-				status = "Refreshing…"
+			status := ""
+			refreshing := s.loading && s.loaded
+			if refreshing {
+				status = a.text("usage.refreshing", "Refreshing…")
+			} else if s.scopeNotice != "" && s.now().Before(s.noticeUntil) {
+				status = s.scopeNotice
 			} else if !s.updated.IsZero() {
-				status = "Updated " + s.updated.Local().Format("15:04:05")
+				status = a.usageAge(s.now().Sub(s.updated))
 			}
+
 			ui.Text(c, status).TextColor(t.TextMuted).Grow(1)
-			a.button(c, a.text("usage.export", "Export"), "icons/download.svg", false).Disabled(!s.loaded || s.projecting || s.computed == "").Menu(func(m *ui.Menu) {
-				for _, format := range []string{"csv", "json"} {
-					title := a.text("usage.export_csv", "Filtered requests (CSV)")
-					if format == "json" {
-						title = a.text("usage.export_json", "Current view (JSON)")
-					}
-					if m.Item(title).Chosen() {
-						a.Dispatch(Action{Kind: "ExportUsage", Value: format, Data: map[string]any{"index": s.index, "filter": cloneUsageFilter(s.filter), "options": workbench.UsageExportOptions{Preset: s.preset, Granularity: s.granularity, SessionSearch: s.table("sessions").Search, Location: time.Local, Now: time.Now(), Insights: a.usageInsightTexts(usageInsights(s.projection, s.preset == "all"))}}})
-					}
-				}
-			})
-			if a.button(c, a.text("common.refresh", "Refresh"), "icons/refresh.svg", false).Disabled(s.loading).Clicked() {
+			a.usageExportControl(c)
+			refreshLabel := a.text("common.refresh", "Refresh")
+			if refreshing {
+				refreshLabel = a.text("usage.refreshing", "Refreshing…")
+			}
+			if a.button(c, refreshLabel, "icons/refresh.svg", refreshing).Clicked() {
 				a.refreshUsage()
 			}
 		})
 		ui.Row(c).Wrap().Padding(8, 12).Gap(6).AlignItems(ui.Center).BorderWidth(0, 0, 1, 0).BorderColor(t.Border).Children(func() {
-			ui.MenuButton(c, usageRangeLabel(s.preset), func(m *ui.Menu) {
-				for _, p := range []string{"today", "yesterday", "last7", "last14", "last30", "this-week", "this-month", "previous-month", "custom", "all"} {
-					if m.Item(usageRangeLabel(p)).Checked(s.preset == p).Chosen() {
-						if p == "custom" {
-							s.customOpen = true
-							s.customError = ""
-							s.customPicking = false
-							s.customMonth = bucketStart(time.Now(), "month", time.Local)
-							s.customStart = time.Now().AddDate(0, 0, -6).Format("2006-01-02")
-							s.customEnd = time.Now().Format("2006-01-02")
-						} else {
-							s.preset = p
-							s.filter.Start, s.filter.End = workbench.UsageRange(p, time.Now())
-							s.granularity = usageAutoGranularity(s.filter, s.index)
-							s.calendarRestore = nil
-							s.filter.FocusStart, s.filter.FocusEnd = time.Time{}, time.Time{}
-							a.saveUsagePrefs()
-						}
-					}
-				}
-			})
+			a.usageRangeControl(c)
 			a.usageDimensionFilter(c, "workspaces")
 			a.usageDimensionFilter(c, "providers")
 			a.usageDimensionFilter(c, "models")
-			ui.MenuButton(c, "Filters", func(m *ui.Menu) {
-				if m.Item("Failed requests only").Checked(s.filter.ErrorsOnly).Chosen() {
-					s.filter.ErrorsOnly = !s.filter.ErrorsOnly
-					if s.filter.ErrorsOnly {
-						s.filter.CachedOnly = false
-					}
-				}
-				if m.Item("Cache hits only").Checked(s.filter.CachedOnly).Chosen() {
-					s.filter.CachedOnly = !s.filter.CachedOnly
-					if s.filter.CachedOnly {
-						s.filter.ErrorsOnly = false
-					}
-				}
-			})
 			ui.Spacer(c)
 			for _, mode := range []string{"simple", "details"} {
 				if a.button(c, a.text("usage.mode_"+mode, titleCase(mode)), "", s.mode == mode).Clicked() {
@@ -313,7 +280,7 @@ func (a *App) usagePage(c *ui.Context) {
 				}
 			}
 		})
-		if s.err != "" {
+		if s.err != "" && s.loaded {
 			ui.Row(c).Padding(8, 12).Background(t.Error.Alpha(.08)).Children(func() {
 				ui.Text(c, s.err).TextColor(t.Error).Grow(1).Selectable()
 				if a.iconButton(c, "Dismiss usage error", "icons/x.svg").Clicked() {
@@ -322,10 +289,10 @@ func (a *App) usagePage(c *ui.Context) {
 			})
 		}
 		if !s.loaded {
-			if s.loading {
+			if s.loading || s.err == "" {
 				a.usageSkeleton(c)
 			} else {
-				a.Empty(c, "Usage unavailable", "The local session history could not be loaded. Retry to check again.")
+				a.usageMessageState(c, "icons/info.svg", a.text("usage.unable_to_load", "Unable to load usage data"), s.err, a.text("view.try_again", "Try again"), a.refreshUsage)
 			}
 			return
 		}
@@ -335,24 +302,23 @@ func (a *App) usagePage(c *ui.Context) {
 		}
 		ui.Scroll(c.Key("usage-body")).TrackScroll(&s.scroll).Grow(1).MinHeight(0).Children(func() {
 			ui.Column(c).WidthPercent(100).MaxWidth(1180).AlignSelf(ui.Center).Padding(20).Gap(20).Children(func() {
-				if len(s.index.Warnings) > 0 {
-					ui.Column(c).Padding(12).Background(t.Warning.Alpha(.08)).Radius(8).Gap(4).Children(func() {
-						ui.Text(c, "Some session files could not be included. The figures below cover only successfully read records.").TextColor(t.Warning)
-						for _, warning := range s.index.Warnings[:min(3, len(s.index.Warnings))] {
-							ui.Text(c, warning).FontSize(11).Selectable()
-						}
-					})
-				}
-				if s.scopeNotice != "" && time.Now().Before(s.noticeUntil) {
-					ui.Text(c, s.scopeNotice).TextColor(t.TextMuted)
-				}
 				a.usageActiveFilters(c)
-				if len(s.index.Records) == 0 && len(s.index.Tools) == 0 && len(s.index.Errors) == 0 && len(s.index.Warnings) > 0 {
-					a.Empty(c, "Usage unavailable", "The session files could not be read. Retry after resolving the reported errors.")
+				switch usageEmptyState(s.index, s.projection) {
+				case "unreadable":
+					a.usageMessageState(c, "icons/info.svg", a.text("usage.unable_to_read", "Unable to read usage data"), a.usageText("usage.unreadable_files_hint", "%{count} session files in %{store} could not be parsed.", map[string]string{"count": usageCount(uint64(s.index.UnreadableFiles)), "store": a.usageStoreHint()}), "", nil)
 					return
-				}
-				if s.projection.Summary.Requests == 0 && len(s.projection.Tools) == 0 && len(s.projection.Errors) == 0 {
-					a.Empty(c, "No usage in this range", "No sample metrics are shown. Try another date range or clear filters.")
+				case "filtered":
+					a.usageMessageState(c, "icons/filter.svg", a.text("usage.no_matches", "No usage matches these filters"), a.text("usage.no_matches_hint", "Try widening the date range or clearing a filter."), a.text("view.clear_filters", "Clear filters"), func() {
+						start, end := s.filter.Start, s.filter.End
+						s.filter = workbench.UsageFilter{Start: start, End: end}
+						s.calendarRestore = nil
+					})
+					return
+				case "empty":
+					a.usageMessageState(c, "icons/usage-total.svg", a.text("usage.no_data_yet", "No usage data yet"), a.usageText("usage.no_data_hint", "Once you run the agent, its activity appears here — %{store} is empty.", map[string]string{"store": a.usageStoreHint()}), "", nil)
+					if s.index.UnreadableFiles > 0 {
+						ui.Text(c, a.usageText("usage.unreadable_files_period", "%{count} session files could not be read.", map[string]string{"count": usageCount(uint64(s.index.UnreadableFiles))})).TextColor(t.TextMuted).FontSize(11).AlignSelf(ui.Center)
+					}
 					return
 				}
 				if s.mode == "details" {
@@ -364,6 +330,39 @@ func (a *App) usagePage(c *ui.Context) {
 		})
 	})
 	a.usageDialogs(c)
+}
+func usageEmptyState(index workbench.UsageIndex, p usageProjection) string {
+	if len(index.Records) == 0 && len(index.Tools) == 0 {
+		if index.UnreadableFiles > 0 {
+			return "unreadable"
+		}
+		return "empty"
+	}
+	if p.Summary.Requests == 0 && len(p.Tools) == 0 {
+		if p.RequestsInRange > 0 {
+			return "filtered"
+		}
+		return "empty"
+	}
+	return ""
+}
+func (a *App) usageStoreHint() string {
+	if a.Options.Store.PiDir == "" {
+		return a.text("usage.the_session_store", "the session store")
+	}
+	return filepath.Join(a.Options.Store.PiDir, "sessions")
+}
+func (a *App) usageAge(age time.Duration) string {
+	if age < 45*time.Second {
+		return a.text("usage.just_now", "just now")
+	}
+	key, count := "m_ago", int64(age/time.Minute)
+	if age >= 24*time.Hour {
+		key, count = "d_ago", int64(age/(24*time.Hour))
+	} else if age >= time.Hour {
+		key, count = "h_ago", int64(age/time.Hour)
+	}
+	return a.usageText("usage."+key, "%{count}"+strings.Split(key, "_")[0]+" ago", map[string]string{"count": fmt.Sprint(count)})
 }
 func usageRangeLabel(p string) string {
 	if label := map[string]string{"today": "Today", "yesterday": "Yesterday", "last7": "Last 7 days", "last14": "Last 14 days", "last30": "Last 30 days", "this-week": "This week", "this-month": "This month", "previous-month": "Previous month", "custom": "Custom range…", "all": "All time", "all_time": "All time"}[p]; label != "" {
@@ -379,12 +378,12 @@ func (a *App) usageSkeleton(c *ui.Context) {
 		}
 	})
 }
-func (a *App) usageCard(c *ui.Context, title, subtitle string, body func()) {
-	ui.Column(c).AlignSelf(ui.Stretch).Background(a.Theme.Elevated).Border(1, a.Theme.Border).Radius(12).Children(func() {
-		ui.Column(c).Padding(12).Gap(4).Children(func() {
-			ui.Text(c, title).FontWeight(500).FontSize(16)
-			if subtitle != "" {
-				ui.Text(c, subtitle).TextColor(a.Theme.TextMuted).FontSize(12)
+func (a *App) usageCard(c *ui.Context, title, meta string, body func()) {
+	ui.Column(c).AlignSelf(ui.Stretch).Background(a.Theme.Elevated).Border(1, a.Theme.Border).Radius(12).Shadow(0, 2, 10, -3, a.Theme.composerContact()).Children(func() {
+		ui.Row(c).Padding(12).Gap(8).AlignItems(ui.Center).Children(func() {
+			ui.Text(c, title).FontWeight(500).FontSize(a.Theme.Px(16)).Height(a.Theme.Px(20)).NoWrap()
+			if meta != "" {
+				ui.Text(c, meta).TextColor(a.Theme.TextMuted).FontSize(a.Theme.Px(12))
 			}
 		})
 		a.line(c)
@@ -394,11 +393,11 @@ func (a *App) usageCard(c *ui.Context, title, subtitle string, body func()) {
 func (a *App) usageSimple(c *ui.Context) {
 	s := &a.usageState
 	p := s.projection
-	ui.Text(c, a.text("usage.overview", "OVERVIEW")).FontSize(10).TextColor(a.Theme.TextMuted)
+	ui.Text(c, strings.ToUpper(a.text("usage.overview", "Overview"))).FontSize(a.Theme.Px(12)).FontWeight(500).Height(a.Theme.Px(14)).TextColor(a.Theme.TextMuted)
 	a.usageHeatmap(c)
 	a.usageSummary(c)
-	a.usageCard(c, a.text("usage.over_time", "Usage over time"), "Click a bucket to focus the page. Arrow keys inspect the chart.", func() { a.usageChart(c) })
-	a.usageCard(c, a.text("usage.buckets", "Buckets"), "The same buckets as the chart, with independent search and paging.", func() { a.usageTable(c, "series") })
+	a.usageCard(c, a.text("usage.over_time", "Usage over time"), a.usageTrendMeta(), func() { a.usageChart(c) })
+	a.usageCard(c, a.text("usage.buckets", "Buckets"), a.usageTableMeta("series"), func() { a.usageTable(c, "series") })
 	a.usageSignals(c)
 	if p.Summary.Tokens.Total > 0 || p.CacheDataRequests > 0 {
 		a.usageHealthDetails(c)
@@ -408,7 +407,7 @@ func (a *App) usageSimple(c *ui.Context) {
 func (a *App) usageHeatmap(c *ui.Context) {
 	s := &a.usageState
 	t := a.Theme
-	a.usageCard(c, a.text("usage.daily_activity", "Daily activity"), "Each cell is a day over the last year. Click again to restore the previous range.", func() {
+	a.usageCard(c, a.text("usage.daily_activity", "Daily activity"), a.usageText("usage.per_day_last_year", "%{metric} per day · last 12 months", map[string]string{"metric": strings.ToLower(a.text("usage.metric_"+s.metric, titleCase(s.metric)))}), func() {
 		start, first, last := usageCalendarBounds(s.index, time.Local)
 		values := map[string]usagePoint{}
 		maximum := 0.0
@@ -708,7 +707,8 @@ func (a *App) usageUnavailableReason(summary workbench.UsageSummary) string {
 }
 func (a *App) usageDetails(c *ui.Context) {
 	s := &a.usageState
-	a.usageCard(c, a.text("usage.breakdown", "Breakdown"), "Ranked usage and independently searchable table.", func() {
+	ui.Text(c, strings.ToUpper(a.text("usage.details", "Details"))).FontSize(a.Theme.Px(12)).FontWeight(500).Height(a.Theme.Px(14)).TextColor(a.Theme.TextMuted)
+	a.usageCard(c, a.text("usage.breakdown", "Breakdown"), a.usageBreakdownMeta(), func() {
 		ui.Row(c).Wrap().Gap(4).Children(func() {
 			for _, tab := range []string{"models", "workspaces", "providers", "tools"} {
 				if a.button(c, a.text("usage.tab_"+tab, titleCase(tab)), "", s.breakdown == tab).Clicked() {
@@ -749,7 +749,7 @@ func (a *App) usageDetails(c *ui.Context) {
 		}
 		a.usageTable(c, "breakdown:"+s.breakdown)
 	})
-	a.usageCard(c, a.text("usage.records", "Records"), "Search affects only the selected table, not the page totals.", func() {
+	a.usageCard(c, a.text("usage.records", "Records"), a.usageTableMeta(s.detail), func() {
 		ui.Row(c).Wrap().Gap(4).Children(func() {
 			for _, tab := range []string{"sessions", "daily", "failures"} {
 				if a.button(c, a.text("usage.tab_"+tab, titleCase(tab)), "", s.detail == tab).Clicked() {
@@ -763,42 +763,6 @@ func (a *App) usageDetails(c *ui.Context) {
 }
 func (a *App) usageDialogs(c *ui.Context) {
 	s := &a.usageState
-	if s.customOpen {
-		a.modal(c.Key("usage-custom-range"), &s.customOpen, 480, func() {
-			ui.Text(c, "Custom date range").FontSize(18)
-			a.usageCalendarPicker(c)
-			ui.Text(c, "Start date (YYYY-MM-DD)")
-			ui.TextInput(c, &s.customStart).Label("Start date").AlignSelf(ui.Stretch)
-			ui.Text(c, "End date, inclusive (YYYY-MM-DD)")
-			ui.TextInput(c, &s.customEnd).Label("End date").AlignSelf(ui.Stretch)
-			if s.customError != "" {
-				ui.Text(c, s.customError).TextColor(a.Theme.Error)
-			}
-			ui.Row(c).Gap(8).Children(func() {
-				if a.button(c, "Cancel", "", false).Clicked() {
-					s.customOpen = false
-				}
-				if a.button(c, "Apply date range", "", true).Clicked() {
-					start, e := time.ParseInLocation("2006-01-02", strings.TrimSpace(s.customStart), time.Local)
-					end, e2 := time.ParseInLocation("2006-01-02", strings.TrimSpace(s.customEnd), time.Local)
-					if e != nil || e2 != nil {
-						s.customError = "Enter valid dates in YYYY-MM-DD format."
-					} else {
-						if end.Before(start) {
-							start, end = end, start
-						}
-						s.filter.Start, s.filter.End = start, end.AddDate(0, 0, 1)
-						s.preset = "custom"
-						s.granularity = usageAutoGranularity(s.filter, s.index)
-						s.filter.FocusStart, s.filter.FocusEnd = time.Time{}, time.Time{}
-						s.calendarRestore = nil
-						s.customOpen = false
-						a.saveUsagePrefs()
-					}
-				}
-			})
-		})
-	}
 	if s.detailError != nil {
 		open := true
 		r := *s.detailError
@@ -922,10 +886,12 @@ func (a *App) openUsage() {
 func (a *App) closeUsage() {
 	s := &a.usageState
 	s.filterMenu = ""
+	s.closeUsagePopovers("")
 	for _, v := range s.filterViews {
 		v.Open = false
 	}
 	s.customOpen = false
+	s.rangeOpen = false
 	s.customPicking = false
 	s.detailSession = nil
 	s.detailError = nil

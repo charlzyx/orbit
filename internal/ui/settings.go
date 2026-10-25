@@ -2,13 +2,8 @@ package orbitui
 
 import (
 	"fmt"
-	"github.com/charlzyx/orbit/internal/workspace"
-	"path/filepath"
-	"runtime"
-	"strconv"
 	"strings"
 
-	"github.com/charlzyx/orbit/internal/preferences"
 	"github.com/egoist/mygo/ui"
 )
 
@@ -98,12 +93,19 @@ func (a *App) settings(c *ui.Context) {
 	ui.Column(c.Key("settings-main")).Grow(1).FillHeight().MinWidth(0).LineHeight(sourceDefaultLineHeight).Children(func() {
 		ui.Column(c).WidthPercent(100).MaxWidth(ContentMaxWidth).AlignSelf(ui.Center).Children(func() {
 			ui.Column(c).AlignSelf(ui.Stretch).Padding(t.Space(20), t.Space(24), t.Space(12)).Gap(t.Space(4)).Children(func() {
+				if a.settingsPage == "about" {
+					ui.Image(c, logos["app-icon.png"]).Size(48, 48)
+				}
 				for _, cat := range settingsCategories {
 					if cat.ID == a.settingsPage {
 						ui.Text(c, a.settingsTitle(cat.ID, cat.Title)).Label("Settings page title").FontSize(t.Px(16)).LineHeight(1.3).Height(sourceTextHeight(t.Px(16), 1.3)).FontWeight(500)
 						ui.Text(c, a.settingsDescription(cat.ID, cat.Description)).FontSize(t.Px(12)).Height(sourceTextHeight(t.Px(12), sourceDefaultLineHeight)).TextColor(t.TextMuted)
 						break
 					}
+				}
+				if a.settingsPage == "providers" {
+					ui.Box(c).Height(a.Theme.Space(8))
+					a.providerToolbar(c)
 				}
 				if a.settingsPage == "models" && a.Models != nil {
 					ui.Box(c).Height(a.Theme.Space(8))
@@ -162,6 +164,7 @@ func (a *App) settingsDescription(id, fallback string) string {
 }
 func (a *App) selectSettingsPage(id string) {
 	a.settingsPage = id
+	a.nativeSettings.selectMenu.id = ""
 	a.providerState.editor = nil
 	a.secretOpen = false
 	a.secretValue = ""
@@ -208,160 +211,10 @@ func (a *App) selectSetting(c *ui.Context, title, description, value string, cho
 		}).MinWidth(120)
 	})
 }
-func (a *App) appearanceSettings(c *ui.Context) {
-	a.section(c, "Appearance", func() {
-		a.selectSetting(c, "Appearance", "Follow the desktop or choose an appearance.", a.Appearance.Mode, []string{"system", "light", "dark"}, func(v string) { a.Appearance.Mode = v; a.save(a.Options.Store.SaveAppearance(a.Appearance)) })
-		a.line(c)
-		a.selectSetting(c, "Dark theme", "Original Orbit semantic palettes", a.Appearance.DarkTheme, preferences.DarkThemes, func(v string) { a.Appearance.DarkTheme = v; a.save(a.Options.Store.SaveAppearance(a.Appearance)) })
-		a.selectSetting(c, "Light theme", "Original Orbit semantic palettes", a.Appearance.LightTheme, preferences.LightThemes, func(v string) { a.Appearance.LightTheme = v; a.save(a.Options.Store.SaveAppearance(a.Appearance)) })
-	})
-	a.backgroundSettings(c)
-	a.section(c, "Typography", func() {
-		a.selectSetting(c, "UI font size", "Interface text and design tokens scale together.", fmt.Sprint(a.Prefs.UIFontSize), []string{"11", "12", "13", "14", "15", "16", "18", "20"}, func(v string) {
-			a.Prefs.UIFontSize, _ = strconv.ParseFloat(v, 64)
-			a.save(a.Options.Store.SaveUI(a.Prefs))
-		})
-		a.selectSetting(c, "Code font size", "Code and file editor text", fmt.Sprint(a.Prefs.EditorFontSize), []string{"11", "12", "13", "14", "15", "16", "18", "20"}, func(v string) {
-			a.Prefs.EditorFontSize, _ = strconv.ParseFloat(v, 64)
-			a.save(a.Options.Store.SaveUI(a.Prefs))
-		})
-		a.selectSetting(c, "Terminal font size", "Terminal text", fmt.Sprint(a.Prefs.TerminalFontSize), []string{"11", "12", "13", "14", "15", "16", "18", "20"}, func(v string) {
-			a.Prefs.TerminalFontSize, _ = strconv.ParseFloat(v, 64)
-			a.save(a.Options.Store.SaveUI(a.Prefs))
-			a.Dispatch(Action{Kind: "TerminalFontChanged"})
-		})
-		families := ui.FontFamilies()
-		var names, mono []string
-		for _, f := range families {
-			if f.Registered {
-				names = append(names, f.Name)
-				if f.Monospaced {
-					mono = append(mono, f.Name)
-				}
-			}
-		}
-		a.selectSetting(c, "Interface font", "Bundled fonts are available without a network connection.", a.Fonts.UIFamily, names, func(v string) { a.Fonts.UIFamily = v; a.save(a.Options.Store.SaveFonts(a.Fonts)) })
-		a.selectSetting(c, "Code font", "Monospaced font for code and terminal", a.Fonts.CodeFamily, mono, func(v string) {
-			a.Fonts.CodeFamily = v
-			a.save(a.Options.Store.SaveFonts(a.Fonts))
-			a.Dispatch(Action{Kind: "TerminalFontChanged"})
-		})
-	})
-	a.section(c, "Layout and motion", func() {
-		a.selectSetting(c, "Spacing density", "Compact 80%, default 100%, comfortable 120%.", strconv.Itoa(a.Prefs.SpacingDensity), []string{"80", "85", "90", "95", "100", "105", "110", "115", "120"}, func(v string) { a.Prefs.SpacingDensity, _ = strconv.Atoi(v); a.save(a.Options.Store.SaveUI(a.Prefs)) })
-		a.setting(c, "Reduce motion", "Disable nonessential animations.", func() {
-			if ui.Switch(c, &a.Prefs.ReduceMotion).Label("Reduce motion").Changed() {
-				a.save(a.Options.Store.SaveUI(a.Prefs))
-			}
-		})
-		a.selectSetting(c, "Language", "All bundled Orbit translations", a.Prefs.Language, preferences.Languages, func(v string) {
-			a.Prefs.Language = v
-			a.reloadLocale()
-			a.save(a.Options.Store.SaveUI(a.Prefs))
-			a.Dispatch(Action{Kind: "LanguageChanged"})
-		})
-	})
-}
-func (a *App) shortcutsSettings(c *ui.Context) {
-	for _, category := range []string{"Session", "Agent", "Navigation", "Panels", "Review", "Git", "Application"} {
-		category := category
-		a.section(c, category, func() {
-			for _, cmd := range Commands {
-				if cmd.Category != category {
-					continue
-				}
-				chords := []string{}
-				for _, b := range Bindings {
-					if b.Command == cmd.ID {
-						chords = append(chords, shortcutLabel(b.Chord))
-					}
-				}
-				if len(chords) == 0 {
-					chords = []string{"Command palette"}
-				}
-				a.setting(c, a.Tr(cmd.TitleKey), "", func() {
-					ui.Text(c, strings.Join(chords, "  ")).FontSize(12).Padding(4, 8).Background(a.Theme.Elevated).Radius(4)
-				})
-			}
-		})
-	}
-}
-func (a *App) agentSettings(c *ui.Context) {
-	a.section(c, "New sessions", func() {
-		a.setting(c, "Default model", "Applies only to new sessions; existing sessions keep their model.", func() { a.Models.DefaultModelControl(c) })
-		a.setting(c, "Default thinking", "Applied when a new session begins.", func() { a.Models.DefaultThinkingControl(c) })
-		a.selectSetting(c, "Send while running", "Enter queues a follow-up or steers the running agent.", a.Prefs.ComposerSendMode, []string{"follow_up", "steer"}, func(v string) { a.Prefs.ComposerSendMode = v; a.save(a.Options.Store.SaveUI(a.Prefs)) })
-		title := a.autoTitlePrefs
-		a.setting(c, "Automatic task titles", "Generate task titles using the bundled pi extension.", func() {
-			if ui.Switch(c, &title.Enabled).Label("Automatic task titles").Changed() {
-				a.autoTitlePrefs = title
-				a.save(a.Options.Store.SaveAutoTitle(title))
-			}
-		})
-	})
-	a.agentRuntimeSettings(c)
-	a.section(c, "Access", func() {
-		a.selectSetting(c, "Access policy", "Guarded by Orbit's pi extension, not an OS sandbox.", a.access, preferences.AccessModes, func(v string) {
-			a.access = v
-			a.save(a.Options.Store.SaveAccess(v))
-			a.Dispatch(Action{Kind: "SetAccess", Value: v})
-		})
-	})
-}
 func (a *App) modelsSettings(c *ui.Context) {
 	if a.Models != nil {
 		a.Models.View(c)
 	}
-}
-func (a *App) privacySettings(c *ui.Context) {
-	defer a.privacyNative(c)
-	a.section(c, a.text("settings.session_retention", "Session retention"), func() {
-		ret := a.retention
-		a.setting(c, a.text("settings.session_retention_enabled", "Automatic session cleanup"), "Apply this policy once per launch, or with Clean up now. Open tasks are kept.", func() {
-			if ui.Switch(c, &ret.Enabled).Label("Automatic session cleanup").Changed() {
-				a.retention = ret
-				a.save(a.Options.Store.SaveRetention(ret))
-			}
-		})
-		a.selectSetting(c, "Action", "Deletion permanently removes matching saved session files.", ret.Mode, []string{"archive", "delete"}, func(v string) { a.retention.Mode = v; a.save(a.Options.Store.SaveRetention(a.retention)) })
-		a.selectSetting(c, "Keep recent sessions", "Idle age in days, based on message activity", strconv.Itoa(ret.Days), []string{"7", "14", "30", "60", "90", "180", "365"}, func(v string) {
-			a.retention.Days, _ = strconv.Atoi(v)
-			a.save(a.Options.Store.SaveRetention(a.retention))
-		})
-		if a.button(c, a.text("settings.session_retention_run", "Clean up now"), "icons/refresh.svg", false).Disabled(!ret.Enabled || a.retentionBusy).Clicked() {
-			if ret.Mode == "delete" {
-				a.Confirm("Permanently delete old tasks?", fmt.Sprintf("Delete saved sessions idle for more than %d days. Open tasks are excluded. This cannot be undone.", ret.Days), func() { a.Dispatch(Action{Kind: "RunRetention"}) })
-			} else {
-				a.Dispatch(Action{Kind: "RunRetention"})
-			}
-		}
-	})
-
-	a.section(c, "Local data", func() {
-		a.setting(c, "Session storage", a.Options.Store.PiDir+"/sessions", func() {
-			if a.button(c, "Open folder", "icons/folder.svg", false).Clicked() {
-				a.Dispatch(Action{Kind: "RevealPath", Value: a.Options.Store.PiDir + "/sessions"})
-			}
-		})
-		a.setting(c, "Orbit preferences", a.Options.Store.RootDir, func() {
-			if a.button(c, "Open folder", "icons/folder.svg", false).Clicked() {
-				a.Dispatch(Action{Kind: "RevealPath", Value: a.Options.Store.RootDir})
-			}
-		})
-		ui.Text(c, "Messages are sent to the model provider selected in pi. Orbit does not substitute another agent runtime or cloud store.").TextColor(a.Theme.TextMuted)
-	})
-}
-func (a *App) aboutSettings(c *ui.Context) {
-	defer a.updateSettings(c)
-	a.section(c, "Orbit", func() {
-		ui.Text(c, "Orbit "+a.Options.Version+" · Go native").FontSize(24).FontWeight(600)
-		ui.Text(c, "Native desktop workbench for the pi coding agent.")
-		ui.Text(c, "MyGo 9c69cf829ece · "+runtime.Version()+" · Pi RPC").TextColor(a.Theme.TextMuted)
-		ui.Text(c, "Copyright 2026 Orbit contributors. Apache License 2.0. MyGo and bundled third-party assets retain their respective licenses.").TextColor(a.Theme.TextMuted)
-		if a.button(c, "Project repository", "icons/external-link.svg", false).Clicked() {
-			a.Dispatch(Action{Kind: "OpenLink", Value: "https://github.com/charlzyx/orbit"})
-		}
-	})
 }
 func (a *App) loadSettings(category string) {
 	if category == "mcp" && a.Options.RefreshMCP != nil {
@@ -458,52 +311,6 @@ func (a *App) jsonDialog(c *ui.Context) {
 						}
 					})
 				}
-			}
-		})
-	})
-}
-func (a *App) providersSettings(c *ui.Context) {
-	a.section(c, "Providers", func() {
-		ui.Text(c, "Provider authentication is handled by pi over RPC. Credentials remain in pi's configuration.").TextColor(a.Theme.TextMuted)
-		if a.button(c, "Refresh providers", "icons/refresh.svg", false).Clicked() {
-			a.refreshProviders()
-		}
-		a.providerRows(c)
-	})
-}
-
-func (a *App) worktreeSettings(c *ui.Context) {
-	path := filepath.Join(a.Options.Store.RootDir, "worktrees.json")
-	config := a.worktreePrefs
-	a.section(c, "Worktree defaults", func() {
-		a.setting(c, "Directory", config.Directory, func() {
-			if a.button(c, "Edit…", "", false).Clicked() {
-				a.Prompt("Worktree directory", config.Directory, func(v string) {
-					config.Directory = v
-					a.worktreePrefs = config
-					a.save(workspace.SaveWorktreeConfig(path, config))
-				})
-			}
-		})
-		a.setting(c, "Setup script", config.SetupScript, func() {
-			if a.button(c, "Edit…", "", false).Clicked() {
-				a.Prompt("Setup script", config.SetupScript, func(v string) {
-					config.SetupScript = v
-					a.worktreePrefs = config
-					a.save(workspace.SaveWorktreeConfig(path, config))
-				})
-			}
-		})
-		a.setting(c, "Run setup automatically", "Untrusted repository scripts still require confirmation.", func() {
-			if ui.Switch(c, &config.RunSetupAuto).Changed() {
-				a.worktreePrefs = config
-				a.save(workspace.SaveWorktreeConfig(path, config))
-			}
-		})
-		a.setting(c, "Open after creation", "Switch to a newly created worktree.", func() {
-			if ui.Switch(c, &config.OpenAfterCreate).Changed() {
-				a.worktreePrefs = config
-				a.save(workspace.SaveWorktreeConfig(path, config))
 			}
 		})
 	})

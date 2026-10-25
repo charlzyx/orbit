@@ -164,7 +164,7 @@ func (a *App) composerView(c *ui.Context) {
 					}
 				})
 			}
-			anchor := ui.Column(c.Key("composer")).AlignSelf(ui.Stretch).Padding(t.Space(12), t.Space(16), t.Space(12)).Gap(t.Space(16)).Radius(t.Px(16)).Border(1, t.Border).Background(t.SurfaceSecondary).Label("Composer box")
+			anchor := ui.Column(c.Key("composer")).AlignSelf(ui.Stretch).Padding(t.Space(12), t.Space(16), t.Space(12)).Gap(t.Space(16)).Radius(t.Px(16)).Border(1, t.Border).Background(t.SurfaceSecondary).Shadow(0, 2, 10, -3, t.composerContact()).Label("Composer box")
 			var input ui.Element
 			anchor.Children(func() {
 				a.attachmentRow(c)
@@ -292,7 +292,7 @@ func (a *App) composerView(c *ui.Context) {
 					} else {
 						bg, fg := t.Action, t.ActionFg
 						if strings.TrimSpace(a.Draft) == "" && len(a.attachments) == 0 {
-							bg, fg = t.Text.Alpha(.04), t.TextMuted
+							bg, fg = t.overlay(), t.TextMuted
 						}
 						b := a.composerRoundButton(c, "Send message", "icons/send.svg", bg, fg)
 						if b.Clicked() {

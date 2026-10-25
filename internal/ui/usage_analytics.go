@@ -171,7 +171,11 @@ func (a *App) usageSignals(c *ui.Context) {
 	if len(insights) == 0 {
 		return
 	}
-	a.usageCard(c, a.text("usage.signals", "Signals"), fmt.Sprintf("%d notes", len(insights)), func() {
+	meta := a.text("usage.one_note", "1 note")
+	if len(insights) != 1 {
+		meta = a.usageText("usage.n_notes", "%{count} notes", map[string]string{"count": usageCount(uint64(len(insights)))})
+	}
+	a.usageCard(c, a.text("usage.signals", "Signals"), meta, func() {
 		for _, insight := range insights {
 			color := a.Theme.TextMuted
 			if insight.Tone == "warning" {
@@ -449,7 +453,7 @@ func (a *App) usageSummary(c *ui.Context) {
 	s := &a.usageState
 	p := s.projection
 	t := a.Theme
-	a.usageCard(c, a.text("usage.summary", "Summary"), fmt.Sprintf("%s requests · %s sessions", usageCount(uint64(p.Summary.Requests)), usageCount(uint64(len(p.Sessions)))), func() {
+	a.usageCard(c, a.text("usage.summary", "Summary"), a.usageSummaryMeta(), func() {
 		unavailable := a.text("usage.unavailable", "Unavailable")
 		avg, avgHint := unavailable, a.text("usage.sub_no_request_gaps", "No request timing available")
 		if p.Summary.TimedRequests > 0 {

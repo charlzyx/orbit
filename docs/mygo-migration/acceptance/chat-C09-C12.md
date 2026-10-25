@@ -65,7 +65,7 @@ Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 **Executed narrow assertions:**
 - None assigned to this scope yet. Last verified SHA: none.
 
-**Owner challenge UI-C08 [PARTIAL]:** Typed tools, logical turns, observed-live elapsed time, source tail/usage footer and shared user/Markdown/alert selection are mounted and native-tested. C11 remains a concrete framework gap: selection clears when a virtualized endpoint unmounts; Rust retains SelectedBlock snapshots. Do not equate mounted-row selection with full parity. [Scoped steps/tests](../native-ui-acceptance.json).
+**Owner challenge UI-C08 [PARTIAL]:** Typed tools, logical turns, observed-live elapsed, tail/usage footer and shared Markdown/alert selection are mounted. C10 upstream endpoint-unmount limitation is covered by approved narrow opt-in retention overlay: mounted host native test now verifies exact copy after virtual endpoints unmount and reset on session switch. Full mixed selection/OS gesture corpus and matched native visuals remain open. [Scoped steps/tests](../native-ui-acceptance.json).
 
 **Remaining:** Native code exists; this row is not validated end to end.
 **Visual/OS gates:** No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state. This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.
@@ -99,7 +99,7 @@ Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 **Executed narrow assertions:**
 - None assigned to this scope yet. Last verified SHA: none.
 
-**Owner challenge UI-C08 [PARTIAL]:** Typed tools, logical turns, observed-live elapsed time, source tail/usage footer and shared user/Markdown/alert selection are mounted and native-tested. C11 remains a concrete framework gap: selection clears when a virtualized endpoint unmounts; Rust retains SelectedBlock snapshots. Do not equate mounted-row selection with full parity. [Scoped steps/tests](../native-ui-acceptance.json).
+**Owner challenge UI-C08 [PARTIAL]:** Typed tools, logical turns, observed-live elapsed, tail/usage footer and shared Markdown/alert selection are mounted. C10 upstream endpoint-unmount limitation is covered by approved narrow opt-in retention overlay: mounted host native test now verifies exact copy after virtual endpoints unmount and reset on session switch. Full mixed selection/OS gesture corpus and matched native visuals remain open. [Scoped steps/tests](../native-ui-acceptance.json).
 
 **Remaining:** Native code exists; this row is not validated end to end.
 **Visual/OS gates:** No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state. This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.
@@ -133,7 +133,7 @@ Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 **Executed narrow assertions:**
 - None assigned to this scope yet. Last verified SHA: none.
 
-**Owner challenge UI-C08 [PARTIAL]:** Typed tools, logical turns, observed-live elapsed time, source tail/usage footer and shared user/Markdown/alert selection are mounted and native-tested. C11 remains a concrete framework gap: selection clears when a virtualized endpoint unmounts; Rust retains SelectedBlock snapshots. Do not equate mounted-row selection with full parity. [Scoped steps/tests](../native-ui-acceptance.json).
+**Owner challenge UI-C08 [PARTIAL]:** Typed tools, logical turns, observed-live elapsed, tail/usage footer and shared Markdown/alert selection are mounted. C10 upstream endpoint-unmount limitation is covered by approved narrow opt-in retention overlay: mounted host native test now verifies exact copy after virtual endpoints unmount and reset on session switch. Full mixed selection/OS gesture corpus and matched native visuals remain open. [Scoped steps/tests](../native-ui-acceptance.json).
 
 **Remaining:** Native code exists; this row is not validated end to end.
 **Visual/OS gates:** No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state. This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.

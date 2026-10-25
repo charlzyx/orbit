@@ -44,8 +44,8 @@
         {
           "id": "W28.behavior",
           "dimension": "functional",
-          "action": "Start New PR, select base/template/draft and submit to fixture gh; cancel and reopen.",
-          "expected": "New PR form has title/body/notes, draft toggle, base-branch picker, template selection, generation, submit/cancel. Base picker is anchored in form; default prefers main/master then available branch.",
+          "action": "Open New PR with main/master, only-current, no-refs and alternate-local-branch fixtures; open its anchored base chip, type a trimmed mixed-case query, choose a local row, enable Draft and submit through fake gh.",
+          "expected": "main wins, then master; otherwise the first local branch not equal to current wins, or main if none. The 320px above-chip picker shows local refs only in stable lowercase order. Pointer selection changes base, closes picker, and sends the selected --base plus --draft only after Create.",
           "status": "UNTESTED",
           "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
@@ -62,46 +62,46 @@
         {
           "id": "W28.error",
           "dimension": "error",
-          "action": "Return nonzero/malformed/empty fixture gh results and a late response after filter/repository change.",
-          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Required title; selected template labels passed to gh. Creation returns URL, opens PR detail, clears fields. No automatic publish/push is performed by this controller before `gh pr create`.",
+          "action": "Fail gh pr create while preserving the open form, correct the fake failure, then retry.",
+          "expected": "Failure does not close or clear the form. Successful retry clears/closes once; no second request is dispatched by repeated busy clicks.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W28.loading",
           "dimension": "loading",
-          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
-          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "action": "Hold PR creation, attempt duplicate native Create and inspect draft/form before releasing.",
+          "expected": "Source pr_busy keeps form visible and disables duplicate submit. Full modal-vs-inline visual difference remains unresolved in Go.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W28.persistence",
           "dimension": "persistence",
-          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
-          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "action": "Cancel/reopen New PR in the same instance; reconstruct panel after full app restart.",
+          "expected": "Draft prose is in memory, not persisted in a new config file. On reopen, source chooses default base anew while existing draft toggle remains its stored field.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W28.keyboard",
           "dimension": "keyboard",
-          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
-          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "action": "Focus the branch filter and type Unicode text; send Up, Down and Enter, including zero results, without clicking a branch. Separately inspect Escape dispatch on the original GPUI host.",
+          "expected": "GitPanel has no PickerConfirm/Prev/Next listener despite the Picker key context, so these actions must not select a branch or create a PR. Native Go containment is tested; original GPUI Escape propagation remains an explicit open gate, not assumed from MyGo PopoverBase.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W28.repeat",
           "dimension": "repeat",
-          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
-          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "action": "Run cancel/reopen, failed create/retry and Issue↔PR navigation three times, using different text for each form.",
+          "expected": "No cross-form draft replacement or duplicate creation. Template-on-open behavior remains source-specific rather than indiscriminate draft erasure.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         }
       ],
@@ -126,10 +126,10 @@
       "source_test_inventory": "`gh_templates.rs` tests and `issue_message.rs` tests; no live PR creation test located.",
       "verdicts": {
         "functional": {
-          "status": "UNTESTED",
-          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "status": "PARTIAL",
+          "reason": "Named narrow assertions pass; remaining row steps are unverified.",
           "last_verified_sha": null,
-          "last_partial_evidence_sha": null
+          "last_partial_evidence_sha": "07dc34d0411e17fa29e1d4d048207adb9472ccfcb6aecbf088ffd37151a19e72"
         },
         "visual": {
           "status": "UNTESTED",
@@ -142,11 +142,95 @@
           "last_verified_sha": null
         }
       },
-      "assertion_results": [],
+      "assertion_results": [
+        {
+          "id": "W28.assert.TestGitHubNativeCreateFailureKeepsFormAndRetryClearsOnce",
+          "status": "PASS",
+          "expected": "Actual native Issue and PR Create stay open during/error, retain drafts, reject duplicate busy dispatch, trim the title and clear only after successful retry.",
+          "test": "TestGitHubNativeCreateFailureKeepsFormAndRetryClearsOnce",
+          "package": "github.com/charlzyx/orbit/internal/gitworkbench",
+          "command": "scripts/go-native.sh test -race -json ./internal/gitworkbench",
+          "evidence": "github-evidence.json",
+          "last_verified_sha": "c80aaa612b72d9a162821cc26a51bd0d5997a2954b2f974bb6d7307203f1f8e3",
+          "sha_kind": "scoped dirty-source manifest; not a published Git commit",
+          "verified_at_utc": "2026-10-25T15:28:22.552885326+09:00",
+          "limits": "Named native CPU/fake-gh/local-repository assertion only. No authenticated remote mutation, full-scope or visual/native-OS PASS."
+        },
+        {
+          "id": "W28.assert.TestGitHubSourceDefaultBase",
+          "status": "PASS",
+          "expected": "Eight fixtures match unchanged Rust default_base, including main/master precedence, skip-current local fallback and empty fallback.",
+          "test": "TestGitHubSourceDefaultBase",
+          "package": "github.com/charlzyx/orbit/internal/gitworkbench",
+          "command": "scripts/go-native.sh test -race -json ./internal/gitworkbench",
+          "evidence": "github-state-evidence.json",
+          "last_verified_sha": "07dc34d0411e17fa29e1d4d048207adb9472ccfcb6aecbf088ffd37151a19e72",
+          "sha_kind": "scoped dirty-source manifest; not a published Git commit",
+          "verified_at_utc": "2026-10-25T16:00:44.043631945+09:00",
+          "limits": "Named native CPU/fake-gh/local-repository assertion only. Source-only Rust oracle does not execute GPUI pixels or dispatch; no whole-scope or visual/native-OS PASS."
+        },
+        {
+          "id": "W28.assert.TestGitHubBaseFilterMatchesRustUnicodeAndStableSort",
+          "status": "PASS",
+          "expected": "Local refs use trimmed full Unicode lowercase substring filtering and stable lowercase sort, including Greek final sigma and dotted capital I.",
+          "test": "TestGitHubBaseFilterMatchesRustUnicodeAndStableSort",
+          "package": "github.com/charlzyx/orbit/internal/gitworkbench",
+          "command": "scripts/go-native.sh test -race -json ./internal/gitworkbench",
+          "evidence": "github-state-evidence.json",
+          "last_verified_sha": "07dc34d0411e17fa29e1d4d048207adb9472ccfcb6aecbf088ffd37151a19e72",
+          "sha_kind": "scoped dirty-source manifest; not a published Git commit",
+          "verified_at_utc": "2026-10-25T16:00:44.043943924+09:00",
+          "limits": "Named native CPU/fake-gh/local-repository assertion only. Source-only Rust oracle does not execute GPUI pixels or dispatch; no whole-scope or visual/native-OS PASS."
+        },
+        {
+          "id": "W28.assert.TestGitHubNativeBasePickerFiltersLocalBranchesWithoutImplicitSelection",
+          "status": "PASS",
+          "expected": "Native anchored search excludes tags/remotes, focuses the query, sorts rows and selects only on pointer click; arrow/Enter do not mutate or submit.",
+          "test": "TestGitHubNativeBasePickerFiltersLocalBranchesWithoutImplicitSelection",
+          "package": "github.com/charlzyx/orbit/internal/gitworkbench",
+          "command": "scripts/go-native.sh test -race -json ./internal/gitworkbench",
+          "evidence": "github-state-evidence.json",
+          "last_verified_sha": "07dc34d0411e17fa29e1d4d048207adb9472ccfcb6aecbf088ffd37151a19e72",
+          "sha_kind": "scoped dirty-source manifest; not a published Git commit",
+          "verified_at_utc": "2026-10-25T16:00:44.475114064+09:00",
+          "limits": "Named native CPU/fake-gh/local-repository assertion only. Source-only Rust oracle does not execute GPUI pixels or dispatch; no whole-scope or visual/native-OS PASS."
+        },
+        {
+          "id": "W28.assert.TestGitHubBasePickerEmptyDismissRepeatAndErrorDoNotMutateDraft",
+          "status": "PASS",
+          "expected": "Native 320px above-chip panel, no-match Enter, retained draft during injected loading/error, outside dismissal and 200ms reopening guard; Escape containment is tested but source GPUI dispatch remains unverified.",
+          "test": "TestGitHubBasePickerEmptyDismissRepeatAndErrorDoNotMutateDraft",
+          "package": "github.com/charlzyx/orbit/internal/gitworkbench",
+          "command": "scripts/go-native.sh test -race -json ./internal/gitworkbench",
+          "evidence": "github-state-evidence.json",
+          "last_verified_sha": "07dc34d0411e17fa29e1d4d048207adb9472ccfcb6aecbf088ffd37151a19e72",
+          "sha_kind": "scoped dirty-source manifest; not a published Git commit",
+          "verified_at_utc": "2026-10-25T16:00:44.16346895+09:00",
+          "limits": "Named native CPU/fake-gh/local-repository assertion only. Source-only Rust oracle does not execute GPUI pixels or dispatch; no whole-scope or visual/native-OS PASS."
+        },
+        {
+          "id": "W28.assert.TestGitHubNativeSelectedBaseSurvivesCreateFailureAndExactArgvRetry",
+          "status": "PASS",
+          "expected": "Pointer-selected Unicode base and draft flag survive actual fake-gh create failure; exact base/title/body/draft argv are repeated only on explicit retry.",
+          "test": "TestGitHubNativeSelectedBaseSurvivesCreateFailureAndExactArgvRetry",
+          "package": "github.com/charlzyx/orbit/internal/gitworkbench",
+          "command": "scripts/go-native.sh test -race -json ./internal/gitworkbench",
+          "evidence": "github-state-evidence.json",
+          "last_verified_sha": "07dc34d0411e17fa29e1d4d048207adb9472ccfcb6aecbf088ffd37151a19e72",
+          "sha_kind": "scoped dirty-source manifest; not a published Git commit",
+          "verified_at_utc": "2026-10-25T16:00:44.812091505+09:00",
+          "limits": "Named native CPU/fake-gh/local-repository assertion only. Source-only Rust oracle does not execute GPUI pixels or dispatch; no whole-scope or visual/native-OS PASS."
+        }
+      ],
       "known_remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending.",
       "full_parity_verified": false,
       "supplemental_cases": [],
-      "additional_evidence": []
+      "additional_evidence": [
+        "../github-acceptance.md",
+        "github-evidence.json",
+        "../github-base-picker-acceptance.md",
+        "github-state-evidence.json"
+      ]
     },
     {
       "id": "W29",
@@ -291,7 +375,12 @@
       "known_remaining": "Tool-free Pi RPC generation and repository templates are implemented; fake-process race tests verify isolation, prompt bounds, fallback, cancellation and no staging mutation. Host workflow/live inference and exact template UI acceptance remain pending.",
       "full_parity_verified": false,
       "supplemental_cases": [],
-      "additional_evidence": []
+      "additional_evidence": [
+        "../github-acceptance.md",
+        "github-evidence.json",
+        "../github-base-picker-acceptance.md",
+        "github-state-evidence.json"
+      ]
     },
     {
       "id": "W30",
@@ -429,7 +518,12 @@
       "known_remaining": "Six-source immutable snapshots/checkpoint attribution/diff model tested; native review interaction/presentation parity remains pending.",
       "full_parity_verified": false,
       "supplemental_cases": [],
-      "additional_evidence": []
+      "additional_evidence": [
+        "../github-acceptance.md",
+        "github-evidence.json",
+        "../github-base-picker-acceptance.md",
+        "github-state-evidence.json"
+      ]
     }
   ]
 }

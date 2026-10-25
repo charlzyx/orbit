@@ -44,8 +44,8 @@
         {
           "id": "W24.behavior",
           "dimension": "functional",
-          "action": "Discover directory and legacy issue/PR templates; apply Markdown frontmatter and YAML issue form.",
-          "expected": "Repository issue/PR templates follow `.github/*_TEMPLATE/` directory then legacy single-file lookup. Markdown frontmatter supplies name/about/title/labels; YAML issue forms flatten to Markdown; config.yml excluded.",
+          "action": "Open New Issue, enter title/body/notes, cancel, visit New PR/comment, and reopen Issue; then create with a whitespace-padded title.",
+          "expected": "Independent Issue text survives cancel/navigation. Title is trimmed for gh create. Only successful creation closes and clears title/body/notes and optionally opens the parsed created issue number.",
           "status": "UNTESTED",
           "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
@@ -62,46 +62,46 @@
         {
           "id": "W24.error",
           "dimension": "error",
-          "action": "Return nonzero/malformed/empty fixture gh results and a late response after filter/repository change.",
-          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Templates capped at 256 KiB. Multiple templates selectable; one template can apply automatically only to untouched body, including late async arrival. Template removal does not blindly erase edited bodies.",
+          "action": "Fail gh issue create while the form is open; retry once after correcting the failure. Separately succeed create but fail the subsequent detail lookup.",
+          "expected": "Failed create keeps form/draft. Successful create plus failed detail still clears/closes and records the successful write; no generic retry may duplicate that mutation. Source refreshes its issue list after create completion; full fan-out remains unverified.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W24.loading",
           "dimension": "loading",
-          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
-          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "action": "Delay creation and click native Create repeatedly; preserve the draft and inspect the form until response.",
+          "expected": "issue_busy is true; source submit control prevents duplicate user dispatch. Form remains open while pending and on failure; it closes only after success.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W24.persistence",
           "dimension": "persistence",
-          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
-          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "action": "Cancel/reopen each creation form, visit an unrelated comment form, change workspace, then fully restart. Apply a lone new-repository template separately.",
+          "expected": "Independent Issue/PR title/body/notes survive cancellation and workspace changes in the same panel; workspace changes close forms and clear templates. Reopening applies the source lone-template/Blank rule. A new panel has empty drafts.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W24.keyboard",
           "dimension": "keyboard",
-          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
-          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "action": "Edit multiline body, use the registered Git close/Escape routing, then reopen New Issue by its button.",
+          "expected": "Closing the transient form does not clear its text. The source command registry has no dedicated GitHub create shortcut; do not invent Ctrl+Enter creation from the unrelated commit binding.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W24.repeat",
           "dimension": "repeat",
-          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
-          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "action": "With exactly one issue template, edit title/body/notes and reopen; select Blank with a known PR skeleton, then unrelated prose.",
+          "expected": "Reopen reapplies the sole template body but keeps nonempty title and notes. Blank clears any known Issue/PR skeleton and preserves unrelated user prose.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         }
       ],
@@ -126,10 +126,10 @@
       "source_test_inventory": "`gh_templates.rs::{reads_a_plain_markdown_pull_template,reads_front_matter_and_body_from_markdown,flattens_a_yaml_issue_form_and_skips_config,legacy_single_file_is_used_without_a_directory,missing_templates_are_an_empty_list,parses_this_repositorys_own_templates}`",
       "verdicts": {
         "functional": {
-          "status": "UNTESTED",
-          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "status": "PARTIAL",
+          "reason": "Named narrow assertions pass; remaining row steps are unverified.",
           "last_verified_sha": null,
-          "last_partial_evidence_sha": null
+          "last_partial_evidence_sha": "07dc34d0411e17fa29e1d4d048207adb9472ccfcb6aecbf088ffd37151a19e72"
         },
         "visual": {
           "status": "UNTESTED",
@@ -142,11 +142,69 @@
           "last_verified_sha": null
         }
       },
-      "assertion_results": [],
+      "assertion_results": [
+        {
+          "id": "W24.assert.TestGitHubNativeCancelRetainsIndependentDrafts",
+          "status": "PASS",
+          "expected": "Native Cancel/reopen keeps separate Issue and PR title/body/notes through an unrelated comment form.",
+          "test": "TestGitHubNativeCancelRetainsIndependentDrafts",
+          "package": "github.com/charlzyx/orbit/internal/gitworkbench",
+          "command": "scripts/go-native.sh test -race -json ./internal/gitworkbench",
+          "evidence": "github-evidence.json",
+          "last_verified_sha": "c80aaa612b72d9a162821cc26a51bd0d5997a2954b2f974bb6d7307203f1f8e3",
+          "sha_kind": "scoped dirty-source manifest; not a published Git commit",
+          "verified_at_utc": "2026-10-25T15:28:21.885380917+09:00",
+          "limits": "Named native CPU/fake-gh/local-repository assertion only. No authenticated remote mutation, full-scope or visual/native-OS PASS."
+        },
+        {
+          "id": "W24.assert.TestGitHubTemplateReopenAndBlankMatchSource",
+          "status": "PASS",
+          "expected": "Reopening applies the lone template body while preserving nonempty title/notes; Blank recognizes any known Issue or PR skeleton and preserves unrelated prose.",
+          "test": "TestGitHubTemplateReopenAndBlankMatchSource",
+          "package": "github.com/charlzyx/orbit/internal/gitworkbench",
+          "command": "scripts/go-native.sh test -race -json ./internal/gitworkbench",
+          "evidence": "github-evidence.json",
+          "last_verified_sha": "c80aaa612b72d9a162821cc26a51bd0d5997a2954b2f974bb6d7307203f1f8e3",
+          "sha_kind": "scoped dirty-source manifest; not a published Git commit",
+          "verified_at_utc": "2026-10-25T15:28:23.704625567+09:00",
+          "limits": "Named native CPU/fake-gh/local-repository assertion only. No authenticated remote mutation, full-scope or visual/native-OS PASS."
+        },
+        {
+          "id": "W24.assert.TestGitHubCreatedMutationNotRetriedWhenDetailRefreshFails",
+          "status": "PASS",
+          "expected": "Successful Issue creation followed by detail-read failure closes/clears the form, retains the created receipt and exposes no retry of the mutation.",
+          "test": "TestGitHubCreatedMutationNotRetriedWhenDetailRefreshFails",
+          "package": "github.com/charlzyx/orbit/internal/gitworkbench",
+          "command": "scripts/go-native.sh test -race -json ./internal/gitworkbench",
+          "evidence": "github-evidence.json",
+          "last_verified_sha": "c80aaa612b72d9a162821cc26a51bd0d5997a2954b2f974bb6d7307203f1f8e3",
+          "sha_kind": "scoped dirty-source manifest; not a published Git commit",
+          "verified_at_utc": "2026-10-25T15:28:23.959999672+09:00",
+          "limits": "Named native CPU/fake-gh/local-repository assertion only. No authenticated remote mutation, full-scope or visual/native-OS PASS."
+        },
+        {
+          "id": "W24.assert.TestGitHubWorkspaceChangeRetainsSourceDraftsAndLabelCache",
+          "status": "PASS",
+          "expected": "Changing real temporary repositories closes forms/clears templates but retains independent Issue/PR input drafts, PR draft flag and in-memory label cache; restart starts empty and no creation occurs.",
+          "test": "TestGitHubWorkspaceChangeRetainsSourceDraftsAndLabelCache",
+          "package": "github.com/charlzyx/orbit/internal/gitworkbench",
+          "command": "scripts/go-native.sh test -race -json ./internal/gitworkbench",
+          "evidence": "github-state-evidence.json",
+          "last_verified_sha": "07dc34d0411e17fa29e1d4d048207adb9472ccfcb6aecbf088ffd37151a19e72",
+          "sha_kind": "scoped dirty-source manifest; not a published Git commit",
+          "verified_at_utc": "2026-10-25T16:00:44.419484366+09:00",
+          "limits": "Named native CPU/fake-gh/local-repository assertion only. Source-only Rust oracle does not execute GPUI pixels or dispatch; no whole-scope or visual/native-OS PASS."
+        }
+      ],
       "known_remaining": "Tool-free Pi RPC generation and repository templates are implemented; fake-process race tests verify isolation, prompt bounds, fallback, cancellation and no staging mutation. Host workflow/live inference and exact template UI acceptance remain pending.",
       "full_parity_verified": false,
       "supplemental_cases": [],
-      "additional_evidence": []
+      "additional_evidence": [
+        "../github-acceptance.md",
+        "github-evidence.json",
+        "../github-base-picker-acceptance.md",
+        "github-state-evidence.json"
+      ]
     },
     {
       "id": "W25",
@@ -189,8 +247,8 @@
         {
           "id": "W25.behavior",
           "dimension": "functional",
-          "action": "Filter PR list by Open/Closed/Merged/All and search; inspect refs/draft/reviews/check summaries.",
-          "expected": "Pull request list has Open/Closed/Merged/All, search, clear filters, draft/author/labels/ref/diffstat/review/check summary and detail selection.",
+          "action": "Open Pulls with fake-gh data containing open/draft/merged metadata; change the source state/query filter and refresh.",
+          "expected": "gh pr list returns current filtered PRs with default limit50. This tab does not depend on issue label lookup and has no Load more pagination.",
           "status": "UNTESTED",
           "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
@@ -207,46 +265,46 @@
         {
           "id": "W25.error",
           "dimension": "error",
-          "action": "Return nonzero/malformed/empty fixture gh results and a late response after filter/repository change.",
-          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: gh limit 50. Backend base/author filter fields exist; exposed list UI is state/search, while base selection belongs to New PR. Loading/error/empty states separate.",
+          "action": "Fail fake label list while PR list succeeds; separately fail PR list with a valid prior result.",
+          "expected": "The first case succeeds without even requesting labels. Primary PR failure sets pulls_error and does not fabricate a successful empty list.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W25.loading",
           "dimension": "loading",
-          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
-          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "action": "Pause gh pr list after dispatch; inspect the active tab, then release success and repeat with failure.",
+          "expected": "pulls_loading is set before background work and cleared on completion. Exact source spinner/empty/error rendering is a separate visual gate.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W25.persistence",
           "dimension": "persistence",
-          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
-          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "action": "Set a PR filter, close/reopen the Git page in the same instance, then reconstruct GitPanel and switch repository context.",
+          "expected": "Filters live in memory; set_context resets pr_filter when workspace changes. No PR filter persistence file is invented.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W25.keyboard",
           "dimension": "keyboard",
-          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
-          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "action": "Invoke registered secondary-alt-6 GitTabPulls; return with another Git tab action.",
+          "expected": "Shared command selects Pulls. Source has no dedicated pagination shortcut; platform chord labels and focus require actual host verification.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W25.repeat",
           "dimension": "repeat",
-          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
-          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "action": "Alternate Issues and Pulls three times while label lookup always fails and each list returns a valid item.",
+          "expected": "Both primary lists remain independently loadable. PR refresh does not issue a label request; label failure never replaces PR results with a global error.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         }
       ],
@@ -271,10 +329,10 @@
       "source_test_inventory": "`gh.rs::{parses_pull_json_and_check_rollup,check_buckets_prefer_the_normalized_field}`",
       "verdicts": {
         "functional": {
-          "status": "UNTESTED",
-          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "status": "PARTIAL",
+          "reason": "Named narrow assertions pass; remaining row steps are unverified.",
           "last_verified_sha": null,
-          "last_partial_evidence_sha": null
+          "last_partial_evidence_sha": "c80aaa612b72d9a162821cc26a51bd0d5997a2954b2f974bb6d7307203f1f8e3"
         },
         "visual": {
           "status": "UNTESTED",
@@ -287,11 +345,30 @@
           "last_verified_sha": null
         }
       },
-      "assertion_results": [],
+      "assertion_results": [
+        {
+          "id": "W25.assert.TestGitHubOptionalLabelsNeverBlockIssuesOrPulls",
+          "status": "PASS",
+          "expected": "Successful Issue/PR lists remain usable when optional label lookup fails; PR loading never fetches issue labels.",
+          "test": "TestGitHubOptionalLabelsNeverBlockIssuesOrPulls",
+          "package": "github.com/charlzyx/orbit/internal/gitworkbench",
+          "command": "scripts/go-native.sh test -race -json ./internal/gitworkbench",
+          "evidence": "github-evidence.json",
+          "last_verified_sha": "c80aaa612b72d9a162821cc26a51bd0d5997a2954b2f974bb6d7307203f1f8e3",
+          "sha_kind": "scoped dirty-source manifest; not a published Git commit",
+          "verified_at_utc": "2026-10-25T15:28:23.034303271+09:00",
+          "limits": "Named native CPU/fake-gh/local-repository assertion only. No authenticated remote mutation, full-scope or visual/native-OS PASS."
+        }
+      ],
       "known_remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending.",
       "full_parity_verified": false,
       "supplemental_cases": [],
-      "additional_evidence": []
+      "additional_evidence": [
+        "../github-acceptance.md",
+        "github-evidence.json",
+        "../github-base-picker-acceptance.md",
+        "github-state-evidence.json"
+      ]
     },
     {
       "id": "W26",
@@ -436,7 +513,12 @@
       "known_remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending.",
       "full_parity_verified": false,
       "supplemental_cases": [],
-      "additional_evidence": []
+      "additional_evidence": [
+        "../github-acceptance.md",
+        "github-evidence.json",
+        "../github-base-picker-acceptance.md",
+        "github-state-evidence.json"
+      ]
     },
     {
       "id": "W27",
@@ -581,7 +663,12 @@
       "known_remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending.",
       "full_parity_verified": false,
       "supplemental_cases": [],
-      "additional_evidence": []
+      "additional_evidence": [
+        "../github-acceptance.md",
+        "github-evidence.json",
+        "../github-base-picker-acceptance.md",
+        "github-state-evidence.json"
+      ]
     }
   ]
 }

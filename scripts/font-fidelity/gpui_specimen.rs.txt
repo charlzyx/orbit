@@ -1,0 +1,22 @@
+pub(crate) fn orbit_font_specimen_impl() {
+    let Some(root)=std::env::var_os("ORBIT_FONT_TRACE_ASSETS") else {return};
+    let root=std::path::PathBuf::from(root);
+    let system=CosmicTextSystem::new();
+    let names=["zed/IBMPlexSans-Regular.ttf","zed/IBMPlexSans-Italic.ttf","zed/IBMPlexSans-SemiBold.ttf","zed/IBMPlexSans-SemiBoldItalic.ttf","zed/Lilex-Regular.ttf","zed/Lilex-Bold.ttf","zed/Lilex-Italic.ttf","zed/Lilex-BoldItalic.ttf","SymbolsNerdFont-Regular.ttf"];
+    system.add_fonts(names.iter().map(|p|Cow::Owned(std::fs::read(root.join(p)).unwrap())).collect()).unwrap();
+    let mut out=Vec::new();
+    for family in [".ZedSans",".ZedMono"] {for italic in [false,true] {for weight in [400.,500.,600.,700.] {for text in ["General","This machine","AV office fi 0123456789 → 中文 🙂"] {
+        let mut font=crate::font(family);font.weight=FontWeight(weight);if italic {font.style=FontStyle::Italic;}
+        let font_id=system.font_id(&font).unwrap();
+        crate::orbit_font_trace::record(serde_json::json!({"kind":"specimen_request","text":text,"family":family,"weight":weight,"italic":italic,"requested_font_id":font_id.0}));
+        let layout=system.layout_line(text,Pixels(14.),&[FontRun{len:text.len(),font_id}]);
+        let glyphs:Vec<_>=layout.runs.iter().flat_map(|r|r.glyphs.iter().map(move|g|serde_json::json!({"id":g.id.0,"x":g.position.x.0,"y":g.position.y.0,"cluster":g.index}))).collect();
+        out.push(serde_json::json!({"text":text,"family":family,"weight":weight,"italic":italic,"width":layout.width.0,"ascent":layout.ascent.0,"descent":layout.descent.0,"glyphs":glyphs}));
+    }}}}
+    if let std::result::Result::Ok(path)=std::env::var("ORBIT_FONT_SPECIMEN_RESULT") {std::fs::write(path,serde_json::to_vec_pretty(&out).unwrap()).unwrap();}
+    crate::orbit_font_trace::flush("headless native text-engine specimen; NO window, NO native present");
+    if let std::result::Result::Ok(path)=std::env::var("ORBIT_FONT_TRACE_DIR") {
+        for _ in 0..500 {if std::fs::read_dir(&path).unwrap().flatten().any(|e|e.file_name().to_string_lossy().starts_with("gpui-")&&std::fs::read(e.path()).is_ok_and(|v|serde_json::from_slice::<serde_json::Value>(&v).is_ok())) {return;}std::thread::sleep(std::time::Duration::from_millis(10));}
+        panic!("trace batch did not flush");
+    }
+}

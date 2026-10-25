@@ -1,0 +1,180 @@
+package text
+
+// Diagnostic-only observer. This file is absent from production dependencies.
+import (
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
+	"fmt"
+	"os"
+	"path/filepath"
+	"sync"
+)
+
+type orbitEvent = map[string]any
+type orbitTraceState struct {
+	sync.Mutex
+	dir, caseID    string
+	allow          map[string]bool
+	seen           map[string]bool
+	fonts          map[*Font]string
+	events         []orbitEvent
+	count, dropped int
+	frame          uint64
+	queue          chan orbitBatch
+}
+type orbitBatch struct {
+	Frame    uint64
+	Events   []orbitEvent
+	Dropped  int
+	CaseID   string
+	Boundary string
+}
+
+var orbitTraceOnce sync.Once
+var orbitTrace *orbitTraceState
+
+func orbitState() *orbitTraceState {
+	orbitTraceOnce.Do(func() {
+		dir, file, caseID := os.Getenv("ORBIT_FONT_TRACE_DIR"), os.Getenv("ORBIT_FONT_TRACE_TEXTS"), os.Getenv("ORBIT_FONT_TRACE_CASE")
+		if dir == "" || file == "" || caseID == "" || len(caseID) > 128 {
+			return
+		}
+		if info, err := os.Stat(file); err != nil || info.Size() > 65536 {
+			return
+		}
+		raw, err := os.ReadFile(file)
+		if err != nil {
+			return
+		}
+		var texts []string
+		if json.Unmarshal(raw, &texts) != nil || len(texts) > 64 {
+			return
+		}
+		st := &orbitTraceState{dir: dir, caseID: caseID, allow: map[string]bool{}, seen: map[string]bool{}, fonts: map[*Font]string{}, queue: make(chan orbitBatch, 8)}
+		for _, s := range texts {
+			if len(s) > 0 && len(s) <= 512 {
+				st.allow[s] = true
+			}
+		}
+		if len(st.allow) == 0 {
+			return
+		}
+		if info, err := os.Stat(dir); err != nil || !info.IsDir() {
+			return
+		}
+		orbitTrace = st
+		go st.writeBatches()
+	})
+	return orbitTrace
+}
+func orbitAllowed(s string) bool { st := orbitState(); return st != nil && st.allow[s] }
+func orbitSum(b []byte) string   { h := sha256.Sum256(b); return hex.EncodeToString(h[:]) }
+func orbitRecord(e orbitEvent) {
+	st := orbitState()
+	if st == nil {
+		return
+	}
+	b, err := json.Marshal(e)
+	if err != nil {
+		return
+	}
+	key := orbitSum(b)
+	st.Lock()
+	defer st.Unlock()
+	if st.seen[key] {
+		return
+	}
+	if st.count >= 4096 {
+		st.dropped++
+		return
+	}
+	st.seen[key] = true
+	st.count++
+	st.events = append(st.events, e)
+}
+func (st *orbitTraceState) writeBatches() {
+	for batch := range st.queue {
+		for _, e := range batch.Events {
+			if path, ok := e["font_file"].(string); ok && path != "" {
+				// The selected file is read after presentation, not in the paint path.
+				// Loaded HarfBuzz bytes are a separately identified stronger measurement.
+				if info, err := os.Stat(path); err == nil && info.Size() <= 64<<20 {
+					if data, err := os.ReadFile(path); err == nil {
+						e["font_file_sha256"] = orbitSum(data)
+					} else {
+						e["font_file_error"] = err.Error()
+					}
+				} else {
+					e["font_file_error"] = "unavailable or larger than 64 MiB"
+				}
+			}
+		}
+		payload := orbitEvent{"schema": 1, "renderer": "mygo-pango", "diagnostic": true, "case_id": batch.CaseID, "completed_present_call": batch.Frame, "presentation_semantics": batch.Boundary, "events": batch.Events, "dropped_events": batch.Dropped}
+		b, err := json.MarshalIndent(payload, "", "  ")
+		if err != nil {
+			continue
+		}
+		path := filepath.Join(st.dir, fmt.Sprintf("mygo-%d-%06d.json", os.Getpid(), batch.Frame))
+		f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0600)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "orbit-font-trace: %v\n", err)
+			continue
+		}
+		_, err = f.Write(append(b, '\n'))
+		closeErr := f.Close()
+		if err != nil || closeErr != nil {
+			fmt.Fprintf(os.Stderr, "orbit-font-trace: write failed: %v %v\n", err, closeErr)
+		}
+	}
+}
+
+// OrbitTracePresent is called only after the native present call returns.
+// I/O stays on a bounded worker; the app never waits for the writer.
+func OrbitTracePresent() { orbitFlush("host.present returned; not GPU fence or display scanout") }
+func orbitFlush(boundary string) {
+	st := orbitState()
+	if st == nil {
+		return
+	}
+	st.Lock()
+	defer st.Unlock()
+	st.frame++
+	if len(st.events) == 0 && st.dropped == 0 {
+		return
+	}
+	batch := orbitBatch{st.frame, st.events, st.dropped, st.caseID, boundary}
+	select {
+	case st.queue <- batch:
+		st.events = nil
+		st.dropped = 0
+	default:
+		st.dropped++
+	}
+}
+func OrbitTracePaint(l *Layout, li int, x, y, scale, baseline float32, clip [4]float32, transformed bool) {
+	if l == nil || !orbitAllowed(l.Params.Text) {
+		return
+	}
+	line := l.Lines[li]
+	glyphs := make([]orbitEvent, 0, len(line.Glyphs))
+	for _, g := range line.Glyphs {
+		glyphs = append(glyphs, orbitEvent{"id": g.ID, "cluster_rune": g.Cluster, "font_id": orbitFontID(g.Font), "x": g.X, "y": g.Y, "advance": g.Advance, "size": g.Size})
+	}
+	orbitRecord(orbitEvent{"kind": "paint_line", "text": l.Params.Text, "request": l.Params.Style, "line": li, "origin": [2]float32{x, y}, "line_box": [4]float32{line.X, line.Y, line.Width, line.Height}, "ascent": line.Ascent, "descent": line.Descent, "baseline_logical": y + line.Baseline, "baseline_physical": baseline, "scale": scale, "clip": clip, "transformed": transformed, "glyphs": glyphs, "baseline_policy": "floor(y + 0.001)", "cluster_units": "Unicode scalar/rune index"})
+}
+func OrbitTraceGlyph(l *Layout, li int, g Glyph, pen, baseline float32, bounds [4]float32) {
+	if l == nil || !orbitAllowed(l.Params.Text) {
+		return
+	}
+	orbitRecord(orbitEvent{"kind": "paint_glyph", "text": l.Params.Text, "line": li, "id": g.ID, "font_id": orbitFontID(g.Font), "cluster_rune": g.Cluster, "pen_physical": pen, "baseline_physical": baseline, "bitmap_bounds_physical": bounds})
+}
+func orbitFontID(f *Font) string {
+	st := orbitState()
+	if st == nil || f == nil {
+		return ""
+	}
+	st.Lock()
+	defer st.Unlock()
+	return st.fonts[f]
+}

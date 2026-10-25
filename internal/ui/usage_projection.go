@@ -25,6 +25,7 @@ type usagePoint struct {
 	usageAggregate
 }
 type usageProjection struct {
+	RequestsInRange                                     int
 	PeakPrompt                                          uint64
 	ToolFailures                                        int
 	ReasoningReported                                   bool
@@ -124,6 +125,9 @@ func buildUsageProjection(index workbench.UsageIndex, filter workbench.UsageFilt
 	modelRefs := map[workbench.UsageModelRef]bool{}
 	providers, models, workspaces := map[string]bool{}, map[string]bool{}, map[string]bool{}
 	for _, r := range index.Records {
+		if (filter.Start.IsZero() || !r.At.Before(filter.Start)) && (filter.End.IsZero() || r.At.Before(filter.End)) {
+			p.RequestsInRange++
+		}
 		if r.Provider != "" {
 			providers[r.Provider] = true
 		}

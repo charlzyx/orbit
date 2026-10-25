@@ -104,6 +104,9 @@ type State struct {
 	templateIndex                                     int
 	attachments                                       []string
 	issueDraft, pullDraft                             githubFormDraft
+	basePickerOpen                                    bool
+	baseQuery                                         string
+	baseDismissedAt                                   time.Time
 }
 type result struct {
 	keepError  bool
@@ -132,11 +135,15 @@ func (s *State) SetWorkspace(dir string) {
 	if dir == s.Git.Dir {
 		return
 	}
+	// Source GitPanel::set_context clears repository results/templates, not
+	// the independent ComposerInput drafts or its lazy issue-label cache.
+	s.rememberGitHubDraft()
+	labels := append([]workspace.GitHubLabel(nil), s.Data.Labels...)
 	s.Cancel()
 	s.generation++
 	s.Git.Dir = dir
 	s.GitHub.Dir = dir
-	s.Data = Data{}
+	s.Data = Data{Labels: labels}
 	s.Error = nil
 	s.Status = ""
 	s.CommitDetail = nil
@@ -153,7 +160,7 @@ func (s *State) SetWorkspace(dir string) {
 	s.pendingCommit, s.pendingPush, s.refreshPending = false, false, false
 	s.title, s.body, s.labels, s.assignees, s.base, s.notes = "", "", "", "", "", ""
 	s.templateIndex, s.templateOriginal, s.attachments = -1, "", nil
-	s.issueDraft, s.pullDraft = githubFormDraft{}, githubFormDraft{}
+	s.basePickerOpen, s.baseQuery, s.baseDismissedAt = false, "", time.Time{}
 	s.list = ui.ListState{}
 	s.initialized = false
 	s.collapsed = map[string]bool{}
@@ -466,6 +473,7 @@ func (s *State) Confirm(title, detail string, action func()) {
 }
 func (s *State) openDialog(kind string) {
 	s.rememberGitHubDraft()
+	s.basePickerOpen, s.baseQuery = false, ""
 	s.dialog = kind
 	s.dialogOpen = true
 	s.title = ""
@@ -485,21 +493,7 @@ func (s *State) openDialog(kind string) {
 		s.restoreGitHubDraft(kind)
 	}
 	if kind == "new-pull" {
-		s.base = ""
-		for _, name := range []string{"main", "master"} {
-			for _, branch := range s.Data.Branches {
-				if branch == name {
-					s.base = branch
-					break
-				}
-			}
-			if s.base != "" {
-				break
-			}
-		}
-		if s.base == "" && len(s.Data.Branches) > 0 {
-			s.base = s.Data.Branches[0]
-		}
+		s.base = s.defaultBase()
 	}
 	if kind == "new-issue" || kind == "new-pull" {
 		pull := kind == "new-pull"

@@ -38,6 +38,7 @@ type RunOptions struct {
 	Offline, NoExtensions              bool
 }
 type Controller struct {
+	authBrowsers      authBrowserEffects
 	catalogRefreshing bool
 	UI                *App
 	Agent             *agent.Manager
@@ -128,15 +129,7 @@ func NewController(o RunOptions) (*Controller, error) {
 		x.Notifier.Deliver(native.Notification{Session: n.SessionPath, Title: n.Title, Body: n.Message, Kind: native.ToastKind(n.Kind)})
 	}})
 	x.UI.Options.Custom = orbiterm.NewCustom(orbiterm.CustomOptions{RowHeight: float32(s.UI().EditorFontSize) * 18 / 13, Font: ghostty.Font{Family: s.Fonts().CodeFamily, Size: float32(s.UI().EditorFontSize) * 12 / 13, Features: []string{"-calt", "-liga", "-dlig"}}, Theme: NewTheme(s.Appearance().LightTheme, s.UI(), s.Fonts()).Terminal(), DarkTheme: NewTheme(s.Appearance().DarkTheme, s.UI(), s.Fonts()).Terminal(), ReduceMotion: s.UI().ReduceMotion, OnChange: invalidate, OnInput: x.Agent.CustomUIInput, OnResize: x.Agent.CustomUIResize, OnError: func(e error) { x.enqueue(func() { x.UI.save(e) }) }})
-	x.Git = gitworkbench.New(o.Workspace, gitworkbench.Options{TokenColor: func(class highlight.Class) ui.Color { return x.UI.Theme.TokenColor(class) }, AvatarLoader: gitworkbench.LoadAvatar, AvatarHome: s.Home, OnChange: invalidate, OpenFile: x.UI.OpenFile, RevealFile: native.RevealPath, OpenReview: func(source, ref, path string) {
-		x.UI.Navigate("chat")
-		x.UI.ReviewVisible = true
-		x.UI.ExplorerVisible = false
-		x.UI.reviewState.source = workspace.ReviewSource(source)
-		x.UI.reviewState.ref = ref
-		x.UI.reviewState.path = path
-		x.UI.RefreshReview()
-	}, OpenURL: func(url string) { x.UI.save(native.OpenURL(url)) }, Authenticate: func() { x.UI.Navigate("chat"); x.UI.save(x.Terminal.NewCommandTab([]string{"gh", "auth", "login"})) }})
+	x.Git = gitworkbench.New(o.Workspace, gitworkbench.Options{TokenColor: func(class highlight.Class) ui.Color { return x.UI.Theme.TokenColor(class) }, AvatarLoader: gitworkbench.LoadAvatar, AvatarHome: s.Home, OnChange: invalidate, OpenFile: x.UI.OpenFile, RevealFile: native.RevealPath, OpenReview: x.UI.OpenReviewDiff, OpenURL: func(url string) { x.UI.save(native.OpenURL(url)) }, Authenticate: func() { x.UI.Navigate("chat"); x.UI.save(x.Terminal.NewCommandTab([]string{"gh", "auth", "login"})) }})
 	var hints map[string]bool
 	_ = s.Read("hints.json", &hints)
 	x.Worktrees = worktreeui.New(o.Workspace, worktreeui.Options{FocusComposer: func() { x.UI.composer.Focus() }, OnPickerOpen: func() { x.UI.autocomplete.Dismiss(); x.UI.thinkingOpen = false; x.UI.workspaceOpen = false }, Translate: x.UI.Tr, HideHowTo: hints["worktree_howto_dismissed"], OnDismissHowTo: func() {
@@ -211,6 +204,7 @@ func NewController(o RunOptions) (*Controller, error) {
 		case "git":
 			x.Git.Refresh()
 		case "worktrees":
+			x.reloadWorktreePreferences()
 			x.Worktrees.Refresh()
 		}
 	}
@@ -236,6 +230,7 @@ func (x *Controller) sync() {
 	s := x.Agent.Snapshot()
 	x.UI.Runtime = x.Agent.RuntimeSnapshot()
 	x.UI.SetSnapshot(adaptSnapshot(s, x.workspace, x.pinned, x.archived))
+	x.openAuthBrowser(s.Auth, native.OpenURL)
 	x.UI.syncUsageStore()
 	if d := x.UI.Model.Dialog; d != nil && d.Method == "custom" {
 		x.UI.Options.Custom.Update(d.ID, d.Lines, d.Width, d.Height, d.Cursor)
@@ -361,6 +356,7 @@ func (x *Controller) Close() {
 }
 func adaptSnapshot(s agent.Snapshot, workspacePath string, pinned, archived map[string]bool) Snapshot {
 	v := Snapshot{ModelCatalog: s.Models, CurrentModel: s.Model, LatestTurn: s.LatestTurn, CommandsRaw: s.Commands, RawMessages: s.Messages, Turn: s.Turn, Connected: s.Connected, Running: s.Running, Error: s.ConnectionError, Status: s.Status, SessionID: s.ActiveSession.ID, SessionPath: s.ActiveSession.Path, SessionName: s.ActiveSession.Name, Workspace: workspacePath, ModelID: s.Model.ID, ModelProvider: s.Model.Provider, Thinking: s.ThinkingLevel, ThinkingLevels: s.ThinkingLevels, AuthProviders: s.Auth.Providers, AuthURL: s.Auth.URL, AuthStatus: s.Auth.Status, AuthCode: s.Auth.UserCode}
+	v.Auth, v.Retrying = s.Auth, s.Retrying
 	v.Extensions = s.Extensions
 	v.SteeringMode = s.SteeringMode
 	v.FollowUpMode = s.FollowUpMode
@@ -535,8 +531,14 @@ func (x *Controller) Action(a Action) {
 		}
 	case "StopRuntime":
 		e = m.Stop()
+	case "WorktreePreferencesChanged":
+		x.reloadWorktreePreferences()
+	case "AbortRetry":
+		e = m.Send(pirpc.AbortRetry, nil)
 	case "SetAutoRetry":
 		e = m.SetAutoRetry(flag("enabled"))
+	case "SetRPCPatches":
+		x.setRPCPatches(flag("enabled"))
 	case "SetAutoCompaction":
 		e = m.Send(pirpc.SetAutoCompaction, map[string]any{"enabled": flag("enabled")})
 	case "SetFollowUpMode", "SetSteeringMode":

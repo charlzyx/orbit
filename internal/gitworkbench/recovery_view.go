@@ -95,6 +95,10 @@ func (s *State) failure(c *ui.Context) {
 
 // CloseTransient lets the host route Escape before leaving the Git page.
 func (s *State) CloseTransient() bool {
+	if s.basePickerOpen {
+		s.closeBasePicker()
+		return true
+	}
 	if s.confirmOpen {
 		s.confirmOpen = false
 		s.confirmAction = nil

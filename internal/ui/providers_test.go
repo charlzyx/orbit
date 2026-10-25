@@ -76,15 +76,16 @@ func TestProviderCredentialCapabilities(t *testing.T) {
 	a.providerState.catalog = workbench.ProviderCatalog{Providers: workbench.BuiltinProviders()}
 	tt := ui.NewTester(a.View, 1200, 800)
 	tt.Frame()
-	if e := tt.Click("Configure"); e != nil {
-		t.Fatal(e)
+	if _, ok := tt.Find("API key openai-codex"); ok {
+		t.Fatal("OAuth-only provider offered API-key control")
 	}
-	for _, item := range tt.Menu() {
-		if item == "API key…" {
-			t.Fatal("OAuth-only provider offered API key")
-		}
+	if _, ok := tt.Find("Configure openai-codex"); ok {
+		t.Fatal("builtin provider without custom configuration offered Configure")
 	}
-	tt.CloseMenu()
+	if !tt.HasText("Connect pi to discover available sign-in methods.") {
+		t.Fatal("OAuth capability without a live method was not explained")
+	}
+
 	a.openProviderSecret("test", false)
 	tt.Frame()
 	tt.Type("fixture-key")

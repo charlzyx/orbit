@@ -132,41 +132,45 @@ func (a *App) paintBackdrop(p *ui.Painter, r ui.Rect, animate bool) {
 		p.After(90 * time.Millisecond)
 	}
 }
-func (a *App) backgroundSettings(c *ui.Context) {
+func (a *App) sourceBackgroundRow(c *ui.Context) {
 	s := &a.backdrop
-	a.section(c, a.text("settings.background", "Background"), func() {
-		label := a.text("settings.choose_image", "Choose image…")
-		current := "Ordered-dither dot field"
-		if s.config.Source != nil {
-			current = *s.config.Source
-			label = a.text("settings.replace_ellipsis", "Replace…")
-		}
-		a.setting(c, a.text("settings.background_image", "Background image"), current, func() {
-			if a.button(c, label, "icons/image.svg", false).Disabled(s.loading).Clicked() {
+	label := a.Tr("settings.choose_image")
+	current := ""
+	if s.config.Source != nil {
+		current = *s.config.Source
+		label = a.Tr("settings.replace_ellipsis")
+	}
+	a.sourceSettingsRow(c, a.Tr("settings.background_image"), a.Tr("settings.a_dithered_image_behind_the_new_task_page"), current, func() {
+		ui.Row(c).Gap(a.Theme.Space(8)).Children(func() {
+			if a.sourceSettingsButton(c, label).Disabled(s.loading).Clicked() {
 				a.Dispatch(Action{Kind: "BrowseBackground"})
 			}
-			if s.config.Source != nil && a.button(c, "Reset", "", false).Disabled(s.loading).Clicked() {
+			if s.config.Source != nil && a.sourceSettingsButton(c, "Reset").Disabled(s.loading).Clicked() {
 				a.clearBackground()
 			}
 		})
-		if s.loading {
-			ui.Row(c).Gap(8).Children(func() {
-				ui.Spinner(c).Size(12, 12)
-				ui.Text(c, "Processing background…").TextColor(a.Theme.TextMuted)
-			})
-		}
-		if s.err != "" {
-			ui.Text(c, s.err).TextColor(a.Theme.Error).Selectable()
-		}
-		if s.config.Source == nil {
-			return
-		}
-		ui.Box(c.Key("background-preview")).AlignSelf(ui.Stretch).Height(84).Radius(a.Theme.Px(12)).Border(1, a.Theme.Border).Clip().Draw(func(p *ui.Painter, r ui.Rect) { a.paintBackdrop(p, r, false) })
+	})
+	if s.loading {
+		ui.Row(c).Padding(8, 16).Gap(8).Children(func() {
+			ui.Spinner(c).Size(12, 12)
+			ui.Text(c, "Processing background…").TextColor(a.Theme.TextMuted)
+		})
+	}
+	if s.err != "" {
+		ui.Text(c, s.err).Padding(8, 16).TextColor(a.Theme.Error).Selectable()
+	}
+}
+func (a *App) backgroundSettings(c *ui.Context) {
+	s := &a.backdrop
+	if s.config.Source == nil {
+		return
+	}
+	a.sourceSettingsSection(c, a.Tr("settings.background_tuning"), "", func() {
 		tuning := s.config.Tuning
 		if s.pending != nil {
 			tuning = *s.pending
 		}
-		a.setting(c, a.text("settings.blur", "Blur"), "", func() {
+		a.sourceSettingsRow(c, a.Tr("settings.blur"), a.Tr("settings.softens_the_picture_before_the_dither_pass_so_a_"), "", func() {
 			blur := float64(tuning.Blur)
 			if ui.StepSlider(c, &blur, 0, float64(background.BlurMax), float64(background.BlurStep)).Width(160).Label("Background blur").Changed() {
 				tuning.Blur = float32(blur)
@@ -174,23 +178,37 @@ func (a *App) backgroundSettings(c *ui.Context) {
 			}
 			ui.Text(c, fmt.Sprintf("%.1f", blur)).Width(28)
 		})
-		a.selectSetting(c, a.text("settings.pixel_size", "Pixel size"), "", background.CellLabels[tuning.CellIndex()], background.CellLabels[:], func(v string) {
-			for i, label := range background.CellLabels {
-				if v == label {
-					tuning.Cell = background.CellSizes[i]
-					a.setBackgroundTuning(tuning)
-					break
-				}
+		a.sourceSettingsDivider(c)
+		a.sourceSettingsRow(c, a.Tr("settings.pixel_size"), a.Tr("settings.the_dither_cell_edge_fine_cells_read_as_halftone"), "", func() {
+			choices := []settingsChoice{}
+			for _, v := range background.CellLabels {
+				choices = append(choices, settingsChoice{v, v})
 			}
+			a.sourceSettingsSelect(c, "Background pixel size", background.CellLabels[tuning.CellIndex()], choices, func(v string) {
+				for i, label := range background.CellLabels {
+					if v == label {
+						tuning.Cell = background.CellSizes[i]
+						a.setBackgroundTuning(tuning)
+						break
+					}
+				}
+			})
 		})
-		a.selectSetting(c, a.text("settings.bottom_fade", "Bottom fade"), "", background.FadeLabels[tuning.FadeIndex()], background.FadeLabels[:], func(v string) {
-			for i, label := range background.FadeLabels {
-				if v == label {
-					tuning.Fade = background.FadeHeights[i]
-					a.setBackgroundTuning(tuning)
-					break
-				}
+		a.sourceSettingsDivider(c)
+		a.sourceSettingsRow(c, a.Tr("settings.bottom_fade"), a.Tr("settings.how_far_the_picture_fades_into_the_page_behind_t"), "", func() {
+			choices := []settingsChoice{}
+			for _, v := range background.FadeLabels {
+				choices = append(choices, settingsChoice{v, v})
 			}
+			a.sourceSettingsSelect(c, "Background fade", background.FadeLabels[tuning.FadeIndex()], choices, func(v string) {
+				for i, label := range background.FadeLabels {
+					if v == label {
+						tuning.Fade = background.FadeHeights[i]
+						a.setBackgroundTuning(tuning)
+						break
+					}
+				}
+			})
 		})
 	})
 }

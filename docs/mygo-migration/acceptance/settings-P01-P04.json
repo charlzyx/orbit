@@ -150,9 +150,10 @@
             "TestSettingsNavigationComplete",
             "TestSettingsPageScrollRetained",
             "TestSettingsSourceSearchIndexAndSectionNavigation",
-            "TestSettingsSourceHeaderAndGeneralRows"
+            "TestSettingsSourceHeaderAndGeneralRows",
+            "TestGeneralMeasuredSourceCardGeometry"
           ],
-          "remaining": "All14 source sections remain; nav groups/28px rows, fixed16px title,960px outer/912px inner column and source55-row setting-label/synonym search are implemented. Source search clears query and opens a section, not exact-row scrolling. Retained scroll, source-header/search, and actual notification-switch pointer/Space persistence pass under the canonical overlay (-race focused suite3.452s). General CPU capture1470×922 was inspected at05:45; source GPUI phi line-height,1.3 heading, left-aligned grouped nav and native36×20 switch geometry are now explicit. Full Settings cards, notification OS permission state/sound preview, matched pixels and OS flows remain unverified.",
+          "remaining": "All14 source sections remain; nav groups/28px rows, fixed16px title,960px outer/912px inner column and source55-row setting-label/synonym search are implemented. Source search clears query and opens a section, not exact-row scrolling. Retained scroll, source-header/search, and actual notification-switch pointer/Space persistence pass under the canonical overlay (-race focused suite3.452s). General CPU capture1470×922 was inspected at05:45; source GPUI phi line-height,1.3 heading, left-aligned grouped nav and native36×20 switch geometry are now explicit. Full Settings cards, notification OS permission state/sound preview, matched pixels and OS flows remain unverified. General cards measured against real1470x922 Rust:121/377 and443/654 source edges within1DIP in CPU regression. No pixel-pass claim.",
           "evidence": "../native-ui-acceptance.json",
           "last_verified_sha": null,
           "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."

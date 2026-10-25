@@ -253,14 +253,14 @@ func TestUsageProviderScopedMultiselectSearchAllClearAndNativeEscape(t *testing.
 	if err := tt.Click("Select all"); err != nil {
 		t.Fatal(err)
 	}
-	if len(s.filter.ModelRefs) != 1 || s.filter.ModelRefs[0].Provider != "second" {
+	if len(s.filter.ModelRefs) != len(s.projection.ModelRefOptions) {
 		t.Fatal(s.filter.ModelRefs)
 	}
 	tt.Key(0, ui.KeyEscape)
 	if s.filterMenu != "" || s.filterViews["models"].Open {
 		t.Fatal("Escape did not close filter")
 	}
-	if len(s.filter.ModelRefs) != 1 {
+	if len(s.filter.ModelRefs) != len(s.projection.ModelRefOptions) {
 		t.Fatal("Escape erased applied scope")
 	}
 }
@@ -441,44 +441,42 @@ func TestUsageProjectionRejectsLateResultAndClonesFilterSlices(t *testing.T) {
 		}
 	}
 }
-func TestUsageNativeFilterKeyboardAndRequestToggleExclusivity(t *testing.T) {
+func TestUsageNativeFilterConfirmDismissesWithoutChangingScope(t *testing.T) {
 	a := fixtureUsageApp(t)
 	s := &a.usageState
 	tt := ui.NewTester(func(c *ui.Context) {
 		ui.Column(c).Fill().Padding(20).Children(func() { a.usageDimensionFilter(c, "models") })
 	}, 800, 560)
 	tt.Click("All models")
-	tt.Click("Filter models")
 	tt.Type("fixture")
 	tt.Key(0, ui.KeyDown)
 	tt.Key(0, ui.KeyEnter)
-	if len(s.filter.ModelRefs) != 1 || s.filter.ModelRefs[0].Model != "fixture-large" {
-		t.Fatal("search keyboard highlight did not toggle exact model", s.filter.ModelRefs)
+	if len(s.filter.ModelRefs) != 0 || s.filterMenu != "" || a.modalOpen() {
+		t.Fatal("source Enter should only dismiss")
 	}
-	tt.Key(0, ui.KeyEnter)
+	tt.Click("All models")
+	tt.Type("zz-no-match")
+	if !tt.HasText("No match for “zz-no-match”") {
+		t.Fatal("no-match text missing")
+	}
+	if _, ok := tt.Find("All"); !ok {
+		t.Fatal("All row disappeared on no matches")
+	}
+	if err := tt.Click("Select all"); err != nil {
+		t.Fatal(err)
+	}
+	if len(s.filter.ModelRefs) != len(s.projection.ModelRefOptions) {
+		t.Fatal("Select all filtered by query")
+	}
+	if err := tt.Click("All"); err != nil {
+		t.Fatal(err)
+	}
 	if len(s.filter.ModelRefs) != 0 {
-		t.Fatal("repeated Enter did not toggle off")
+		t.Fatal("All did not clear dimension")
 	}
 	tt.Key(0, ui.KeyEscape)
 	if a.modalOpen() {
-		t.Fatal("closed popup blocked app")
-	}
-	// The real page's source error/cache toggles must never become contradictory.
-	tt = ui.NewTester(a.View, 1470, 922)
-	tt.Frame()
-	tt.Click("Filters")
-	if err := tt.ChooseMenuItem("Failed requests only"); err != nil {
-		t.Fatal(err)
-	}
-	if !s.filter.ErrorsOnly || s.filter.CachedOnly {
-		t.Fatal("error toggle failed")
-	}
-	tt.Click("Filters")
-	if err := tt.ChooseMenuItem("Cache hits only"); err != nil {
-		t.Fatal(err)
-	}
-	if !s.filter.CachedOnly || s.filter.ErrorsOnly {
-		t.Fatal("cache and error filters simultaneously active")
+		t.Fatal("closed popup blocks app")
 	}
 }
 func TestUsageNativeContextMenuExportAndColumnPreferences(t *testing.T) {
@@ -487,23 +485,23 @@ func TestUsageNativeContextMenuExportAndColumnPreferences(t *testing.T) {
 	a.Options.OnAction = func(x Action) { actions = append(actions, x) }
 	tab := a.usageState.table("sessions")
 	tab.Search = "Task 079"
+	a.usageState.contextRow = -1
 	tt.Frame()
 	if err := tt.RightClick("Task 079"); err != nil {
 		t.Fatal(err)
 	}
-	if err := tt.ChooseMenuItem("Copy session ID"); err != nil {
-		t.Fatal(err)
+	if err := tt.Click("Copy session ID"); err != nil {
+		t.Fatalf("%v; context=%+v fresh=%v row=%d texts=%v", err, a.usageState.menu("context"), a.usageState.contextFresh, a.usageState.contextRow, tt.Texts())
 	}
 	if len(actions) != 1 || actions[0].Kind != "CopyText" || actions[0].Value != "79" {
 		t.Fatal(actions)
 	}
-	tt.RightClick("Task 079")
-	tt.ChooseMenuItem("Scope to this session")
+	tt.Click("Scope to this session")
 	if a.usageState.filter.SessionPath != "/sessions/79.jsonl" {
 		t.Fatal("context scope lost path identity")
 	}
 	tt.Click("Columns")
-	if err := tt.ChooseMenuItem("Input"); err != nil {
+	if err := tt.Click("Toggle sessions column input"); err != nil {
 		t.Fatal(err)
 	}
 	if !slices.Contains(tab.Hidden, "input") {
@@ -514,8 +512,10 @@ func TestUsageNativeContextMenuExportAndColumnPreferences(t *testing.T) {
 	if !strings.Contains(string(saved["hidden_columns"]), "input") {
 		t.Fatal("session visibility not persisted")
 	}
-	tt.Click("Columns")
-	tt.ChooseMenuItem("Show all columns")
+	if !a.usageState.menu("columns:sessions").Open {
+		t.Fatal("source column toggle should keep popup open")
+	}
+	tt.Click("Show all")
 	if len(tab.Hidden) > 0 {
 		t.Fatal("reset did not show columns")
 	}
@@ -526,7 +526,7 @@ func TestUsageNativeContextMenuExportAndColumnPreferences(t *testing.T) {
 	tt = ui.NewTester(a.View, 1470, 922)
 	tt.Frame()
 	tt.Click("Export")
-	if err := tt.ChooseMenuItem(a.text("usage.export_json", "Current view (JSON)")); err != nil {
+	if err := tt.Click(a.text("usage.export_json", "Current view (JSON)")); err != nil {
 		t.Fatal(err)
 	}
 	if len(actions) != 1 || actions[0].Kind != "ExportUsage" || actions[0].Value != "json" {
@@ -540,7 +540,7 @@ func TestUsageNativeContextMenuExportAndColumnPreferences(t *testing.T) {
 	a.usageState.projecting = true
 	tt.Frame()
 	tt.Click("Export")
-	if tt.Menu() != nil {
+	if a.usageState.menu("export").Open {
 		t.Fatal("stale projection remained exportable")
 	}
 }

@@ -67,7 +67,7 @@ func (a *App) shortcuts(c *ui.Context) {
 		}
 		return
 	}
-	if a.ReviewVisible && a.reviewState.handle.FocusWithin(c) {
+	if a.ReviewVisible && a.reviewState.treeHandle.FocusWithin(c) {
 		for _, b := range Bindings {
 			if b.Context != "ReviewDiffTree" {
 				continue
@@ -109,7 +109,7 @@ func (a *App) shortcuts(c *ui.Context) {
 	}
 }
 func (a *App) modalOpen() bool {
-	return (a.Models != nil && a.Models.HasModal()) || a.workspaceOpen || a.usageState.filterMenu != "" || a.providerState.editor != nil || (a.Options.HasModal != nil && a.Options.HasModal()) || a.promptOpen || a.confirmOpen || a.Model.Dialog != nil || a.paletteOpen || a.modelOpen || a.jsonOpen || a.secretOpen || a.imageOpen || a.usageState.detailError != nil || a.usageState.customOpen || a.usageState.detailRecord != nil || a.usageState.detailSession != nil
+	return a.nativeSettings.selectMenu.id != "" || a.providerState.usageProvider != "" || (a.Models != nil && a.Models.HasModal()) || a.workspaceOpen || a.usageState.filterMenu != "" || a.providerState.editor != nil || (a.Options.HasModal != nil && a.Options.HasModal()) || a.promptOpen || a.confirmOpen || a.Model.Dialog != nil || a.paletteOpen || a.modelOpen || a.jsonOpen || a.secretOpen || a.imageOpen || a.usageState.detailError != nil || a.usageState.customOpen || a.usageState.detailRecord != nil || a.usageState.detailSession != nil
 }
 
 // Native menu accelerators arrive outside MyGo's modal shortcut scope. Apply

@@ -80,6 +80,17 @@ def detach_overlay(flags: list[str]) -> tuple[list[str], str | None]:
     return out, overlay
 
 
+def default_trimpath(flags: list[str], arguments: list[str]) -> list[str]:
+    # Go's build action hashes absolute source directories unless -trimpath is
+    # set. Our verified temporary dependency copy gets a fresh directory each
+    # invocation; embedding it would defeat dependency-cache reuse and retain
+    # paths to already-deleted files in debug information. Preserve an explicit
+    # caller choice (including -trimpath=false for local debugging).
+    if any(f == "-trimpath" or f.startswith("-trimpath=") for f in flags + arguments):
+        return list(flags)
+    return [*flags, "-trimpath"]
+
+
 def sha(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
@@ -148,6 +159,7 @@ def main() -> int:
     if inherited is None:
         inherited = subprocess.check_output([go, "env", "GOFLAGS"], text=True).strip()
     flags, previous_overlay = detach_overlay(split_flags(inherited))
+    flags = default_trimpath(flags, args)
     if any(f == "-modfile" or f.startswith("-modfile=") for f in flags + args):
         fail("The native wrapper owns its temporary -modfile; remove the conflicting flag")
     env["GOFLAGS"] = " ".join(quote_flag(f) for f in flags)

@@ -27,6 +27,13 @@ class WrapperFlags(unittest.TestCase):
         self.assertEqual(overlay.detach_overlay(['-race','-overlay=x','-tags=test']), (['-race','-tags=test'],'x'))
         self.assertEqual(overlay.detach_overlay(['-overlay','x','-overlay=y']), ([], 'y'))
         with self.assertRaises(RuntimeError): overlay.detach_overlay(['-overlay'])
+    def test_default_trimpath_preserves_explicit_debug_choice(self):
+        original = ['-race']
+        self.assertEqual(overlay.default_trimpath(original, ['test', './...']), ['-race', '-trimpath'])
+        self.assertEqual(original, ['-race'])
+        for choice in ['-trimpath', '-trimpath=true', '-trimpath=false']:
+            self.assertEqual(overlay.default_trimpath([choice], ['build']), [choice])
+            self.assertEqual(overlay.default_trimpath(['-race'], ['build', choice]), ['-race'])
 
 class SelectionManifest(unittest.TestCase):
     def setUp(self):
