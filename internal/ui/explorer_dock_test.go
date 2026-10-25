@@ -248,3 +248,34 @@ func TestMountedExplorerWorkspaceChangeClearsCursorAndExpansion(t *testing.T) {
 		t.Fatal("old workspace row survived")
 	}
 }
+
+// A pixel line-height passed to LineHeight is interpreted as a multiplier and
+// can paint the label into the next row despite a correctly sized badge box.
+func TestMountedExplorerFileBadgeTextStaysInsideItsOwnRow(t *testing.T) {
+	a, tt, _ := mountedExplorer(t)
+	for _, fontSize := range []float64{14, 16} {
+		a.Prefs.UIFontSize = fontSize
+		for _, selected := range []bool{false, true} {
+			if selected {
+				if err := tt.Click("Explorer row alpha.go"); err != nil {
+					t.Fatal(err)
+				}
+			}
+			tt.Frame()
+			for _, path := range []string{"alpha.go", "bravo.go", "notes.txt"} {
+				badge := explorerBounds(t, tt, "Explorer file badge "+path)
+				text := explorerBounds(t, tt, "Explorer file badge text "+path)
+				row := explorerBounds(t, tt, "Explorer row "+path)
+				// Font shaping may retain natural glyph height above the requested
+				// eight-DIP line box; it must nevertheless fit this badge and row.
+				if text.H <= 0 || text.X < badge.X || text.X+text.W > badge.X+badge.W || text.Y < badge.Y || text.Y+text.H > badge.Y+badge.H || text.Y < row.Y || text.Y+text.H > row.Y+row.H {
+					t.Fatalf("font=%v selected=%v %s: label escaped own badge/row: text=%+v badge=%+v row=%+v", fontSize, selected, path, text, badge, row)
+				}
+				delta := text.Y + text.H/2 - (badge.Y + badge.H/2)
+				if delta < -1 || delta > 1 {
+					t.Fatalf("%s: label not vertically centered: text=%+v badge=%+v", path, text, badge)
+				}
+			}
+		}
+	}
+}

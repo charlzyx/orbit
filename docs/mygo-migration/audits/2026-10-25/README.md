@@ -50,6 +50,12 @@ History 列表位置、Explorer 调宽/记忆及键盘操作、Usage Details 几
 
 Pi 正常读取 `~/.pi/agent` 或指定的 `PI_CODING_AGENT_DIR`；原生 Pi 可能正常迁移配置或刷新登录信息，不能承诺完全不写原文件。原版自动更新功能也不能在本测试包中验收成功：尚无 Go 签名更新 feed/key，不能使用 Rust 的更新包代替。
 
+## 开发分支进展（不改变 .4）
+
+- [History / Explorer / Usage / 手动清理冻结批次](parity-integration.md)。
+- [MCP / 终端 / badge 及测试同步修正](functional-integration.md)：功能补丁与门禁有独立证据，未发布为安装包。
+- [原生实图对照及剩余差异](native-image-review.md)：History、Usage 几何有改善，但截图不是全功能验收，仍非像素级对齐。
+
 ## 详细追踪
 
 - [C01–C20：Chat / Pi RPC / 扩展交互](chat.md)

@@ -1078,14 +1078,44 @@ func cloneValue(value reflect.Value) reflect.Value {
 		return value
 	}
 }
-func (m *Manager) Restart() error {
+
+// ErrReloadDeferred means the target became busy after the host's idle check.
+var ErrReloadDeferred = errors.New("Pi configuration reload deferred until idle")
+var ErrReloadSuperseded = errors.New("Pi configuration reload target changed")
+
+func (m *Manager) Restart() error { return m.restart("", "", "", false) }
+
+// RestartIdle validates the exact active runtime and its busy state under the
+// same lock that detaches it. A parked busy runtime is never stopped by this call.
+func (m *Manager) RestartIdle(expectedRuntime, expectedPath, expectedSession string) error {
+	return m.restart(expectedRuntime, expectedPath, expectedSession, true)
+}
+func (m *Manager) restart(expectedRuntime, expectedPath, expectedSession string, idleOnly bool) error {
 	m.mu.Lock()
+	if m.closed {
+		m.mu.Unlock()
+		return pirpc.ErrClosed
+	}
+	if idleOnly && m.active != expectedRuntime {
+		m.mu.Unlock()
+		return ErrReloadSuperseded
+	}
+	if idleOnly {
+		if e := m.sessions[m.active]; e != nil && e.busy() {
+			m.mu.Unlock()
+			return ErrReloadDeferred
+		}
+	}
 	entry := m.sessions[m.active]
 	if entry == nil {
 		m.mu.Unlock()
 		return errors.New("no active session")
 	}
 	row := entry.state.snapshot.ActiveSession
+	if idleOnly && (row.Path != expectedPath || row.ID != expectedSession) {
+		m.mu.Unlock()
+		return ErrReloadSuperseded
+	}
 	pendingWorkflow := entry.workflowPending
 	delete(m.sessions, m.active)
 	m.active = ""

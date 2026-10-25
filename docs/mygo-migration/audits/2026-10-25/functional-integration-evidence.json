@@ -1,0 +1,45 @@
+{
+  "base": "e577c31c91780a0367f2cfe676b98e5ac2ba12f8",
+  "releaseChanged": false,
+  "sourceSha256": {
+    "internal/ui/run.go": "bfa8c1fdba648ccddab9fb163ab9ea4c9ad7dab43fd120ef64cb5be36c70287c",
+    "internal/ui/config_apply.go": "2559828a44707c31e16e3b40f8724842841c9984831231a98edf4c87d056c7db",
+    "internal/ui/config_apply_test.go": "65a402fb4ecce419c4ed26c3240ac8da2df5a5d6ce8669e69eb9c99de9df115a",
+    "internal/agent/manager.go": "72288b13d4e497bb1e01b39346a0caca32094b7b2ab88e4c8d1602480507f130",
+    "internal/agent/config_reload_test.go": "16c4f1bbacb5a338f390b3b75901235ab17ee5f485ff7cc7ead3933c9c8d9802",
+    "internal/mcpui/state.go": "a53ff8a8b041a3760048a433b5f7974af269ed889e9443081a6e3f24d3437c45",
+    "internal/mcpui/state_test.go": "de0eed8a09b1e3689ba5d2a74dab2f6b9e5cb69100114b5eb5474f0f516852fb",
+    "docs/mygo-migration/mcp-reload-acknowledgment.md": "d5a0b180344534fcbcac4320bf739f87423f46127c835006689fff2eb87caa93",
+    "internal/ui/app.go": "93b03266a5a40abcebc517aebd852e5bd3b49ac2707b6a12ac0525e4c78c3996",
+    "internal/ui/terminal_host_test.go": "d69bb4094d2b36b73bef867904df2521c328daef3894942525b844f9d505f2a0",
+    "internal/ui/files.go": "03dba8ebd734c77aefd3217975ae2e0b1accd1c4ce0f85fb61af3dd93bc0a76e",
+    "internal/ui/explorer_dock_test.go": "f52461be8266f1b55e02b7a974959c5322595d56290062615fcfdf1244d20974",
+    "internal/agent/abort_pipeline_test.go": "643a0856c63d3131a1bd4661ee827829ec063c5cf255416f3eaa28fc291881aa"
+  },
+  "evidenceSha256": {
+    "orbit-functional-race-1432.jsonl": "9dfc183145bda18ff9548973813e7b510e4947deb8c1fde629e8701a0c8c2d63",
+    "orbit-functional-race-1432.stderr": "4563659a8e94e95f1c1fc623706f380d4e244d1b11c1b4b584ebcea7d1aaca08",
+    "orbit-functional-vet-1432.log": "4563659a8e94e95f1c1fc623706f380d4e244d1b11c1b4b584ebcea7d1aaca08",
+    "orbit-functional-python-1434.log": "a3ee624feb59979d622e16b5e95ccbbff06323467d71696c073e14a95904d049",
+    "orbit-abort-sync-1429.log": "ac0b3ed70de9d2c4267bbc334cff2433ca600ab1a4770e2110f2b9736af3c790",
+    "orbit-badge-negative-1424.log": "aa7e952b28cd8f56cda90f25cb09fd5ad48f3d63aed3c9d5bc2d69c9f619d7af",
+    "orbit-badge-final-1425.log": "d354df3d3699ebeee13eb62f44226d3d8505aee209df4c79cb4401330f80b263",
+    "orbit-mcp-final-1423.log": "5bb750c2e3a8e1967e1ee289f07f7f03af0a5accd8247ff6cb4a6eed6c4dc62e",
+    "orbit-mcp-vet-1423.log": "4563659a8e94e95f1c1fc623706f380d4e244d1b11c1b4b584ebcea7d1aaca08"
+  },
+  "fullRace": {
+    "testPassEvents": 2361,
+    "packagePass": 24,
+    "skip": 14,
+    "fail": 0,
+    "cached": false
+  },
+  "vet": "PASS",
+  "python": {
+    "run": 43,
+    "skip": 2,
+    "status": "PASS"
+  },
+  "nativeFinalSource": "PENDING",
+  "fullParity": false
+}

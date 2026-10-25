@@ -28,7 +28,9 @@ func TestAbortDelayedClearRejectsReusedStateButRestoresParkedSession(t *testing.
 			if err := m.Submit("hold", nil, SendPrompt); err != nil {
 				t.Fatal(err)
 			}
-			waitFor(t, m, func(s Snapshot) bool { return s.Running })
+			// Awaiting is locally optimistic; require the fixture agent_start before
+			// Abort so the later !Running barrier proves agent_settled was received.
+			waitFor(t, m, func(s Snapshot) bool { return s.Running && !s.Awaiting })
 			if err := m.Send("emit_abort_queue", nil); err != nil {
 				t.Fatal(err)
 			}
@@ -108,7 +110,9 @@ func TestAbortPendingRestorationCancelledByExplicitClear(t *testing.T) {
 	if err := m.Submit("hold", nil, SendPrompt); err != nil {
 		t.Fatal(err)
 	}
-	waitFor(t, m, func(s Snapshot) bool { return s.Running })
+	// Awaiting is locally optimistic; require the fixture agent_start before
+	// Abort so the later !Running barrier proves agent_settled was received.
+	waitFor(t, m, func(s Snapshot) bool { return s.Running && !s.Awaiting })
 	if err := m.Send("emit_abort_queue", nil); err != nil {
 		t.Fatal(err)
 	}
@@ -157,7 +161,9 @@ func TestAbortPendingPipelineStopDoesNotRestoreExpectedCloseError(t *testing.T) 
 	if err := m.Submit("hold", nil, SendPrompt); err != nil {
 		t.Fatal(err)
 	}
-	waitFor(t, m, func(s Snapshot) bool { return s.Running })
+	// Awaiting is locally optimistic; require the fixture agent_start before
+	// Abort so the later !Running barrier proves agent_settled was received.
+	waitFor(t, m, func(s Snapshot) bool { return s.Running && !s.Awaiting })
 	if err := m.Send("emit_abort_queue", nil); err != nil {
 		t.Fatal(err)
 	}

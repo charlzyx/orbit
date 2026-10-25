@@ -474,8 +474,8 @@ func (a *App) explorerFileBadge(c *ui.Context, path string) {
 		hex = badge.Dark
 	}
 	color := ui.RGB(uint8(hex>>16), uint8(hex>>8), uint8(hex))
-	ui.Box(c).Size(17, 17).Shrink(0).Radius(t.Px(4)).Background(color.Alpha(.16)).Center().Children(func() {
-		ui.Text(c, badge.Label).FontSize(t.Px(7.5)).LineHeight(t.Px(8)).FontWeight(600).TextColor(color)
+	ui.Box(c).Label("Explorer file badge "+path).Size(17, 17).Shrink(0).Radius(t.Px(4)).Background(color.Alpha(.16)).Center().Children(func() {
+		ui.Text(c, badge.Label).Label("Explorer file badge text " + path).FontSize(t.Px(7.5)).FixedLineHeight(t.Px(8)).FontWeight(600).TextColor(color)
 	})
 }
 func (a *App) explorerStatusBadge(status string) (string, ui.Color) {

@@ -888,6 +888,14 @@ func (a *App) terminal(c *ui.Context) {
 	p := a.Options.Terminal
 	t := a.Theme
 	s := p.Snapshot()
+	var active orbiterm.TabInfo
+	hasActive := s.Active >= 0 && s.Active < len(s.Tabs)
+	if hasActive {
+		active = s.Tabs[s.Active]
+	}
+	// Rust TerminalPanel::restart and exited_overlay operate only on the active
+	// tab. Snapshot state belongs to the host; the Ghostty grid does not render
+	// startup failures or the shell-exited recovery affordance for us.
 	ui.Column(c.Key("terminal-pane")).Height(p.Height()).BorderWidth(1, 0, 0, 0).BorderColor(t.Border).Background(t.Surface).Children(func() {
 		handle := ui.Box(c).Height(6).AlignSelf(ui.Stretch).Cursor(ui.CursorResizeNS).Label("Resize terminal")
 		if _, dy, ok := handle.Dragged(); ok {
@@ -897,13 +905,23 @@ func (a *App) terminal(c *ui.Context) {
 		}
 		ui.Row(c).Height(32).PaddingX(8).Gap(4).AlignItems(ui.Center).Children(func() {
 			for i, tab := range s.Tabs {
-				if a.button(c, tab.Label, tab.Icon, i == s.Active).Clicked() {
+				if a.button(c.Key(fmt.Sprintf("terminal-tab-%d", tab.ID)), tab.Label, tab.Icon, i == s.Active).Tooltip(tab.Tooltip).Clicked() {
 					p.Select(i)
 				}
 			}
 			ui.Spacer(c)
 			if a.iconButton(c, "New terminal tab", "icons/plus.svg").Clicked() {
 				a.save(p.NewTab())
+			}
+			if hasActive && active.Exited {
+				ui.Text(c, a.text("terminal.exited", "exited")).FontSize(t.Px(11)).TextColor(t.Error).Padding(1, 6).Background(t.Error.Alpha(.15)).Radius(t.Px(4))
+			}
+			restart := a.iconButton(c, "Restart terminal", "icons/refresh.svg").Tooltip(a.text("terminal.restart", "Restart")).Disabled(!hasActive || active.Loading)
+			if s.Restarting {
+				restart.Background(t.Hover)
+			}
+			if restart.Clicked() {
+				a.save(p.Restart())
 			}
 			if a.iconButton(c, "Close terminal tab", "icons/x.svg").Clicked() {
 				a.save(p.CloseActive())
@@ -912,8 +930,30 @@ func (a *App) terminal(c *ui.Context) {
 				p.Hide()
 			}
 		})
-		orbiterm.View(c, p).Grow(1).MinHeight(0)
+		ui.Box(c.Key("terminal-content")).Grow(1).MinHeight(0).Children(func() {
+			orbiterm.View(c, p).Fill()
+			if hasActive && (active.Exited || active.Error != "") {
+				ui.Box(c.Key("terminal-exited-overlay")).Absolute().Top(0).Bottom(0).Left(0).Right(0).Center().Children(func() {
+					ui.Column(c).AlignItems(ui.Center).MaxWidth(540).Padding(t.Space(12), t.Space(16)).Gap(t.Space(8)).Radius(t.Px(12)).Background(t.Elevated).Border(1, t.Border).Children(func() {
+						title := a.text("terminal.shell_exited", "Shell exited")
+						if active.Error != "" {
+							title = a.text("terminal.start_failed", "Terminal could not start")
+						}
+						ui.Text(c, title).FontSize(t.Px(13)).TextColor(t.TextSecondary)
+						if active.Error != "" {
+							ui.Text(c, active.Error).FontSize(t.Px(12)).TextColor(t.Error).MaxLines(4)
+						}
+						if a.button(c, a.text("terminal.restart", "Restart"), "icons/refresh.svg", true).Label("Restart shell").Disabled(active.Loading).Clicked() {
+							a.save(p.Restart())
+						}
+					})
+				})
+			}
+		})
 	})
+	if hasActive && (active.Loading || s.Restarting) {
+		c.After(40 * time.Millisecond)
+	}
 }
 func (a *App) String() string { return fmt.Sprintf("Orbit native %s", a.page) }
 

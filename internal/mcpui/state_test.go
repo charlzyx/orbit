@@ -421,3 +421,86 @@ if [ "$2" = "list" ]; then printf '%s\n' '{"servers":[]}'; fi`)
 		t.Fatal("incorrect OAuth/probe command arguments", text)
 	}
 }
+
+func TestApplyAcknowledgmentRejectsNewEditWorkspaceAndBinary(t *testing.T) {
+	s := stateFixture(t)
+	s.modified()
+	token := s.ApplyToken()
+	s.modified()
+	if s.AppliedIfCurrent(token) || !s.applyPending {
+		t.Fatal("old reload consumed a newer edit")
+	}
+	current := s.ApplyToken()
+	if !s.AppliedIfCurrent(current) || s.applyPending {
+		t.Fatal("matching reload not acknowledged")
+	}
+	token = s.ApplyToken()
+	s.SetWorkspace(t.TempDir())
+	s.SetWorkspace(token.workspace)
+	if s.AppliedIfCurrent(token) {
+		t.Fatal("workspace round trip reused old apply token")
+	}
+	token = s.ApplyToken()
+	s.SetPiBinary("synthetic-other-pi")
+	if s.AppliedIfCurrent(token) {
+		t.Fatal("old binary reload acknowledged")
+	}
+	token = s.ApplyToken()
+	s.Close()
+	if s.AppliedIfCurrent(token) {
+		t.Fatal("closed page accepted completion")
+	}
+}
+
+func TestRefreshAndApplyCapturesFreshConfigBeforeHostRequest(t *testing.T) {
+	s := stateFixture(t)
+	s.fingerprint = "old-page-snapshot"
+	called := 0
+	s.Options.OnApply = func() {
+		called++
+		if s.fingerprint == "old-page-snapshot" {
+			t.Error("host scheduled against stale config")
+		}
+	}
+	s.RefreshAndApply()
+	if called != 0 {
+		t.Fatal("refresh blocked the UI thread or called apply before worker completion")
+	}
+	waitState(t, s)
+	if called != 1 {
+		t.Fatal("fresh config did not reach host exactly once", called)
+	}
+}
+
+func TestRefreshAndApplyInterruptsProbeAndReportsOtherBusy(t *testing.T) {
+	s := stateFixture(t)
+	called := 0
+	s.Options.OnApply = func() { called++ }
+	// Hold an actual asynchronous read-only worker until cancellation.
+	s.start("probe fixture", func(ctx context.Context) (func(*State), error) {
+		<-ctx.Done()
+		return nil, ctx.Err()
+	})
+	s.Probing = true
+	s.RefreshAndApply()
+	waitState(t, s)
+	if called != 1 || s.Error != "" {
+		t.Fatal("probe swallowed reconnect", called, s.Error)
+	}
+	release := make(chan struct{})
+	s.start("configuration write fixture", func(ctx context.Context) (func(*State), error) {
+		<-release
+		return nil, nil
+	})
+	s.RefreshAndApply()
+	if called != 1 || !s.Busy || !strings.Contains(s.Error, "Retry reconnect") {
+		t.Fatal("busy write not preserved/reported", called, s.Error)
+	}
+	close(release)
+	waitState(t, s)
+	s.RefreshAndApply()
+	waitState(t, s)
+	if called != 2 {
+		t.Fatal("retry after write did not apply", called)
+	}
+}

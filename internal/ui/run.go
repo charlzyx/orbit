@@ -74,6 +74,11 @@ type Controller struct {
 	maintenance       atomic.Bool
 	background        context.Context
 	cancelBackground  context.CancelFunc
+
+	configApplyEpoch         uint64
+	configApplyTarget        configApplyTarget
+	configApplyFlight        *configApplyFlight
+	configApplyFailedRuntime string
 }
 
 func NewController(o RunOptions) (*Controller, error) {
@@ -202,8 +207,8 @@ func NewController(o RunOptions) (*Controller, error) {
 	}})
 	x.MCP = mcpui.New(s, o.Workspace, mcpui.Options{OnChange: invalidate, PiBinary: o.PiBinary, Text: x.UI.text, Theme: func() mcpui.Theme {
 		return mcpui.Theme{Elevated: x.UI.Theme.Elevated, Secondary: x.UI.Theme.TextSecondary, Action: x.UI.Theme.Action, ActionText: x.UI.Theme.ActionFg, CodeFont: x.UI.Fonts.CodeFamily, Px: x.UI.Theme.Px, Space: x.UI.Theme.Space}
-	}, OnModified: func() { x.configApplyAfter = time.Now().Add(500 * time.Millisecond) }, OnApply: func() { x.configApplyAfter = time.Now() }})
-	x.Resources = resourceui.New(s, o.Workspace, resourceui.Options{Notify: x.UI.Notify, Offline: o.Offline, OnChange: invalidate, OnModified: func() { x.configApplyAfter = time.Now().Add(500 * time.Millisecond) }, Text: x.UI.text, PiBinary: o.PiBinary, Theme: func() resourceui.Theme {
+	}, OnModified: func() { x.scheduleMCPApply(500 * time.Millisecond) }, OnApply: func() { x.scheduleMCPApply(0) }})
+	x.Resources = resourceui.New(s, o.Workspace, resourceui.Options{Notify: x.UI.Notify, Offline: o.Offline, OnChange: invalidate, OnModified: func() { x.scheduleConfigApply(500 * time.Millisecond) }, Text: x.UI.text, PiBinary: o.PiBinary, Theme: func() resourceui.Theme {
 		return resourceui.Theme{SurfaceSecondary: x.UI.Theme.SurfaceSecondary, Secondary: x.UI.Theme.TextSecondary, Action: x.UI.Theme.Action, ActionText: x.UI.Theme.ActionFg, SelectionText: x.UI.Theme.SelectionFg, Elevated: x.UI.Theme.Elevated, CodeFont: x.UI.Fonts.CodeFamily, Px: x.UI.Theme.Px, Space: x.UI.Theme.Space}
 	}, OpenFile: func(path string) { x.UI.save(native.OpenPath(path)) }, RevealPath: native.RevealPath, CopyText: func(text string) { x.Action(Action{Kind: "CopyText", Value: text}) }, InvokeSkill: func(command string) { x.UI.Navigate("chat"); x.UI.Draft = command + " "; x.UI.composer.Focus() }})
 	x.UI.Options.Overlay = x.Resources.Overlay
@@ -310,15 +315,7 @@ func (x *Controller) sync() {
 	}
 	x.MCP.Tick()
 	x.Resources.Tick()
-	if !x.configApplyAfter.IsZero() && time.Now().After(x.configApplyAfter) && !x.Agent.AnyBusy() && x.sessionGate.TryRLock() {
-		x.configApplyAfter = time.Time{}
-		err := x.Agent.Restart()
-		x.sessionGate.RUnlock()
-		x.UI.save(err)
-		if err == nil {
-			x.UI.Notify("Pi configuration reload requested for the current session. Other open sessions keep their running configuration.", false)
-		}
-	}
+	x.tickConfigApply(time.Now())
 	x.BugReport.Tick()
 	x.Git.Tick()
 	x.UI.Model.Branch = x.Git.Data.Branch
@@ -764,15 +761,14 @@ func (x *Controller) Action(a Action) {
 		u.settingsPage = "mcp"
 		u.Navigate("settings")
 		x.MCP.AddServer()
-	case "RefreshMcpServers", "ReconnectMcpServers":
+	case "RefreshMcpServers":
 		x.MCP.Refresh()
-		if a.Kind == "ReconnectMcpServers" {
-			x.configApplyAfter = time.Now()
-		}
+	case "ReconnectMcpServers":
+		x.MCP.RefreshAndApply()
 	case "AutoTitleChanged":
 		// The title extension reads its configuration live; no process restart.
 	case "RuntimeConfigChanged":
-		x.configApplyAfter = time.Now().Add(500 * time.Millisecond)
+		x.scheduleConfigApply(500 * time.Millisecond)
 	case "NotificationsChanged":
 		p := x.Store.Notifications()
 		x.Notifier.SetPrefs(native.NotificationPrefs{Desktop: p.Desktop, Sound: p.Sound, Toasts: p.Toasts})

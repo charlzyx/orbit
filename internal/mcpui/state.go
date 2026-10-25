@@ -88,6 +88,7 @@ type State struct {
 	results                                                    chan completion
 	cancel                                                     context.CancelFunc
 	generation                                                 uint64
+	applyRevision                                              uint64
 	closed, loaded, pendingProbe, externalChange, applyPending bool
 	activity, authTarget                                       string
 	fingerprint                                                string
@@ -124,6 +125,7 @@ func (s *State) SetWorkspace(workspace string) {
 		return
 	}
 	s.cancelWork()
+	s.applyRevision++
 	s.Workspace = workspace
 	s.service = workbench.New(s.service.Preferences, workspace)
 	if s.Options.PiBinary != "" {
@@ -302,6 +304,26 @@ func (s *State) adopt(v snapshot) {
 	}
 }
 func (s *State) Refresh() { s.refresh(true, false) }
+
+// RefreshAndApply captures the latest desired fingerprint before the host
+// schedules a reload. Scheduling immediately after an async Refresh would bind
+// the request to stale page data and could discard the user's reconnect action.
+func (s *State) RefreshAndApply() {
+	s.interruptProbe()
+	if s.closed {
+		return
+	}
+	if s.Busy {
+		s.Error = "Configuration operation in progress. Retry reconnect when it finishes."
+		return
+	}
+	service := s.service
+	s.start(s.label("mcp.refresh", "Refresh"), func(ctx context.Context) (func(*State), error) {
+		v := loadSnapshot(service)
+		return func(s *State) { s.adopt(v); s.apply() }, nil
+	})
+}
+
 func (s *State) refresh(withProbe, external bool) {
 	service := s.service
 	previous := s.fingerprint
@@ -311,6 +333,7 @@ func (s *State) refresh(withProbe, external bool) {
 			s.adopt(v)
 			if external && previous != v.fingerprint {
 				s.externalChange = true
+				s.applyRevision++
 			}
 			s.pendingProbe = withProbe || (external && previous != v.fingerprint)
 		}, nil
@@ -495,6 +518,7 @@ func (s *State) savePrepared(d preparedDraft) {
 	})
 }
 func (s *State) modified() {
+	s.applyRevision++
 	s.applyPending = true
 	s.externalChange = false
 	s.pendingProbe = true
@@ -541,6 +565,41 @@ func (s *State) remove(name string) {
 	})
 }
 
+// ApplyToken identifies the desired configuration without exposing secrets. It is
+// distinct from async operation generation: starting a probe must not invalidate
+// a valid runtime reload, but a newer edit or workspace/binary change must.
+type ApplyToken struct {
+	revision                       uint64
+	workspace, fingerprint, binary string
+}
+
+func (s *State) ApplyToken() ApplyToken {
+	return ApplyToken{s.applyRevision, s.Workspace, s.fingerprint, s.Options.PiBinary}
+}
+func (s *State) ApplyCurrent(token ApplyToken) bool {
+	return !s.closed && s.ApplyToken() == token
+}
+
+// AppliedIfCurrent acknowledges a completed reload only while its desired
+// configuration request is still current in the settings state.
+func (s *State) AppliedIfCurrent(token ApplyToken) bool {
+	if !s.ApplyCurrent(token) {
+		return false
+	}
+	s.Applied()
+	return true
+}
+
+// ApplyFailed leaves pending edits available for an explicit retry. Error text
+// is fixed here rather than duplicating possibly sensitive process diagnostics.
+func (s *State) ApplyFailed(token ApplyToken) {
+	if !s.ApplyCurrent(token) {
+		return
+	}
+	s.applyPending = true
+	s.Status = s.label("mcp.apply_failed", "Pi reload failed. Changes remain pending; retry Apply.")
+}
+
 // Applied acknowledges a completed, session-preserving host reload. Merely
 // clicking Apply never calls it; the host must observe actual runtime success.
 func (s *State) Applied() {
@@ -557,6 +616,7 @@ func (s *State) SetPiBinary(binary string) {
 		return
 	}
 	s.cancelWork()
+	s.applyRevision++
 	s.Options.PiBinary = binary
 	s.service = workbench.New(s.service.Preferences, s.Workspace)
 	if binary != "" {
