@@ -1,0 +1,586 @@
+{
+  "schema": "orbit-acceptance-shard/v1",
+  "category": "review",
+  "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "rows": [
+    {
+      "id": "W35",
+      "title": "Long unchanged context collapses around changes; directional expand from either edge, both edges/count, or all reveals retained lines.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/review.rs",
+          "handler": "Gap",
+          "line": 76,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/review.rs#L76",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/review.rs",
+          "handler": "ExpansionDirection",
+          "line": 68,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/review.rs#L68",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/review.rs",
+          "handler": "Snapshot::expand_gap",
+          "line": 208,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/review.rs#L208",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/review.rs",
+          "handler": "collapse_context",
+          "line": 655,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/review.rs#L655",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Long unchanged context collapses around changes; directional expand from either edge, both edges/count, or all reveals retained lines.",
+      "baseline_edge_state": "3-line context around changes; directional increments of 100; stable gap IDs; file/section header indexes recomputed and virtual row count spliced correctly. Compact fallback never claims expandable bytes it lacks.",
+      "fixture": "Temporary Git repository with differing HEAD/index/worktree/branch/turn snapshots, Unicode/quoted paths and complete/compact/binary patches.",
+      "steps": [
+        {
+          "id": "W35.behavior",
+          "dimension": "functional",
+          "action": "Collapse long leading/between/trailing context and expand start/end/both/all repeatedly.",
+          "expected": "Long unchanged context collapses around changes; directional expand from either edge, both edges/count, or all reveals retained lines.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W35.edge",
+          "dimension": "edge",
+          "action": "Near the 50k visible cap and compact fallback, disable impossible expansion; retain stable gap IDs and unchanged source lines.",
+          "expected": "3-line context around changes; directional increments of 100; stable gap IDs; file/section header indexes recomputed and virtual row count spliced correctly. Compact fallback never claims expandable bytes it lacks.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W35.error",
+          "dimension": "error",
+          "action": "Fail a first load and same-source refresh separately; finish an earlier request after a newer source/workspace selection.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: 3-line context around changes; directional increments of 100; stable gap IDs; file/section header indexes recomputed and virtual row count spliced correctly. Compact fallback never claims expandable bytes it lacks.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W35.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W35.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W35.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W35.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/workspace/checkpoint.go",
+        "internal/workspace/review.go",
+        "internal/ui/review.go",
+        "internal/agent/manager.go"
+      ],
+      "existing_test_candidates": [
+        "internal/workspace/checkpoint_test.go",
+        "internal/workspace/review_test.go"
+      ],
+      "inventory_evidence": "../parity/review.json",
+      "source_test_inventory": "`review.rs::{full_context_collapses_around_changes_and_label_expands_everything,directional_expansion_reveals_one_hundred_lines_from_the_gap_edge,count_expansion_reveals_one_hundred_lines_from_both_edges,file_header_lookup_tracks_gap_expansion}`",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Named narrow assertions pass; remaining row steps are unverified.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3"
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [
+        {
+          "id": "W35.assert.TestReviewHighlightSurvivesHiddenExpansionAndGrouping",
+          "status": "PASS",
+          "expected": "Token spans survive retained context expansion, grouping and split conversion.",
+          "test": "TestReviewHighlightSurvivesHiddenExpansionAndGrouping",
+          "package": "github.com/charlzyx/orbit/internal/workspace",
+          "command": "go test -race -count=1 ./internal/workspace -run ^TestReviewHighlightSurvivesHiddenExpansionAndGrouping$",
+          "evidence": "workspace-evidence.json",
+          "last_verified_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:01:17.757219679+09:00",
+          "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
+        },
+        {
+          "id": "W35.assert.TestReviewVisibleLimitAndExpansionCap",
+          "status": "PASS",
+          "expected": "Visible-line cap remains 50,000 and expansion cannot exceed it.",
+          "test": "TestReviewVisibleLimitAndExpansionCap",
+          "package": "github.com/charlzyx/orbit/internal/workspace",
+          "command": "go test -race -count=1 ./internal/workspace -run ^TestReviewVisibleLimitAndExpansionCap$",
+          "evidence": "workspace-evidence.json",
+          "last_verified_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:01:18.019988287+09:00",
+          "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
+        }
+      ],
+      "known_remaining": "Six-source immutable snapshots/checkpoint attribution/diff model tested; native review interaction/presentation parity remains pending.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    },
+    {
+      "id": "W36",
+      "title": "Review wrap/no-wrap, unified/split diff, per-file and all-file collapse/expand, sticky file/section headers, horizontal pan with pinned header, dock resize and full-width toggle.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "toggle_wrap",
+          "line": 392,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L392",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "toggle_split",
+          "line": 399,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L399",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "toggle_all_files",
+          "line": 406,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L406",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "toggle_file",
+          "line": 423,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L423",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Review wrap/no-wrap, unified/split diff, per-file and all-file collapse/expand, sticky file/section headers, horizontal pan with pinned header, dock resize and full-width toggle.",
+      "baseline_edge_state": "Pair deletion/addition replacements across two columns; unbalanced additions/deletions get filler. Width constraints change stats/tree visibility; full-width can exceed dock cap and restores prior width. Wrap/split/collapse choices are entity state, not shown persisted to disk.",
+      "fixture": "Temporary Git repository with differing HEAD/index/worktree/branch/turn snapshots, Unicode/quoted paths and complete/compact/binary patches.",
+      "steps": [
+        {
+          "id": "W36.behavior",
+          "dimension": "functional",
+          "action": "Toggle wrap, unified/split, file/all collapse, full-width and horizontal pan across several changed files.",
+          "expected": "Review wrap/no-wrap, unified/split diff, per-file and all-file collapse/expand, sticky file/section headers, horizontal pan with pinned header, dock resize and full-width toggle.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W36.edge",
+          "dimension": "edge",
+          "action": "Collapse a preceding file while viewing a later hunk, switch layout and resize; sticky headers and selection/scroll must stay on semantic targets.",
+          "expected": "Pair deletion/addition replacements across two columns; unbalanced additions/deletions get filler. Width constraints change stats/tree visibility; full-width can exceed dock cap and restores prior width. Wrap/split/collapse choices are entity state, not shown persisted to disk.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W36.error",
+          "dimension": "error",
+          "action": "Fail a first load and same-source refresh separately; finish an earlier request after a newer source/workspace selection.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Pair deletion/addition replacements across two columns; unbalanced additions/deletions get filler. Width constraints change stats/tree visibility; full-width can exceed dock cap and restores prior width. Wrap/split/collapse choices are entity state, not shown persisted to disk.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W36.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W36.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W36.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W36.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/workspace/checkpoint.go",
+        "internal/workspace/review.go",
+        "internal/ui/review.go",
+        "internal/agent/manager.go"
+      ],
+      "existing_test_candidates": [
+        "internal/workspace/checkpoint_test.go",
+        "internal/workspace/review_test.go"
+      ],
+      "inventory_evidence": "../parity/review.json",
+      "source_test_inventory": "`sidepane.rs::{every_view_mode_draws,wrap_and_split_toggles_flip_their_state,unwrapped_file_header_stays_fixed_while_code_pans,full_width_and_dock_share_one_restore_point,a_drag_resize_is_capped_but_full_width_is_not}`; `diff_view.rs::tests`",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Six-source immutable snapshots/checkpoint attribution/diff model tested; native review interaction/presentation parity remains pending. Full-width mode, per-file collapse, sticky headers and horizontal panning are not fully wired.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    },
+    {
+      "id": "W37",
+      "title": "Changed-files tree groups folders, expands/collapses directories, case-insensitive filter, selection/highlight, jump to file and autoexpansion of new directories.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/review.rs",
+          "handler": "directory_paths",
+          "line": 921,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/review.rs#L921",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/review.rs",
+          "handler": "tree_rows",
+          "line": 940,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/review.rs#L940",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "sync_tree_rows",
+          "line": 717,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L717",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "apply_snapshot",
+          "line": 661,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L661",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Changed-files tree groups folders, expands/collapses directories, case-insensitive filter, selection/highlight, jump to file and autoexpansion of new directories.",
+      "baseline_edge_state": "Tree list virtualized and cached, recomputed only filter/structure change. Refresh attempts to preserve selected path; pending file choice wins. Tree is hidden below responsive pane width.",
+      "fixture": "Temporary Git repository with differing HEAD/index/worktree/branch/turn snapshots, Unicode/quoted paths and complete/compact/binary patches.",
+      "steps": [
+        {
+          "id": "W37.behavior",
+          "dimension": "functional",
+          "action": "Filter changed-files tree, expand folders and select nested files; refresh with added directories.",
+          "expected": "Changed-files tree groups folders, expands/collapses directories, case-insensitive filter, selection/highlight, jump to file and autoexpansion of new directories.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W37.edge",
+          "dimension": "edge",
+          "action": "Use same basename in different directories and collapse ancestors; selection/jump/autoexpansion must not target row ordinals.",
+          "expected": "Tree list virtualized and cached, recomputed only filter/structure change. Refresh attempts to preserve selected path; pending file choice wins. Tree is hidden below responsive pane width.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W37.error",
+          "dimension": "error",
+          "action": "Fail a first load and same-source refresh separately; finish an earlier request after a newer source/workspace selection.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Tree list virtualized and cached, recomputed only filter/structure change. Refresh attempts to preserve selected path; pending file choice wins. Tree is hidden below responsive pane width.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W37.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W37.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W37.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W37.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/workspace/checkpoint.go",
+        "internal/workspace/review.go",
+        "internal/ui/review.go",
+        "internal/agent/manager.go"
+      ],
+      "existing_test_candidates": [
+        "internal/workspace/checkpoint_test.go",
+        "internal/workspace/review_test.go"
+      ],
+      "inventory_evidence": "../parity/review.json",
+      "source_test_inventory": "`review.rs::tree_rows_share_directories_collapse_and_filter`; `sidepane.rs::review_keyboard_navigation_moves_between_files`",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Six-source immutable snapshots/checkpoint attribution/diff model tested; native review interaction/presentation parity remains pending. Current native file list is not the complete source tree/filter interaction.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    },
+    {
+      "id": "W38",
+      "title": "Review keyboard context: Up/Down tree cursor, Enter/Space toggle/open, n/p next/previous file, ]/[ next/previous hunk, e/c expand/collapse all, Escape returns to composer/closes Review rather than aborting agent.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/commands.rs",
+          "handler": "BINDINGS",
+          "line": 794,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/commands.rs#L794",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "review_tree_move",
+          "line": 908,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L908",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "review_tree_toggle",
+          "line": 922,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L922",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "review_move_file",
+          "line": 933,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L933",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Review keyboard context: Up/Down tree cursor, Enter/Space toggle/open, n/p next/previous file, ]/[ next/previous hunk, e/c expand/collapse all, Escape returns to composer/closes Review rather than aborting agent.",
+      "baseline_edge_state": "Context binding order wins over global abort; filter Escape clears filter appropriately. Selected file is expanded before scrolling.",
+      "fixture": "Temporary Git repository with differing HEAD/index/worktree/branch/turn snapshots, Unicode/quoted paths and complete/compact/binary patches.",
+      "steps": [
+        {
+          "id": "W38.behavior",
+          "dimension": "functional",
+          "action": "Focus Review and exercise Up/Down, Enter/Space, n/p, ]/[, e/c and Escape.",
+          "expected": "Review keyboard context: Up/Down tree cursor, Enter/Space toggle/open, n/p next/previous file, ]/[ next/previous hunk, e/c expand/collapse all, Escape returns to composer/closes Review rather than aborting agent.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W38.edge",
+          "dimension": "edge",
+          "action": "Repeat with split view and collapsed earlier files; Escape restores composer/Review state without aborting the agent.",
+          "expected": "Context binding order wins over global abort; filter Escape clears filter appropriately. Selected file is expanded before scrolling.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W38.error",
+          "dimension": "error",
+          "action": "Fail a first load and same-source refresh separately; finish an earlier request after a newer source/workspace selection.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Context binding order wins over global abort; filter Escape clears filter appropriately. Selected file is expanded before scrolling.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W38.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W38.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W38.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W38.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/workspace/checkpoint.go",
+        "internal/workspace/review.go",
+        "internal/ui/review.go",
+        "internal/agent/manager.go"
+      ],
+      "existing_test_candidates": [
+        "internal/workspace/checkpoint_test.go",
+        "internal/workspace/review_test.go"
+      ],
+      "inventory_evidence": "../parity/review.json",
+      "source_test_inventory": "`sidepane.rs::review_keyboard_navigation_moves_between_files`; binding/spec tests; no full real-key event coverage for every Review shortcut located.",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Source-specific n/p, bracket hunk navigation, expand/collapse and focus-return keyboard acceptance remains open.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    }
+  ]
+}

@@ -1,0 +1,587 @@
+{
+  "schema": "orbit-acceptance-shard/v1",
+  "category": "git-changes-history",
+  "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "rows": [
+    {
+      "id": "W12",
+      "title": "Fetch, push/publish with upstream creation, ff-only pull, merge upstream, rebase upstream with autostash, Sync and force-with-lease. Sync fetches, pulls/merges when behind, then pushes when ahead.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/git.rs",
+          "handler": "fetch",
+          "line": 230,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git.rs#L230",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/git.rs",
+          "handler": "push",
+          "line": 166,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git.rs#L166",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/git.rs",
+          "handler": "pull",
+          "line": 205,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git.rs#L205",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/git.rs",
+          "handler": "merge_upstream",
+          "line": 214,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git.rs#L214",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Fetch, push/publish with upstream creation, ff-only pull, merge upstream, rebase upstream with autostash, Sync and force-with-lease. Sync fetches, pulls/merges when behind, then pushes when ahead.",
+      "baseline_edge_state": "Push with an existing upstream does not reinterpret auth/network failure as missing-upstream. Forced push never uses bare `--force` and requires UI confirmation. Rejected push triggers best-effort fetch to update counts and available recovery.",
+      "fixture": "Temporary repositories plus local bare remote/clones, fixture users and conflict branches; no external remote writes.",
+      "steps": [
+        {
+          "id": "W12.behavior",
+          "dimension": "functional",
+          "action": "Fetch/publish/pull/sync/merge/rebase and force-with-lease using temporary clones and local bare remote.",
+          "expected": "Fetch, push/publish with upstream creation, ff-only pull, merge upstream, rebase upstream with autostash, Sync and force-with-lease. Sync fetches, pulls/merges when behind, then pushes when ahead.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W12.edge",
+          "dimension": "edge",
+          "action": "Create ahead, behind, diverged, rejected and stale-lease states; verify each recovery command and never force-push without lease.",
+          "expected": "Push with an existing upstream does not reinterpret auth/network failure as missing-upstream. Forced push never uses bare `--force` and requires UI confirmation. Rejected push triggers best-effort fetch to update counts and available recovery.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W12.error",
+          "dimension": "error",
+          "action": "Return a controlled nonzero Git exit, cancellation or stale completion; retry only the operation still outstanding.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Push with an existing upstream does not reinterpret auth/network failure as missing-upstream. Forced push never uses bare `--force` and requires UI confirmation. Rejected push triggers best-effort fetch to update counts and available recovery.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W12.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W12.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W12.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W12.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/github_templates.go",
+        "internal/gitworkbench/templates.go"
+      ],
+      "existing_test_candidates": [
+        "internal/workspace/git_test.go",
+        "internal/workspace/github_test.go",
+        "internal/gitworkbench/state_test.go",
+        "internal/workspace/generation_test.go",
+        "internal/workspace/process_cancel_unix_test.go"
+      ],
+      "inventory_evidence": "../parity/git-changes-history.json",
+      "source_test_inventory": "`git.rs::force_push_uses_the_lease_and_refuses_a_stale_remote`; commit-bar state test.",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    },
+    {
+      "id": "W13",
+      "title": "Persistent copyable Git failure banner classifies push rejection/divergence/conflicts/dirty-overwrite/auth/network/no-upstream, secret scanning, file-size/LFS/protected-branch/hooks, missing remote/repository and unknown failures. Offers only matching recovery.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/git_panel/failure.rs",
+          "handler": "FailureKind",
+          "line": 20,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/failure.rs#L20",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/git_panel/failure.rs",
+          "handler": "ActionError",
+          "line": 138,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/failure.rs#L138",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/git_panel/failure.rs",
+          "handler": "RecoveryAction",
+          "line": 105,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/failure.rs#L105",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/git_panel/failure.rs",
+          "handler": "classify",
+          "line": 184,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/failure.rs#L184",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Persistent copyable Git failure banner classifies push rejection/divergence/conflicts/dirty-overwrite/auth/network/no-upstream, secret scanning, file-size/LFS/protected-branch/hooks, missing remote/repository and unknown failures. Offers only matching recovery.",
+      "baseline_edge_state": "Full raw stderr survives until dismiss or later success; not a fleeting/truncated toast. Recovery may pull/merge/rebase/force-with-lease/continue/skip/abort/open conflict/publish/retry. Reauthenticate only copies `gh auth login`; it does not automatically run login. Server-rule failures have no fake repair button.",
+      "fixture": "Temporary repositories plus local bare remote/clones, fixture users and conflict branches; no external remote writes.",
+      "steps": [
+        {
+          "id": "W13.behavior",
+          "dimension": "functional",
+          "action": "Feed one fixture stderr for every classified Git failure; inspect banner, Copy and offered recovery action.",
+          "expected": "Persistent copyable Git failure banner classifies push rejection/divergence/conflicts/dirty-overwrite/auth/network/no-upstream, secret scanning, file-size/LFS/protected-branch/hooks, missing remote/repository and unknown failures. Offers only matching recovery.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W13.edge",
+          "dimension": "edge",
+          "action": "Trigger recovery after changing repository; preserve original diagnosis on refresh failure and never replay an already-successful mutation.",
+          "expected": "Full raw stderr survives until dismiss or later success; not a fleeting/truncated toast. Recovery may pull/merge/rebase/force-with-lease/continue/skip/abort/open conflict/publish/retry. Reauthenticate only copies `gh auth login`; it does not automatically run login. Server-rule failures have no fake repair button.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W13.error",
+          "dimension": "error",
+          "action": "Return a controlled nonzero Git exit, cancellation or stale completion; retry only the operation still outstanding.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Full raw stderr survives until dismiss or later success; not a fleeting/truncated toast. Recovery may pull/merge/rebase/force-with-lease/continue/skip/abort/open conflict/publish/retry. Reauthenticate only copies `gh auth login`; it does not automatically run login. Server-rule failures have no fake repair button.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W13.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W13.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W13.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W13.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/github_templates.go",
+        "internal/gitworkbench/templates.go"
+      ],
+      "existing_test_candidates": [
+        "internal/workspace/git_test.go",
+        "internal/workspace/github_test.go",
+        "internal/gitworkbench/state_test.go",
+        "internal/workspace/generation_test.go",
+        "internal/workspace/process_cancel_unix_test.go"
+      ],
+      "inventory_evidence": "../parity/git-changes-history.json",
+      "source_test_inventory": "`git_panel/failure.rs::tests` includes server-side rejection precedence, auth/network, dirty-worktree, no-upstream, unknown failure and detail cleaning cases.",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    },
+    {
+      "id": "W14",
+      "title": "Detect and display in-progress merge/rebase/cherry-pick/revert/bisect, conflict count and up to eight file links. Open conflicts in Files; continue once no conflicts; skip only rebase/cherry-pick; confirm abort.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/git_ops.rs",
+          "handler": "InProgress",
+          "line": 18,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_ops.rs#L18",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/git_ops.rs",
+          "handler": "operation_state",
+          "line": 64,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_ops.rs#L64",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/git_ops.rs",
+          "handler": "conflicted_files",
+          "line": 86,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_ops.rs#L86",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/git_ops.rs",
+          "handler": "continue_operation",
+          "line": 133,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_ops.rs#L133",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Detect and display in-progress merge/rebase/cherry-pick/revert/bisect, conflict count and up to eight file links. Open conflicts in Files; continue once no conflicts; skip only rebase/cherry-pick; confirm abort.",
+      "baseline_edge_state": "Worktree-safe Git-dir resolution. `GIT_EDITOR`/`GIT_SEQUENCE_EDITOR=:` avoid interactive editor blocking. Bisect has no meaningful continue and returns an explicit error; abort is `bisect reset`. This is conflict assistance, not a three-way merge editor or new cherry-pick/revert/bisect UI.",
+      "fixture": "Temporary repositories plus local bare remote/clones, fixture users and conflict branches; no external remote writes.",
+      "steps": [
+        {
+          "id": "W14.behavior",
+          "dimension": "functional",
+          "action": "Create merge/rebase/cherry-pick/revert/bisect states in disposable repositories; open conflict files and continue/skip/abort.",
+          "expected": "Detect and display in-progress merge/rebase/cherry-pick/revert/bisect, conflict count and up to eight file links. Open conflicts in Files; continue once no conflicts; skip only rebase/cherry-pick; confirm abort.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W14.edge",
+          "dimension": "edge",
+          "action": "Leave unresolved conflicts, cancel abort and try unsupported skip; source gating and operation detection must match actual Git state.",
+          "expected": "Worktree-safe Git-dir resolution. `GIT_EDITOR`/`GIT_SEQUENCE_EDITOR=:` avoid interactive editor blocking. Bisect has no meaningful continue and returns an explicit error; abort is `bisect reset`. This is conflict assistance, not a three-way merge editor or new cherry-pick/revert/bisect UI.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W14.error",
+          "dimension": "error",
+          "action": "Return a controlled nonzero Git exit, cancellation or stale completion; retry only the operation still outstanding.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Worktree-safe Git-dir resolution. `GIT_EDITOR`/`GIT_SEQUENCE_EDITOR=:` avoid interactive editor blocking. Bisect has no meaningful continue and returns an explicit error; abort is `bisect reset`. This is conflict assistance, not a three-way merge editor or new cherry-pick/revert/bisect UI.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W14.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W14.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W14.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W14.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/github_templates.go",
+        "internal/gitworkbench/templates.go"
+      ],
+      "existing_test_candidates": [
+        "internal/workspace/git_test.go",
+        "internal/workspace/github_test.go",
+        "internal/gitworkbench/state_test.go",
+        "internal/workspace/generation_test.go",
+        "internal/workspace/process_cancel_unix_test.go"
+      ],
+      "inventory_evidence": "../parity/git-changes-history.json",
+      "source_test_inventory": "`git_ops.rs::{a_conflicted_merge_is_detected_with_its_files,skip_is_only_offered_where_git_supports_it,bisect_has_no_continue,no_operation_on_a_clean_repo}`",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    },
+    {
+      "id": "W15",
+      "title": "Stashes tab lists newest first; create stash including untracked, pop, apply without removal and drop.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/git_ops.rs",
+          "handler": "StashEntry",
+          "line": 269,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_ops.rs#L269",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/git_ops.rs",
+          "handler": "list_stashes",
+          "line": 277,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_ops.rs#L277",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/git_ops.rs",
+          "handler": "stash_push",
+          "line": 296,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_ops.rs#L296",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/git_ops.rs",
+          "handler": "stash_pop",
+          "line": 320,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_ops.rs#L320",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Stashes tab lists newest first; create stash including untracked, pop, apply without removal and drop.",
+      "baseline_edge_state": "Git owns stash persistence. UI currently creates no custom message and drops without a separate PendingConfirm path. Backend supports optional stash message even though UI does not expose it.",
+      "fixture": "Temporary repositories plus local bare remote/clones, fixture users and conflict branches; no external remote writes.",
+      "steps": [
+        {
+          "id": "W15.behavior",
+          "dimension": "functional",
+          "action": "Create stash with tracked/untracked changes, list, apply, pop and drop with confirmations where source requires.",
+          "expected": "Stashes tab lists newest first; create stash including untracked, pop, apply without removal and drop.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W15.edge",
+          "dimension": "edge",
+          "action": "Use empty stash list, conflicting pop and stale stash index after refresh; never apply/drop a different entry silently.",
+          "expected": "Git owns stash persistence. UI currently creates no custom message and drops without a separate PendingConfirm path. Backend supports optional stash message even though UI does not expose it.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W15.error",
+          "dimension": "error",
+          "action": "Return a controlled nonzero Git exit, cancellation or stale completion; retry only the operation still outstanding.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Git owns stash persistence. UI currently creates no custom message and drops without a separate PendingConfirm path. Backend supports optional stash message even though UI does not expose it.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W15.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W15.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W15.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W15.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/github_templates.go",
+        "internal/gitworkbench/templates.go"
+      ],
+      "existing_test_candidates": [
+        "internal/workspace/git_test.go",
+        "internal/workspace/github_test.go",
+        "internal/gitworkbench/state_test.go",
+        "internal/workspace/generation_test.go",
+        "internal/workspace/process_cancel_unix_test.go"
+      ],
+      "inventory_evidence": "../parity/git-changes-history.json",
+      "source_test_inventory": "`git_ops.rs::stash_round_trip`",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    }
+  ]
+}

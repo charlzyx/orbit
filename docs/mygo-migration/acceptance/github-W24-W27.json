@@ -1,0 +1,587 @@
+{
+  "schema": "orbit-acceptance-shard/v1",
+  "category": "github",
+  "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "rows": [
+    {
+      "id": "W24",
+      "title": "Repository issue/PR templates follow `.github/*_TEMPLATE/` directory then legacy single-file lookup. Markdown frontmatter supplies name/about/title/labels; YAML issue forms flatten to Markdown; config.yml excluded.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/gh_templates.rs",
+          "handler": "issue_templates",
+          "line": 72,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/gh_templates.rs#L72",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/gh_templates.rs",
+          "handler": "pull_templates",
+          "line": 83,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/gh_templates.rs#L83",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/gh_templates.rs",
+          "handler": "parse_markdown",
+          "line": 170,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/gh_templates.rs#L170",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/gh_templates.rs",
+          "handler": "parse_issue_form",
+          "line": 277,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/gh_templates.rs#L277",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Repository issue/PR templates follow `.github/*_TEMPLATE/` directory then legacy single-file lookup. Markdown frontmatter supplies name/about/title/labels; YAML issue forms flatten to Markdown; config.yml excluded.",
+      "baseline_edge_state": "Templates capped at 256 KiB. Multiple templates selectable; one template can apply automatically only to untouched body, including late async arrival. Template removal does not blindly erase edited bodies.",
+      "fixture": "Temporary repository with fixture templates and fake gh executable recording argv/JSON; no real GitHub writes/auth.",
+      "steps": [
+        {
+          "id": "W24.behavior",
+          "dimension": "functional",
+          "action": "Discover directory and legacy issue/PR templates; apply Markdown frontmatter and YAML issue form.",
+          "expected": "Repository issue/PR templates follow `.github/*_TEMPLATE/` directory then legacy single-file lookup. Markdown frontmatter supplies name/about/title/labels; YAML issue forms flatten to Markdown; config.yml excluded.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W24.edge",
+          "dimension": "edge",
+          "action": "Exclude config.yml, reject malformed frontmatter safely and preserve expected title/labels/body precedence across template changes.",
+          "expected": "Templates capped at 256 KiB. Multiple templates selectable; one template can apply automatically only to untouched body, including late async arrival. Template removal does not blindly erase edited bodies.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W24.error",
+          "dimension": "error",
+          "action": "Return nonzero/malformed/empty fixture gh results and a late response after filter/repository change.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Templates capped at 256 KiB. Multiple templates selectable; one template can apply automatically only to untouched body, including late async arrival. Template removal does not blindly erase edited bodies.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W24.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W24.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W24.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W24.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/github_templates.go",
+        "internal/gitworkbench/templates.go"
+      ],
+      "existing_test_candidates": [
+        "internal/workspace/git_test.go",
+        "internal/workspace/github_test.go",
+        "internal/gitworkbench/state_test.go",
+        "internal/workspace/generation_test.go",
+        "internal/workspace/process_cancel_unix_test.go"
+      ],
+      "inventory_evidence": "../parity/github.json",
+      "source_test_inventory": "`gh_templates.rs::{reads_a_plain_markdown_pull_template,reads_front_matter_and_body_from_markdown,flattens_a_yaml_issue_form_and_skips_config,legacy_single_file_is_used_without_a_directory,missing_templates_are_an_empty_list,parses_this_repositorys_own_templates}`",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Tool-free Pi RPC generation and repository templates are implemented; fake-process race tests verify isolation, prompt bounds, fallback, cancellation and no staging mutation. Host workflow/live inference and exact template UI acceptance remain pending.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    },
+    {
+      "id": "W25",
+      "title": "Pull request list has Open/Closed/Merged/All, search, clear filters, draft/author/labels/ref/diffstat/review/check summary and detail selection.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/gh.rs",
+          "handler": "PrFilter",
+          "line": 665,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/gh.rs#L665",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/gh.rs",
+          "handler": "list_pulls",
+          "line": 720,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/gh.rs#L720",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/gh.rs",
+          "handler": "GhPull",
+          "line": 562,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/gh.rs#L562",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/gh.rs",
+          "handler": "checks_summary",
+          "line": 618,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/gh.rs#L618",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Pull request list has Open/Closed/Merged/All, search, clear filters, draft/author/labels/ref/diffstat/review/check summary and detail selection.",
+      "baseline_edge_state": "gh limit 50. Backend base/author filter fields exist; exposed list UI is state/search, while base selection belongs to New PR. Loading/error/empty states separate.",
+      "fixture": "Temporary repository with fixture templates and fake gh executable recording argv/JSON; no real GitHub writes/auth.",
+      "steps": [
+        {
+          "id": "W25.behavior",
+          "dimension": "functional",
+          "action": "Filter PR list by Open/Closed/Merged/All and search; inspect refs/draft/reviews/check summaries.",
+          "expected": "Pull request list has Open/Closed/Merged/All, search, clear filters, draft/author/labels/ref/diffstat/review/check summary and detail selection.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W25.edge",
+          "dimension": "edge",
+          "action": "Return absent check fields, no results and stale responses; clearing filters restores actual repository list.",
+          "expected": "gh limit 50. Backend base/author filter fields exist; exposed list UI is state/search, while base selection belongs to New PR. Loading/error/empty states separate.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W25.error",
+          "dimension": "error",
+          "action": "Return nonzero/malformed/empty fixture gh results and a late response after filter/repository change.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: gh limit 50. Backend base/author filter fields exist; exposed list UI is state/search, while base selection belongs to New PR. Loading/error/empty states separate.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W25.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W25.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W25.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W25.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/github_templates.go",
+        "internal/gitworkbench/templates.go"
+      ],
+      "existing_test_candidates": [
+        "internal/workspace/git_test.go",
+        "internal/workspace/github_test.go",
+        "internal/gitworkbench/state_test.go",
+        "internal/workspace/generation_test.go",
+        "internal/workspace/process_cancel_unix_test.go"
+      ],
+      "inventory_evidence": "../parity/github.json",
+      "source_test_inventory": "`gh.rs::{parses_pull_json_and_check_rollup,check_buckets_prefer_the_normalized_field}`",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    },
+    {
+      "id": "W26",
+      "title": "PR detail renders Markdown description, comments, reviews, commits, changed files, CI checks with links, draft/ref/state metadata and additions/deletions.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "pr_detail_view",
+          "line": 5686,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L5686",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/gh.rs",
+          "handler": "GhPull",
+          "line": 562,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/gh.rs#L562",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/gh.rs",
+          "handler": "GhCheck",
+          "line": 454,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/gh.rs#L454",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/gh.rs",
+          "handler": "GhReview",
+          "line": 523,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/gh.rs#L523",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "PR detail renders Markdown description, comments, reviews, commits, changed files, CI checks with links, draft/ref/state metadata and additions/deletions.",
+      "baseline_edge_state": "File rendering capped at 300; unknown/missing check data is not treated as a passing check. Checks combine failure first, then pending, passed, skipped. No native full PR patch review or inline line-comment editor located.",
+      "fixture": "Temporary repository with fixture templates and fake gh executable recording argv/JSON; no real GitHub writes/auth.",
+      "steps": [
+        {
+          "id": "W26.behavior",
+          "dimension": "functional",
+          "action": "Open a PR with body/comments/reviews/commits/files/checks and follow fixture links.",
+          "expected": "PR detail renders Markdown description, comments, reviews, commits, changed files, CI checks with links, draft/ref/state metadata and additions/deletions.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W26.edge",
+          "dimension": "edge",
+          "action": "Use pending/failed/unknown checks and unavailable file details; represent unknown state rather than a false pass.",
+          "expected": "File rendering capped at 300; unknown/missing check data is not treated as a passing check. Checks combine failure first, then pending, passed, skipped. No native full PR patch review or inline line-comment editor located.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W26.error",
+          "dimension": "error",
+          "action": "Return nonzero/malformed/empty fixture gh results and a late response after filter/repository change.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: File rendering capped at 300; unknown/missing check data is not treated as a passing check. Checks combine failure first, then pending, passed, skipped. No native full PR patch review or inline line-comment editor located.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W26.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W26.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W26.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W26.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/github_templates.go",
+        "internal/gitworkbench/templates.go"
+      ],
+      "existing_test_candidates": [
+        "internal/workspace/git_test.go",
+        "internal/workspace/github_test.go",
+        "internal/gitworkbench/state_test.go",
+        "internal/workspace/generation_test.go",
+        "internal/workspace/process_cancel_unix_test.go"
+      ],
+      "inventory_evidence": "../parity/github.json",
+      "source_test_inventory": "`gh.rs::{reviews_and_files_parse,parses_pull_json_and_check_rollup,check_buckets_prefer_the_normalized_field}`",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    },
+    {
+      "id": "W27",
+      "title": "PR comment, approve/request changes, close/reopen, checkout, merge by merge/squash/rebase and optional delete-head-branch. Merge requires confirmation showing method.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "comment_pull",
+          "line": 1936,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L1936",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "review_pull",
+          "line": 1949,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L1949",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "toggle_pull_state",
+          "line": 1975,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L1975",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "checkout_pull",
+          "line": 1993,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L1993",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "PR comment, approve/request changes, close/reopen, checkout, merge by merge/squash/rebase and optional delete-head-branch. Merge requires confirmation showing method.",
+      "baseline_edge_state": "Checkout refuses dirty worktree or in-progress Git operation. Mutation busy states; list/detail re-read. Existing comment/review input is cleared before success. gh enforces repository-side merge rules; UI is not a CI-bypass implementation.",
+      "fixture": "Temporary repository with fixture templates and fake gh executable recording argv/JSON; no real GitHub writes/auth.",
+      "steps": [
+        {
+          "id": "W27.behavior",
+          "dimension": "functional",
+          "action": "Comment, approve/request changes, close/reopen and checkout through fixture gh; request merge using each method.",
+          "expected": "PR comment, approve/request changes, close/reopen, checkout, merge by merge/squash/rebase and optional delete-head-branch. Merge requires confirmation showing method.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W27.edge",
+          "dimension": "edge",
+          "action": "Cancel confirmation and repeat clicks; confirm dialog must name method and branch deletion choice, with one resulting mutation.",
+          "expected": "Checkout refuses dirty worktree or in-progress Git operation. Mutation busy states; list/detail re-read. Existing comment/review input is cleared before success. gh enforces repository-side merge rules; UI is not a CI-bypass implementation.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W27.error",
+          "dimension": "error",
+          "action": "Return nonzero/malformed/empty fixture gh results and a late response after filter/repository change.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Checkout refuses dirty worktree or in-progress Git operation. Mutation busy states; list/detail re-read. Existing comment/review input is cleared before success. gh enforces repository-side merge rules; UI is not a CI-bypass implementation.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W27.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W27.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W27.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W27.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/github_templates.go",
+        "internal/gitworkbench/templates.go"
+      ],
+      "existing_test_candidates": [
+        "internal/workspace/git_test.go",
+        "internal/workspace/github_test.go",
+        "internal/gitworkbench/state_test.go",
+        "internal/workspace/generation_test.go",
+        "internal/workspace/process_cancel_unix_test.go"
+      ],
+      "inventory_evidence": "../parity/github.json",
+      "source_test_inventory": "gh wire parsing tests; no live mutation/merge confirmation interaction test located.",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    }
+  ]
+}

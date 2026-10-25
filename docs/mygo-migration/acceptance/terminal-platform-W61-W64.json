@@ -1,0 +1,543 @@
+{
+  "schema": "orbit-acceptance-shard/v1",
+  "category": "terminal-platform",
+  "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "rows": [
+    {
+      "id": "W61",
+      "title": "Integrated bottom terminal owns one real alacritty PTY/shell per tab. New tab uses current workspace; old tabs keep original shells/cwd across workspace/session switch and hidden panel. Toggle focuses shell; close tab ends that shell; closing last tab closes panel.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/terminal.rs",
+          "handler": "TerminalSession::with_shell",
+          "line": 354,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/terminal.rs#L354",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/terminal.rs",
+          "handler": "TerminalSession::drop",
+          "line": 451,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/terminal.rs#L451",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/terminal.rs",
+          "handler": "default_shell",
+          "line": 515,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/terminal.rs#L515",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/terminal.rs",
+          "handler": "TerminalPanel::set_workspace",
+          "line": 1675,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/terminal.rs#L1675",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Integrated bottom terminal owns one real alacritty PTY/shell per tab. New tab uses current workspace; old tabs keep original shells/cwd across workspace/session switch and hidden panel. Toggle focuses shell; close tab ends that shell; closing last tab closes panel.",
+      "baseline_edge_state": "Unix login shell from SHELL then zsh/bash/sh, `-l`; Windows COMSPEC/cmd. TERM=xterm-256color and COLORTERM=truecolor. Drop sends Shutdown; process state is in-memory, not persisted across app restart.",
+      "fixture": "Disposable native host or CPU test harness, real temporary PTY where supported, controlled shell/byte recorder and stub external apps.",
+      "steps": [
+        {
+          "id": "W61.behavior",
+          "dimension": "functional",
+          "action": "Create two real PTY tabs in different temporary workspaces; hide/show terminal and switch session/workspace.",
+          "expected": "Integrated bottom terminal owns one real alacritty PTY/shell per tab. New tab uses current workspace; old tabs keep original shells/cwd across workspace/session switch and hidden panel. Toggle focuses shell; close tab ends that shell; closing last tab closes panel.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W61.edge",
+          "dimension": "edge",
+          "action": "Existing PTYs retain original shell/cwd; closing one terminates only it, including child process cleanup, while new tab uses current cwd.",
+          "expected": "Unix login shell from SHELL then zsh/bash/sh, `-l`; Windows COMSPEC/cmd. TERM=xterm-256color and COLORTERM=truecolor. Drop sends Shutdown; process state is in-memory, not persisted across app restart.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W61.error",
+          "dimension": "error",
+          "action": "Exit/fail the active child or external-app stub while hidden/unfocused; exercise restart and missing-platform capability.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Unix login shell from SHELL then zsh/bash/sh, `-l`; Windows COMSPEC/cmd. TERM=xterm-256color and COLORTERM=truecolor. Drop sends Shutdown; process state is in-memory, not persisted across app restart.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W61.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W61.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W61.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W61.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/terminal"
+      ],
+      "existing_test_candidates": [
+        "internal/terminal/panel_test.go"
+      ],
+      "inventory_evidence": "../parity/terminal-platform.json",
+      "source_test_inventory": "`terminal.rs::{session_runs_a_shell_command,new_tabs_keep_the_earlier_shells_alive,switching_workspaces_spares_running_shells,closing_a_tab_selects_its_neighbour,closing_the_last_tab_closes_the_panel}`",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Terminal package race tests pass; optional live tests and macOS/Windows packaged delivery not established by this run.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    },
+    {
+      "id": "W62",
+      "title": "Terminal renders real VT grid on canvas: ANSI/indexed/truecolor, attributes, wide cells, selections, cursor shapes/focus, scrollback indicator and resizing.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/terminal.rs",
+          "handler": "prepare_grid",
+          "line": 594,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/terminal.rs#L594",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/terminal.rs",
+          "handler": "Palette",
+          "line": 100,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/terminal.rs#L100",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/terminal.rs",
+          "handler": "EventProxy::send_event",
+          "line": 279,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/terminal.rs#L279",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/terminal.rs",
+          "handler": "TerminalView::poll",
+          "line": 1085,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/terminal.rs#L1085",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Terminal renders real VT grid on canvas: ANSI/indexed/truecolor, attributes, wide cells, selections, cursor shapes/focus, scrollback indicator and resizing.",
+      "baseline_edge_state": "10,000 scrollback lines; min 2 columns/1 row; 16 ms channel drain; dirty flag avoids unnecessary frames, hidden tabs still drain. OSC color/size/cursor requests answered; Bell currently ignored.",
+      "fixture": "Disposable native host or CPU test harness, real temporary PTY where supported, controlled shell/byte recorder and stub external apps.",
+      "steps": [
+        {
+          "id": "W62.behavior",
+          "dimension": "functional",
+          "action": "Feed ANSI/truecolor/wide-character/attribute/cursor sequences and scroll beyond visible rows; resize repeatedly.",
+          "expected": "Terminal renders real VT grid on canvas: ANSI/indexed/truecolor, attributes, wide cells, selections, cursor shapes/focus, scrollback indicator and resizing.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W62.edge",
+          "dimension": "edge",
+          "action": "Compare VT grid, selection, scrollback indicator and cursor in focused/unfocused states; no ANSI text simulation passes this gate.",
+          "expected": "10,000 scrollback lines; min 2 columns/1 row; 16 ms channel drain; dirty flag avoids unnecessary frames, hidden tabs still drain. OSC color/size/cursor requests answered; Bell currently ignored.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W62.error",
+          "dimension": "error",
+          "action": "Exit/fail the active child or external-app stub while hidden/unfocused; exercise restart and missing-platform capability.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: 10,000 scrollback lines; min 2 columns/1 row; 16 ms channel drain; dirty flag avoids unnecessary frames, hidden tabs still drain. OSC color/size/cursor requests answered; Bell currently ignored.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W62.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W62.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W62.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W62.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/terminal"
+      ],
+      "existing_test_candidates": [
+        "internal/terminal/panel_test.go"
+      ],
+      "inventory_evidence": "../parity/terminal-platform.json",
+      "source_test_inventory": "`terminal.rs::{prepare_grid_resolves_colors_flags_and_selection,prepare_grid_survives_a_right_prompt_round_trip,prepare_grid_places_the_cursor_and_tracks_focus,prepare_grid_reports_scrollback_position,session_answers_a_cursor_position_report,terminal_view_draws_a_real_grid,indexed_colors_cover_the_cube_and_greys}`",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Terminal package race tests pass; optional live tests and macOS/Windows packaged delivery not established by this run.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    },
+    {
+      "id": "W63",
+      "title": "Terminal translates Enter/backspace/tab/shift-tab/arrows/home/end/page/insert/delete/F1–F12, application-cursor mode, C0 control keys and Alt/meta; app-platform shortcuts not sent to shell. Escape specifically goes to terminal so vim/less can exit, not global AbortRun.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/terminal.rs",
+          "handler": "control_byte",
+          "line": 799,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/terminal.rs#L799",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/terminal.rs",
+          "handler": "encode_key",
+          "line": 829,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/terminal.rs#L829",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/terminal.rs",
+          "handler": "on_key_down",
+          "line": 1207,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/terminal.rs#L1207",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/terminal.rs",
+          "handler": "on_terminal_escape",
+          "line": 1195,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/terminal.rs#L1195",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Terminal translates Enter/backspace/tab/shift-tab/arrows/home/end/page/insert/delete/F1–F12, application-cursor mode, C0 control keys and Alt/meta; app-platform shortcuts not sent to shell. Escape specifically goes to terminal so vim/less can exit, not global AbortRun.",
+      "baseline_edge_state": "Cmd/Super combinations remain app territory; Ctrl-C remains terminal control, copy/paste use Cmd or Ctrl+Shift. Alt uses base key/meta escape rather than OS option-produced glyph. Typing returns view to bottom and resets cursor blink.",
+      "fixture": "Disposable native host or CPU test harness, real temporary PTY where supported, controlled shell/byte recorder and stub external apps.",
+      "steps": [
+        {
+          "id": "W63.behavior",
+          "dimension": "functional",
+          "action": "Send all declared terminal keys, modifiers, application-cursor mode and Escape to a controlled byte-recording PTY.",
+          "expected": "Terminal translates Enter/backspace/tab/shift-tab/arrows/home/end/page/insert/delete/F1–F12, application-cursor mode, C0 control keys and Alt/meta; app-platform shortcuts not sent to shell. Escape specifically goes to terminal so vim/less can exit, not global AbortRun.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W63.edge",
+          "dimension": "edge",
+          "action": "App-global platform shortcuts must not leak bytes to shell; Ctrl/Alt and F1–F12 encodings match source behavior.",
+          "expected": "Cmd/Super combinations remain app territory; Ctrl-C remains terminal control, copy/paste use Cmd or Ctrl+Shift. Alt uses base key/meta escape rather than OS option-produced glyph. Typing returns view to bottom and resets cursor blink.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W63.error",
+          "dimension": "error",
+          "action": "Exit/fail the active child or external-app stub while hidden/unfocused; exercise restart and missing-platform capability.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Cmd/Super combinations remain app territory; Ctrl-C remains terminal control, copy/paste use Cmd or Ctrl+Shift. Alt uses base key/meta escape rather than OS option-produced glyph. Typing returns view to bottom and resets cursor blink.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W63.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W63.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W63.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W63.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/terminal"
+      ],
+      "existing_test_candidates": [
+        "internal/terminal/panel_test.go"
+      ],
+      "inventory_evidence": "../parity/terminal-platform.json",
+      "source_test_inventory": "`terminal.rs::{control_bytes_follow_the_c0_table,encode_key_sends_expected_sequences,typing_reaches_the_shell,opening_the_panel_and_typing_reaches_the_shell}`",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Terminal package race tests pass; optional live tests and macOS/Windows packaged delivery not established by this run.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    },
+    {
+      "id": "W64",
+      "title": "Mouse drag simple text selection, precise left-side cell boundary, copy selection and clipboard paste with bracketed-paste framing when enabled; smooth pixel/line scroll accumulator.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/terminal.rs",
+          "handler": "grid_point",
+          "line": 1127,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/terminal.rs#L1127",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/terminal.rs",
+          "handler": "on_mouse_down",
+          "line": 1230,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/terminal.rs#L1230",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/terminal.rs",
+          "handler": "on_mouse_move",
+          "line": 1252,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/terminal.rs#L1252",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/terminal.rs",
+          "handler": "on_mouse_up",
+          "line": 1268,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/terminal.rs#L1268",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Mouse drag simple text selection, precise left-side cell boundary, copy selection and clipboard paste with bracketed-paste framing when enabled; smooth pixel/line scroll accumulator.",
+      "baseline_edge_state": "OSC clipboard store/load bridged through GPUI clipboard. No distinct rectangular/word/line selection or terminal search implementation located. Selection movement clamps to viewport/grid, scrollback coordinates corrected.",
+      "fixture": "Disposable native host or CPU test harness, real temporary PTY where supported, controlled shell/byte recorder and stub external apps.",
+      "steps": [
+        {
+          "id": "W64.behavior",
+          "dimension": "functional",
+          "action": "Drag/select at left cell boundary, copy selection, paste with bracketed mode and scroll fractional wheel deltas.",
+          "expected": "Mouse drag simple text selection, precise left-side cell boundary, copy selection and clipboard paste with bracketed-paste framing when enabled; smooth pixel/line scroll accumulator.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W64.edge",
+          "dimension": "edge",
+          "action": "Use wide characters, backward drag and hidden/unfocused terminal; no selection offset drift or unframed bracketed paste.",
+          "expected": "OSC clipboard store/load bridged through GPUI clipboard. No distinct rectangular/word/line selection or terminal search implementation located. Selection movement clamps to viewport/grid, scrollback coordinates corrected.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W64.error",
+          "dimension": "error",
+          "action": "Exit/fail the active child or external-app stub while hidden/unfocused; exercise restart and missing-platform capability.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: OSC clipboard store/load bridged through GPUI clipboard. No distinct rectangular/word/line selection or terminal search implementation located. Selection movement clamps to viewport/grid, scrollback coordinates corrected.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W64.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W64.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W64.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W64.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/terminal"
+      ],
+      "existing_test_candidates": [
+        "internal/terminal/panel_test.go"
+      ],
+      "inventory_evidence": "../parity/terminal-platform.json",
+      "source_test_inventory": "`terminal.rs::{prepare_grid_paints_the_selection,selection_side_left_stops_before_the_cursor_cell}`; key/real-shell tests above.",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Terminal package race tests pass; optional live tests and macOS/Windows packaged delivery not established by this run.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    }
+  ]
+}

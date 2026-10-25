@@ -1,0 +1,755 @@
+{
+  "category": "Usage analytics, update, privacy and release behavior",
+  "rows": [
+    {
+      "group": "Usage analytics, update, privacy and release behavior",
+      "id": "U01",
+      "feature": "Usage data/accounting",
+      "interaction_contract": "Scan pi session assistant usage/tool calls/results into normalized index; requests, turns, tool runs, token buckets/cache hit/cost/time/errors.",
+      "state_failure_platform": "Only real billed records; reasoning subset of output not extra tokens. Duration gaps >30 min excluded. Pricing coverage exposed; retries absent from store remain unavailable.",
+      "sources": [
+        "crates/orbit-pi/src/usage/collect.rs",
+        "crates/orbit-pi/src/usage/model.rs",
+        "crates/orbit-pi/src/usage/aggregate.rs"
+      ],
+      "tests": "T18",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/usage/collect.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/model.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/aggregate.rs"
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Usage analytics, update, privacy and release behavior",
+      "id": "U02",
+      "feature": "Usage overview/detail surfaces",
+      "interaction_contract": "Primary+U, Simple/Details modes, daily heatmap, summary KPIs, usage-over-time chart/table, signals, token-health panels, provider/model/workspace/tool breakdown and records.",
+      "state_failure_platform": "Responsive panels use actual main-area width; first load/refresh/no-data/error/last-updated states distinct. Virtual/data-table performance and chart hover tooltips need separate verification.",
+      "sources": [
+        "crates/orbit-pi/src/usage/view.rs",
+        "crates/orbit-pi/src/usage/chart.rs",
+        "crates/orbit-pi/src/usage/heatmap.rs",
+        "crates/orbit-pi/src/usage/table.rs",
+        "crates/orbit-pi/src/usage/page.rs::UsagePage"
+      ],
+      "tests": "T18",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/chart.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/heatmap.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/table.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/page.rs",
+          "symbol": "UsagePage",
+          "line": 876
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Usage analytics, update, privacy and release behavior",
+      "id": "U03",
+      "feature": "Usage filters and drill-down",
+      "interaction_contract": "Date presets and custom calendar range, granularity, searchable multi-select workspace/provider/model, select-all/clear, active chips, day/bucket click narrowing, session/errors-only/cached-only focus.",
+      "state_failure_platform": "One filter model drives every panel; local-time date buckets, inclusive/exclusive boundaries and zero/unknown values preserved. No separate project dimension invented.",
+      "sources": [
+        "crates/orbit-pi/src/usage/filters.rs",
+        "crates/orbit-pi/src/usage/model.rs::UsageFilter",
+        "crates/orbit-pi/src/usage/page.rs::set_filter",
+        "crates/orbit-pi/src/usage/page.rs::scope_to_day"
+      ],
+      "tests": "T18",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/usage/filters.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/model.rs",
+          "symbol": "UsageFilter",
+          "line": 675
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/page.rs",
+          "symbol": "set_filter",
+          "line": 1580
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/page.rs",
+          "symbol": "scope_to_day",
+          "line": 1758
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Usage analytics, update, privacy and release behavior",
+      "id": "U04",
+      "feature": "Usage tables and export",
+      "interaction_contract": "Search/sort/direction, column visibility/reset/resize, pagination/page sizes across session/series/daily/failure/breakdown tables, context menu and open source session; export CSV/JSON with native Save dialog.",
+      "state_failure_platform": "usage.json persists supported view prefs only, not transient filters/data IDs. Export filtered records/aggregates as implemented; escaping, cancellation and write errors surfaced.",
+      "sources": [
+        "crates/orbit-pi/src/usage/page.rs::query_sessions",
+        "crates/orbit-pi/src/usage/page.rs::export",
+        "crates/orbit-pi/src/usage/page.rs::Prefs",
+        "crates/orbit-pi/src/usage/table.rs"
+      ],
+      "tests": "T18",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/usage/page.rs",
+          "symbol": "query_sessions",
+          "line": 79
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/page.rs",
+          "symbol": "export",
+          "line": 2457
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/page.rs",
+          "symbol": "Prefs",
+          "line": 2528
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/table.rs"
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Usage analytics, update, privacy and release behavior",
+      "id": "U05",
+      "feature": "Notifications and toasts",
+      "interaction_contract": "Completion/failure/input-needed background notifications, three independent desktop/sound/toast preferences, click bundled banner opens session; deduped capped toast stack with dismiss/TTL/fade.",
+      "state_failure_platform": "Frontmost window suppresses OS banner/sound in favor of toast. macOS bundled UNUserNotificationCenter; unbundled osascript attributed to Script Editor. Non-macOS native banner/sound stubs remain limitations.",
+      "sources": [
+        "crates/orbit-pi/src/notifications.rs",
+        "crates/orbit-pi/src/toast.rs",
+        "crates/orbit-pi/src/app/events.rs::post_notification",
+        "crates/orbit-pi/src/app/toast_ui.rs",
+        "crates/orbit-pi/src/app/session.rs::activate_session_from_notification"
+      ],
+      "tests": "T19",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/notifications.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/toast.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/events.rs",
+          "symbol": "post_notification",
+          "line": 1193
+        },
+        {
+          "path": "crates/orbit-pi/src/app/toast_ui.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/session.rs",
+          "symbol": "activate_session_from_notification",
+          "line": 1215
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Usage analytics, update, privacy and release behavior",
+      "id": "U06",
+      "feature": "Session retention and privacy controls",
+      "interaction_contract": "Privacy explains local data, opt-in launch archive/delete by age presets and manual cleanup; eligible sessions based on message activity.",
+      "state_failure_platform": "Default off/archive/30 d; presets 7,14,30,60,90,180,365. Live sessions skipped. Permanent deletion removes JSONL and pin/archive state; archive is reversible. Outcome reports touched/skipped/failures.",
+      "sources": [
+        "crates/orbit-pi/src/session_retention.rs",
+        "crates/orbit-pi/src/app/retention_ui.rs",
+        "crates/orbit-pi/src/app/settings.rs::privacy_rows"
+      ],
+      "tests": "T20",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/session_retention.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/retention_ui.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "privacy_rows",
+          "line": 5618
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Usage analytics, update, privacy and release behavior",
+      "id": "U07",
+      "feature": "Temporary file cleanup",
+      "interaction_contract": "List Orbit temp files and legacy orbit-* separately from pi AI scratch, sizes/age, refresh/reveal/cleanup.",
+      "state_failure_platform": "Protect files belonging to live Orbit process; AI scratch touched within 1 h retained; scan depth bound; do not delete arbitrary temp directories. Failures and kept items reported.",
+      "sources": [
+        "crates/orbit-pi/src/temp_files.rs",
+        "crates/orbit-pi/src/app/temp_ui.rs",
+        "crates/orbit-pi/src/app/settings.rs::privacy_rows"
+      ],
+      "tests": "T20",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/temp_files.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/temp_ui.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "privacy_rows",
+          "line": 5618
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Usage analytics, update, privacy and release behavior",
+      "id": "U08",
+      "feature": "Signed Orbit app updater",
+      "interaction_contract": "Automatic check preference, manual check/Primary+Shift+U, version/history/search modal, available pill, Update now, download/stage/quit/install and failure messages.",
+      "state_failure_platform": "Ed25519 signature verification before staging; bounded feed/artifact/unpack limits. Debug dormant unless explicitly forced; missing/invalid key disables. Fork must not accidentally install upstream Orbit artifacts.",
+      "sources": [
+        "crates/orbit-pi/src/updater.rs",
+        "crates/orbit-pi/src/app/updater_ui.rs",
+        "crates/orbit-pi/build.rs",
+        "crates/orbit-pi/build.rs"
+      ],
+      "tests": "T21",
+      "baseline_status": "source_present",
+      "migration_status": "partial_backend_blocked_release_configuration",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/updater.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/updater_ui.rs"
+        },
+        {
+          "path": "crates/orbit-pi/build.rs"
+        },
+        {
+          "path": "crates/orbit-pi/build.rs"
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Signed updater/staging logic and disposable tests exist; a Go-specific signed feed/key/release artifact pipeline is not configured. Must not use upstream Rust updates."
+      }
+    },
+    {
+      "group": "Usage analytics, update, privacy and release behavior",
+      "id": "U09",
+      "feature": "Platform update installation safety",
+      "interaction_contract": "Unix helper validates archive/install path, waits normal quit, swaps application, relaunches and rolls back if ready signal fails; Windows installer launch.",
+      "state_failure_platform": "macOS .app tarball, Linux managed prefix, Windows silent installer; platform/arch feeds differ. Download/staged temp cleanup and signature rejection are part of parity.",
+      "sources": [
+        "crates/orbit-pi/src/updater.rs::run_install_helper",
+        "crates/orbit-pi/src/updater.rs::StagedUpdate",
+        "crates/orbit-pi/src/main.rs",
+        "contrib"
+      ],
+      "tests": "T21",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/updater.rs",
+          "symbol": "run_install_helper",
+          "line": 694
+        },
+        {
+          "path": "crates/orbit-pi/src/updater.rs",
+          "symbol": "StagedUpdate",
+          "line": 113
+        },
+        {
+          "path": "crates/orbit-pi/src/main.rs"
+        },
+        {
+          "path": "contrib"
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Disposable signature/archive/install-helper tests pass; actual installed macOS/Linux/Windows update/rollback remains unverified."
+      }
+    },
+    {
+      "group": "Usage analytics, update, privacy and release behavior",
+      "id": "U10",
+      "feature": "Pi update/install management",
+      "interaction_contract": "Delayed newer-version check for installed pi, official managed update, npm migration prompt, reported unsupported package manager, install/version/PATH verification.",
+      "state_failure_platform": "PI_BIN custom builds and PI_OFFLINE skip. Wait up to 120 s for all sessions/compaction to quiet, otherwise defer next launch. Existing children keep old version; new children use new version.",
+      "sources": [
+        "crates/orbit-pi/src/app/pi_update_ui.rs::check_pi_update_on_launch",
+        "crates/orbit-pi/src/app/pi_update_ui.rs::finish_pi_update",
+        "crates/orbit-pi/src/pi_install.rs",
+        "crates/orbit-pi/src/pi_update.rs"
+      ],
+      "tests": "T13,T21",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/app/pi_update_ui.rs",
+          "symbol": "check_pi_update_on_launch",
+          "line": 30
+        },
+        {
+          "path": "crates/orbit-pi/src/app/pi_update_ui.rs",
+          "symbol": "finish_pi_update",
+          "line": 139
+        },
+        {
+          "path": "crates/orbit-pi/src/pi_install.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/pi_update.rs"
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Usage analytics, update, privacy and release behavior",
+      "id": "U11",
+      "feature": "Automatic RPC patches",
+      "interaction_contract": "Embed/materialize custom-ui/quota/auth patch scripts, identify pi bundle anchors, apply before every spawn, fingerprint/lock fast path, Runtime opt-out/status.",
+      "state_failure_platform": "Best-effort missing Node/read-only install/anchor drift → report unavailable capability, not broken core launch. Backups/revert and patch scripts remain source of truth. Config default enabled; ORBIT_NO_RPC_PATCHES override.",
+      "sources": [
+        "crates/orbit-pi/src/rpc_patches.rs",
+        "crates/orbit-pi/src/bundled_extensions.rs::spawn",
+        "contrib/pi-custom-ui-rpc/apply.mjs",
+        "contrib/pi-quota-rpc/apply.mjs",
+        "contrib/pi-auth-rpc/apply.mjs"
+      ],
+      "tests": "T11,T21",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/rpc_patches.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/bundled_extensions.rs",
+          "symbol": "spawn",
+          "line": 97
+        },
+        {
+          "path": "contrib/pi-custom-ui-rpc/apply.mjs"
+        },
+        {
+          "path": "contrib/pi-quota-rpc/apply.mjs"
+        },
+        {
+          "path": "contrib/pi-auth-rpc/apply.mjs"
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Usage analytics, update, privacy and release behavior",
+      "id": "U12",
+      "feature": "Bug/feature reporting",
+      "interaction_contract": "Settings Report Bug accepts context/title/description/repro or problem/solution; AI draft using active model; up to six screenshots; clear/submit and created-issue link.",
+      "state_failure_platform": "Build diagnostics disclosed; gh issue create --attach when available, browser prefilled fallback and saved screenshots otherwise. No silent issue creation on AI draft. Busy and inline errors separate.",
+      "sources": [
+        "crates/orbit-pi/src/app/bug_report_ui.rs",
+        "crates/orbit-pi/src/bug_report.rs::file",
+        "crates/orbit-pi/src/bug_report.rs::Diagnostics",
+        "crates/orbit-pi/src/issue_message.rs"
+      ],
+      "tests": "T22",
+      "baseline_status": "source_present",
+      "migration_status": "pending_ui_feature",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/app/bug_report_ui.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/bug_report.rs",
+          "symbol": "file",
+          "line": 116
+        },
+        {
+          "path": "crates/orbit-pi/src/bug_report.rs",
+          "symbol": "Diagnostics",
+          "line": 26
+        },
+        {
+          "path": "crates/orbit-pi/src/issue_message.rs"
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Original report wizard context/redaction/action workflow is not yet evidenced in the native host."
+      }
+    },
+    {
+      "group": "Usage analytics, update, privacy and release behavior",
+      "id": "U13",
+      "feature": "Privacy and network boundaries",
+      "interaction_contract": "No telemetry/installation-ID feature in source; keep local sessions/config and actual provider/auth/quota/update/GitHub behavior.",
+      "state_failure_platform": "Network is not zero: provider calls, quota/auth, app/pi/plugin update checks, GitHub metadata/avatars/reporting, and requested remote content. Preserve actual timing/PI_OFFLINE guards instead of claiming no background traffic.",
+      "sources": [
+        "crates/orbit-pi/src/http.rs",
+        "crates/orbit-pi/src/providers.rs",
+        "crates/orbit-pi/src/quota.rs",
+        "crates/orbit-pi/src/pi_update.rs",
+        "crates/orbit-pi/src/plugins.rs",
+        "crates/orbit-pi/src/updater.rs",
+        "crates/orbit-pi/src/bug_report.rs",
+        "PRIVACY.md"
+      ],
+      "tests": "T13,T14,T21,T22",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/http.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/providers.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/quota.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/pi_update.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/plugins.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/updater.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/bug_report.rs"
+        },
+        {
+          "path": "PRIVACY.md"
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Usage analytics, update, privacy and release behavior",
+      "id": "U14",
+      "feature": "Packaging and platform identity",
+      "interaction_contract": "Bundled assets/fonts/icon, macOS debug Alpha identity, app menu/window controls, Windows manifest/installer and Linux bundle/deb scripts; release target identity and native integration.",
+      "state_failure_platform": "Platform-limited functions must show unavailability, not fake success. Fork identifiers, update key/feed, report target and branding must be explicit migration decisions.",
+      "sources": [
+        "crates/orbit-pi/src/assets.rs",
+        "crates/orbit-pi/src/app_icon.rs",
+        "crates/orbit-pi/src/platform.rs",
+        "crates/orbit-pi/src/main.rs",
+        "crates/orbit-pi/build.rs",
+        ".github/workflows/release.yml",
+        "scripts"
+      ],
+      "tests": "T01,T17,T21",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_blocked_packaging_acceptance",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/assets.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app_icon.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/platform.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/main.rs"
+        },
+        {
+          "path": "crates/orbit-pi/build.rs"
+        },
+        {
+          "path": ".github/workflows/release.yml"
+        },
+        {
+          "path": "scripts"
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Native entry point/assets exist; target installers, identity/signing and full packaged-platform acceptance remain pending."
+      }
+    }
+  ]
+}

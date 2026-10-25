@@ -1,0 +1,383 @@
+{
+  "category": "GitHub issues and pull requests",
+  "rows": [
+    {
+      "id": "W20",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "GitHub integration probes gh availability/auth/version and shows honest setup states on Issues/Pulls when absent or signed out. Refresh retries probe; CLI path can be overridden by `GH_BIN`.",
+      "interaction_contract": "GitHub integration probes gh availability/auth/version and shows honest setup states on Issues/Pulls when absent or signed out. Refresh retries probe; CLI path can be overridden by `GH_BIN`.",
+      "state_failure_platform": "Known minimum is 2.20.0; old version produces detail warning, not an unsupported-capability success claim. Prompts/update notifier/pager/color disabled, console hidden on Windows. Signed-in current user fetched only after auth succeeds.",
+      "sources": [
+        "`gh.rs::{GH_BIN_ENV,MIN_GH_VERSION,status,binary,command,run}`; `git_panel/mod.rs::{refresh_gh,gh_setup_tab,issues_tab,pulls_tab}`"
+      ],
+      "tests": "`gh.rs::{parses_versions_from_gh_output,version_floor_matches_the_json_surface_we_need}`",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G2",
+        "paths": [
+          "internal/workspace/git.go",
+          "internal/workspace/git_ops.go",
+          "internal/workspace/github.go",
+          "internal/gitworkbench/state.go",
+          "internal/gitworkbench/view.go",
+          "internal/workspace/generation.go",
+          "internal/workspace/github_templates.go",
+          "internal/gitworkbench/templates.go"
+        ],
+        "tests": [
+          "internal/workspace/git_test.go",
+          "internal/workspace/github_test.go",
+          "internal/gitworkbench/state_test.go",
+          "internal/workspace/generation_test.go",
+          "internal/workspace/process_cancel_unix_test.go"
+        ],
+        "remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending."
+      }
+    },
+    {
+      "id": "W21",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Issue list has Open/Closed/All, search, label filter, clear filters, status/author/label/time/comment metadata and detail selection.",
+      "interaction_contract": "Issue list has Open/Closed/All, search, label filter, clear filters, status/author/label/time/comment metadata and detail selection.",
+      "state_failure_platform": "gh fetch limit 50, label catalog limit 100; empty/loading/error displayed. Backend assignee filter exists but no assignee picker found in list UI. No continuous issue monitoring or list pagination beyond this fetched window.",
+      "sources": [
+        "`gh.rs::{IssueFilter,list_issues,list_labels}`; `git_panel/mod.rs::{refresh_issues,issue_filter_bar,issues_list_view}`"
+      ],
+      "tests": "`gh.rs::{parses_issue_json,parses_labels_json,relative_time_handles_unknown_formats}`",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G2",
+        "paths": [
+          "internal/workspace/git.go",
+          "internal/workspace/git_ops.go",
+          "internal/workspace/github.go",
+          "internal/gitworkbench/state.go",
+          "internal/gitworkbench/view.go",
+          "internal/workspace/generation.go",
+          "internal/workspace/github_templates.go",
+          "internal/gitworkbench/templates.go"
+        ],
+        "tests": [
+          "internal/workspace/git_test.go",
+          "internal/workspace/github_test.go",
+          "internal/gitworkbench/state_test.go",
+          "internal/workspace/generation_test.go",
+          "internal/workspace/process_cancel_unix_test.go"
+        ],
+        "remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending."
+      }
+    },
+    {
+      "id": "W22",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Issue detail renders Markdown body/comments and metadata; send comment, toggle labels, close/reopen, open on GitHub, return to list.",
+      "interaction_contract": "Issue detail renders Markdown body/comments and metadata; send comment, toggle labels, close/reopen, open on GitHub, return to list.",
+      "state_failure_platform": "Mutation busy state, success/failure banner, list/detail reload from GitHub. Existing comment handler clears composer before network result; failure restoration is not implemented there. Close reason backend supported but UI uses default.",
+      "sources": [
+        "`git_panel/mod.rs::{open_issue,issue_detail_view,comment_issue,toggle_issue_state,toggle_issue_label,run_issue_op}`; `gh.rs::{view_issue,comment_issue,edit_issue_labels,close_issue,reopen_issue}`"
+      ],
+      "tests": "gh JSON/label tests; no live-GitHub or mutation UI tests located.",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G2",
+        "paths": [
+          "internal/workspace/git.go",
+          "internal/workspace/git_ops.go",
+          "internal/workspace/github.go",
+          "internal/gitworkbench/state.go",
+          "internal/gitworkbench/view.go",
+          "internal/workspace/generation.go",
+          "internal/workspace/github_templates.go",
+          "internal/gitworkbench/templates.go"
+        ],
+        "tests": [
+          "internal/workspace/git_test.go",
+          "internal/workspace/github_test.go",
+          "internal/gitworkbench/state_test.go",
+          "internal/workspace/generation_test.go",
+          "internal/workspace/process_cancel_unix_test.go"
+        ],
+        "remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending."
+      }
+    },
+    {
+      "id": "W23",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "New issue form has title/body/notes, repository template selector and generation, submit, cancel/back. Requires nonblank title; selected template labels pass to create. Successful creation clears fields, reloads list and opens resulting issue number.",
+      "interaction_contract": "New issue form has title/body/notes, repository template selector and generation, submit, cancel/back. Requires nonblank title; selected template labels pass to create. Successful creation clears fields, reloads list and opens resulting issue number.",
+      "state_failure_platform": "Writes via `gh issue create`; no auto-send merely on generation. Generic backend can target explicit repo, assignees and attachment paths, but ordinary Git-page create passes current repo and empty assignee/attachment arrays.",
+      "sources": [
+        "`git_panel/mod.rs::{open_issue_new,issue_new_view,create_issue,generate_issue_draft}`; `gh.rs::create_issue`"
+      ],
+      "tests": "`issue_message.rs` draft parsing/heuristic tests; no live issue-creation test located.",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G2",
+        "paths": [
+          "internal/workspace/git.go",
+          "internal/workspace/git_ops.go",
+          "internal/workspace/github.go",
+          "internal/gitworkbench/state.go",
+          "internal/gitworkbench/view.go",
+          "internal/workspace/generation.go",
+          "internal/workspace/github_templates.go",
+          "internal/gitworkbench/templates.go"
+        ],
+        "tests": [
+          "internal/workspace/git_test.go",
+          "internal/workspace/github_test.go",
+          "internal/gitworkbench/state_test.go",
+          "internal/workspace/generation_test.go",
+          "internal/workspace/process_cancel_unix_test.go"
+        ],
+        "remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending."
+      }
+    },
+    {
+      "id": "W24",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Repository issue/PR templates follow `.github/*_TEMPLATE/` directory then legacy single-file lookup. Markdown frontmatter supplies name/about/title/labels; YAML issue forms flatten to Markdown; config.yml excluded.",
+      "interaction_contract": "Repository issue/PR templates follow `.github/*_TEMPLATE/` directory then legacy single-file lookup. Markdown frontmatter supplies name/about/title/labels; YAML issue forms flatten to Markdown; config.yml excluded.",
+      "state_failure_platform": "Templates capped at 256 KiB. Multiple templates selectable; one template can apply automatically only to untouched body, including late async arrival. Template removal does not blindly erase edited bodies.",
+      "sources": [
+        "`gh_templates.rs::{issue_templates,pull_templates,parse_markdown,parse_issue_form,render_issue_form}`; `git_panel/mod.rs::{refresh_templates,apply_issue_template,apply_pull_template,clear_template_body,template_picker_popup}`"
+      ],
+      "tests": "`gh_templates.rs::{reads_a_plain_markdown_pull_template,reads_front_matter_and_body_from_markdown,flattens_a_yaml_issue_form_and_skips_config,legacy_single_file_is_used_without_a_directory,missing_templates_are_an_empty_list,parses_this_repositorys_own_templates}`",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G2",
+        "paths": [
+          "internal/workspace/git.go",
+          "internal/workspace/git_ops.go",
+          "internal/workspace/github.go",
+          "internal/gitworkbench/state.go",
+          "internal/gitworkbench/view.go",
+          "internal/workspace/generation.go",
+          "internal/workspace/github_templates.go",
+          "internal/gitworkbench/templates.go"
+        ],
+        "tests": [
+          "internal/workspace/git_test.go",
+          "internal/workspace/github_test.go",
+          "internal/gitworkbench/state_test.go",
+          "internal/workspace/generation_test.go",
+          "internal/workspace/process_cancel_unix_test.go"
+        ],
+        "remaining": "Tool-free Pi RPC generation and repository templates are implemented; fake-process race tests verify isolation, prompt bounds, fallback, cancellation and no staging mutation. Host workflow/live inference and exact template UI acceptance remain pending."
+      }
+    },
+    {
+      "id": "W25",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Pull request list has Open/Closed/Merged/All, search, clear filters, draft/author/labels/ref/diffstat/review/check summary and detail selection.",
+      "interaction_contract": "Pull request list has Open/Closed/Merged/All, search, clear filters, draft/author/labels/ref/diffstat/review/check summary and detail selection.",
+      "state_failure_platform": "gh limit 50. Backend base/author filter fields exist; exposed list UI is state/search, while base selection belongs to New PR. Loading/error/empty states separate.",
+      "sources": [
+        "`gh.rs::{PrFilter,list_pulls,GhPull,checks_summary}`; `git_panel/mod.rs::{refresh_pulls,pr_filter_bar,pulls_list_view}`"
+      ],
+      "tests": "`gh.rs::{parses_pull_json_and_check_rollup,check_buckets_prefer_the_normalized_field}`",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G2",
+        "paths": [
+          "internal/workspace/git.go",
+          "internal/workspace/git_ops.go",
+          "internal/workspace/github.go",
+          "internal/gitworkbench/state.go",
+          "internal/gitworkbench/view.go",
+          "internal/workspace/generation.go",
+          "internal/workspace/github_templates.go",
+          "internal/gitworkbench/templates.go"
+        ],
+        "tests": [
+          "internal/workspace/git_test.go",
+          "internal/workspace/github_test.go",
+          "internal/gitworkbench/state_test.go",
+          "internal/workspace/generation_test.go",
+          "internal/workspace/process_cancel_unix_test.go"
+        ],
+        "remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending."
+      }
+    },
+    {
+      "id": "W26",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "PR detail renders Markdown description, comments, reviews, commits, changed files, CI checks with links, draft/ref/state metadata and additions/deletions.",
+      "interaction_contract": "PR detail renders Markdown description, comments, reviews, commits, changed files, CI checks with links, draft/ref/state metadata and additions/deletions.",
+      "state_failure_platform": "File rendering capped at 300; unknown/missing check data is not treated as a passing check. Checks combine failure first, then pending, passed, skipped. No native full PR patch review or inline line-comment editor located.",
+      "sources": [
+        "`git_panel/mod.rs::pr_detail_view`; `gh.rs::{GhPull,GhCheck,GhReview,GhPullCommit,GhPullFile,CheckBucket}`"
+      ],
+      "tests": "`gh.rs::{reviews_and_files_parse,parses_pull_json_and_check_rollup,check_buckets_prefer_the_normalized_field}`",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G2",
+        "paths": [
+          "internal/workspace/git.go",
+          "internal/workspace/git_ops.go",
+          "internal/workspace/github.go",
+          "internal/gitworkbench/state.go",
+          "internal/gitworkbench/view.go",
+          "internal/workspace/generation.go",
+          "internal/workspace/github_templates.go",
+          "internal/gitworkbench/templates.go"
+        ],
+        "tests": [
+          "internal/workspace/git_test.go",
+          "internal/workspace/github_test.go",
+          "internal/gitworkbench/state_test.go",
+          "internal/workspace/generation_test.go",
+          "internal/workspace/process_cancel_unix_test.go"
+        ],
+        "remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending."
+      }
+    },
+    {
+      "id": "W27",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "PR comment, approve/request changes, close/reopen, checkout, merge by merge/squash/rebase and optional delete-head-branch. Merge requires confirmation showing method.",
+      "interaction_contract": "PR comment, approve/request changes, close/reopen, checkout, merge by merge/squash/rebase and optional delete-head-branch. Merge requires confirmation showing method.",
+      "state_failure_platform": "Checkout refuses dirty worktree or in-progress Git operation. Mutation busy states; list/detail re-read. Existing comment/review input is cleared before success. gh enforces repository-side merge rules; UI is not a CI-bypass implementation.",
+      "sources": [
+        "`git_panel/mod.rs::{comment_pull,review_pull,toggle_pull_state,checkout_pull,request_merge_pull,confirm_pending,run_pr_op}`; `gh.rs::{review_pull,merge_pull,checkout_pull,close_pull,reopen_pull}`"
+      ],
+      "tests": "gh wire parsing tests; no live mutation/merge confirmation interaction test located.",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G2",
+        "paths": [
+          "internal/workspace/git.go",
+          "internal/workspace/git_ops.go",
+          "internal/workspace/github.go",
+          "internal/gitworkbench/state.go",
+          "internal/gitworkbench/view.go",
+          "internal/workspace/generation.go",
+          "internal/workspace/github_templates.go",
+          "internal/gitworkbench/templates.go"
+        ],
+        "tests": [
+          "internal/workspace/git_test.go",
+          "internal/workspace/github_test.go",
+          "internal/gitworkbench/state_test.go",
+          "internal/workspace/generation_test.go",
+          "internal/workspace/process_cancel_unix_test.go"
+        ],
+        "remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending."
+      }
+    },
+    {
+      "id": "W28",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "New PR form has title/body/notes, draft toggle, base-branch picker, template selection, generation, submit/cancel. Base picker is anchored in form; default prefers main/master then available branch.",
+      "interaction_contract": "New PR form has title/body/notes, draft toggle, base-branch picker, template selection, generation, submit/cancel. Base picker is anchored in form; default prefers main/master then available branch.",
+      "state_failure_platform": "Required title; selected template labels passed to gh. Creation returns URL, opens PR detail, clears fields. No automatic publish/push is performed by this controller before `gh pr create`.",
+      "sources": [
+        "`git_panel/mod.rs::{open_pull_new,pr_new_view,base_branch_selector,pr_base_popup,default_base,create_pull}`; `gh.rs::create_pull`"
+      ],
+      "tests": "`gh_templates.rs` tests and `issue_message.rs` tests; no live PR creation test located.",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G2",
+        "paths": [
+          "internal/workspace/git.go",
+          "internal/workspace/git_ops.go",
+          "internal/workspace/github.go",
+          "internal/gitworkbench/state.go",
+          "internal/gitworkbench/view.go",
+          "internal/workspace/generation.go",
+          "internal/workspace/github_templates.go",
+          "internal/gitworkbench/templates.go"
+        ],
+        "tests": [
+          "internal/workspace/git_test.go",
+          "internal/workspace/github_test.go",
+          "internal/gitworkbench/state_test.go",
+          "internal/workspace/generation_test.go",
+          "internal/workspace/process_cancel_unix_test.go"
+        ],
+        "remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending."
+      }
+    },
+    {
+      "id": "W29",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "AI issue/PR draft uses optional user notes, branch commits/diff and chosen template; preserves template prefix/body structure.",
+      "interaction_contract": "AI issue/PR draft uses optional user notes, branch commits/diff and chosen template; preserves template prefix/body structure.",
+      "state_failure_platform": "Isolated tool-free `pi -p` subprocess, 180 s timeout, 24 KiB context and max 30 commits, same selected model/provider, heuristic fallback. No active chat-session mutation. A strict “all pi calls over RPC” conversion must include this path and W11.",
+      "sources": [
+        "`issue_message.rs::{generate,collect,run_pi,heuristic,process_response,fill_first_section}`; `git_panel/mod.rs::{generate_issue_draft,generate_pull_draft}`"
+      ],
+      "tests": "`issue_message.rs::{parses_title_and_body_from_a_text_fence,tolerates_preamble_and_trailing_prose,accepts_markdown_fence_and_title_first_prose,process_response_rejects_blank_output,heuristic_uses_the_hint_first_line_as_the_title,heuristic_falls_back_to_the_branch_or_latest_commit,template_is_embedded_and_filled_faithfully}`",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G2",
+        "paths": [
+          "internal/workspace/git.go",
+          "internal/workspace/git_ops.go",
+          "internal/workspace/github.go",
+          "internal/gitworkbench/state.go",
+          "internal/gitworkbench/view.go",
+          "internal/workspace/generation.go",
+          "internal/workspace/github_templates.go",
+          "internal/gitworkbench/templates.go"
+        ],
+        "tests": [
+          "internal/workspace/git_test.go",
+          "internal/workspace/github_test.go",
+          "internal/gitworkbench/state_test.go",
+          "internal/workspace/generation_test.go",
+          "internal/workspace/process_cancel_unix_test.go"
+        ],
+        "remaining": "Tool-free Pi RPC generation and repository templates are implemented; fake-process race tests verify isolation, prompt bounds, fallback, cancellation and no staging mutation. Host workflow/live inference and exact template UI acceptance remain pending."
+      }
+    },
+    {
+      "id": "W30",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Review can open from toolbar diffstat, transcript per-turn summary, command/palette, Git file callback; select desired file after load. Separate embedded instance supplies Changes overview.",
+      "interaction_contract": "Review can open from toolbar diffstat, transcript per-turn summary, command/palette, Git file callback; select desired file after load. Separate embedded instance supplies Changes overview.",
+      "state_failure_platform": "Full-page Git embedded mode suppresses dock resize/full-width/close chrome and source popup, groups Staged and Changes, starts files collapsed; dock starts expanded.",
+      "sources": [
+        "`sidepane.rs::{show_uncommitted,show_file,show_review,show_review_turn,set_embedded,apply_snapshot}`; `app/session.rs::review_callback`; `git_panel/mod.rs::install_review_actions`"
+      ],
+      "tests": "`sidepane.rs::{one_file_collapses_independently_and_selecting_it_expands_it,collapse_all_hides_every_file_body_and_expand_all_restores_them}`; grouped Review parser test.",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G3",
+        "paths": [
+          "internal/workspace/checkpoint.go",
+          "internal/workspace/review.go",
+          "internal/ui/review.go",
+          "internal/agent/manager.go"
+        ],
+        "tests": [
+          "internal/workspace/checkpoint_test.go",
+          "internal/workspace/review_test.go"
+        ],
+        "remaining": "Six-source immutable snapshots/checkpoint attribution/diff model tested; native review interaction/presentation parity remains pending."
+      }
+    }
+  ]
+}

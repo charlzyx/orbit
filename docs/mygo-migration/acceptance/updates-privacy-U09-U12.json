@@ -1,0 +1,532 @@
+{
+  "schema": "orbit-acceptance-shard/v1",
+  "category": "updates-privacy",
+  "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "rows": [
+    {
+      "id": "U09",
+      "title": "Platform update installation safety",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/updater.rs",
+          "handler": "run_install_helper",
+          "line": 694,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/updater.rs#L694",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/updater.rs",
+          "handler": "StagedUpdate",
+          "line": 113,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/updater.rs#L113",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Unix helper validates archive/install path, waits normal quit, swaps application, relaunches and rolls back if ready signal fails; Windows installer launch.",
+      "baseline_edge_state": "macOS .app tarball, Linux managed prefix, Windows silent installer; platform/arch feeds differ. Download/staged temp cleanup and signature rejection are part of parity.",
+      "fixture": "Copied fixture session store, controlled clock/pricing/update responses, dummy redaction markers and disposable staging directory.",
+      "steps": [
+        {
+          "id": "U09.behavior",
+          "dimension": "functional",
+          "action": "Exercise updater preparation/rollback using local staged packages for each platform without replacing a user's app.",
+          "expected": "Unix helper validates archive/install path, waits normal quit, swaps application, relaunches and rolls back if ready signal fails; Windows installer launch.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U09.edge",
+          "dimension": "edge",
+          "action": "Simulate archive traversal, locked destination, helper failure and cancellation; preserve old runnable version and report unsupported hosts honestly.",
+          "expected": "macOS .app tarball, Linux managed prefix, Windows silent installer; platform/arch feeds differ. Download/staged temp cleanup and signature rejection are part of parity.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U09.error",
+          "dimension": "error",
+          "action": "Inject malformed data, unavailable I/O/network response and cancellation at the action boundary.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: macOS .app tarball, Linux managed prefix, Windows silent installer; platform/arch feeds differ. Download/staged temp cleanup and signature rejection are part of parity.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U09.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U09.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U09.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U09.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/preferences",
+        "internal/workbench",
+        "internal/native"
+      ],
+      "existing_test_candidates": [
+        "internal/preferences/store_test.go",
+        "internal/preferences/workspaces_test.go",
+        "internal/workbench/workbench_test.go",
+        "internal/native/native_test.go",
+        "internal/native/runtime_test.go",
+        "internal/native/updater_test.go",
+        "internal/native/temp_files_test.go"
+      ],
+      "inventory_evidence": "../parity/updates-privacy.json",
+      "source_test_inventory": "T21",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Disposable signature/archive/install-helper tests pass; actual installed macOS/Linux/Windows update/rollback remains unverified.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    },
+    {
+      "id": "U10",
+      "title": "Pi update/install management",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/pi_update_ui.rs",
+          "handler": "check_pi_update_on_launch",
+          "line": 30,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/pi_update_ui.rs#L30",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/pi_update_ui.rs",
+          "handler": "finish_pi_update",
+          "line": 139,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/pi_update_ui.rs#L139",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Delayed newer-version check for installed pi, official managed update, npm migration prompt, reported unsupported package manager, install/version/PATH verification.",
+      "baseline_edge_state": "PI_BIN custom builds and PI_OFFLINE skip. Wait up to 120 s for all sessions/compaction to quiet, otherwise defer next launch. Existing children keep old version; new children use new version.",
+      "fixture": "Copied fixture session store, controlled clock/pricing/update responses, dummy redaction markers and disposable staging directory.",
+      "steps": [
+        {
+          "id": "U10.behavior",
+          "dimension": "functional",
+          "action": "Detect Pi version, offer supported install/update and run controlled package command with fixture output.",
+          "expected": "Delayed newer-version check for installed pi, official managed update, npm migration prompt, reported unsupported package manager, install/version/PATH verification.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U10.edge",
+          "dimension": "edge",
+          "action": "Simulate missing npm, broken executable, failed version check and cancellation; restart only after verified success.",
+          "expected": "PI_BIN custom builds and PI_OFFLINE skip. Wait up to 120 s for all sessions/compaction to quiet, otherwise defer next launch. Existing children keep old version; new children use new version.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U10.error",
+          "dimension": "error",
+          "action": "Inject malformed data, unavailable I/O/network response and cancellation at the action boundary.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: PI_BIN custom builds and PI_OFFLINE skip. Wait up to 120 s for all sessions/compaction to quiet, otherwise defer next launch. Existing children keep old version; new children use new version.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U10.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U10.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U10.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U10.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/preferences",
+        "internal/workbench",
+        "internal/native"
+      ],
+      "existing_test_candidates": [
+        "internal/preferences/store_test.go",
+        "internal/preferences/workspaces_test.go",
+        "internal/workbench/workbench_test.go",
+        "internal/native/native_test.go",
+        "internal/native/runtime_test.go",
+        "internal/native/updater_test.go",
+        "internal/native/temp_files_test.go"
+      ],
+      "inventory_evidence": "../parity/updates-privacy.json",
+      "source_test_inventory": "T13,T21",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-U05",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "partial",
+          "steps": [
+            "Hold runtime maintenance gate then send/open/change workspace.",
+            "Run retention on temporary sessions, including active/parked ones.",
+            "Cancel temp cleanup/install confirmations and inspect errors."
+          ],
+          "expected": "No prompt loss/new process during exclusive update; live sessions protected; explicit cleanup and honest progress.",
+          "tests": [
+            "TestMaintenanceGateKeepsDraftAndBlocksNewProcess",
+            "TestRetentionRunsOffThreadAndReloadsArchiveSet"
+          ],
+          "remaining": "Guard and temporary retention tests pass. Whole native update/install/temp dialogs and real OS notification lifecycle remain platform acceptance gates.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": []
+    },
+    {
+      "id": "U11",
+      "title": "Automatic RPC patches",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/bundled_extensions.rs",
+          "handler": "spawn",
+          "line": 97,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/bundled_extensions.rs#L97",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Embed/materialize custom-ui/quota/auth patch scripts, identify pi bundle anchors, apply before every spawn, fingerprint/lock fast path, Runtime opt-out/status.",
+      "baseline_edge_state": "Best-effort missing Node/read-only install/anchor drift → report unavailable capability, not broken core launch. Backups/revert and patch scripts remain source of truth. Config default enabled; ORBIT_NO_RPC_PATCHES override.",
+      "fixture": "Copied fixture session store, controlled clock/pricing/update responses, dummy redaction markers and disposable staging directory.",
+      "steps": [
+        {
+          "id": "U11.behavior",
+          "dimension": "functional",
+          "action": "Apply each bundled RPC patch to the exact supported Pi fixture version; reapply and inspect markers.",
+          "expected": "Embed/materialize custom-ui/quota/auth patch scripts, identify pi bundle anchors, apply before every spawn, fingerprint/lock fast path, Runtime opt-out/status.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U11.edge",
+          "dimension": "edge",
+          "action": "Use already-patched, unsupported-version and changed-source input; patches must be idempotent and fail closed without partial corruption.",
+          "expected": "Best-effort missing Node/read-only install/anchor drift → report unavailable capability, not broken core launch. Backups/revert and patch scripts remain source of truth. Config default enabled; ORBIT_NO_RPC_PATCHES override.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U11.error",
+          "dimension": "error",
+          "action": "Inject malformed data, unavailable I/O/network response and cancellation at the action boundary.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Best-effort missing Node/read-only install/anchor drift → report unavailable capability, not broken core launch. Backups/revert and patch scripts remain source of truth. Config default enabled; ORBIT_NO_RPC_PATCHES override.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U11.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U11.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U11.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U11.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/preferences",
+        "internal/workbench",
+        "internal/native"
+      ],
+      "existing_test_candidates": [
+        "internal/preferences/store_test.go",
+        "internal/preferences/workspaces_test.go",
+        "internal/workbench/workbench_test.go",
+        "internal/native/native_test.go",
+        "internal/native/runtime_test.go",
+        "internal/native/updater_test.go",
+        "internal/native/temp_files_test.go"
+      ],
+      "inventory_evidence": "../parity/updates-privacy.json",
+      "source_test_inventory": "T11,T21",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    },
+    {
+      "id": "U12",
+      "title": "Bug/feature reporting",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/bug_report.rs",
+          "handler": "file",
+          "line": 116,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/bug_report.rs#L116",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/bug_report.rs",
+          "handler": "Diagnostics",
+          "line": 26,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/bug_report.rs#L26",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Settings Report Bug accepts context/title/description/repro or problem/solution; AI draft using active model; up to six screenshots; clear/submit and created-issue link.",
+      "baseline_edge_state": "Build diagnostics disclosed; gh issue create --attach when available, browser prefilled fallback and saved screenshots otherwise. No silent issue creation on AI draft. Busy and inline errors separate.",
+      "fixture": "Copied fixture session store, controlled clock/pricing/update responses, dummy redaction markers and disposable staging directory.",
+      "steps": [
+        {
+          "id": "U12.behavior",
+          "dimension": "functional",
+          "action": "Open Report Bug/Feature, populate diagnostics and preview outgoing content; use a non-sending test receiver.",
+          "expected": "Settings Report Bug accepts context/title/description/repro or problem/solution; AI draft using active model; up to six screenshots; clear/submit and created-issue link.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U12.edge",
+          "dimension": "edge",
+          "action": "Verify redaction, omitted private paths/secrets, cancellation and launch failure; do not submit externally during acceptance runs.",
+          "expected": "Build diagnostics disclosed; gh issue create --attach when available, browser prefilled fallback and saved screenshots otherwise. No silent issue creation on AI draft. Busy and inline errors separate.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U12.error",
+          "dimension": "error",
+          "action": "Inject malformed data, unavailable I/O/network response and cancellation at the action boundary.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Build diagnostics disclosed; gh issue create --attach when available, browser prefilled fallback and saved screenshots otherwise. No silent issue creation on AI draft. Busy and inline errors separate.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U12.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U12.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U12.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U12.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/preferences",
+        "internal/workbench",
+        "internal/native"
+      ],
+      "existing_test_candidates": [
+        "internal/preferences/store_test.go",
+        "internal/preferences/workspaces_test.go",
+        "internal/workbench/workbench_test.go",
+        "internal/native/native_test.go",
+        "internal/native/runtime_test.go",
+        "internal/native/updater_test.go",
+        "internal/native/temp_files_test.go"
+      ],
+      "inventory_evidence": "../parity/updates-privacy.json",
+      "source_test_inventory": "T22",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Original report wizard context/redaction/action workflow is not yet evidenced in the native host.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    }
+  ]
+}

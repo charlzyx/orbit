@@ -1,0 +1,613 @@
+{
+  "schema": "orbit-acceptance-shard/v1",
+  "category": "chat",
+  "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "rows": [
+    {
+      "id": "C17",
+      "title": "Inline permission approval",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/dialog.rs",
+          "handler": "ApprovalRequest",
+          "line": 127,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/dialog.rs#L127",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/dialogs.rs",
+          "handler": "open_approval",
+          "line": 260,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/dialogs.rs#L260",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "handler": "approval_bar",
+          "line": 4379,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/view.rs#L4379",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Access guard requests show tool/detail with Allow once / Always allow this tool / Deny; keyboard selection and Escape deny; MCP tool labels include server.",
+      "baseline_edge_state": "Global Supervised / Auto-accept edits / Full access mode, default Full access. Per-mode allowlist persists. Not a sandbox; extension unavailable is visible and cannot be portrayed as enforced protection.",
+      "fixture": "Isolated HOME, deterministic fixture Pi RPC stream, long transcript/Unicode/image fixtures and no live provider inference.",
+      "steps": [
+        {
+          "id": "C17.behavior",
+          "dimension": "functional",
+          "action": "Request each permission kind, inspect requested scope, allow once/session and deny via inline approval.",
+          "expected": "Access guard requests show tool/detail with Allow once / Always allow this tool / Deny; keyboard selection and Escape deny; MCP tool labels include server.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C17.edge",
+          "dimension": "edge",
+          "action": "Repeat or cancel pending approval and deliver a stale response; never grant wider scope than selected.",
+          "expected": "Global Supervised / Auto-accept edits / Full access mode, default Full access. Per-mode allowlist persists. Not a sandbox; extension unavailable is visible and cannot be portrayed as enforced protection.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C17.error",
+          "dimension": "error",
+          "action": "Delay, reject, cancel or disconnect the fixture RPC operation; send a late event for the previous request/session.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Global Supervised / Auto-accept edits / Full access mode, default Full access. Per-mode allowlist persists. Not a sandbox; extension unavailable is visible and cannot be portrayed as enforced protection.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C17.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C17.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C17.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C17.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/pirpc",
+        "internal/agent"
+      ],
+      "existing_test_candidates": [
+        "internal/pirpc/client_test.go",
+        "internal/agent/manager_test.go",
+        "internal/agent/reducer_test.go"
+      ],
+      "inventory_evidence": "../parity/chat.json",
+      "source_test_inventory": "T10,T11",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-C11",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "failed_missing_cases",
+          "steps": [
+            "Exercise select/confirm/input/editor and custom ANSI render.",
+            "Exercise Allow once/Always/Deny guard, Plan/Build/Ask and multi-question ask_user_question.",
+            "Set/replace/clear widgets and editor text."
+          ],
+          "expected": "Exact IDs/response types, scoped keys, no fake unsupported capability and source specialized panels.",
+          "tests": [
+            "TestCustomDialogDoesNotDismissEscape",
+            "TestLiveCustomDialogForwardsEscape"
+          ],
+          "remaining": "General modal and ANSI custom bridge exist. Structured questionnaire, specialized inline approval/replay, widget placement and unavailable workflow/access presentation are not fully wired. No full extension parity claim.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": []
+    },
+    {
+      "id": "C18",
+      "title": "Plan/Build/Ask workflow",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/composer_ops.rs",
+          "handler": "set_workflow_mode",
+          "line": 891,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/composer_ops.rs#L891",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Composer mode chip, keyboard picker and palette action; Plan/Ask scope mutation tools and shell access, Build restores only workflow-removed tools.",
+      "baseline_edge_state": "Per-session workflow.json is read live by extension and custom entries record mode; prune deleted-session keys. Default Build. This is extension policy, not OS isolation.",
+      "fixture": "Isolated HOME, deterministic fixture Pi RPC stream, long transcript/Unicode/image fixtures and no live provider inference.",
+      "steps": [
+        {
+          "id": "C18.behavior",
+          "dimension": "functional",
+          "action": "Switch Plan, Build and Ask modes; start and continue a turn in each; inspect resulting extension state.",
+          "expected": "Composer mode chip, keyboard picker and palette action; Plan/Ask scope mutation tools and shell access, Build restores only workflow-removed tools.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C18.edge",
+          "dimension": "edge",
+          "action": "Reject unsupported protocol capability honestly; cancellation and mode changes must not silently broaden execution permission.",
+          "expected": "Per-session workflow.json is read live by extension and custom entries record mode; prune deleted-session keys. Default Build. This is extension policy, not OS isolation.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C18.error",
+          "dimension": "error",
+          "action": "Delay, reject, cancel or disconnect the fixture RPC operation; send a late event for the previous request/session.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Per-session workflow.json is read live by extension and custom entries record mode; prune deleted-session keys. Default Build. This is extension policy, not OS isolation.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C18.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C18.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C18.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C18.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/pirpc",
+        "internal/agent"
+      ],
+      "existing_test_candidates": [
+        "internal/pirpc/client_test.go",
+        "internal/agent/manager_test.go",
+        "internal/agent/reducer_test.go"
+      ],
+      "inventory_evidence": "../parity/chat.json",
+      "source_test_inventory": "T11",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-C11",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "failed_missing_cases",
+          "steps": [
+            "Exercise select/confirm/input/editor and custom ANSI render.",
+            "Exercise Allow once/Always/Deny guard, Plan/Build/Ask and multi-question ask_user_question.",
+            "Set/replace/clear widgets and editor text."
+          ],
+          "expected": "Exact IDs/response types, scoped keys, no fake unsupported capability and source specialized panels.",
+          "tests": [
+            "TestCustomDialogDoesNotDismissEscape",
+            "TestLiveCustomDialogForwardsEscape"
+          ],
+          "remaining": "General modal and ANSI custom bridge exist. Structured questionnaire, specialized inline approval/replay, widget placement and unavailable workflow/access presentation are not fully wired. No full extension parity claim.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": []
+    },
+    {
+      "id": "C19",
+      "title": "Structured ask questionnaire",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/ask.rs",
+          "handler": "AskPrompt",
+          "line": 70,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/ask.rs#L70",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/ask.rs",
+          "handler": "AskReplayState",
+          "line": 140,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/ask.rs#L140",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "handler": "ask_panel",
+          "line": 3982,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/view.rs#L3982",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "handler": "render_ask_card",
+          "line": 2928,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/transcript_view.rs#L2928",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "ask_user_question inline panel supports multiple questions, single/multi select, custom text, previews, previous/next, final submit and cancel; finished transcript question card.",
+      "baseline_edge_state": "Buffer answers locally until whole questionnaire commits, then replay extension select/input requests; retain prior answer when navigating back; reject unexpected replay sequences.",
+      "fixture": "Isolated HOME, deterministic fixture Pi RPC stream, long transcript/Unicode/image fixtures and no live provider inference.",
+      "steps": [
+        {
+          "id": "C19.behavior",
+          "dimension": "functional",
+          "action": "Present a structured questionnaire with single, multiple and freeform answers; navigate and submit.",
+          "expected": "ask_user_question inline panel supports multiple questions, single/multi select, custom text, previews, previous/next, final submit and cancel; finished transcript question card.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C19.edge",
+          "dimension": "edge",
+          "action": "Test required unanswered question, Other, back, cancellation and stale request replacement; preserve exact answer structure.",
+          "expected": "Buffer answers locally until whole questionnaire commits, then replay extension select/input requests; retain prior answer when navigating back; reject unexpected replay sequences.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C19.error",
+          "dimension": "error",
+          "action": "Delay, reject, cancel or disconnect the fixture RPC operation; send a late event for the previous request/session.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Buffer answers locally until whole questionnaire commits, then replay extension select/input requests; retain prior answer when navigating back; reject unexpected replay sequences.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C19.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C19.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C19.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C19.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/pirpc",
+        "internal/agent"
+      ],
+      "existing_test_candidates": [
+        "internal/pirpc/client_test.go",
+        "internal/agent/manager_test.go",
+        "internal/agent/reducer_test.go"
+      ],
+      "inventory_evidence": "../parity/chat.json",
+      "source_test_inventory": "T10",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Transport/state support is not proof of image drag/paste, structured asks or custom UI/widget rendering parity.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-C11",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "failed_missing_cases",
+          "steps": [
+            "Exercise select/confirm/input/editor and custom ANSI render.",
+            "Exercise Allow once/Always/Deny guard, Plan/Build/Ask and multi-question ask_user_question.",
+            "Set/replace/clear widgets and editor text."
+          ],
+          "expected": "Exact IDs/response types, scoped keys, no fake unsupported capability and source specialized panels.",
+          "tests": [
+            "TestCustomDialogDoesNotDismissEscape",
+            "TestLiveCustomDialogForwardsEscape"
+          ],
+          "remaining": "General modal and ANSI custom bridge exist. Structured questionnaire, specialized inline approval/replay, widget placement and unavailable workflow/access presentation are not fully wired. No full extension parity claim.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": []
+    },
+    {
+      "id": "C20",
+      "title": "Extension widgets and custom UI",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/dialogs.rs",
+          "handler": "apply_extension_widget",
+          "line": 76,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/dialogs.rs#L76",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/dialogs.rs",
+          "handler": "apply_custom_frame",
+          "line": 114,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/dialogs.rs#L114",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "setWidget styled ANSI/SGR text above/below composer; replace/clear by key; custom open/render/close stack with monospace terminal frames, cursor, input and resize notifications. notify toast, setStatus line, set_editor_text composer.",
+      "baseline_edge_state": "Custom UI is capability/patch-dependent; advertises 96×20 viewport, scrolls oversized content. Legacy keyboard encoder only; Kitty mode metadata is recorded but not fully implemented. setTitle and widget component factories have no equivalent.",
+      "fixture": "Isolated HOME, deterministic fixture Pi RPC stream, long transcript/Unicode/image fixtures and no live provider inference.",
+      "steps": [
+        {
+          "id": "C20.behavior",
+          "dimension": "functional",
+          "action": "Emit extension notification, status, widget and custom UI events at all source placements.",
+          "expected": "setWidget styled ANSI/SGR text above/below composer; replace/clear by key; custom open/render/close stack with monospace terminal frames, cursor, input and resize notifications. notify toast, setStatus line, set_editor_text composer.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C20.edge",
+          "dimension": "edge",
+          "action": "Replace/remove keyed widgets, emit unsupported UI payloads and end a session; do not keep stale cross-session content.",
+          "expected": "Custom UI is capability/patch-dependent; advertises 96×20 viewport, scrolls oversized content. Legacy keyboard encoder only; Kitty mode metadata is recorded but not fully implemented. setTitle and widget component factories have no equivalent.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C20.error",
+          "dimension": "error",
+          "action": "Delay, reject, cancel or disconnect the fixture RPC operation; send a late event for the previous request/session.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Custom UI is capability/patch-dependent; advertises 96×20 viewport, scrolls oversized content. Legacy keyboard encoder only; Kitty mode metadata is recorded but not fully implemented. setTitle and widget component factories have no equivalent.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C20.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C20.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C20.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C20.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/pirpc",
+        "internal/agent"
+      ],
+      "existing_test_candidates": [
+        "internal/pirpc/client_test.go",
+        "internal/agent/manager_test.go",
+        "internal/agent/reducer_test.go"
+      ],
+      "inventory_evidence": "../parity/chat.json",
+      "source_test_inventory": "T10",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Transport/state support is not proof of image drag/paste, structured asks or custom UI/widget rendering parity.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-S04",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "pass_scoped",
+          "steps": [
+            "Open confirm, prompt, custom terminal, secret, image, model or palette.",
+            "Dispatch New task/Settings/Terminal through native menu.",
+            "For custom UI press Escape, then explicit Cancel."
+          ],
+          "expected": "No action mutates behind modal. Custom Escape sends ESC to Pi rather than dismissing; explicit Cancel cancels.",
+          "tests": [
+            "TestNativeMenuCannotMutateBehindModal",
+            "TestCustomDialogDoesNotDismissEscape",
+            "TestLiveCustomDialogForwardsEscape"
+          ],
+          "remaining": "Live custom test requires ORBIT_TERMINAL_TEST and pinned Ghostty; it was run previously. Ordinary default suite skips opt-in test. OS-native menu entry/accelerator dispatch remains separate.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        },
+        {
+          "id": "UI-C11",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "failed_missing_cases",
+          "steps": [
+            "Exercise select/confirm/input/editor and custom ANSI render.",
+            "Exercise Allow once/Always/Deny guard, Plan/Build/Ask and multi-question ask_user_question.",
+            "Set/replace/clear widgets and editor text."
+          ],
+          "expected": "Exact IDs/response types, scoped keys, no fake unsupported capability and source specialized panels.",
+          "tests": [
+            "TestCustomDialogDoesNotDismissEscape",
+            "TestLiveCustomDialogForwardsEscape"
+          ],
+          "remaining": "General modal and ANSI custom bridge exist. Structured questionnaire, specialized inline approval/replay, widget placement and unavailable workflow/access presentation are not fully wired. No full extension parity claim.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": []
+    }
+  ]
+}

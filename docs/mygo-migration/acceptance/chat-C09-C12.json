@@ -1,0 +1,625 @@
+{
+  "schema": "orbit-acceptance-shard/v1",
+  "category": "chat",
+  "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "rows": [
+    {
+      "id": "C09",
+      "title": "Rich transcript text and code",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "handler": "parse_blocks",
+          "line": 5839,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/transcript_view.rs#L5839",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "handler": "parse_inline",
+          "line": 5201,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/transcript_view.rs#L5201",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "handler": "render_block",
+          "line": 6177,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/transcript_view.rs#L6177",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "handler": "render_code_block",
+          "line": 6537,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/transcript_view.rs#L6537",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Headings, paragraphs, emphasis/strike/inline code, links/autolinks, quote/alerts, ordered/unordered/task lists, tables, code fences and paint-only syntax highlighting; copy code and whole response.",
+      "baseline_edge_state": "Mermaid remains explicitly labelled copyable source, not diagram rendering. Markdown images have loading/fallback and URL normalization. Lists/tables need identical wrapping/column constraints.",
+      "fixture": "Isolated HOME, deterministic fixture Pi RPC stream, long transcript/Unicode/image fixtures and no live provider inference.",
+      "steps": [
+        {
+          "id": "C09.behavior",
+          "dimension": "functional",
+          "action": "Render nested Markdown, tables, links, code fences in all supported languages and streaming incomplete fences.",
+          "expected": "Headings, paragraphs, emphasis/strike/inline code, links/autolinks, quote/alerts, ordered/unordered/task lists, tables, code fences and paint-only syntax highlighting; copy code and whole response.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C09.edge",
+          "dimension": "edge",
+          "action": "Grow a code block one Unicode prefix at a time; highlighting must alter paint only, not text width, wrapping or scroll anchors.",
+          "expected": "Mermaid remains explicitly labelled copyable source, not diagram rendering. Markdown images have loading/fallback and URL normalization. Lists/tables need identical wrapping/column constraints.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C09.error",
+          "dimension": "error",
+          "action": "Delay, reject, cancel or disconnect the fixture RPC operation; send a late event for the previous request/session.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Mermaid remains explicitly labelled copyable source, not diagram rendering. Markdown images have loading/fallback and URL normalization. Lists/tables need identical wrapping/column constraints.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C09.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C09.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C09.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C09.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/ui",
+        "cmd/orbit/main.go"
+      ],
+      "existing_test_candidates": [
+        "internal/ui/snapshot_test.go",
+        "internal/ui/workspace_review_regression_test.go",
+        "internal/ui/viewer_parity_test.go"
+      ],
+      "inventory_evidence": "../parity/chat.json",
+      "source_test_inventory": "T08",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-C07",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "partial",
+          "steps": [
+            "Render alerts, tables, lists, fenced code, links, images and malformed streamed fences.",
+            "Resize with code wrapping.",
+            "Change light/dark theme."
+          ],
+          "expected": "Source semantic Markdown and color-only syntax with stable font metrics.",
+          "tests": [
+            "TestMarkdownAlertAndGeometry"
+          ],
+          "remaining": "GFM alert/geometry sample passes; highlight tokenizer has1204 source-oracle cases. Whole source markdown corpus, per-message media/actions and exact spacing remain unverified.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": []
+    },
+    {
+      "id": "C10",
+      "title": "Transcript selection and context menu",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "handler": "TextSelection",
+          "line": 302,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/transcript_view.rs#L302",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "handler": "text_selection_menu",
+          "line": 912,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/transcript_view.rs#L912",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript.rs",
+          "handler": "selected_text",
+          "line": 1076,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/transcript.rs#L1076",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript.rs",
+          "handler": "mark_copied",
+          "line": 2271,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/transcript.rs#L2271",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Selectable text across rendered blocks, drag selection, copy feedback, right-click text menu, clickable links and image lightbox. Primary+Shift+C copies newest assistant response.",
+      "baseline_edge_state": "UTF-8/grapheme boundaries, virtualized visible blocks and selection registration must remain sound; copy control success feedback expires.",
+      "fixture": "Isolated HOME, deterministic fixture Pi RPC stream, long transcript/Unicode/image fixtures and no live provider inference.",
+      "steps": [
+        {
+          "id": "C10.behavior",
+          "dimension": "functional",
+          "action": "Select across transcript rows; copy through keyboard and context menu; invoke available row actions.",
+          "expected": "Selectable text across rendered blocks, drag selection, copy feedback, right-click text menu, clickable links and image lightbox. Primary+Shift+C copies newest assistant response.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C10.edge",
+          "dimension": "edge",
+          "action": "Right-click a link, code block and tool row near viewport edges; preserve exact copied text and no unintended agent action.",
+          "expected": "UTF-8/grapheme boundaries, virtualized visible blocks and selection registration must remain sound; copy control success feedback expires.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C10.error",
+          "dimension": "error",
+          "action": "Delay, reject, cancel or disconnect the fixture RPC operation; send a late event for the previous request/session.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: UTF-8/grapheme boundaries, virtualized visible blocks and selection registration must remain sound; copy control success feedback expires.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C10.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C10.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C10.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C10.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/ui",
+        "cmd/orbit/main.go"
+      ],
+      "existing_test_candidates": [
+        "internal/ui/snapshot_test.go",
+        "internal/ui/workspace_review_regression_test.go",
+        "internal/ui/viewer_parity_test.go"
+      ],
+      "inventory_evidence": "../parity/chat.json",
+      "source_test_inventory": "T08",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-C08",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "failed_missing_implementation",
+          "steps": [
+            "Select across multiple Markdown blocks/messages.",
+            "Open Bash/read/edit/write/search tool cards and errors.",
+            "Inspect finished turn duration/tokens/cost."
+          ],
+          "expected": "Source structured tool presentation, cross-block selection, context menu and turn metrics.",
+          "tests": [],
+          "remaining": "Host has selectable individual text/Markdown, generic collapsible tool output and copy response. Source typed tool cards, full cross-message selection/context menu and detailed turn summaries are incomplete.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": []
+    },
+    {
+      "id": "C11",
+      "title": "Thinking/tool activity and details",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "handler": "render_activity_group",
+          "line": 2387,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/transcript_view.rs#L2387",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "handler": "render_tool_detail",
+          "line": 3551,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/transcript_view.rs#L3551",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "handler": "render_tool_error_strip",
+          "line": 3512,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/transcript_view.rs#L3512",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "handler": "build_edit_diff",
+          "line": 3973,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/transcript_view.rs#L3973",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Fold activity chains; live thinking scroll/tail; distinct tool icons/action preview, invocation arguments/result, error/truncation badges, code body, file edit inline diff and changed-file links.",
+      "baseline_edge_state": "Tool output caps and truncated indicator preserve honesty; read/write/edit/bash/search/web/MCP and unknown/custom tool paths have meaningful fallbacks; errors remain visible after turn settles.",
+      "fixture": "Isolated HOME, deterministic fixture Pi RPC stream, long transcript/Unicode/image fixtures and no live provider inference.",
+      "steps": [
+        {
+          "id": "C11.behavior",
+          "dimension": "functional",
+          "action": "Stream thinking and tool start/update/end/error events; expand/collapse raw details and nested content.",
+          "expected": "Fold activity chains; live thinking scroll/tail; distinct tool icons/action preview, invocation arguments/result, error/truncation badges, code body, file edit inline diff and changed-file links.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C11.edge",
+          "dimension": "edge",
+          "action": "Show missing tool results, large output and interrupted tools honestly; switching rows must not reuse another tool's detail.",
+          "expected": "Tool output caps and truncated indicator preserve honesty; read/write/edit/bash/search/web/MCP and unknown/custom tool paths have meaningful fallbacks; errors remain visible after turn settles.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C11.error",
+          "dimension": "error",
+          "action": "Delay, reject, cancel or disconnect the fixture RPC operation; send a late event for the previous request/session.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Tool output caps and truncated indicator preserve honesty; read/write/edit/bash/search/web/MCP and unknown/custom tool paths have meaningful fallbacks; errors remain visible after turn settles.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C11.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C11.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C11.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C11.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/ui",
+        "cmd/orbit/main.go"
+      ],
+      "existing_test_candidates": [
+        "internal/ui/snapshot_test.go",
+        "internal/ui/workspace_review_regression_test.go",
+        "internal/ui/viewer_parity_test.go"
+      ],
+      "inventory_evidence": "../parity/chat.json",
+      "source_test_inventory": "T08",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-C08",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "failed_missing_implementation",
+          "steps": [
+            "Select across multiple Markdown blocks/messages.",
+            "Open Bash/read/edit/write/search tool cards and errors.",
+            "Inspect finished turn duration/tokens/cost."
+          ],
+          "expected": "Source structured tool presentation, cross-block selection, context menu and turn metrics.",
+          "tests": [],
+          "remaining": "Host has selectable individual text/Markdown, generic collapsible tool output and copy response. Source typed tool cards, full cross-message selection/context menu and detailed turn summaries are incomplete.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": []
+    },
+    {
+      "id": "C12",
+      "title": "Turn summaries and metrics",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "handler": "render_working_indicator",
+          "line": 4820,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/transcript_view.rs#L4820",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "handler": "render_message_footer",
+          "line": 4369,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/transcript_view.rs#L4369",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "handler": "render_summary_card",
+          "line": 1811,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/transcript_view.rs#L1811",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "handler": "render_changed_files",
+          "line": 7053,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/transcript_view.rs#L7053",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Working elapsed time, output rate, usage footer/breakdown, added/removed counts, final changed-files summary card and summary click-through to review.",
+      "baseline_edge_state": "Distinguish estimated/live rates from final provider usage, stopped from failed; avoid showing generated metrics when source does not supply them.",
+      "fixture": "Isolated HOME, deterministic fixture Pi RPC stream, long transcript/Unicode/image fixtures and no live provider inference.",
+      "steps": [
+        {
+          "id": "C12.behavior",
+          "dimension": "functional",
+          "action": "Complete turns with usage, latency and file changes; inspect per-turn summary and open its Review target.",
+          "expected": "Working elapsed time, output rate, usage footer/breakdown, added/removed counts, final changed-files summary card and summary click-through to review.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C12.edge",
+          "dimension": "edge",
+          "action": "Return absent usage or failed checkpoints; do not invent cost, diff or elapsed values; resumed sessions retain turn attribution.",
+          "expected": "Distinguish estimated/live rates from final provider usage, stopped from failed; avoid showing generated metrics when source does not supply them.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C12.error",
+          "dimension": "error",
+          "action": "Delay, reject, cancel or disconnect the fixture RPC operation; send a late event for the previous request/session.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Distinguish estimated/live rates from final provider usage, stopped from failed; avoid showing generated metrics when source does not supply them.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C12.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C12.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C12.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C12.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/ui",
+        "cmd/orbit/main.go"
+      ],
+      "existing_test_candidates": [
+        "internal/ui/snapshot_test.go",
+        "internal/ui/workspace_review_regression_test.go",
+        "internal/ui/viewer_parity_test.go"
+      ],
+      "inventory_evidence": "../parity/chat.json",
+      "source_test_inventory": "T08",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-C08",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "failed_missing_implementation",
+          "steps": [
+            "Select across multiple Markdown blocks/messages.",
+            "Open Bash/read/edit/write/search tool cards and errors.",
+            "Inspect finished turn duration/tokens/cost."
+          ],
+          "expected": "Source structured tool presentation, cross-block selection, context menu and turn metrics.",
+          "tests": [],
+          "remaining": "Host has selectable individual text/Markdown, generic collapsible tool output and copy response. Source typed tool cards, full cross-message selection/context menu and detailed turn summaries are incomplete.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": []
+    }
+  ]
+}

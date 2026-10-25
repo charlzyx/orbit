@@ -1,0 +1,174 @@
+{
+  "schema": "orbit-acceptance-shard/v1",
+  "category": "files",
+  "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "rows": [
+    {
+      "id": "W60",
+      "title": "Markdown rendered preview/source toggle uses live edited buffer; image preview for PNG/JPEG/GIF/WebP/BMP/TIFF/SVG; code/text read-only fallback for lossy/truncated content; binary/too-large/read-error honest states. Toolbar shows relative path, byte size/lines/truncation/save status.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/explorer/viewer.rs",
+          "handler": "Mode",
+          "line": 52,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/explorer/viewer.rs#L52",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/explorer/viewer.rs",
+          "handler": "FileContent::editable",
+          "line": 91,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/explorer/viewer.rs#L91",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/explorer/viewer.rs",
+          "handler": "load",
+          "line": 122,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/explorer/viewer.rs#L122",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/explorer/viewer.rs",
+          "handler": "is_image",
+          "line": 234,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/explorer/viewer.rs#L234",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Markdown rendered preview/source toggle uses live edited buffer; image preview for PNG/JPEG/GIF/WebP/BMP/TIFF/SVG; code/text read-only fallback for lossy/truncated content; binary/too-large/read-error honest states. Toolbar shows relative path, byte size/lines/truncation/save status.",
+      "baseline_edge_state": "2 MiB file cap before read (including images); 200,000-line cap; NUL sniff first 8,000 bytes; invalid UTF-8 decoded lossily but never editable. Image format guard does not imply ICO/AVIF decode support.",
+      "fixture": "Temporary directory with Unicode/binary/images/large files, nested ignores, editable documents and controllable I/O/watch callbacks.",
+      "steps": [
+        {
+          "id": "W60.behavior",
+          "dimension": "functional",
+          "action": "Toggle Markdown preview/source from live buffer and load all source image formats, binary and oversized files.",
+          "expected": "Markdown rendered preview/source toggle uses live edited buffer; image preview for PNG/JPEG/GIF/WebP/BMP/TIFF/SVG; code/text read-only fallback for lossy/truncated content; binary/too-large/read-error honest states. Toolbar shows relative path, byte size/lines/truncation/save status.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W60.edge",
+          "dimension": "edge",
+          "action": "Use invalid UTF-8, truncated/unreadable file and missing image decoder; read-only fallback must stay bounded and never save truncated text.",
+          "expected": "2 MiB file cap before read (including images); 200,000-line cap; NUL sniff first 8,000 bytes; invalid UTF-8 decoded lossily but never editable. Image format guard does not imply ICO/AVIF decode support.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W60.error",
+          "dimension": "error",
+          "action": "Fail read/save/rename/delete in the temporary root, then deliver an external watch event or late file load.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: 2 MiB file cap before read (including images); 200,000-line cap; NUL sniff first 8,000 bytes; invalid UTF-8 decoded lossily but never editable. Image format guard does not imply ICO/AVIF decode support.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W60.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W60.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W60.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W60.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/workspace/files.go",
+        "internal/workspace/editor.go",
+        "internal/workspace/tree.go",
+        "internal/workspace/watch.go",
+        "internal/ui/files.go"
+      ],
+      "existing_test_candidates": [
+        "internal/workspace/files_test.go",
+        "internal/workspace/tree_test.go",
+        "internal/workspace/watch_test.go"
+      ],
+      "inventory_evidence": "../parity/files.json",
+      "source_test_inventory": "`explorer/viewer.rs::{loads_code_with_tokens_and_drops_the_trailing_blank_line,detects_markdown,detects_binary_from_a_nul_byte,oversized_files_are_not_read,invalid_utf8_is_decoded_lossily_not_rejected,directories_report_an_error_instead_of_panicking,image_extensions_are_recognized,truncated_and_lossy_content_is_not_editable}`",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Named narrow assertions pass; remaining row steps are unverified.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3"
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [
+        {
+          "id": "W60.assert.TestFileLoadingModesAndGuards",
+          "status": "PASS",
+          "expected": "Text/image/binary/loading guards use actual file content and bounds.",
+          "test": "TestFileLoadingModesAndGuards",
+          "package": "github.com/charlzyx/orbit/internal/workspace",
+          "command": "go test -race -count=1 ./internal/workspace -run ^TestFileLoadingModesAndGuards$",
+          "evidence": "workspace-evidence.json",
+          "last_verified_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:01:15.656767899+09:00",
+          "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
+        },
+        {
+          "id": "W60.assert.TestEditorReadonly",
+          "status": "PASS",
+          "expected": "Read-only documents reject edits and saves.",
+          "test": "TestEditorReadonly",
+          "package": "github.com/charlzyx/orbit/internal/workspace",
+          "command": "go test -race -count=1 ./internal/workspace -run ^TestEditorReadonly$",
+          "evidence": "workspace-evidence.json",
+          "last_verified_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:01:15.689609776+09:00",
+          "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
+        }
+      ],
+      "known_remaining": "File/ignore/editor/autosave/read-only/failure tests pass; native explorer/editor keyboard and visual acceptance remain pending.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    }
+  ]
+}

@@ -1,0 +1,145 @@
+{
+  "schema": "orbit-acceptance-shard/v1",
+  "category": "review",
+  "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "rows": [
+    {
+      "id": "W39",
+      "title": "Review loading starts immediately, stale invalidation reloads when visible, generation rejects older source requests, manual refresh feedback minimum 650 ms, source-specific empty/error states.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "load_review",
+          "line": 582,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L582",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "mark_review_stale",
+          "line": 515,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L515",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "set_source",
+          "line": 786,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L786",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "clear_diff",
+          "line": 800,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L800",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Review loading starts immediately, stale invalidation reloads when visible, generation rejects older source requests, manual refresh feedback minimum 650 ms, source-specific empty/error states.",
+      "baseline_edge_state": "On an error after an existing snapshot, code keeps previous snapshot and only sets `review_error` if no snapshot exists. Selection/scroll and collapses are refreshed per mode. This cached-error behavior is source truth, not proof fresh content is shown.",
+      "fixture": "Temporary Git repository with differing HEAD/index/worktree/branch/turn snapshots, Unicode/quoted paths and complete/compact/binary patches.",
+      "steps": [
+        {
+          "id": "W39.behavior",
+          "dimension": "functional",
+          "action": "Open a Review source without cached data; manually refresh a loaded source; then change to another source while the first load is delayed.",
+          "expected": "Loading begins immediately; a source change resets unrelated snapshot. Completion for the obsolete generation cannot replace the selected source.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W39.edge",
+          "dimension": "edge",
+          "action": "Keep same-source snapshot on refresh error, show first-load error honestly and maintain minimum source refresh feedback timing.",
+          "expected": "On an error after an existing snapshot, code keeps previous snapshot and only sets `review_error` if no snapshot exists. Selection/scroll and collapses are refreshed per mode. This cached-error behavior is source truth, not proof fresh content is shown.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W39.error",
+          "dimension": "error",
+          "action": "Fail first Review collection; then load successfully and fail refreshing that same source.",
+          "expected": "First load shows unavailable/error rather than an empty-success diff. Same-source refresh preserves the previous snapshot with a visible error; failure is not cleared merely by navigating back.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W39.loading",
+          "dimension": "loading",
+          "action": "Complete a manually requested refresh in less than50ms using a controlled collector and clock; inspect refresh feedback at100ms,649ms and650ms.",
+          "expected": "Source refresh_from_button feedback remains active for at least650ms even when Git finishes immediately. A slow request stays loading until its actual completion; the time floor is not a fake completion delay for content.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W39.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W39.keyboard",
+          "dimension": "keyboard",
+          "action": "Focus Review and press Escape during load, then reopen and invoke the registered Refresh action.",
+          "expected": "Escape follows Review cancellation/focus behavior rather than sending agent abort. Refresh reloads the current source and keeps its source/ref/path selection.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W39.repeat",
+          "dimension": "repeat",
+          "action": "Queue sourceA, sourceB and sourceC refreshes; release callbacks in C,A,B order while also switching workspace.",
+          "expected": "Only current generation/workspace/session/source/ref/path can apply. If a pending request was deferred while loading, it runs once after stale completion rather than being lost.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/workspace/checkpoint.go",
+        "internal/workspace/review.go",
+        "internal/ui/review.go",
+        "internal/agent/manager.go"
+      ],
+      "existing_test_candidates": [
+        "internal/workspace/checkpoint_test.go",
+        "internal/workspace/review_test.go"
+      ],
+      "inventory_evidence": "../parity/review.json",
+      "source_test_inventory": "Review/parser/view tests above; no forced-async-race/error-preservation integration test located.",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Six-source immutable snapshots/checkpoint attribution/diff model tested; native review interaction/presentation parity remains pending. Dedicated native-controller stale source/session/workspace/hidden-toggle regressions pass under -race.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    }
+  ]
+}

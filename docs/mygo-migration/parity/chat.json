@@ -1,0 +1,1055 @@
+{
+  "category": "Composer, transcript and interactive agent surfaces",
+  "rows": [
+    {
+      "group": "Composer, transcript and interactive agent surfaces",
+      "id": "C01",
+      "feature": "Native multiline text editing",
+      "interaction_contract": "Wrapping/auto-grow/scroll; grapheme-aware caret/selection, word/line/document movement, copy/cut/paste/select-all, undo/redo and IME composition. Shift+Enter inserts newline.",
+      "state_failure_platform": "IME candidate Enter must never submit; focused surface gates submission. Same input primitive is reused for editor, search and modal fields but key context differs.",
+      "sources": [
+        "crates/orbit-pi/src/composer.rs::ComposerInput",
+        "crates/orbit-pi/src/main.rs::bind_keys",
+        "crates/orbit-pi/src/app/session.rs::submit_composer_as"
+      ],
+      "tests": "T04",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/composer.rs",
+          "symbol": "ComposerInput",
+          "line": 55
+        },
+        {
+          "path": "crates/orbit-pi/src/main.rs",
+          "symbol": "bind_keys",
+          "line": 357
+        },
+        {
+          "path": "crates/orbit-pi/src/app/session.rs",
+          "symbol": "submit_composer_as",
+          "line": 88
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G8",
+        "paths": [
+          "internal/ui",
+          "cmd/orbit/main.go"
+        ],
+        "tests": [
+          "internal/ui/snapshot_test.go",
+          "internal/ui/workspace_review_regression_test.go",
+          "internal/ui/viewer_parity_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Composer, transcript and interactive agent surfaces",
+      "id": "C02",
+      "feature": "Prompt, steer and follow-up policy",
+      "interaction_contract": "Idle send starts prompt. While working, Enter uses configurable Follow-up/Steer mode, Alt+Enter its opposite, Primary+Shift+Enter explicitly steers; hints and button labels follow preference.",
+      "state_failure_platform": "UI enters busy/awaiting immediately before first agent event; clear input only after send succeeds; failed send retains text and attachments. Empty text is not sent.",
+      "sources": [
+        "crates/orbit-pi/src/composer_send.rs::SendMode",
+        "crates/orbit-pi/src/app/session.rs::submit_as",
+        "crates/orbit-pi/src/theme.rs::UiPrefs"
+      ],
+      "tests": "T04,T06",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/composer_send.rs",
+          "symbol": "SendMode",
+          "line": 10
+        },
+        {
+          "path": "crates/orbit-pi/src/app/session.rs",
+          "symbol": "submit_as",
+          "line": 129
+        },
+        {
+          "path": "crates/orbit-pi/src/theme.rs",
+          "symbol": "UiPrefs",
+          "line": 324
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G5",
+        "paths": [
+          "internal/pirpc",
+          "internal/agent"
+        ],
+        "tests": [
+          "internal/pirpc/client_test.go",
+          "internal/agent/manager_test.go",
+          "internal/agent/reducer_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Composer, transcript and interactive agent surfaces",
+      "id": "C03",
+      "feature": "Queue visualization and delivery",
+      "interaction_contract": "Pending steering/follow-up queue appears above composer, offers clear_queue; set_follow_up_mode supports one-at-a-time/all delivery.",
+      "state_failure_platform": "Optimistic queue display reconciles with queue_update; parked sessions maintain queue. Input not rendered as delivered until runtime actually delivers it.",
+      "sources": [
+        "crates/orbit-pi/src/app/view.rs::queue_bar",
+        "crates/orbit-pi/src/app/view.rs::on_clear_queue",
+        "crates/orbit-pi/src/app/events.rs",
+        "crates/orbit-pi/src/app/session.rs::reset_queue",
+        "crates/orbit-pi/src/app/settings.rs::set_follow_up_mode"
+      ],
+      "tests": "T04,T06",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "symbol": "queue_bar",
+          "line": 4532
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "symbol": "on_clear_queue",
+          "line": 4719
+        },
+        {
+          "path": "crates/orbit-pi/src/app/events.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/session.rs",
+          "symbol": "reset_queue",
+          "line": 284
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "set_follow_up_mode",
+          "line": 5580
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G5",
+        "paths": [
+          "internal/pirpc",
+          "internal/agent"
+        ],
+        "tests": [
+          "internal/pirpc/client_test.go",
+          "internal/agent/manager_test.go",
+          "internal/agent/reducer_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Composer, transcript and interactive agent surfaces",
+      "id": "C04",
+      "feature": "Slash commands and file mentions",
+      "interaction_contract": "Slash command catalog from pi; @ file autocomplete, query highlighting and arrow/Tab/Enter acceptance; + menu Attach image / Attach file / Mention file.",
+      "state_failure_platform": "Autocomplete list capped at eight rows; path discovery is background/git-aware. Accepting completion takes precedence over prompt send. Attach file inserts a mention, not arbitrary contents upload.",
+      "sources": [
+        "crates/orbit-pi/src/app/composer_ops.rs::autocomplete_entries",
+        "crates/orbit-pi/src/app/composer_ops.rs::commit_entry",
+        "crates/orbit-pi/src/app/composer_ops.rs::attach_file",
+        "crates/orbit-pi/src/mentions.rs"
+      ],
+      "tests": "T04",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/app/composer_ops.rs",
+          "symbol": "autocomplete_entries",
+          "line": 9
+        },
+        {
+          "path": "crates/orbit-pi/src/app/composer_ops.rs",
+          "symbol": "commit_entry",
+          "line": 113
+        },
+        {
+          "path": "crates/orbit-pi/src/app/composer_ops.rs",
+          "symbol": "attach_file",
+          "line": 471
+        },
+        {
+          "path": "crates/orbit-pi/src/mentions.rs"
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G8",
+        "paths": [
+          "internal/ui",
+          "cmd/orbit/main.go"
+        ],
+        "tests": [
+          "internal/ui/snapshot_test.go",
+          "internal/ui/workspace_review_regression_test.go",
+          "internal/ui/viewer_parity_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Composer, transcript and interactive agent surfaces",
+      "id": "C05",
+      "feature": "Image attachments and drag/paste",
+      "interaction_contract": "Async native picker, external file drop, clipboard image paste, removable previews/chips, attached image lightbox; images travel with prompt/follow_up/steer.",
+      "state_failure_platform": "Maximum eight images. PNG/JPEG compression targets 1400 px and 512 KiB base64, transparency uses WebP; caps are best effort, GIF/SVG/TIFF pass through unchanged. Source/decoding failures must not crash.",
+      "sources": [
+        "crates/orbit-pi/src/app/composer_ops.rs::attach_image",
+        "crates/orbit-pi/src/app/composer_ops.rs::on_file_drop",
+        "crates/orbit-pi/src/app/events.rs::drain_pasted_images",
+        "crates/orbit-pi/src/attachments.rs::compress_image",
+        "crates/orbit-pi/src/app/view.rs::lightbox_layer"
+      ],
+      "tests": "T04",
+      "baseline_status": "source_present",
+      "migration_status": "partial_backend_ui_gaps",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/app/composer_ops.rs",
+          "symbol": "attach_image",
+          "line": 435
+        },
+        {
+          "path": "crates/orbit-pi/src/app/composer_ops.rs",
+          "symbol": "on_file_drop",
+          "line": 405
+        },
+        {
+          "path": "crates/orbit-pi/src/app/events.rs",
+          "symbol": "drain_pasted_images",
+          "line": 1108
+        },
+        {
+          "path": "crates/orbit-pi/src/attachments.rs",
+          "symbol": "compress_image",
+          "line": 55
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "symbol": "lightbox_layer",
+          "line": 4733
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G8",
+        "paths": [
+          "internal/ui",
+          "cmd/orbit/main.go"
+        ],
+        "tests": [
+          "internal/ui/snapshot_test.go",
+          "internal/ui/workspace_review_regression_test.go",
+          "internal/ui/viewer_parity_test.go"
+        ],
+        "remaining": "Transport/state support is not proof of image drag/paste, structured asks or custom UI/widget rendering parity."
+      }
+    },
+    {
+      "group": "Composer, transcript and interactive agent surfaces",
+      "id": "C06",
+      "feature": "Model and thinking selectors",
+      "interaction_contract": "Searchable model picker with provider groups, current model, favorites and recent sections; provider scope, favorite toggle, metadata and keyboard scrolling. Reasoning levels are runtime-provided.",
+      "state_failure_platform": "No hardcoded available-model truth. Thinking picker hidden/disabled for empty or [off]-only levels. Favorites/recent stores survive restart and model provider/id form identity.",
+      "sources": [
+        "crates/orbit-pi/src/model_selector.rs::ModelSelector",
+        "crates/orbit-pi/src/model_selector_match.rs",
+        "crates/orbit-pi/src/app/pickers.rs::sync_model_selector",
+        "crates/orbit-pi/src/app/session.rs::can_choose_thinking",
+        "crates/orbit-pi/src/favorites.rs",
+        "crates/orbit-pi/src/recent_models.rs"
+      ],
+      "tests": "T07",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/model_selector.rs",
+          "symbol": "ModelSelector",
+          "line": 159
+        },
+        {
+          "path": "crates/orbit-pi/src/model_selector_match.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/pickers.rs",
+          "symbol": "sync_model_selector",
+          "line": 761
+        },
+        {
+          "path": "crates/orbit-pi/src/app/session.rs",
+          "symbol": "can_choose_thinking",
+          "line": 52
+        },
+        {
+          "path": "crates/orbit-pi/src/favorites.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/recent_models.rs"
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G5",
+        "paths": [
+          "internal/pirpc",
+          "internal/agent"
+        ],
+        "tests": [
+          "internal/pirpc/client_test.go",
+          "internal/agent/manager_test.go",
+          "internal/agent/reducer_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Composer, transcript and interactive agent surfaces",
+      "id": "C07",
+      "feature": "Stream reducer and snapshot equivalence",
+      "interaction_contract": "Snapshot get_messages and live text/thinking/tool events feed one transcript model; per-user-turn fold, tool-result association, custom messages and compaction summary cards.",
+      "state_failure_platform": "Recover partial/missing live events and process stop; unknown payloads do not panic. Avoid duplicate optimistic user messages when snapshot arrives.",
+      "sources": [
+        "crates/orbit-pi/src/transcript.rs::load_from",
+        "crates/orbit-pi/src/transcript.rs::apply_event",
+        "crates/orbit-pi/src/app/events.rs::apply_messages_snapshot"
+      ],
+      "tests": "T08",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/transcript.rs",
+          "symbol": "load_from",
+          "line": 1081
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript.rs",
+          "symbol": "apply_event",
+          "line": 1181
+        },
+        {
+          "path": "crates/orbit-pi/src/app/events.rs",
+          "symbol": "apply_messages_snapshot",
+          "line": 645
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G5",
+        "paths": [
+          "internal/pirpc",
+          "internal/agent"
+        ],
+        "tests": [
+          "internal/pirpc/client_test.go",
+          "internal/agent/manager_test.go",
+          "internal/agent/reducer_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Composer, transcript and interactive agent surfaces",
+      "id": "C08",
+      "feature": "Virtualized scrolling and navigation rail",
+      "interaction_contract": "Tail-follow while at bottom, scroll-away inspection, Jump to latest, previous/next user turn, clickable rail markers/hover previews and one-time rail hint.",
+      "state_failure_platform": "Streaming row remeasurement must keep stable scroll behavior. Rail hint dismissal persists; no full transcript rerender cost for every token.",
+      "sources": [
+        "crates/orbit-pi/src/message_scroller.rs",
+        "crates/orbit-pi/src/transcript.rs::jump_turn",
+        "crates/orbit-pi/src/transcript_view.rs::render_navigation_rail",
+        "crates/orbit-pi/src/transcript.rs::persist_hint"
+      ],
+      "tests": "T08",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/message_scroller.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript.rs",
+          "symbol": "jump_turn",
+          "line": 2278
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "symbol": "render_navigation_rail",
+          "line": 1396
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript.rs",
+          "symbol": "persist_hint",
+          "line": 877
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G8",
+        "paths": [
+          "internal/ui",
+          "cmd/orbit/main.go"
+        ],
+        "tests": [
+          "internal/ui/snapshot_test.go",
+          "internal/ui/workspace_review_regression_test.go",
+          "internal/ui/viewer_parity_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Composer, transcript and interactive agent surfaces",
+      "id": "C09",
+      "feature": "Rich transcript text and code",
+      "interaction_contract": "Headings, paragraphs, emphasis/strike/inline code, links/autolinks, quote/alerts, ordered/unordered/task lists, tables, code fences and paint-only syntax highlighting; copy code and whole response.",
+      "state_failure_platform": "Mermaid remains explicitly labelled copyable source, not diagram rendering. Markdown images have loading/fallback and URL normalization. Lists/tables need identical wrapping/column constraints.",
+      "sources": [
+        "crates/orbit-pi/src/transcript_view.rs::parse_blocks",
+        "crates/orbit-pi/src/transcript_view.rs::parse_inline",
+        "crates/orbit-pi/src/transcript_view.rs::render_block",
+        "crates/orbit-pi/src/transcript_view.rs::render_code_block",
+        "crates/orbit-pi/src/highlight.rs"
+      ],
+      "tests": "T08",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "symbol": "parse_blocks",
+          "line": 5839
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "symbol": "parse_inline",
+          "line": 5201
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "symbol": "render_block",
+          "line": 6177
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "symbol": "render_code_block",
+          "line": 6537
+        },
+        {
+          "path": "crates/orbit-pi/src/highlight.rs"
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G8",
+        "paths": [
+          "internal/ui",
+          "cmd/orbit/main.go"
+        ],
+        "tests": [
+          "internal/ui/snapshot_test.go",
+          "internal/ui/workspace_review_regression_test.go",
+          "internal/ui/viewer_parity_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Composer, transcript and interactive agent surfaces",
+      "id": "C10",
+      "feature": "Transcript selection and context menu",
+      "interaction_contract": "Selectable text across rendered blocks, drag selection, copy feedback, right-click text menu, clickable links and image lightbox. Primary+Shift+C copies newest assistant response.",
+      "state_failure_platform": "UTF-8/grapheme boundaries, virtualized visible blocks and selection registration must remain sound; copy control success feedback expires.",
+      "sources": [
+        "crates/orbit-pi/src/transcript_view.rs::TextSelection",
+        "crates/orbit-pi/src/transcript_view.rs::text_selection_menu",
+        "crates/orbit-pi/src/transcript.rs::selected_text",
+        "crates/orbit-pi/src/transcript.rs::mark_copied"
+      ],
+      "tests": "T08",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "symbol": "TextSelection",
+          "line": 302
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "symbol": "text_selection_menu",
+          "line": 912
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript.rs",
+          "symbol": "selected_text",
+          "line": 1076
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript.rs",
+          "symbol": "mark_copied",
+          "line": 2271
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G8",
+        "paths": [
+          "internal/ui",
+          "cmd/orbit/main.go"
+        ],
+        "tests": [
+          "internal/ui/snapshot_test.go",
+          "internal/ui/workspace_review_regression_test.go",
+          "internal/ui/viewer_parity_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Composer, transcript and interactive agent surfaces",
+      "id": "C11",
+      "feature": "Thinking/tool activity and details",
+      "interaction_contract": "Fold activity chains; live thinking scroll/tail; distinct tool icons/action preview, invocation arguments/result, error/truncation badges, code body, file edit inline diff and changed-file links.",
+      "state_failure_platform": "Tool output caps and truncated indicator preserve honesty; read/write/edit/bash/search/web/MCP and unknown/custom tool paths have meaningful fallbacks; errors remain visible after turn settles.",
+      "sources": [
+        "crates/orbit-pi/src/transcript_view.rs::render_activity_group",
+        "crates/orbit-pi/src/transcript_view.rs::render_tool_detail",
+        "crates/orbit-pi/src/transcript_view.rs::render_tool_error_strip",
+        "crates/orbit-pi/src/transcript_view.rs::build_edit_diff",
+        "crates/orbit-pi/src/transcript_view.rs::mcp_tool_parts"
+      ],
+      "tests": "T08",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "symbol": "render_activity_group",
+          "line": 2387
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "symbol": "render_tool_detail",
+          "line": 3551
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "symbol": "render_tool_error_strip",
+          "line": 3512
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "symbol": "build_edit_diff",
+          "line": 3973
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "symbol": "mcp_tool_parts",
+          "line": 7391
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G8",
+        "paths": [
+          "internal/ui",
+          "cmd/orbit/main.go"
+        ],
+        "tests": [
+          "internal/ui/snapshot_test.go",
+          "internal/ui/workspace_review_regression_test.go",
+          "internal/ui/viewer_parity_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Composer, transcript and interactive agent surfaces",
+      "id": "C12",
+      "feature": "Turn summaries and metrics",
+      "interaction_contract": "Working elapsed time, output rate, usage footer/breakdown, added/removed counts, final changed-files summary card and summary click-through to review.",
+      "state_failure_platform": "Distinguish estimated/live rates from final provider usage, stopped from failed; avoid showing generated metrics when source does not supply them.",
+      "sources": [
+        "crates/orbit-pi/src/transcript_view.rs::render_working_indicator",
+        "crates/orbit-pi/src/transcript_view.rs::render_message_footer",
+        "crates/orbit-pi/src/transcript_view.rs::render_summary_card",
+        "crates/orbit-pi/src/transcript_view.rs::render_changed_files"
+      ],
+      "tests": "T08",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "symbol": "render_working_indicator",
+          "line": 4820
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "symbol": "render_message_footer",
+          "line": 4369
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "symbol": "render_summary_card",
+          "line": 1811
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "symbol": "render_changed_files",
+          "line": 7053
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G8",
+        "paths": [
+          "internal/ui",
+          "cmd/orbit/main.go"
+        ],
+        "tests": [
+          "internal/ui/snapshot_test.go",
+          "internal/ui/workspace_review_regression_test.go",
+          "internal/ui/viewer_parity_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Composer, transcript and interactive agent surfaces",
+      "id": "C13",
+      "feature": "In-transcript find",
+      "interaction_contract": "Primary+F opens find; Enter/Shift+Enter next/previous, hit count, selected row wash, Escape close and focus return.",
+      "state_failure_platform": "Case-insensitive message-level substring matches, not per-occurrence highlighting or global content search. Refresh when query/message count changes; matching streaming text with unchanged count is not guaranteed.",
+      "sources": [
+        "crates/orbit-pi/src/app/search.rs::TranscriptSearch",
+        "crates/orbit-pi/src/app/search.rs::sync_transcript_search",
+        "crates/orbit-pi/src/transcript.rs::find_messages",
+        "crates/orbit-pi/src/main.rs::bind_keys"
+      ],
+      "tests": "T08",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/app/search.rs",
+          "symbol": "TranscriptSearch",
+          "line": 12
+        },
+        {
+          "path": "crates/orbit-pi/src/app/search.rs",
+          "symbol": "sync_transcript_search",
+          "line": 71
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript.rs",
+          "symbol": "find_messages",
+          "line": 2388
+        },
+        {
+          "path": "crates/orbit-pi/src/main.rs",
+          "symbol": "bind_keys",
+          "line": 357
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G8",
+        "paths": [
+          "internal/ui",
+          "cmd/orbit/main.go"
+        ],
+        "tests": [
+          "internal/ui/snapshot_test.go",
+          "internal/ui/workspace_review_regression_test.go",
+          "internal/ui/viewer_parity_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Composer, transcript and interactive agent surfaces",
+      "id": "C14",
+      "feature": "Stop, retry and compact states",
+      "interaction_contract": "Stop button/Escape abort, retry banner with attempt/maximum/provider error and cancel retry, manual compact and auto-compaction/retry controls.",
+      "state_failure_platform": "Awaiting-first-token, streaming, compacting, retrying, aborted and exited are distinct; error banner is dismissible; runtime failure clears busy so Stop cannot stay stuck.",
+      "sources": [
+        "crates/orbit-pi/src/app/session.rs::on_abort",
+        "crates/orbit-pi/src/app/view.rs::run_status_strip",
+        "crates/orbit-pi/src/app/runtime.rs::on_command_failure",
+        "crates/orbit-pi/src/app/settings.rs::compact_now",
+        "crates/orbit-pi/src/app/settings.rs::abort_retry",
+        "crates/orbit-pi/src/app/events.rs"
+      ],
+      "tests": "T06,T08",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/app/session.rs",
+          "symbol": "on_abort",
+          "line": 417
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "symbol": "run_status_strip",
+          "line": 3882
+        },
+        {
+          "path": "crates/orbit-pi/src/app/runtime.rs",
+          "symbol": "on_command_failure",
+          "line": 50
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "compact_now",
+          "line": 5811
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "abort_retry",
+          "line": 5828
+        },
+        {
+          "path": "crates/orbit-pi/src/app/events.rs"
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G5",
+        "paths": [
+          "internal/pirpc",
+          "internal/agent"
+        ],
+        "tests": [
+          "internal/pirpc/client_test.go",
+          "internal/agent/manager_test.go",
+          "internal/agent/reducer_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Composer, transcript and interactive agent surfaces",
+      "id": "C15",
+      "feature": "Context/cost meter",
+      "interaction_contract": "Used context ring, hover summary, detail breakdown, compact action, session tokens/cost/cache rate.",
+      "state_failure_platform": "pi stats are authoritative. Conversation-versus-other uses labelled chars/4 estimate; rules/skills/MCP split is not invented. Unknown is not zero; very small nonzero percentages render <1%.",
+      "sources": [
+        "crates/orbit-pi/src/context_meter.rs::ContextMeterData",
+        "crates/orbit-pi/src/context_meter.rs::usage_slices",
+        "crates/orbit-pi/src/app/runtime.rs::refresh_context_stats",
+        "crates/orbit-pi/src/app/view.rs::context_button"
+      ],
+      "tests": "T09",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/context_meter.rs",
+          "symbol": "ContextMeterData",
+          "line": 633
+        },
+        {
+          "path": "crates/orbit-pi/src/context_meter.rs",
+          "symbol": "usage_slices",
+          "line": 120
+        },
+        {
+          "path": "crates/orbit-pi/src/app/runtime.rs",
+          "symbol": "refresh_context_stats",
+          "line": 123
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "symbol": "context_button",
+          "line": 3195
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G8",
+        "paths": [
+          "internal/ui",
+          "cmd/orbit/main.go"
+        ],
+        "tests": [
+          "internal/ui/snapshot_test.go",
+          "internal/ui/workspace_review_regression_test.go",
+          "internal/ui/viewer_parity_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Composer, transcript and interactive agent surfaces",
+      "id": "C16",
+      "feature": "Blocking extension dialogs",
+      "interaction_contract": "Native select/confirm/input/editor modal; arrows/Enter/Escape, text editing and cancel return exact extension_ui_response ID.",
+      "state_failure_platform": "Cancel on teardown/switch; if an existing blocking dialog/approval is open, cancel newcomer instead of stranding first. UI request pending can issue background notification.",
+      "sources": [
+        "crates/orbit-pi/src/dialog.rs::Dialog",
+        "crates/orbit-pi/src/app/dialogs.rs::handle_extension_ui_request",
+        "crates/orbit-pi/src/app/dialogs.rs::open_dialog",
+        "crates/orbit-pi/src/app/dialogs.rs::respond_to_dialog"
+      ],
+      "tests": "T10",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/dialog.rs",
+          "symbol": "Dialog",
+          "line": 171
+        },
+        {
+          "path": "crates/orbit-pi/src/app/dialogs.rs",
+          "symbol": "handle_extension_ui_request",
+          "line": 10
+        },
+        {
+          "path": "crates/orbit-pi/src/app/dialogs.rs",
+          "symbol": "open_dialog",
+          "line": 205
+        },
+        {
+          "path": "crates/orbit-pi/src/app/dialogs.rs",
+          "symbol": "respond_to_dialog",
+          "line": 236
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G5",
+        "paths": [
+          "internal/pirpc",
+          "internal/agent"
+        ],
+        "tests": [
+          "internal/pirpc/client_test.go",
+          "internal/agent/manager_test.go",
+          "internal/agent/reducer_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Composer, transcript and interactive agent surfaces",
+      "id": "C17",
+      "feature": "Inline permission approval",
+      "interaction_contract": "Access guard requests show tool/detail with Allow once / Always allow this tool / Deny; keyboard selection and Escape deny; MCP tool labels include server.",
+      "state_failure_platform": "Global Supervised / Auto-accept edits / Full access mode, default Full access. Per-mode allowlist persists. Not a sandbox; extension unavailable is visible and cannot be portrayed as enforced protection.",
+      "sources": [
+        "crates/orbit-pi/src/dialog.rs::ApprovalRequest",
+        "crates/orbit-pi/src/app/dialogs.rs::open_approval",
+        "crates/orbit-pi/src/app/view.rs::approval_bar",
+        "crates/orbit-pi/src/access.rs",
+        "contrib/orbit-guard-extension/policy.js"
+      ],
+      "tests": "T10,T11",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/dialog.rs",
+          "symbol": "ApprovalRequest",
+          "line": 127
+        },
+        {
+          "path": "crates/orbit-pi/src/app/dialogs.rs",
+          "symbol": "open_approval",
+          "line": 260
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "symbol": "approval_bar",
+          "line": 4379
+        },
+        {
+          "path": "crates/orbit-pi/src/access.rs"
+        },
+        {
+          "path": "contrib/orbit-guard-extension/policy.js"
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G5",
+        "paths": [
+          "internal/pirpc",
+          "internal/agent"
+        ],
+        "tests": [
+          "internal/pirpc/client_test.go",
+          "internal/agent/manager_test.go",
+          "internal/agent/reducer_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Composer, transcript and interactive agent surfaces",
+      "id": "C18",
+      "feature": "Plan/Build/Ask workflow",
+      "interaction_contract": "Composer mode chip, keyboard picker and palette action; Plan/Ask scope mutation tools and shell access, Build restores only workflow-removed tools.",
+      "state_failure_platform": "Per-session workflow.json is read live by extension and custom entries record mode; prune deleted-session keys. Default Build. This is extension policy, not OS isolation.",
+      "sources": [
+        "crates/orbit-pi/src/workflow.rs",
+        "crates/orbit-pi/src/app/composer_ops.rs::set_workflow_mode",
+        "contrib/orbit-workflow-extension/index.js",
+        "contrib/orbit-workflow-extension/policy.js"
+      ],
+      "tests": "T11",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/workflow.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/composer_ops.rs",
+          "symbol": "set_workflow_mode",
+          "line": 891
+        },
+        {
+          "path": "contrib/orbit-workflow-extension/index.js"
+        },
+        {
+          "path": "contrib/orbit-workflow-extension/policy.js"
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G5",
+        "paths": [
+          "internal/pirpc",
+          "internal/agent"
+        ],
+        "tests": [
+          "internal/pirpc/client_test.go",
+          "internal/agent/manager_test.go",
+          "internal/agent/reducer_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Composer, transcript and interactive agent surfaces",
+      "id": "C19",
+      "feature": "Structured ask questionnaire",
+      "interaction_contract": "ask_user_question inline panel supports multiple questions, single/multi select, custom text, previews, previous/next, final submit and cancel; finished transcript question card.",
+      "state_failure_platform": "Buffer answers locally until whole questionnaire commits, then replay extension select/input requests; retain prior answer when navigating back; reject unexpected replay sequences.",
+      "sources": [
+        "crates/orbit-pi/src/ask.rs::AskPrompt",
+        "crates/orbit-pi/src/ask.rs::AskReplayState",
+        "crates/orbit-pi/src/app/ask.rs",
+        "crates/orbit-pi/src/app/view.rs::ask_panel",
+        "crates/orbit-pi/src/transcript_view.rs::render_ask_card"
+      ],
+      "tests": "T10",
+      "baseline_status": "source_present",
+      "migration_status": "partial_backend_ui_gaps",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/ask.rs",
+          "symbol": "AskPrompt",
+          "line": 70
+        },
+        {
+          "path": "crates/orbit-pi/src/ask.rs",
+          "symbol": "AskReplayState",
+          "line": 140
+        },
+        {
+          "path": "crates/orbit-pi/src/app/ask.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "symbol": "ask_panel",
+          "line": 3982
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "symbol": "render_ask_card",
+          "line": 2928
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G5",
+        "paths": [
+          "internal/pirpc",
+          "internal/agent"
+        ],
+        "tests": [
+          "internal/pirpc/client_test.go",
+          "internal/agent/manager_test.go",
+          "internal/agent/reducer_test.go"
+        ],
+        "remaining": "Transport/state support is not proof of image drag/paste, structured asks or custom UI/widget rendering parity."
+      }
+    },
+    {
+      "group": "Composer, transcript and interactive agent surfaces",
+      "id": "C20",
+      "feature": "Extension widgets and custom UI",
+      "interaction_contract": "setWidget styled ANSI/SGR text above/below composer; replace/clear by key; custom open/render/close stack with monospace terminal frames, cursor, input and resize notifications. notify toast, setStatus line, set_editor_text composer.",
+      "state_failure_platform": "Custom UI is capability/patch-dependent; advertises 96×20 viewport, scrolls oversized content. Legacy keyboard encoder only; Kitty mode metadata is recorded but not fully implemented. setTitle and widget component factories have no equivalent.",
+      "sources": [
+        "crates/orbit-pi/src/widgets.rs",
+        "crates/orbit-pi/src/custom_ui.rs",
+        "crates/orbit-pi/src/app/dialogs.rs::apply_extension_widget",
+        "crates/orbit-pi/src/app/dialogs.rs::apply_custom_frame"
+      ],
+      "tests": "T10",
+      "baseline_status": "source_present",
+      "migration_status": "partial_backend_ui_gaps",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/widgets.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/custom_ui.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/dialogs.rs",
+          "symbol": "apply_extension_widget",
+          "line": 76
+        },
+        {
+          "path": "crates/orbit-pi/src/app/dialogs.rs",
+          "symbol": "apply_custom_frame",
+          "line": 114
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G5",
+        "paths": [
+          "internal/pirpc",
+          "internal/agent"
+        ],
+        "tests": [
+          "internal/pirpc/client_test.go",
+          "internal/agent/manager_test.go",
+          "internal/agent/reducer_test.go"
+        ],
+        "remaining": "Transport/state support is not proof of image drag/paste, structured asks or custom UI/widget rendering parity."
+      }
+    }
+  ]
+}

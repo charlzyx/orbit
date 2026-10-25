@@ -1,0 +1,1010 @@
+{
+  "scope": "Named assertions only. Not full feature, native OS or pixel parity.",
+  "executed_at_utc": "2026-10-25T05:01:20.142299+00:00",
+  "command": [
+    "/workspace/shared/orbit-toolchains/go/bin/go",
+    "test",
+    "-race",
+    "-count=1",
+    "-json",
+    "./internal/highlight",
+    "./internal/workspace",
+    "./internal/gitworkbench",
+    "./internal/worktreeui"
+  ],
+  "exit_code": 0,
+  "revision": {
+    "kind": "dirty-working-tree-content-manifest",
+    "sha256": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3",
+    "published_commit": null,
+    "files_unchanged_during_test": true
+  },
+  "files": {
+    "internal/gitworkbench/avatars.go": "c8cc709654827fd3268589d3811e6f39386145775b84849e371a74af0ee5e782",
+    "internal/gitworkbench/commit_bar.go": "928f15cddfcdddba1fa755507e3af902f8fea8b4927bd45180589cbe7125c8af",
+    "internal/gitworkbench/commit_flow.go": "b3456c102f68ae2bfad0d9a1a54d57a9855357fafc5d0dd9dbe55c6f79cea80d",
+    "internal/gitworkbench/dialogs.go": "3c54fce49347e6aa5fba2d056de0548be1be58df570199796c69876d962604be",
+    "internal/gitworkbench/embedded_diff.go": "e4aec66a909da0aaebd378cff4b217e3743dda8cb893203d1a3b54a5091a741e",
+    "internal/gitworkbench/github_view.go": "bf6d9e76137c56694a55eb04b5b95e87622691b384c032087f05ee17b1050790",
+    "internal/gitworkbench/highlight_test.go": "dad394b32d701693f55bddad61140f53d9511c39b5eb923897b8d12d27b775f9",
+    "internal/gitworkbench/parity_test.go": "ab8de6c3262ae810ff22001a22593d9c2b430797ab76927c8910e0705032de49",
+    "internal/gitworkbench/recovery_view.go": "0308301cf7bf71ab842162fec625c882c2cbc952f83a6a4d165456caf1537074",
+    "internal/gitworkbench/stashes.go": "3752a4035a2cea47a949d4386964bd4fd31e3436418f14262309533ac6016d1c",
+    "internal/gitworkbench/state.go": "3b14c2765c86ec63c1eba475545a98b641afca199f21b54772edea98e550ed9b",
+    "internal/gitworkbench/state_test.go": "1f9c617c88e358cac81016c70c7aa79e2b7301d6a33f7f2a839d947ac2659872",
+    "internal/gitworkbench/templates.go": "c23b186c692ab44f232a35e28480224f3f41dd273c9771d6d7a6099c69782009",
+    "internal/gitworkbench/view.go": "560bbde722cf25360b086e422b44d7a5fa6821c3cbede19defa1db462451e376",
+    "internal/highlight/highlight.go": "eb974acff24c38e1d2c85168a76a39daa7d9647d032c54e3c051d8d6b01f2a01",
+    "internal/highlight/highlight_test.go": "bc9b22379ca10eddc43e21c10d0ffe6f4eabe5f50eef2b6ac29e6223eea43f89",
+    "internal/highlight/runs.go": "002b3eda30ad5a83ba33cc92d4597d1b883315d83b23f5db98d17e42e72a706b",
+    "internal/highlight/special.go": "b7ba12d0551811c6693efa30bd1b4050e32983a9728474c0558158372c35727f",
+    "internal/highlight/specs.go": "12f931d4eace0ccac598c16ec17aea1ffaa01d57c53bb00c43b4dedd24bbb43d",
+    "internal/highlight/testdata/README.md": "d2fa5011ceea871608d699aaa35396f14b20e7541d0ba3704cdf5e62edd7ab2d",
+    "internal/highlight/testdata/c.json": "cb0de4eac73c5d3bb0a165bcfaaa5ffaa49f53108fcbe4e340e1f4ad31b8a761",
+    "internal/highlight/testdata/css.json": "ea3917976dc8a25ea71fcfe9110e481186ae340c60a3e1f0f2e87221644cbc04",
+    "internal/highlight/testdata/diff.json": "0360a58093dc38e949fa570a2e38be1315c193994eed3399dec90c213a531b11",
+    "internal/highlight/testdata/generate.py": "ecbfb2bcdc08300a7cc139b83441724caf2f7620cc82b7ba7115bd2a0d4627ec",
+    "internal/highlight/testdata/go.json": "2966c7d50969883050c0578c813e0f02e5e8837ad5b83775927bca7557afcd82",
+    "internal/highlight/testdata/html.json": "7f8acbf8773eb1e900b4e2e0cde41e116bd7c46aa0bcc70f2238648ec85ce253",
+    "internal/highlight/testdata/java.json": "b4373d1f0073930a2fd085d1e1913d1ecab488071311665577a5a1bfb5f457a1",
+    "internal/highlight/testdata/json.json": "d259845ad0c5d810ca8e81be82f665ffe49d925ae91a8e34be52256cd3d516e9",
+    "internal/highlight/testdata/py.json": "26bbc225a10854f07e8a554f7a462fb5b34b7d17bf10f84d8b5c1f376165122e",
+    "internal/highlight/testdata/rb.json": "1a46b4e70e827d561a5a08dcf2dcf5869926cd2abc528143d1e9227d311c9295",
+    "internal/highlight/testdata/rs.json": "3050d52901b0d6e106eac9b8c8ffd339e7b6f22aadaef837ec33a181aa0f99ee",
+    "internal/highlight/testdata/sh.json": "8f33a39cd799668f65935a35614671e25276d7afb0b7bca571bd2a9ee565219d",
+    "internal/highlight/testdata/sql.json": "1583e3f3643d3969401b8531a9486d68cac6a5ee69b11cc772541496bea9e1bc",
+    "internal/highlight/testdata/swift.json": "279a5f21dc5b526aa15e6b7e32a8bea186414c5db8eec376c3e706a2d57f03fa",
+    "internal/highlight/testdata/toml.json": "544181f44e5a198cb9eeb393af87fb2ce276d442d663eb94497ca93625357837",
+    "internal/highlight/testdata/ts.json": "9e062c8549eb15c229ab9bee8fb80bd9eab0c92f59ef3814c4bba5ad1dd2952d",
+    "internal/highlight/testdata/yaml.json": "25d7db4a880e4fabd0ef1ec4bceec607c574cc4a854b0fc173deb722fe3df287",
+    "internal/workspace/avatars.go": "86b4e37b1a640b2d11882f9444486f3bc3ba90f27c76c4a3bcbfed846dabec48",
+    "internal/workspace/avatars_test.go": "da79970a5a2761eeb199d9483d36cecf28a1fc1101d35a8d67db65833335795c",
+    "internal/workspace/checkpoint.go": "d6ae83b461e776191b5295a03d53db3c79a618d69f739758e7366b398f1bc726",
+    "internal/workspace/checkpoint_test.go": "577fb3d125464fe6eb47547db8bb7ab947e580cb2dc32e8e867f312d98522be4",
+    "internal/workspace/editor.go": "30d4302a79fc077b78af53fd86de0b51e112e381a19dee2fadde8a736fdb4093",
+    "internal/workspace/files.go": "250117e100828f5652dc0ce27204569f3f0a42bf692a04d7de4db85b6ff272ad",
+    "internal/workspace/files_test.go": "a74d3bbbada7614a438fedde91ab18bb288a6ca607e623fd5665042b47e20e8b",
+    "internal/workspace/generation.go": "9bd2994a269da04f5995f1d5f4e6a21317db9000bec406e9f1ad01104af2a06b",
+    "internal/workspace/generation_test.go": "241d8cb0cf1eb86a71372061a93bf033e769932a20257cba9a08d7ad9a52b746",
+    "internal/workspace/git.go": "30763b0f065926558fb8ecbb8b7f63685caadda6d577f6fc03394d231354ba4f",
+    "internal/workspace/git_ops.go": "bb9b0b617efc2423087fd493608bd8343b1117d4ff6e27f8d72090a7340f93d0",
+    "internal/workspace/git_process_unix.go": "0c20187f9017fc105ff6e95a357bbc578d1634a2bed12ff2a0e95cccc69ff3ab",
+    "internal/workspace/git_process_windows.go": "22aef4c201f52c228b031385b20ad373c975864b281dcbb919a3653534bd8bc8",
+    "internal/workspace/git_test.go": "fad74d00e241a2603b7366ac92c4821eb54248cb9adf71a211c33e9f962f6429",
+    "internal/workspace/github.go": "ef32646e2cd59ab3d858397c20fed99331bb5eac5194966c622d76bed5afea67",
+    "internal/workspace/github_templates.go": "c04bdfa32859ee09f08b1f73a29e1913f28ddf8a051c16d073a30e0df21aab89",
+    "internal/workspace/github_test.go": "9999ba754fb4ace346d954885219b7fefd2dca0593aa853fee2b873f4f0d209e",
+    "internal/workspace/process_cancel_unix_test.go": "7ccbb146e84243c7249a07d4ee5f15762dbd3ba07e01bd287a6c929a023ef226",
+    "internal/workspace/report_generation.go": "7d1bc41defb7b4ad7a17b73edb02820db92a533abf613d9e98b5013c4aec1112",
+    "internal/workspace/review.go": "35765592aa3c493dfa29b4a5863dadece49e2759a2d66665659bb56278fc758d",
+    "internal/workspace/review_highlight_test.go": "5ff97828275b80efd275ac833426bd389f0c8d254706b9c7ef04ab16499e64cb",
+    "internal/workspace/review_test.go": "5ac89e037754e534e9349de9b45a81667d450029f83a6deebe936528bd52eae5",
+    "internal/workspace/setup.go": "ffb6793263b0b8b8a6ac1fee458df264e78c0a8c954a8eb470b630293554db9a",
+    "internal/workspace/setup_process_other.go": "0ae1cb2423ab6f22d4d417fa02b50472e46e0fe01729556c52ba8e2fb23b28b4",
+    "internal/workspace/setup_process_unix.go": "1cf0d3b747248ffdfab56e59889edd22fe7f2ce6ea5f3fc380074aa663b0d15a",
+    "internal/workspace/tree.go": "90d74215301a92e7d632a34a84f9e55e530e9c482b074e815cd4c9474a6e97ee",
+    "internal/workspace/tree_test.go": "61a6b4e41b49bbff34e4e147c1d580b7efefe65208b41cd3eef82a6aff8111ec",
+    "internal/workspace/watch.go": "c10294d92b8108852787fc88fa478821718de473815083a2696c19b6ad3b1e46",
+    "internal/workspace/watch_test.go": "a95a60c00402bda2452311a7d515a51ac6f51545b0e85ce09419b4d3df5f4adb",
+    "internal/workspace/worktrees.go": "27da359c7ec6e9ed048c258dc89b2da91fc1bd9761475e8f2418d6f9f12423fb",
+    "internal/workspace/worktrees_test.go": "d1f60119c2d663124f22165485fb50923da5822511c2fe5160609e85360728c5",
+    "internal/worktreeui/labels.go": "6f43ed3980f53165adfb7795763f9ad1e833edd5c8b59944b1cd15a17b012c18",
+    "internal/worktreeui/picker.go": "c35e488254d9f562fca596ff1b0774853dbe74de8382f90d40d187f2d4842e67",
+    "internal/worktreeui/picker_test.go": "46f469a90121c5714fd893c89f46c128c480952bf589f2b2d85851bccbe00bd4",
+    "internal/worktreeui/state.go": "b957f2158521da8a4b6c722e8f9f1e2a0d9d7e2418ce202a3b9d332e35060fd4",
+    "internal/worktreeui/state_test.go": "bc7cc365c0960b2f92a5c06cca1913e2dda2b784feacad6f64f127f34ba9cf20",
+    "internal/worktreeui/view.go": "3344bbef9fbfba3b03ed4965dceeb02e26d0beb4a2ade1fb0cd29f22c7d26e7b",
+    "internal/worktreeui/view_test.go": "52d16295f1051a43875dde16e38fe2b0b356c534ef7a2f2e1cd127bc4d7caa8d",
+    "go.mod": "83dea25d420fb3d7bc4a83f8c3bc2cb96094324ee6729b0b4ba48d9e7cc3c86c",
+    "go.sum": "5ae86d7f224e45a162962c1505dfb7f1b644c931297b113e4e1709e4a3d1dcc9"
+  },
+  "results": [
+    {
+      "Time": "2026-10-25T14:01:15.248007697+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestAvatarIdentityAndOverrides",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:15.308499501+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestCheckpointDoesNotChangeIndexHeadOrWorktree",
+      "Elapsed": 0.06
+    },
+    {
+      "Time": "2026-10-25T14:01:15.372038317+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/highlight",
+      "Test": "TestPinnedSourceOracle",
+      "Elapsed": 0.17
+    },
+    {
+      "Time": "2026-10-25T14:01:15.372320752+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/highlight",
+      "Test": "TestLanguageAliasesLabelsAndPaths",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:15.386328005+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/highlight",
+      "Test": "TestEveryStreamingUnicodePrefixIsLossless",
+      "Elapsed": 0.01
+    },
+    {
+      "Time": "2026-10-25T14:01:15.386575497+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/highlight",
+      "Test": "TestRunsRejectInvalidSpansWithoutChangingText",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:15.390772779+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/highlight",
+      "Test": "TestCarryAndCacheRemainIndependent",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:15.394798989+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestCheckpointTurnFreezesDiffAndRestoresCounter",
+      "Elapsed": 0.09
+    },
+    {
+      "Time": "2026-10-25T14:01:15.466515483+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestCheckpointBranchSwitchExcludesExistingTargetChanges",
+      "Elapsed": 0.07
+    },
+    {
+      "Time": "2026-10-25T14:01:15.536210276+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestCheckpointNewBranchIncludesCommittedAgentWork",
+      "Elapsed": 0.07
+    },
+    {
+      "Time": "2026-10-25T14:01:15.557164225+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/gitworkbench",
+      "Test": "TestDiffColorSpansPreserveEveryByteAndFontMetrics",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:15.575569633+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/worktreeui",
+      "Test": "TestWorkInRowsAndNativeMenuSelection",
+      "Elapsed": 0.02
+    },
+    {
+      "Time": "2026-10-25T14:01:15.583360197+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestCheckpointUnbornAndCancellation",
+      "Elapsed": 0.05
+    },
+    {
+      "Time": "2026-10-25T14:01:15.642342232+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestCheckpointPlainFolderAndLegacyBaselineAreNonErrors",
+      "Elapsed": 0.06
+    },
+    {
+      "Time": "2026-10-25T14:01:15.642685729+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestFileNamesAndNoClobber",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:15.656767899+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestFileLoadingModesAndGuards",
+      "Elapsed": 0.01
+    },
+    {
+      "Time": "2026-10-25T14:01:15.656780138+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestSaveExistingDoesNotRecreate",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:15.65678844+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestDeleteConfirmationAndCancellation",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:15.689082733+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestEditorAutosaveUndoRenameAndClose",
+      "Elapsed": 0.03
+    },
+    {
+      "Time": "2026-10-25T14:01:15.689361542+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestEditorDirtyReloadAndFailedSaveKeepBuffer",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:15.689609776+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestEditorReadonly",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:15.705894414+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/worktreeui",
+      "Test": "TestRealWorktreePageLifecycle",
+      "Elapsed": 0.13
+    },
+    {
+      "Time": "2026-10-25T14:01:15.748218798+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/gitworkbench",
+      "Test": "TestCommitGenerationChoiceAndPartialPush",
+      "Elapsed": 0.19
+    },
+    {
+      "Time": "2026-10-25T14:01:15.779757515+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/worktreeui",
+      "Test": "TestSetupConsentFailureAndRetry",
+      "Elapsed": 0.07
+    },
+    {
+      "Time": "2026-10-25T14:01:15.780247702+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/worktreeui",
+      "Test": "TestOldWorkspaceResultAndCancelNeverApplied",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:15.821894324+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/worktreeui",
+      "Test": "TestRefreshPreservesFailedActionAndNoFalseSuccess",
+      "Elapsed": 0.04
+    },
+    {
+      "Time": "2026-10-25T14:01:15.874077584+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/worktreeui",
+      "Test": "TestExistingRemoteBranchAvailableWithoutNetwork",
+      "Elapsed": 0.05
+    },
+    {
+      "Time": "2026-10-25T14:01:15.878414826+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/gitworkbench",
+      "Test": "TestBlankCommitGeneratesThenCommits",
+      "Elapsed": 0.13
+    },
+    {
+      "Time": "2026-10-25T14:01:15.878827276+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/gitworkbench",
+      "Test": "TestTemplatePrefillPreservesEdits",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:15.878837491+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/gitworkbench",
+      "Test": "TestCommitBarStateBranches",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:15.881301121+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestEditorDebounceAcrossTabsAndClosingLastEdited",
+      "Elapsed": 0.19
+    },
+    {
+      "Time": "2026-10-25T14:01:15.881735905+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestSaveExistingAtomicPreservesModeAndConflict",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:15.882196938+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestSlowSaveDoesNotBlockSnapshotsOrLoseConcurrentEdits",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:15.882470199+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestCloseKeepsTabIfUserEditsDuringSlowSave",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:15.88274992+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestEditorInactiveLoadNeverStealsSelection",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:15.883010702+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestEditorSelfSaveReloadPreservesUndoHistory",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:15.88315544+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestGenerationRPCProcess",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:15.926506965+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/worktreeui",
+      "Test": "TestFailedLockRetryDoesNotRepeatPreviousCreate",
+      "Elapsed": 0.05
+    },
+    {
+      "Time": "2026-10-25T14:01:15.927016411+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/worktreeui",
+      "Test": "TestSettingsPersistenceFailureIsTransactionalAndRetryable",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:15.927261359+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/worktreeui",
+      "Test": "TestWorkspaceChangeClearsRetryAndPresentationState",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:15.928082975+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/worktreeui",
+      "Test": "TestCreateSuggestionsPreserveManualBranchAndModes",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:15.962779409+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/worktreeui",
+      "Test": "TestBranchAlreadyUsedOpensExistingWorktreeDialog",
+      "Elapsed": 0.03
+    },
+    {
+      "Time": "2026-10-25T14:01:16.004057561+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestCommitRPCIsolatedAndNormalized",
+      "Elapsed": 0.12
+    },
+    {
+      "Time": "2026-10-25T14:01:16.007887235+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/gitworkbench",
+      "Test": "TestEmbeddedDiffRendersAndExpands",
+      "Elapsed": 0.13
+    },
+    {
+      "Time": "2026-10-25T14:01:16.016085679+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/gitworkbench",
+      "Test": "TestAvatarAsyncCacheAndFallback",
+      "Elapsed": 0.01
+    },
+    {
+      "Time": "2026-10-25T14:01:16.016097847+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/gitworkbench",
+      "Test": "TestGitEscapeClosesTransientOnly",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:16.053571638+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/worktreeui",
+      "Test": "TestSetupAllowRemembersCanonicalRepositoryBeforeCreation",
+      "Elapsed": 0.09
+    },
+    {
+      "Time": "2026-10-25T14:01:16.106478782+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/gitworkbench",
+      "Test": "TestCommitDetailExpandsInlineAndGithubDetailsReplaceLists",
+      "Elapsed": 0.09
+    },
+    {
+      "Time": "2026-10-25T14:01:16.106520174+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/gitworkbench",
+      "Test": "TestWorkspaceSwitchClearsPendingActionsAndFilters",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:16.115186296+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/worktreeui",
+      "Test": "TestThrottledWorktreeWatchEventuallyRefreshesWithoutAnotherEvent",
+      "Elapsed": 0.06
+    },
+    {
+      "Time": "2026-10-25T14:01:16.154193038+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/worktreeui",
+      "Test": "TestNativeWorktreeConfirmationCancelAndAccept",
+      "Elapsed": 0.04
+    },
+    {
+      "Time": "2026-10-25T14:01:16.167908626+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/worktreeui",
+      "Test": "TestNativeWorktreeSettingsCancelPreservesConfig",
+      "Elapsed": 0.01
+    },
+    {
+      "Time": "2026-10-25T14:01:16.168016499+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/worktreeui",
+      "Test": "TestWorktreeTranslationFallbackAndInterpolation",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:16.210074699+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/worktreeui",
+      "Test": "TestNativeCreateNameTypingDerivesBranchUntilManualEdit",
+      "Elapsed": 0.04
+    },
+    {
+      "Time": "2026-10-25T14:01:16.232293841+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/worktreeui",
+      "Test": "TestNativeBranchInUseOpenRequiresExplicitClick",
+      "Elapsed": 0.02
+    },
+    {
+      "Time": "2026-10-25T14:01:16.279237328+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestDraftRPCFallbackTimeoutAndCancellation",
+      "Elapsed": 0.28
+    },
+    {
+      "Time": "2026-10-25T14:01:16.317192503+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/gitworkbench",
+      "Test": "TestRefreshAndChangesAreReal",
+      "Elapsed": 0.21
+    },
+    {
+      "Time": "2026-10-25T14:01:16.317271371+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/gitworkbench",
+      "Test": "TestStaleResultsAndWorkspaceReset",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:16.360472876+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestCommitContextBudgetsAndNoMutation",
+      "Elapsed": 0.08
+    },
+    {
+      "Time": "2026-10-25T14:01:16.395717069+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/highlight",
+      "Elapsed": 1.208
+    },
+    {
+      "Time": "2026-10-25T14:01:16.410696625+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/gitworkbench",
+      "Test": "TestTabSwitchDoesNotCancelMutation",
+      "Elapsed": 0.09
+    },
+    {
+      "Time": "2026-10-25T14:01:16.410781492+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/gitworkbench",
+      "Test": "TestCancellationDoesNotApplyLateResults",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:16.435677825+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestCommitUnbornAndUntrackedContext",
+      "Elapsed": 0.08
+    },
+    {
+      "Time": "2026-10-25T14:01:16.435759938+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestGenerationParsersAndHeuristics",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:16.437681258+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestRepositoryTemplatesLookupAndForms",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:16.523747805+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/gitworkbench",
+      "Test": "TestActionFailureSurvivesRefresh",
+      "Elapsed": 0.11
+    },
+    {
+      "Time": "2026-10-25T14:01:16.536068823+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/gitworkbench",
+      "Test": "TestSuccessfulMutationWithFailedRefreshCannotReplay",
+      "Elapsed": 0.01
+    },
+    {
+      "Time": "2026-10-25T14:01:16.536171608+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/gitworkbench",
+      "Test": "TestChangeGroupingAndLiteralFilters",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:16.57398179+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/gitworkbench",
+      "Test": "TestSixNativeTabsRender",
+      "Elapsed": 0.04
+    },
+    {
+      "Time": "2026-10-25T14:01:16.576260146+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestReportDraftRPCNotesOnlyFallbackAndCancellation",
+      "Elapsed": 0.14
+    },
+    {
+      "Time": "2026-10-25T14:01:16.590246182+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/gitworkbench",
+      "Test": "TestNativeConfirmationDoesNotExecuteBeforeConfirm",
+      "Elapsed": 0.02
+    },
+    {
+      "Time": "2026-10-25T14:01:16.601438924+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/gitworkbench",
+      "Test": "TestGitHubFormValidation",
+      "Elapsed": 0.01
+    },
+    {
+      "Time": "2026-10-25T14:01:16.635271909+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestGitUnbornStageCommitAndUnstage",
+      "Elapsed": 0.06
+    },
+    {
+      "Time": "2026-10-25T14:01:16.664707914+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestGitStatusPreservesWhitespaceRenameAndLiteralPaths",
+      "Elapsed": 0.03
+    },
+    {
+      "Time": "2026-10-25T14:01:16.703673038+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestGitDiscardPreservesIndex",
+      "Elapsed": 0.04
+    },
+    {
+      "Time": "2026-10-25T14:01:16.745945475+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestGitHistoryBranchesAndGraph",
+      "Elapsed": 0.04
+    },
+    {
+      "Time": "2026-10-25T14:01:16.745960347+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestGraphOctopusAndWindowBoundary",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:16.792086199+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestGitStashesPreserveUntrackedChoice",
+      "Elapsed": 0.05
+    },
+    {
+      "Time": "2026-10-25T14:01:16.851713824+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestGitMergeConflictRecovery",
+      "Elapsed": 0.06
+    },
+    {
+      "Time": "2026-10-25T14:01:16.959158274+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestGitRebaseCherryPickAndBisectRecovery",
+      "Elapsed": 0.11
+    },
+    {
+      "Time": "2026-10-25T14:01:17.17354652+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestGitLocalRemoteSynchronization",
+      "Elapsed": 0.21
+    },
+    {
+      "Time": "2026-10-25T14:01:17.237788964+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/worktreeui",
+      "Elapsed": 1.69
+    },
+    {
+      "Time": "2026-10-25T14:01:17.291197879+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestGitFailureAndCancellation",
+      "Elapsed": 0.12
+    },
+    {
+      "Time": "2026-10-25T14:01:17.291221114+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestGitCommandHelper",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:17.2913383+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestGitRemoteURLsAndFailureClassification",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:17.292107006+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestGitHubProbeAndVersions",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:17.292658635+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestGitHubIssuesAndUserParsing",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:17.292768491+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestGitHubIssueMutationArguments",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:17.29342632+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestGitHubPullParsingAndChecks",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:17.293602074+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestGitHubPullMutations",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:17.293785139+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestGitHubValidationPreventsInvocation",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:17.325259148+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestGitHubCheckoutSafety",
+      "Elapsed": 0.03
+    },
+    {
+      "Time": "2026-10-25T14:01:17.60517997+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/gitworkbench",
+      "Elapsed": 2.058
+    },
+    {
+      "Time": "2026-10-25T14:01:17.756897014+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestCancelledCommandStopsDescendantWork",
+      "Elapsed": 0.43
+    },
+    {
+      "Time": "2026-10-25T14:01:17.757038767+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestReviewHighlightCarriesSeparateSidesAndResetsAtHunks",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:17.757219679+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestReviewHighlightSurvivesHiddenExpansionAndGrouping",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:17.757352028+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestReviewSourceHeaderPathsMetadataAndSyntheticHunks",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:17.757421483+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestReviewHeaderEscapesAndCompactAsymmetricGaps",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:17.852876693+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestReviewSixSourcesAndUntrackedPaths",
+      "Elapsed": 0.1
+    },
+    {
+      "Time": "2026-10-25T14:01:17.887949668+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestReviewGapsExpandStableIDsAndSplit",
+      "Elapsed": 0.03
+    },
+    {
+      "Time": "2026-10-25T14:01:17.888010159+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestReviewBinaryGroupedAndCompactFallback",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:18.019988287+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestReviewVisibleLimitAndExpansionCap",
+      "Elapsed": 0.13
+    },
+    {
+      "Time": "2026-10-25T14:01:18.060180536+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestReviewSelectedCommitRootAndLiteralPath",
+      "Elapsed": 0.04
+    },
+    {
+      "Time": "2026-10-25T14:01:18.060327567+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestCompactGapCountsAndEachFileReset",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:18.071410053+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestSnapshotIgnoresHiddenSymlinkAndNestedRules",
+      "Elapsed": 0.01
+    },
+    {
+      "Time": "2026-10-25T14:01:18.071828402+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestSnapshotCancelledAndMissing",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:18.071981161+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestTreeRowsFilterKeepsAncestors",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:18.173409765+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestWatcherReportsChangeAndCloses",
+      "Elapsed": 0.1
+    },
+    {
+      "Time": "2026-10-25T14:01:18.18010343+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestSnapshotAncestorIgnoreRelativePatterns",
+      "Elapsed": 0.01
+    },
+    {
+      "Time": "2026-10-25T14:01:18.194073898+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestWatcherDoesNotObserveCheckpointScratchOrRefs",
+      "Elapsed": 0.01
+    },
+    {
+      "Time": "2026-10-25T14:01:18.228613807+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestWorktreeMutationLockCancellation",
+      "Elapsed": 0.03
+    },
+    {
+      "Time": "2026-10-25T14:01:18.247824425+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestIgnoreFileOverridesGitRulesAndGlobalExcludes",
+      "Elapsed": 0.02
+    },
+    {
+      "Time": "2026-10-25T14:01:18.26744879+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestSnapshotPrunesGitGlobalAndInfoExcludesBeforeWalk",
+      "Elapsed": 0.02
+    },
+    {
+      "Time": "2026-10-25T14:01:18.267866899+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestWatcherTracksEmptyDirectoriesAndOrdinaryLogsObjects",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:18.372698474+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestNativeWatchDetectsPreservedMetadataAndNewNestedTrees",
+      "Elapsed": 0.1
+    },
+    {
+      "Time": "2026-10-25T14:01:18.566613334+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestNativeWatchFollowsLinkedMetadataAndIgnoresCheckpointChurn",
+      "Elapsed": 0.19
+    },
+    {
+      "Time": "2026-10-25T14:01:18.580753688+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestWatchFallbackOnInitializationFailureAndCancellation",
+      "Elapsed": 0.01
+    },
+    {
+      "Time": "2026-10-25T14:01:18.594599623+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestNativeWatchRootRecreationFallsBack",
+      "Elapsed": 0.01
+    },
+    {
+      "Time": "2026-10-25T14:01:18.868969022+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestNativeWatchDebouncesBurstAndFallsBackOnOverflow",
+      "Elapsed": 0.27
+    },
+    {
+      "Time": "2026-10-25T14:01:18.869249193+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestEmptyWorkspaceDoesNotWatchProcessDirectory",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:18.919035159+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestNativeWatchDiscoversGitCreatedAfterStartup",
+      "Elapsed": 0.05
+    },
+    {
+      "Time": "2026-10-25T14:01:18.986015195+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestWorktreeLifecyclePreservesBranches",
+      "Elapsed": 0.07
+    },
+    {
+      "Time": "2026-10-25T14:01:19.00492452+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestWorktreeBranchCollisionAndCancelledCreate",
+      "Elapsed": 0.02
+    },
+    {
+      "Time": "2026-10-25T14:01:19.036262985+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestWorktreeSetupConsentAndFailureKeepsTree",
+      "Elapsed": 0.03
+    },
+    {
+      "Time": "2026-10-25T14:01:19.036813973+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestWorktreeConfigAndNULParser",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:19.068306375+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestSetupCancellationAndConfirmation",
+      "Elapsed": 0.03
+    },
+    {
+      "Time": "2026-10-25T14:01:19.068733968+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestWorktreeConfigEmptyAndMalformedRepoOverrides",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:19.068792857+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestWorktreeSlugMatchesSourceSuggestions",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-10-25T14:01:19.113065863+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Test": "TestWorktreeMoveResolvesMainRootAndRenameConfiguredRoot",
+      "Elapsed": 0.04
+    },
+    {
+      "Time": "2026-10-25T14:01:20.118990276+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workspace",
+      "Elapsed": 4.883
+    }
+  ],
+  "stderr": ""
+}

@@ -1,0 +1,644 @@
+{
+  "schema": "orbit-acceptance-shard/v1",
+  "category": "settings",
+  "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "rows": [
+    {
+      "id": "P17",
+      "title": "MCP apply/reconnect lifecycle",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/mcp_ui.rs",
+          "handler": "tick_mcp",
+          "line": 90,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/mcp_ui.rs#L90",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/mcp_ui.rs",
+          "handler": "mcp_after_settle",
+          "line": 277,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/mcp_ui.rs#L277",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/mcp_ui.rs",
+          "handler": "mcp_force_apply",
+          "line": 301,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/mcp_ui.rs#L301",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app.rs",
+          "handler": "ParkedSession",
+          "line": 150,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app.rs#L150",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Detect external edits/fingerprint, pending apply notice, safe idle restart/resume, defer while running, force-apply warning path; stale parked clients respawn later.",
+      "baseline_edge_state": "Changes do not silently abort a live turn. Startup/probe loading, parse/connection/auth failure, reconnect outcome and updated fingerprints require independent states.",
+      "fixture": "Isolated HOME and project config, dummy secret marker values, controlled package/provider/MCP executables and fake OAuth issuer; no real credentials.",
+      "steps": [
+        {
+          "id": "P17.behavior",
+          "dimension": "functional",
+          "action": "Apply MCP changes and reconnect/probe selected servers while a fixture Pi runtime is active.",
+          "expected": "Detect external edits/fingerprint, pending apply notice, safe idle restart/resume, defer while running, force-apply warning path; stale parked clients respawn later.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P17.edge",
+          "dimension": "edge",
+          "action": "Delay or fail apply/reload and switch sessions; latest configuration must win, with retained actionable diagnostics and no duplicate restart.",
+          "expected": "Changes do not silently abort a live turn. Startup/probe loading, parse/connection/auth failure, reconnect outcome and updated fingerprints require independent states.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P17.error",
+          "dimension": "error",
+          "action": "Make this setting's file write or provider/package/MCP operation fail; cancel then retry once after recovery.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Changes do not silently abort a live turn. Startup/probe loading, parse/connection/auth failure, reconnect outcome and updated fingerprints require independent states.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P17.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P17.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P17.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P17.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/preferences",
+        "internal/workbench",
+        "internal/native"
+      ],
+      "existing_test_candidates": [
+        "internal/preferences/store_test.go",
+        "internal/preferences/workspaces_test.go",
+        "internal/workbench/workbench_test.go",
+        "internal/native/native_test.go",
+        "internal/native/runtime_test.go",
+        "internal/native/updater_test.go",
+        "internal/native/temp_files_test.go"
+      ],
+      "inventory_evidence": "../parity/settings.json",
+      "source_test_inventory": "T16,T06",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-P06",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "partial",
+          "steps": [
+            "Create/edit stdio andHTTP servers acrossglobal/project scope.",
+            "Validate timeout, exposure and secret references; cancel OAuth/remove.",
+            "Apply while task busy; verify deferred session-preserving reload."
+          ],
+          "expected": "Source typed fields, redacted status, scope-aware metadata/secrets and truthful requested-vs-applied state.",
+          "tests": [],
+          "remaining": "mcpui/workbench scoped race tests and19-case checklist pass. Host mount/deferred reload exists. Real OAuth and authoritative applied/readiness callback are not verified; Applied is deliberately not called on async restart acceptance.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": [
+        "../mcp-ui-implementation.md"
+      ]
+    },
+    {
+      "id": "P18",
+      "title": "Appearance and typography",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/theme.rs",
+          "handler": "UiPrefs",
+          "line": 324,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/theme.rs#L324",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/theme.rs",
+          "handler": "FontPrefs",
+          "line": 482,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/theme.rs#L482",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/theme/appearance.rs",
+          "handler": "AppearancePrefs",
+          "line": 31,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/theme/appearance.rs#L31",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "appearance_rows",
+          "line": 5926,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L5926",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "System/light/dark, separate remembered light/dark themes, full bundled theme catalog and live previews; UI/code fonts, UI/terminal/editor sizes, density, sidebar and reduce-motion.",
+      "baseline_edge_state": "Theme, ui.json and fonts.json retain choices; sizes 11/12/13/14/15/16/18/20, densities 80–120 in steps of 5. Invalid legacy prefs default/migrate. Theme changes repaint all surfaces consistently.",
+      "fixture": "Isolated HOME and project config, dummy secret marker values, controlled package/provider/MCP executables and fake OAuth issuer; no real credentials.",
+      "steps": [
+        {
+          "id": "P18.behavior",
+          "dimension": "functional",
+          "action": "Switch every bundled palette, font family/size, density and background setting; inspect preview and live surfaces.",
+          "expected": "System/light/dark, separate remembered light/dark themes, full bundled theme catalog and live previews; UI/code fonts, UI/terminal/editor sizes, density, sidebar and reduce-motion.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P18.edge",
+          "dimension": "edge",
+          "action": "Use missing font and invalid persisted values; relaunch and compare readability, clamps and palette-specific syntax colors.",
+          "expected": "Theme, ui.json and fonts.json retain choices; sizes 11/12/13/14/15/16/18/20, densities 80–120 in steps of 5. Invalid legacy prefs default/migrate. Theme changes repaint all surfaces consistently.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P18.error",
+          "dimension": "error",
+          "action": "Make this setting's file write or provider/package/MCP operation fail; cancel then retry once after recovery.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Theme, ui.json and fonts.json retain choices; sizes 11/12/13/14/15/16/18/20, densities 80–120 in steps of 5. Invalid legacy prefs default/migrate. Theme changes repaint all surfaces consistently.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P18.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P18.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P18.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P18.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/preferences",
+        "internal/workbench",
+        "internal/native"
+      ],
+      "existing_test_candidates": [
+        "internal/preferences/store_test.go",
+        "internal/preferences/workspaces_test.go",
+        "internal/workbench/workbench_test.go",
+        "internal/native/native_test.go",
+        "internal/native/runtime_test.go",
+        "internal/native/updater_test.go",
+        "internal/native/temp_files_test.go"
+      ],
+      "inventory_evidence": "../parity/settings.json",
+      "source_test_inventory": "T17",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-P07",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "partial",
+          "steps": [
+            "Change every theme/font/density/motion choice and relaunch.",
+            "Visit all sections in each of10 locales.",
+            "Configure animated/photo backdrop and inspect keyboard reference."
+          ],
+          "expected": "Source palette/tokens and persistent preferences, complete localization and backdrop.",
+          "tests": [
+            "TestTokensAndCommandRegistry",
+            "TestFractionalScaleKeepsLogicalComposerGeometry"
+          ],
+          "remaining": "10 palettes and55 binding parsing pass; many host labels remain English, backdrop integration is pending, and font/density/motion/OS contrast visual matrix remains open.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": [
+        "../background-acceptance.md"
+      ]
+    },
+    {
+      "id": "P19",
+      "title": "Backdrop customization",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "background_controls",
+          "line": 6382,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L6382",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "background_choose",
+          "line": 6569,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L6569",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "handler": "new_task_backdrop",
+          "line": 2271,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/view.rs#L2271",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Animated ordered-dither new-task field, optional background image, image picker/reset, blur/pixel-size/bottom-fade tuning and preview.",
+      "baseline_edge_state": "Decode/cache off paint path, bounded resize/blur; reduce motion freezes perpetual animation. Persisted backdrop state and image failures need faithful fallback.",
+      "fixture": "Isolated HOME and project config, dummy secret marker values, controlled package/provider/MCP executables and fake OAuth issuer; no real credentials.",
+      "steps": [
+        {
+          "id": "P19.behavior",
+          "dimension": "functional",
+          "action": "Select bundled/custom backdrop and vary blur, fade, opacity and fit options.",
+          "expected": "Animated ordered-dither new-task field, optional background image, image picker/reset, blur/pixel-size/bottom-fade tuning and preview.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P19.edge",
+          "dimension": "edge",
+          "action": "Cancel file picker, remove selected asset and use extreme aspect ratios; fallback must keep composer usable and settings recoverable.",
+          "expected": "Decode/cache off paint path, bounded resize/blur; reduce motion freezes perpetual animation. Persisted backdrop state and image failures need faithful fallback.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P19.error",
+          "dimension": "error",
+          "action": "Make this setting's file write or provider/package/MCP operation fail; cancel then retry once after recovery.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Decode/cache off paint path, bounded resize/blur; reduce motion freezes perpetual animation. Persisted backdrop state and image failures need faithful fallback.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P19.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P19.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P19.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P19.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/preferences",
+        "internal/workbench",
+        "internal/native"
+      ],
+      "existing_test_candidates": [
+        "internal/preferences/store_test.go",
+        "internal/preferences/workspaces_test.go",
+        "internal/workbench/workbench_test.go",
+        "internal/native/native_test.go",
+        "internal/native/runtime_test.go",
+        "internal/native/updater_test.go",
+        "internal/native/temp_files_test.go"
+      ],
+      "inventory_evidence": "../parity/settings.json",
+      "source_test_inventory": "T17",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Backdrop preferences/source audit exist; original ordered-dither field, image/blur/pixel/fade controls and preview are not yet reconstructed.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-P07",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "partial",
+          "steps": [
+            "Change every theme/font/density/motion choice and relaunch.",
+            "Visit all sections in each of10 locales.",
+            "Configure animated/photo backdrop and inspect keyboard reference."
+          ],
+          "expected": "Source palette/tokens and persistent preferences, complete localization and backdrop.",
+          "tests": [
+            "TestTokensAndCommandRegistry",
+            "TestFractionalScaleKeepsLogicalComposerGeometry"
+          ],
+          "remaining": "10 palettes and55 binding parsing pass; many host labels remain English, backdrop integration is pending, and font/density/motion/OS contrast visual matrix remains open.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": [
+        "../background-acceptance.md"
+      ]
+    },
+    {
+      "id": "P20",
+      "title": "Localization and shortcuts reference",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/main.rs",
+          "handler": "set_app_menus",
+          "line": 626,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/main.rs#L626",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/theme.rs",
+          "handler": "set_ui_prefs",
+          "line": 1468,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/theme.rs#L1468",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "shortcut_rows",
+          "line": 4672,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L4672",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "System locale plus English, zh-CN, Japanese, Korean, Spanish, French, German, pt-BR, Russian, Italian; live translated placeholder/menu rebuild; categorized shortcut help.",
+      "baseline_edge_state": "Source en.yml + generated locale files. Native macOS menus follow language changes; keyboard label modifier names vary by OS. Accessibility is incomplete, not an implied guarantee.",
+      "fixture": "Isolated HOME and project config, dummy secret marker values, controlled package/provider/MCP executables and fake OAuth issuer; no real credentials.",
+      "steps": [
+        {
+          "id": "P20.behavior",
+          "dimension": "functional",
+          "action": "Change app language, inspect translated menus/dialogs and shortcut reference; search translated commands.",
+          "expected": "System locale plus English, zh-CN, Japanese, Korean, Spanish, French, German, pt-BR, Russian, Italian; live translated placeholder/menu rebuild; categorized shortcut help.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P20.edge",
+          "dimension": "edge",
+          "action": "Use missing translation keys and locale fallback; ensure displayed key labels match actual platform-scoped bindings.",
+          "expected": "Source en.yml + generated locale files. Native macOS menus follow language changes; keyboard label modifier names vary by OS. Accessibility is incomplete, not an implied guarantee.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P20.error",
+          "dimension": "error",
+          "action": "Make this setting's file write or provider/package/MCP operation fail; cancel then retry once after recovery.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Source en.yml + generated locale files. Native macOS menus follow language changes; keyboard label modifier names vary by OS. Accessibility is incomplete, not an implied guarantee.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P20.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P20.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P20.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P20.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/preferences",
+        "internal/workbench",
+        "internal/native"
+      ],
+      "existing_test_candidates": [
+        "internal/preferences/store_test.go",
+        "internal/preferences/workspaces_test.go",
+        "internal/workbench/workbench_test.go",
+        "internal/native/native_test.go",
+        "internal/native/runtime_test.go",
+        "internal/native/updater_test.go",
+        "internal/native/temp_files_test.go"
+      ],
+      "inventory_evidence": "../parity/settings.json",
+      "source_test_inventory": "T03,T17",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Locale assets and command registry exist, but hard-coded English labels and context-specific bindings prevent full localization/shortcut parity.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-P07",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "partial",
+          "steps": [
+            "Change every theme/font/density/motion choice and relaunch.",
+            "Visit all sections in each of10 locales.",
+            "Configure animated/photo backdrop and inspect keyboard reference."
+          ],
+          "expected": "Source palette/tokens and persistent preferences, complete localization and backdrop.",
+          "tests": [
+            "TestTokensAndCommandRegistry",
+            "TestFractionalScaleKeepsLogicalComposerGeometry"
+          ],
+          "remaining": "10 palettes and55 binding parsing pass; many host labels remain English, backdrop integration is pending, and font/density/motion/OS contrast visual matrix remains open.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": []
+    }
+  ]
+}

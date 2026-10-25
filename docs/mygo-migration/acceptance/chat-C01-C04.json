@@ -1,0 +1,611 @@
+{
+  "schema": "orbit-acceptance-shard/v1",
+  "category": "chat",
+  "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "rows": [
+    {
+      "id": "C01",
+      "title": "Native multiline text editing",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/composer.rs",
+          "handler": "ComposerInput",
+          "line": 55,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/composer.rs#L55",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/main.rs",
+          "handler": "bind_keys",
+          "line": 357,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/main.rs#L357",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/session.rs",
+          "handler": "submit_composer_as",
+          "line": 88,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/session.rs#L88",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Wrapping/auto-grow/scroll; grapheme-aware caret/selection, word/line/document movement, copy/cut/paste/select-all, undo/redo and IME composition. Shift+Enter inserts newline.",
+      "baseline_edge_state": "IME candidate Enter must never submit; focused surface gates submission. Same input primitive is reused for editor, search and modal fields but key context differs.",
+      "fixture": "Isolated HOME, deterministic fixture Pi RPC stream, long transcript/Unicode/image fixtures and no live provider inference.",
+      "steps": [
+        {
+          "id": "C01.behavior",
+          "dimension": "functional",
+          "action": "Type Unicode, combining marks, emoji and multiline text; select by word/line; cut, paste, undo and redo.",
+          "expected": "Wrapping/auto-grow/scroll; grapheme-aware caret/selection, word/line/document movement, copy/cut/paste/select-all, undo/redo and IME composition. Shift+Enter inserts newline.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C01.edge",
+          "dimension": "edge",
+          "action": "Use IME composition and candidate Enter, Shift+Enter and editor focus; none may accidentally submit a chat prompt.",
+          "expected": "IME candidate Enter must never submit; focused surface gates submission. Same input primitive is reused for editor, search and modal fields but key context differs.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C01.error",
+          "dimension": "error",
+          "action": "Delay, reject, cancel or disconnect the fixture RPC operation; send a late event for the previous request/session.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: IME candidate Enter must never submit; focused surface gates submission. Same input primitive is reused for editor, search and modal fields but key context differs.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C01.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C01.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C01.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C01.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/ui",
+        "cmd/orbit/main.go"
+      ],
+      "existing_test_candidates": [
+        "internal/ui/snapshot_test.go",
+        "internal/ui/workspace_review_regression_test.go",
+        "internal/ui/viewer_parity_test.go"
+      ],
+      "inventory_evidence": "../parity/chat.json",
+      "source_test_inventory": "T04",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-C01",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "pass_scoped",
+          "steps": [
+            "Type line one, Shift+Enter, line two.",
+            "Start IME composition; Enter commits composition only.",
+            "Commit Chinese text then Enter."
+          ],
+          "expected": "No prompt during composition; native text editing and multiline text remain intact.",
+          "tests": [
+            "TestIMECompositionDoesNotSubmit",
+            "TestComposerRepeatedEnterShiftAlternateAndRejection"
+          ],
+          "remaining": "Headless composition event and multiline submission pass. Real Chinese/Japanese/Korean OS IME candidates, clipboard and accessibility remain unexecuted.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": []
+    },
+    {
+      "id": "C02",
+      "title": "Prompt, steer and follow-up policy",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/composer_send.rs",
+          "handler": "SendMode",
+          "line": 10,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/composer_send.rs#L10",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/session.rs",
+          "handler": "submit_as",
+          "line": 129,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/session.rs#L129",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/theme.rs",
+          "handler": "UiPrefs",
+          "line": 324,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/theme.rs#L324",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Idle send starts prompt. While working, Enter uses configurable Follow-up/Steer mode, Alt+Enter its opposite, Primary+Shift+Enter explicitly steers; hints and button labels follow preference.",
+      "baseline_edge_state": "UI enters busy/awaiting immediately before first agent event; clear input only after send succeeds; failed send retains text and attachments. Empty text is not sent.",
+      "fixture": "Isolated HOME, deterministic fixture Pi RPC stream, long transcript/Unicode/image fixtures and no live provider inference.",
+      "steps": [
+        {
+          "id": "C02.behavior",
+          "dimension": "functional",
+          "action": "Send an idle prompt; while busy send with Enter, Alt+Enter and Primary+Shift+Enter under each configured send mode.",
+          "expected": "Idle send starts prompt. While working, Enter uses configurable Follow-up/Steer mode, Alt+Enter its opposite, Primary+Shift+Enter explicitly steers; hints and button labels follow preference.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C02.edge",
+          "dimension": "edge",
+          "action": "Make the RPC send fail before acknowledgement; retain exact draft and attachments; reject whitespace-only input.",
+          "expected": "UI enters busy/awaiting immediately before first agent event; clear input only after send succeeds; failed send retains text and attachments. Empty text is not sent.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C02.error",
+          "dimension": "error",
+          "action": "Delay, reject, cancel or disconnect the fixture RPC operation; send a late event for the previous request/session.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: UI enters busy/awaiting immediately before first agent event; clear input only after send succeeds; failed send retains text and attachments. Empty text is not sent.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C02.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C02.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C02.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C02.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/pirpc",
+        "internal/agent"
+      ],
+      "existing_test_candidates": [
+        "internal/pirpc/client_test.go",
+        "internal/agent/manager_test.go",
+        "internal/agent/reducer_test.go"
+      ],
+      "inventory_evidence": "../parity/chat.json",
+      "source_test_inventory": "T04,T06",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-C02",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "partial",
+          "steps": [
+            "Set follow_up; Alt+Enter sends steer.",
+            "Press Enter again with empty input.",
+            "Reject Submit during maintenance/disconnect, then retry."
+          ],
+          "expected": "One action per accepted nonempty submission; rejected draft remains; alternate mode is exact opposite.",
+          "tests": [
+            "TestComposerRepeatedEnterShiftAlternateAndRejection",
+            "TestMaintenanceGateKeepsDraftAndBlocksNewProcess"
+          ],
+          "remaining": "Exact tested sends/rejection pass. Source individual queue editing/removal and one/all queued delivery controls are incomplete in host UI.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": []
+    },
+    {
+      "id": "C03",
+      "title": "Queue visualization and delivery",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "handler": "queue_bar",
+          "line": 4532,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/view.rs#L4532",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "handler": "on_clear_queue",
+          "line": 4719,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/view.rs#L4719",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/session.rs",
+          "handler": "reset_queue",
+          "line": 284,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/session.rs#L284",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "set_follow_up_mode",
+          "line": 5580,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L5580",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Pending steering/follow-up queue appears above composer, offers clear_queue; set_follow_up_mode supports one-at-a-time/all delivery.",
+      "baseline_edge_state": "Optimistic queue display reconciles with queue_update; parked sessions maintain queue. Input not rendered as delivered until runtime actually delivers it.",
+      "fixture": "Isolated HOME, deterministic fixture Pi RPC stream, long transcript/Unicode/image fixtures and no live provider inference.",
+      "steps": [
+        {
+          "id": "C03.behavior",
+          "dimension": "functional",
+          "action": "Queue multiple steer and follow-up messages, inspect order, edit/remove supported entries and let the agent settle.",
+          "expected": "Pending steering/follow-up queue appears above composer, offers clear_queue; set_follow_up_mode supports one-at-a-time/all delivery.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C03.edge",
+          "dimension": "edge",
+          "action": "Switch sessions with queued messages, fail one delivery and repeat the action; verify no duplicate or wrong-session delivery.",
+          "expected": "Optimistic queue display reconciles with queue_update; parked sessions maintain queue. Input not rendered as delivered until runtime actually delivers it.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C03.error",
+          "dimension": "error",
+          "action": "Delay, reject, cancel or disconnect the fixture RPC operation; send a late event for the previous request/session.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Optimistic queue display reconciles with queue_update; parked sessions maintain queue. Input not rendered as delivered until runtime actually delivers it.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C03.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C03.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C03.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C03.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/pirpc",
+        "internal/agent"
+      ],
+      "existing_test_candidates": [
+        "internal/pirpc/client_test.go",
+        "internal/agent/manager_test.go",
+        "internal/agent/reducer_test.go"
+      ],
+      "inventory_evidence": "../parity/chat.json",
+      "source_test_inventory": "T04,T06",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-C02",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "partial",
+          "steps": [
+            "Set follow_up; Alt+Enter sends steer.",
+            "Press Enter again with empty input.",
+            "Reject Submit during maintenance/disconnect, then retry."
+          ],
+          "expected": "One action per accepted nonempty submission; rejected draft remains; alternate mode is exact opposite.",
+          "tests": [
+            "TestComposerRepeatedEnterShiftAlternateAndRejection",
+            "TestMaintenanceGateKeepsDraftAndBlocksNewProcess"
+          ],
+          "remaining": "Exact tested sends/rejection pass. Source individual queue editing/removal and one/all queued delivery controls are incomplete in host UI.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": []
+    },
+    {
+      "id": "C04",
+      "title": "Slash commands and file mentions",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/composer_ops.rs",
+          "handler": "autocomplete_entries",
+          "line": 9,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/composer_ops.rs#L9",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/composer_ops.rs",
+          "handler": "commit_entry",
+          "line": 113,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/composer_ops.rs#L113",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/composer_ops.rs",
+          "handler": "attach_file",
+          "line": 471,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/composer_ops.rs#L471",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Slash command catalog from pi; @ file autocomplete, query highlighting and arrow/Tab/Enter acceptance; + menu Attach image / Attach file / Mention file.",
+      "baseline_edge_state": "Autocomplete list capped at eight rows; path discovery is background/git-aware. Accepting completion takes precedence over prompt send. Attach file inserts a mention, not arbitrary contents upload.",
+      "fixture": "Isolated HOME, deterministic fixture Pi RPC stream, long transcript/Unicode/image fixtures and no live provider inference.",
+      "steps": [
+        {
+          "id": "C04.behavior",
+          "dimension": "functional",
+          "action": "Type slash and file-mention prefixes, navigate results, accept a command/file, then submit.",
+          "expected": "Slash command catalog from pi; @ file autocomplete, query highlighting and arrow/Tab/Enter acceptance; + menu Attach image / Attach file / Mention file.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C04.edge",
+          "dimension": "edge",
+          "action": "Use spaces, Unicode and ambiguous paths; Escape and backspace must restore draft; test empty and stale result lists.",
+          "expected": "Autocomplete list capped at eight rows; path discovery is background/git-aware. Accepting completion takes precedence over prompt send. Attach file inserts a mention, not arbitrary contents upload.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C04.error",
+          "dimension": "error",
+          "action": "Delay, reject, cancel or disconnect the fixture RPC operation; send a late event for the previous request/session.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Autocomplete list capped at eight rows; path discovery is background/git-aware. Accepting completion takes precedence over prompt send. Attach file inserts a mention, not arbitrary contents upload.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C04.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C04.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C04.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C04.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/ui",
+        "cmd/orbit/main.go"
+      ],
+      "existing_test_candidates": [
+        "internal/ui/snapshot_test.go",
+        "internal/ui/workspace_review_regression_test.go",
+        "internal/ui/viewer_parity_test.go"
+      ],
+      "inventory_evidence": "../parity/chat.json",
+      "source_test_inventory": "T04",
+      "verdicts": {
+        "functional": {
+          "status": "NOT_IMPLEMENTED",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-C03",
+          "status": "NOT_IMPLEMENTED",
+          "owner_reported_verdict": "failed_missing_implementation",
+          "steps": [
+            "Type / then filter a command.",
+            "Type @ then select a nested file by keyboard.",
+            "Escape cancels; accepting replaces only trigger range."
+          ],
+          "expected": "Source composer_ops autocomplete ordering, keyboard ownership and trigger replacement.",
+          "tests": [],
+          "remaining": "Host currently has no source-equivalent slash/file-mention popup. Plain text commands are forwarded but are not autocomplete parity.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": []
+    }
+  ]
+}

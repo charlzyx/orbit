@@ -1,0 +1,621 @@
+{
+  "schema": "orbit-acceptance-shard/v1",
+  "category": "settings",
+  "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "rows": [
+    {
+      "id": "P01",
+      "title": "Settings hub and search",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app.rs",
+          "handler": "SettingsSection",
+          "line": 2679,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app.rs#L2679",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "SETTINGS_SECTIONS",
+          "line": 50,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L50",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "SETTINGS_SEARCH_INDEX",
+          "line": 116,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L116",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "14 sections: General, Appearance, Shortcuts, Privacy, Runtime, Agent, Worktrees, Providers, Models, Skills, Plugins, MCP, About, Report Bug; search indexes labels/synonyms across sections, keyboard selects results.",
+      "baseline_edge_state": "Section navigation, back and scroll state; empty-query/no-result behavior and popup focus must match. Existing docs that list fewer sections are stale.",
+      "fixture": "Isolated HOME and project config, dummy secret marker values, controlled package/provider/MCP executables and fake OAuth issuer; no real credentials.",
+      "steps": [
+        {
+          "id": "P01.behavior",
+          "dimension": "functional",
+          "action": "Visit all 14 source Settings sections; search by section name and synonym; choose with keyboard.",
+          "expected": "14 sections: General, Appearance, Shortcuts, Privacy, Runtime, Agent, Worktrees, Providers, Models, Skills, Plugins, MCP, About, Report Bug; search indexes labels/synonyms across sections, keyboard selects results.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P01.edge",
+          "dimension": "edge",
+          "action": "Test empty/no-result query, back navigation, scrolling and section change while a popup is open.",
+          "expected": "Section navigation, back and scroll state; empty-query/no-result behavior and popup focus must match. Existing docs that list fewer sections are stale.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P01.error",
+          "dimension": "error",
+          "action": "Make this setting's file write or provider/package/MCP operation fail; cancel then retry once after recovery.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Section navigation, back and scroll state; empty-query/no-result behavior and popup focus must match. Existing docs that list fewer sections are stale.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P01.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P01.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P01.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P01.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/preferences",
+        "internal/workbench",
+        "internal/native"
+      ],
+      "existing_test_candidates": [
+        "internal/preferences/store_test.go",
+        "internal/preferences/workspaces_test.go",
+        "internal/workbench/workbench_test.go",
+        "internal/native/native_test.go",
+        "internal/native/runtime_test.go",
+        "internal/native/updater_test.go",
+        "internal/native/temp_files_test.go"
+      ],
+      "inventory_evidence": "../parity/settings.json",
+      "source_test_inventory": "T12",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-P01",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "partial",
+          "steps": [
+            "Visit all14 source sections.",
+            "Scroll a long page, switch away for8 frames, return.",
+            "Search a row label/synonym and activate result."
+          ],
+          "expected": "Source section order; retained per-page scroll; search navigates exact row with source keyboard behavior.",
+          "tests": [
+            "TestSettingsNavigationComplete",
+            "TestSettingsPageScrollRetained"
+          ],
+          "remaining": "14 sections and retained native scroll pass; fixed missing FillHeight that previously prevented long pages scrolling. Exact-row/synonym search is missing; current category-only search fails source P01.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": []
+    },
+    {
+      "id": "P02",
+      "title": "General and runtime inspection",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "runtime_rows",
+          "line": 4931,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L4931",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/runtime.rs",
+          "handler": "runtime_start",
+          "line": 488,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/runtime.rs#L488",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/runtime.rs",
+          "handler": "runtime_stop",
+          "line": 518,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/runtime.rs#L518",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/runtime.rs",
+          "handler": "runtime_restart",
+          "line": 532,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/runtime.rs#L532",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Show local session store/current workspace, process status/PID/binary/uptime/stdio, last error and recent stderr, parked process count; Start/Stop/Restart.",
+      "baseline_edge_state": "Runtime restart must resume current session rather than erase history. Missing executable/dead child is actionable, never Connected. State refreshes on heartbeat.",
+      "fixture": "Isolated HOME and project config, dummy secret marker values, controlled package/provider/MCP executables and fake OAuth issuer; no real credentials.",
+      "steps": [
+        {
+          "id": "P02.behavior",
+          "dimension": "functional",
+          "action": "Inspect binary/PID/uptime/stderr and parked processes; Start, Stop and Restart the active runtime.",
+          "expected": "Show local session store/current workspace, process status/PID/binary/uptime/stdio, last error and recent stderr, parked process count; Start/Stop/Restart.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P02.edge",
+          "dimension": "edge",
+          "action": "Use missing binary and crashed child; Restart must resume the same session, not display Connected or erase history.",
+          "expected": "Runtime restart must resume current session rather than erase history. Missing executable/dead child is actionable, never Connected. State refreshes on heartbeat.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P02.error",
+          "dimension": "error",
+          "action": "Make this setting's file write or provider/package/MCP operation fail; cancel then retry once after recovery.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Runtime restart must resume current session rather than erase history. Missing executable/dead child is actionable, never Connected. State refreshes on heartbeat.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P02.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P02.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P02.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P02.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/preferences",
+        "internal/workbench",
+        "internal/native"
+      ],
+      "existing_test_candidates": [
+        "internal/preferences/store_test.go",
+        "internal/preferences/workspaces_test.go",
+        "internal/workbench/workbench_test.go",
+        "internal/native/native_test.go",
+        "internal/native/runtime_test.go",
+        "internal/native/updater_test.go",
+        "internal/native/temp_files_test.go"
+      ],
+      "inventory_evidence": "../parity/settings.json",
+      "source_test_inventory": "T06,T12",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-P02",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "failed_missing_data",
+          "steps": [
+            "Inspect active/parked PID/executable/uptime/stdout/stderr.",
+            "Start/Stop/Restart; dependency install failure/cancel.",
+            "Change defaults, auto-retry/compaction/title model; restart/resume."
+          ],
+          "expected": "Only real process fields, safe busy gates and source fresh-session-only defaults.",
+          "tests": [
+            "TestMaintenanceGateKeepsDraftAndBlocksNewProcess"
+          ],
+          "remaining": "Host lacks actual PID/uptime/stderr/process-row adapter and complete auto-retry/follow-up/title-model controls. Native dependency/install helpers exist; action/OS integration needs execution. Do not fabricate metrics.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": [
+        "../runtime-acceptance.md"
+      ]
+    },
+    {
+      "id": "P03",
+      "title": "First-run dependency setup",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "handler": "render_onboarding",
+          "line": 2664,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/view.rs#L2664",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "handler": "render_pi_migration",
+          "line": 2903,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/view.rs#L2903",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Host OS/architecture/store paths, Node/pi/git/gh detection/install guidance, refresh checks, official pi installer and npm-to-managed migration UI.",
+      "baseline_edge_state": "Required versus optional dependencies differ. Managed/npm/other/custom PI_BIN installs are distinguished; unsupported package-manager installs are not silently replaced. Verify install outcome and on-PATH identity.",
+      "fixture": "Isolated HOME and project config, dummy secret marker values, controlled package/provider/MCP executables and fake OAuth issuer; no real credentials.",
+      "steps": [
+        {
+          "id": "P03.behavior",
+          "dimension": "functional",
+          "action": "Run first-use dependency detection with Pi/Node present and missing; inspect each offered setup action.",
+          "expected": "Host OS/architecture/store paths, Node/pi/git/gh detection/install guidance, refresh checks, official pi installer and npm-to-managed migration UI.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P03.edge",
+          "dimension": "edge",
+          "action": "Cancel installation, fail a command and retry in a disposable environment; never report ready before verification succeeds.",
+          "expected": "Required versus optional dependencies differ. Managed/npm/other/custom PI_BIN installs are distinguished; unsupported package-manager installs are not silently replaced. Verify install outcome and on-PATH identity.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P03.error",
+          "dimension": "error",
+          "action": "Make this setting's file write or provider/package/MCP operation fail; cancel then retry once after recovery.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Required versus optional dependencies differ. Managed/npm/other/custom PI_BIN installs are distinguished; unsupported package-manager installs are not silently replaced. Verify install outcome and on-PATH identity.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P03.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P03.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P03.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P03.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/preferences",
+        "internal/workbench",
+        "internal/native"
+      ],
+      "existing_test_candidates": [
+        "internal/preferences/store_test.go",
+        "internal/preferences/workspaces_test.go",
+        "internal/workbench/workbench_test.go",
+        "internal/native/native_test.go",
+        "internal/native/runtime_test.go",
+        "internal/native/updater_test.go",
+        "internal/native/temp_files_test.go"
+      ],
+      "inventory_evidence": "../parity/settings.json",
+      "source_test_inventory": "T13",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-P02",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "failed_missing_data",
+          "steps": [
+            "Inspect active/parked PID/executable/uptime/stdout/stderr.",
+            "Start/Stop/Restart; dependency install failure/cancel.",
+            "Change defaults, auto-retry/compaction/title model; restart/resume."
+          ],
+          "expected": "Only real process fields, safe busy gates and source fresh-session-only defaults.",
+          "tests": [
+            "TestMaintenanceGateKeepsDraftAndBlocksNewProcess"
+          ],
+          "remaining": "Host lacks actual PID/uptime/stderr/process-row adapter and complete auto-retry/follow-up/title-model controls. Native dependency/install helpers exist; action/OS integration needs execution. Do not fabricate metrics.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": []
+    },
+    {
+      "id": "P04",
+      "title": "Agent defaults and titles",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "agent_rows",
+          "line": 5196,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L5196",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/runtime.rs",
+          "handler": "apply_default_model",
+          "line": 217,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/runtime.rs#L217",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Default model/provider/thinking for NEW sessions, active model selection, Enter delivery policy, one/all follow-ups, auto-compaction/retry, automatic session titles and dedicated title model.",
+      "baseline_edge_state": "session-defaults.json affects spawn and new session but not resumed model. auto-title.json supports active-model fallback; title generation after first settled exchange only.",
+      "fixture": "Isolated HOME and project config, dummy secret marker values, controlled package/provider/MCP executables and fake OAuth issuer; no real credentials.",
+      "steps": [
+        {
+          "id": "P04.behavior",
+          "dimension": "functional",
+          "action": "Edit agent defaults, prompt/title-generation settings and restore source defaults; start a new session.",
+          "expected": "Default model/provider/thinking for NEW sessions, active model selection, Enter delivery policy, one/all follow-ups, auto-compaction/retry, automatic session titles and dedicated title model.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P04.edge",
+          "dimension": "edge",
+          "action": "Load malformed stored values, fail persistence and override settings in an existing session; compare scope boundaries.",
+          "expected": "session-defaults.json affects spawn and new session but not resumed model. auto-title.json supports active-model fallback; title generation after first settled exchange only.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P04.error",
+          "dimension": "error",
+          "action": "Make this setting's file write or provider/package/MCP operation fail; cancel then retry once after recovery.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: session-defaults.json affects spawn and new session but not resumed model. auto-title.json supports active-model fallback; title generation after first settled exchange only.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P04.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P04.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P04.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P04.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/preferences",
+        "internal/workbench",
+        "internal/native"
+      ],
+      "existing_test_candidates": [
+        "internal/preferences/store_test.go",
+        "internal/preferences/workspaces_test.go",
+        "internal/workbench/workbench_test.go",
+        "internal/native/native_test.go",
+        "internal/native/runtime_test.go",
+        "internal/native/updater_test.go",
+        "internal/native/temp_files_test.go"
+      ],
+      "inventory_evidence": "../parity/settings.json",
+      "source_test_inventory": "T07,T11,T12",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-P02",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "failed_missing_data",
+          "steps": [
+            "Inspect active/parked PID/executable/uptime/stdout/stderr.",
+            "Start/Stop/Restart; dependency install failure/cancel.",
+            "Change defaults, auto-retry/compaction/title model; restart/resume."
+          ],
+          "expected": "Only real process fields, safe busy gates and source fresh-session-only defaults.",
+          "tests": [
+            "TestMaintenanceGateKeepsDraftAndBlocksNewProcess"
+          ],
+          "remaining": "Host lacks actual PID/uptime/stderr/process-row adapter and complete auto-retry/follow-up/title-model controls. Native dependency/install helpers exist; action/OS integration needs execution. Do not fabricate metrics.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": [
+        "../runtime-acceptance.md"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,466 @@
+{
+  "schema": "orbit-acceptance-shard/v1",
+  "category": "workbench-lifecycle",
+  "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "rows": [
+    {
+      "id": "W01",
+      "title": "One main-area feature surface at a time: Files opens while closing Settings/Git/Usage/Worktrees; return-to-chat preserves the file entity. Docked Review and Explorer are mutually exclusive. Full-width Review keeps/restores a dock width and opens the sessions sidebar.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/session.rs",
+          "handler": "open_file_in_viewer",
+          "line": 2448,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/session.rs#L2448",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app.rs",
+          "handler": "sync_terminal_active",
+          "line": 2098,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app.rs#L2098",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "close",
+          "line": 524,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L524",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "handler": "render",
+          "line": 166,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/view.rs#L166",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "One main-area feature surface at a time: Files opens while closing Settings/Git/Usage/Worktrees; return-to-chat preserves the file entity. Docked Review and Explorer are mutually exclusive. Full-width Review keeps/restores a dock width and opens the sessions sidebar.",
+      "baseline_edge_state": "Page changes update terminal visibility rather than killing shells. Full-width close restores dock state. This is cross-surface behavior, not just styling.",
+      "fixture": "Two temporary Git workspaces, fixture Pi stream, open files/tabs and independent watcher/subprocess completion controls.",
+      "steps": [
+        {
+          "id": "W01.behavior",
+          "dimension": "functional",
+          "action": "Open Files, Settings, Git, Usage and Worktrees in turn; toggle docked Review/Explorer and full-width Review.",
+          "expected": "One main-area feature surface at a time: Files opens while closing Settings/Git/Usage/Worktrees; return-to-chat preserves the file entity. Docked Review and Explorer are mutually exclusive. Full-width Review keeps/restores a dock width and opens the sessions sidebar.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W01.edge",
+          "dimension": "edge",
+          "action": "Hide and return to Files with an unsaved buffer; verify only source-exclusive surfaces close and saved widths/focus restore.",
+          "expected": "Page changes update terminal visibility rather than killing shells. Full-width close restores dock state. This is cross-surface behavior, not just styling.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W01.error",
+          "dimension": "error",
+          "action": "Delay/fail a watcher or refresh callback and switch visible workspace/surface before completion.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Page changes update terminal visibility rather than killing shells. Full-width close restores dock state. This is cross-surface behavior, not just styling.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W01.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W01.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W01.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W01.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/ui",
+        "cmd/orbit/main.go"
+      ],
+      "existing_test_candidates": [
+        "internal/ui/snapshot_test.go",
+        "internal/ui/workspace_review_regression_test.go",
+        "internal/ui/viewer_parity_test.go"
+      ],
+      "inventory_evidence": "../parity/workbench-lifecycle.json",
+      "source_test_inventory": "`app/new_task_panels_tests.rs::{starting_a_new_task_closes_every_open_panel,closing_surfaces_with_nothing_open_is_a_no_op}`; `app/sidepane_full_width_tests.rs`",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    },
+    {
+      "id": "W02",
+      "title": "Workspace edits from agent, user, editor or Git refresh docked Review, visible Git status, Explorer, active Files tab, branch status and visible Worktrees list.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/watch.rs",
+          "handler": "WorkspaceWatcher",
+          "line": 77,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/watch.rs#L77",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/watch.rs",
+          "handler": "git_metadata_dirs",
+          "line": 138,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/watch.rs#L138",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/watch.rs",
+          "handler": "workspace_relevant",
+          "line": 206,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/watch.rs#L206",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/watch.rs",
+          "handler": "git_metadata_relevant",
+          "line": 243,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/watch.rs#L243",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Workspace edits from agent, user, editor or Git refresh docked Review, visible Git status, Explorer, active Files tab, branch status and visible Worktrees list.",
+      "baseline_edge_state": "Watch is 500 ms debounced; linked-worktree per-worktree/common Git dirs are watched separately. Generated trees, Git object/log/checkpoint scratch are excluded to prevent refresh loops. No watcher backend means manual refresh remains; startup retried after workspace change, not every heartbeat.",
+      "fixture": "Two temporary Git workspaces, fixture Pi stream, open files/tabs and independent watcher/subprocess completion controls.",
+      "steps": [
+        {
+          "id": "W02.behavior",
+          "dimension": "functional",
+          "action": "Modify files via agent/editor/external process and stage/checkout via Git while each dependent pane is visible.",
+          "expected": "Workspace edits from agent, user, editor or Git refresh docked Review, visible Git status, Explorer, active Files tab, branch status and visible Worktrees list.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W02.edge",
+          "dimension": "edge",
+          "action": "Burst changes, rename directories and switch workspace during debounce; no stale refresh or watch loop from checkpoint refs.",
+          "expected": "Watch is 500 ms debounced; linked-worktree per-worktree/common Git dirs are watched separately. Generated trees, Git object/log/checkpoint scratch are excluded to prevent refresh loops. No watcher backend means manual refresh remains; startup retried after workspace change, not every heartbeat.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W02.error",
+          "dimension": "error",
+          "action": "Delay/fail a watcher or refresh callback and switch visible workspace/surface before completion.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Watch is 500 ms debounced; linked-worktree per-worktree/common Git dirs are watched separately. Generated trees, Git object/log/checkpoint scratch are excluded to prevent refresh loops. No watcher backend means manual refresh remains; startup retried after workspace change, not every heartbeat.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W02.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W02.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W02.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W02.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/workspace/files.go",
+        "internal/workspace/editor.go",
+        "internal/workspace/tree.go",
+        "internal/workspace/watch.go",
+        "internal/ui/files.go"
+      ],
+      "existing_test_candidates": [
+        "internal/workspace/files_test.go",
+        "internal/workspace/tree_test.go",
+        "internal/workspace/watch_test.go"
+      ],
+      "inventory_evidence": "../parity/workbench-lifecycle.json",
+      "source_test_inventory": "`watch.rs::{linked_worktree_metadata_dirs_are_resolved_outside_the_tree,workspace_watcher_ignores_orbit_checkpoint_scratch,workspace_watcher_ignores_changes_tab_diff_loads,workspace_watcher_reports_a_source_change}`",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Named narrow assertions pass; remaining row steps are unverified.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3"
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [
+        {
+          "id": "W02.assert.TestNativeWatchDetectsPreservedMetadataAndNewNestedTrees",
+          "status": "PASS",
+          "expected": "Native filesystem events detect metadata-preserving writes and newly nested directories.",
+          "test": "TestNativeWatchDetectsPreservedMetadataAndNewNestedTrees",
+          "package": "github.com/charlzyx/orbit/internal/workspace",
+          "command": "go test -race -count=1 ./internal/workspace -run ^TestNativeWatchDetectsPreservedMetadataAndNewNestedTrees$",
+          "evidence": "workspace-evidence.json",
+          "last_verified_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:01:18.372698474+09:00",
+          "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
+        },
+        {
+          "id": "W02.assert.TestNativeWatchFollowsLinkedMetadataAndIgnoresCheckpointChurn",
+          "status": "PASS",
+          "expected": "Linked-worktree/common refs are watched without refreshing on private checkpoint churn.",
+          "test": "TestNativeWatchFollowsLinkedMetadataAndIgnoresCheckpointChurn",
+          "package": "github.com/charlzyx/orbit/internal/workspace",
+          "command": "go test -race -count=1 ./internal/workspace -run ^TestNativeWatchFollowsLinkedMetadataAndIgnoresCheckpointChurn$",
+          "evidence": "workspace-evidence.json",
+          "last_verified_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:01:18.566613334+09:00",
+          "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
+        },
+        {
+          "id": "W02.assert.TestNativeWatchDebouncesBurstAndFallsBackOnOverflow",
+          "status": "PASS",
+          "expected": "Debounced bursts and overflow fallback preserve eventual refresh.",
+          "test": "TestNativeWatchDebouncesBurstAndFallsBackOnOverflow",
+          "package": "github.com/charlzyx/orbit/internal/workspace",
+          "command": "go test -race -count=1 ./internal/workspace -run ^TestNativeWatchDebouncesBurstAndFallsBackOnOverflow$",
+          "evidence": "workspace-evidence.json",
+          "last_verified_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:01:18.868969022+09:00",
+          "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
+        }
+      ],
+      "known_remaining": "Native fsnotify recursive/trailing-debounce and bounded polling fallback pass Linux filesystem/race tests. Windows/macOS cross-compile only; real host event delivery, network filesystems and all UI refresh fan-out remain acceptance gates.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    },
+    {
+      "id": "W03",
+      "title": "Resizable sidebar, Review, Explorer and terminal dimensions survive relaunch.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/layout.rs",
+          "handler": "Layout",
+          "line": 29,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/layout.rs#L29",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/layout.rs",
+          "handler": "record",
+          "line": 115,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/layout.rs#L115",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/layout.rs",
+          "handler": "flush_if_settled",
+          "line": 142,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/layout.rs#L142",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "set_width",
+          "line": 328,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L328",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Resizable sidebar, Review, Explorer and terminal dimensions survive relaunch.",
+      "baseline_edge_state": "`~/.orbit-pi/layout.json`; 500 ms settle debounce, finite 80–4000 px load sanity plus per-panel clamps. Only dimensions are in this store; do not infer persisted tab/process/buffer state. Current writes are best-effort and errors are ignored.",
+      "fixture": "Two temporary Git workspaces, fixture Pi stream, open files/tabs and independent watcher/subprocess completion controls.",
+      "steps": [
+        {
+          "id": "W03.behavior",
+          "dimension": "functional",
+          "action": "Drag Sidebar, Review, Explorer and Terminal below minimum, to a normal size and above maximum; toggle full-width Review independently.",
+          "expected": "Sidebar default248/min200; Review default460/min300/drag max900; Explorer default248/min172/max460; Terminal default260/min96. Main content retains480px reserve where the source resize handler applies it. Full-width Review preserves its separate restore width.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W03.edge",
+          "dimension": "edge",
+          "action": "Write invalid/nonfinite sizes and test save failure; source clamps/defaults apply without overwriting unrelated layout state.",
+          "expected": "`~/.orbit-pi/layout.json`; 500 ms settle debounce, finite 80–4000 px load sanity plus per-panel clamps. Only dimensions are in this store; do not infer persisted tab/process/buffer state. Current writes are best-effort and errors are ignored.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W03.error",
+          "dimension": "error",
+          "action": "Make the fixture ~/.orbit-pi/layout.json parent unwritable; drag and allow the settle flush. Restore permission, change a size again and flush.",
+          "expected": "Pinned Layout.persist ignores write errors: current live size remains, old disk state is not falsely claimed updated, and a later changed size can persist. This action has no session-scan or Pi dependency.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W03.loading",
+          "dimension": "loading",
+          "action": "Record a size change at t=0; flush at499ms and500ms. Record an identical value at400ms and repeat.",
+          "expected": "No disk write before500ms; one flush when changed value has settled. Recording the same value does not rearm the timer. Resizing is immediate and has no loading spinner.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W03.persistence",
+          "dimension": "persistence",
+          "action": "Persist sidebar_width248, sidepane_width460, explorer_width300, terminal_height260 in ~/.orbit-pi/layout.json; relaunch. Repeat with missing, text,10,99999 and nonfinite parsed fields.",
+          "expected": "Only those four sizes belong to this store. Numeric finite values in inclusive80…4000 survive parsing before panel-specific clamps; invalid fields become absent/default independently. Malformed file defaults all fields. Open panels, fonts and theme are not restored by this file.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W03.keyboard",
+          "dimension": "keyboard",
+          "action": "After resizing use Cmd+B/Ctrl+B, Cmd+Shift+E/Ctrl+Shift+E and Cmd+J/Ctrl+J to toggle Sidebar, Explorer and Terminal; reopen each.",
+          "expected": "The registered source panel actions toggle visibility without treating those keys as resize commands; remembered size is retained. Review ToggleSidePanel has no chord in this command entry, so no invented key is required.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W03.repeat",
+          "dimension": "repeat",
+          "action": "Perform100 pointer size updates, stop, then leave the splitter stationary and reopen the panel three times.",
+          "expected": "Live geometry updates without writing per pixel; one settled write per changed burst. Stationary input does not repeatedly rewrite layout.json; visibility toggles retain size.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/preferences",
+        "internal/workbench",
+        "internal/native"
+      ],
+      "existing_test_candidates": [
+        "internal/preferences/store_test.go",
+        "internal/preferences/workspaces_test.go",
+        "internal/workbench/workbench_test.go",
+        "internal/native/native_test.go",
+        "internal/native/runtime_test.go",
+        "internal/native/updater_test.go",
+        "internal/native/temp_files_test.go"
+      ],
+      "inventory_evidence": "../parity/workbench-lifecycle.json",
+      "source_test_inventory": "`layout.rs::{fields_round_trip,missing_and_out_of_bounds_fields_are_dropped,non_numeric_field_is_dropped,record_arms_the_settle_timer_only_on_change}`",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Layout persistence code exists; settle debounce and drag/restore interactions require acceptance.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    }
+  ]
+}

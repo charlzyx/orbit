@@ -1,0 +1,116 @@
+{
+  "original_orbit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "mygo": "9c69cf829ece196c5b3a3601f1c7bbe70526376f",
+  "pi_metadata_probe": "1.4.0: 42 providers; 42 catalogs; no inference/network",
+  "snapshot": "dirty cloud working tree on 2026-10-25T05:08:57.909521+00:00; not a published-checkpoint claim",
+  "files": {
+    "internal/resourceui/audit_acceptance_test.go": "4809164269a9c80ab86ef22a52af1fdec54967c24322a0d4caaa901d5d533af5",
+    "internal/resourceui/plugins.go": "8a9b7be950ea6c8b8f998ac9ea250c38570a1204bc07fc02837a61243f97ebd4",
+    "internal/resourceui/skills.go": "f1a5166ccd9ce2c0679384248d26cf603480f614ebbf75e5da9266128bb510fe",
+    "internal/resourceui/state.go": "5cc88dab42111154590ba810a998f7630fb76a1a647845bb0e33925980815842",
+    "internal/resourceui/state_test.go": "a083704784dc08fa0a4e4e319008920a229364efb53ac72c8982e76031a97da0",
+    "internal/resourceui/updates.go": "093c373f03f3d6661368113ce335ae6bc1144b883062527536e8ac74f07f1844",
+    "internal/resourceui/view.go": "3673996ccf97ef568815a30fc295ccc66bdbea27d72e4306d2ece4d8733ab9f4",
+    "internal/resourceui/view_test.go": "15d1bb8375e00dbda0823cd1ed646226868b31968d28c4b26f68883d524d008f",
+    "internal/ui/app.go": "e36014195df5b2804ed065c464b7991e332e62772f432f868343b52d1706b9b5",
+    "internal/ui/behavior_acceptance_test.go": "3243a90c0db372df2fa6acfb32a079e8cceb7ca9a792b96c241d3a48164f7c4d",
+    "internal/ui/providers.go": "15e9aeddf2ec56737e303d0520eaf31828b977b84ff311115b162be94f92c8fd",
+    "internal/ui/providers_test.go": "8492d03d7db780fb769e1bd660252b0100680ea9b3ba408f1014a485dff7407a",
+    "internal/ui/run.go": "1b2a09bcdfe1f08519a1d06dd7befce8639c4e56f693acf9a755b90cfddabbd7",
+    "internal/ui/settings_backend_integration_test.go": "d01b9500e5994213aa308acf7c6ff4d13047d6256d5c60d9e7c17921eeb431a5",
+    "internal/ui/usage.go": "bb810cff6103293de8608c23ab38c93dc82558819dbcb3d717b0702a766fb84a",
+    "internal/ui/usage_projection.go": "e02a771b305dee9379b4df7c722bcb0cec9ea97ee551d8720b44513522b8500b",
+    "internal/ui/usage_test.go": "b9da9d20cea2ae37b19cd5c3edecd3cd19dc17afb35ba01568e8946989f283b6",
+    "internal/workbench/providers.go": "6fdaa5564c5a2926d333bd540411a9d4ae64054a4b11fbcecf9a2f7ecacbdfce",
+    "internal/workbench/providers_parity_test.go": "86975db768bccbf5e13e43d04b9e920fbe594a4ccbe6084b89ca91f5e36c1219",
+    "internal/workbench/resource_process_other.go": "be06f0e6530c3947d8612ce0fb63e7f20918bb974083857ae87985843224ae5c",
+    "internal/workbench/resource_process_unix.go": "46dd7bdd2862af7ae0846798c04434a97e9eb95aa68147e9059f1dcfd4e5136c",
+    "internal/workbench/resource_process_unix_test.go": "000635b3098689447f3b5f555dc92e50f6c23910a7b55b1414b3317b953b60ef",
+    "internal/workbench/resource_process_windows.go": "d1dfc2e1c1c9f9d5bb3a2eafd5d1b5aa9c9416a20f317c1a698ecd2fbf3172dc",
+    "internal/workbench/resources.go": "c024cdd1eb3582ace6e09fc69f12f40552e7d51bb2f8b53b7ae4ea77246e5d34",
+    "internal/workbench/resources_parity_test.go": "7cc9e20bc40310a3b6a5858479bcf211f15b348b381c3a01e60a72d2b3a33bbb",
+    "internal/workbench/service.go": "56c17ee90e6da552d3a0d0c94803051ae21fd876124a2a3b27003a29513bc03e",
+    "internal/workbench/usage.go": "4bea5b754355ec3639bb70eb6c4e47450a0c70887947bb758e895e21d9c4142f",
+    "internal/workbench/usage_export.go": "d57201278c9cdc1df797c78d4de26dbab7f7f7092129cf8d3098d824005d2a8d",
+    "internal/workbench/usage_export_test.go": "cd6992f92e9a6c7c736954ed1d23d58153ca86598420fa9a322f724967691c73",
+    "internal/workbench/usage_parity_test.go": "983015e52d15656568b15fa154a9ecea763ec24fea76c9625920772862950cc6",
+    "internal/workbench/workbench_test.go": "283f6abd2ecf2c542eb48225700df2e7984ede9aae05ca18b914e7b86b3c63bf"
+  },
+  "executed": [
+    {
+      "command": "go test -race ./internal/workbench -count=1 (ORBIT_PI_METADATA_TEST_BIN enabled)",
+      "result": "PASS"
+    },
+    {
+      "command": "go test -race ./internal/ui -run '^TestSettingsBackend' -count=1",
+      "result": "PASS"
+    },
+    {
+      "command": "go test -race ./internal/workbench ./internal/ui -run 'Test(SettingsBackend|Usage|Skill|Plugin|Provider|LivePiProvider|MetadataProbe)' -count=1 (Pi metadata probe enabled)",
+      "result": "PASS; source hashes unchanged before/after scope"
+    },
+    {
+      "command": "go vet ./internal/workbench",
+      "result": "PASS"
+    },
+    {
+      "command": "GOOS=windows GOARCH=amd64 go test -c ./internal/workbench",
+      "result": "PASS; cross-compile only"
+    },
+    {
+      "command": "GOOS=darwin GOARCH=arm64 go test -c ./internal/workbench",
+      "result": "PASS; cross-compile only"
+    },
+    {
+      "command": "go test -race ./internal/workbench ./internal/resourceui ./internal/ui -count=1 (Pi metadata probe enabled), after group-depth and DST calendar corrections",
+      "result": "PASS; workbench 2.419s, resourceui 3.088s, ui 5.638s; all listed source hashes unchanged before/after"
+    },
+    {
+      "command": "go vet ./internal/workbench ./internal/resourceui; Windows amd64 and Darwin arm64 workbench test-binary cross-compiles, after final DST export correction",
+      "result": "PASS; cross-compile only"
+    }
+  ],
+  "visual_parity_verified": false,
+  "native_os_behavior_verified": false,
+  "latest_verification": {
+    "command": "go test -race ./internal/workbench ./internal/resourceui ./internal/ui -count=1 (ORBIT_PI_METADATA_TEST_BIN enabled); go vet ./internal/workbench ./internal/resourceui; Windows amd64 and Darwin arm64 workbench test-binary cross-compiles",
+    "result": "PASS",
+    "before_sha256": {
+      "internal/resourceui/audit_acceptance_test.go": "4809164269a9c80ab86ef22a52af1fdec54967c24322a0d4caaa901d5d533af5",
+      "internal/resourceui/plugins.go": "8a9b7be950ea6c8b8f998ac9ea250c38570a1204bc07fc02837a61243f97ebd4",
+      "internal/resourceui/skills.go": "f1a5166ccd9ce2c0679384248d26cf603480f614ebbf75e5da9266128bb510fe",
+      "internal/resourceui/state.go": "5cc88dab42111154590ba810a998f7630fb76a1a647845bb0e33925980815842",
+      "internal/resourceui/state_test.go": "a083704784dc08fa0a4e4e319008920a229364efb53ac72c8982e76031a97da0",
+      "internal/resourceui/updates.go": "093c373f03f3d6661368113ce335ae6bc1144b883062527536e8ac74f07f1844",
+      "internal/resourceui/view.go": "3673996ccf97ef568815a30fc295ccc66bdbea27d72e4306d2ece4d8733ab9f4",
+      "internal/resourceui/view_test.go": "15d1bb8375e00dbda0823cd1ed646226868b31968d28c4b26f68883d524d008f",
+      "internal/ui/app.go": "e36014195df5b2804ed065c464b7991e332e62772f432f868343b52d1706b9b5",
+      "internal/ui/behavior_acceptance_test.go": "3243a90c0db372df2fa6acfb32a079e8cceb7ca9a792b96c241d3a48164f7c4d",
+      "internal/ui/providers.go": "15e9aeddf2ec56737e303d0520eaf31828b977b84ff311115b162be94f92c8fd",
+      "internal/ui/providers_test.go": "8492d03d7db780fb769e1bd660252b0100680ea9b3ba408f1014a485dff7407a",
+      "internal/ui/run.go": "1b2a09bcdfe1f08519a1d06dd7befce8639c4e56f693acf9a755b90cfddabbd7",
+      "internal/ui/settings_backend_integration_test.go": "d01b9500e5994213aa308acf7c6ff4d13047d6256d5c60d9e7c17921eeb431a5",
+      "internal/ui/usage.go": "bb810cff6103293de8608c23ab38c93dc82558819dbcb3d717b0702a766fb84a",
+      "internal/ui/usage_projection.go": "e02a771b305dee9379b4df7c722bcb0cec9ea97ee551d8720b44513522b8500b",
+      "internal/ui/usage_test.go": "b9da9d20cea2ae37b19cd5c3edecd3cd19dc17afb35ba01568e8946989f283b6",
+      "internal/workbench/providers.go": "6fdaa5564c5a2926d333bd540411a9d4ae64054a4b11fbcecf9a2f7ecacbdfce",
+      "internal/workbench/providers_parity_test.go": "86975db768bccbf5e13e43d04b9e920fbe594a4ccbe6084b89ca91f5e36c1219",
+      "internal/workbench/resource_process_other.go": "be06f0e6530c3947d8612ce0fb63e7f20918bb974083857ae87985843224ae5c",
+      "internal/workbench/resource_process_unix.go": "46dd7bdd2862af7ae0846798c04434a97e9eb95aa68147e9059f1dcfd4e5136c",
+      "internal/workbench/resource_process_unix_test.go": "000635b3098689447f3b5f555dc92e50f6c23910a7b55b1414b3317b953b60ef",
+      "internal/workbench/resource_process_windows.go": "d1dfc2e1c1c9f9d5bb3a2eafd5d1b5aa9c9416a20f317c1a698ecd2fbf3172dc",
+      "internal/workbench/resources.go": "c024cdd1eb3582ace6e09fc69f12f40552e7d51bb2f8b53b7ae4ea77246e5d34",
+      "internal/workbench/resources_parity_test.go": "7cc9e20bc40310a3b6a5858479bcf211f15b348b381c3a01e60a72d2b3a33bbb",
+      "internal/workbench/service.go": "56c17ee90e6da552d3a0d0c94803051ae21fd876124a2a3b27003a29513bc03e",
+      "internal/workbench/usage.go": "4bea5b754355ec3639bb70eb6c4e47450a0c70887947bb758e895e21d9c4142f",
+      "internal/workbench/usage_export.go": "d57201278c9cdc1df797c78d4de26dbab7f7f7092129cf8d3098d824005d2a8d",
+      "internal/workbench/usage_export_test.go": "cd6992f92e9a6c7c736954ed1d23d58153ca86598420fa9a322f724967691c73",
+      "internal/workbench/usage_parity_test.go": "983015e52d15656568b15fa154a9ecea763ec24fea76c9625920772862950cc6",
+      "internal/workbench/workbench_test.go": "283f6abd2ecf2c542eb48225700df2e7984ede9aae05ca18b914e7b86b3c63bf"
+    },
+    "changed_during_verification": [],
+    "backend_added_tests": 26,
+    "independent_ui_regressions": 4,
+    "independent_resource_controller_cases": 3
+  }
+}

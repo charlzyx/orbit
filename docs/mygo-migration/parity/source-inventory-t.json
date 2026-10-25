@@ -1,0 +1,1636 @@
+[
+  {
+    "path": "crates/orbit-pi/src/app/temp_ui.rs",
+    "lines": 279,
+    "tests": []
+  },
+  {
+    "path": "crates/orbit-pi/src/app/theme_switch_tests.rs",
+    "lines": 41,
+    "tests": [
+      {
+        "name": "switching_the_palette_repaints_every_surface",
+        "line": 20,
+        "kind": "gpui"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/app/titlebar_layout_tests.rs",
+    "lines": 73,
+    "tests": [
+      {
+        "name": "collapsed_controls_take_the_fixed_lead",
+        "line": 6,
+        "kind": "rust"
+      },
+      {
+        "name": "collapsed_title_clears_the_controls",
+        "line": 22,
+        "kind": "rust"
+      },
+      {
+        "name": "open_controls_hug_the_sidebar_edge",
+        "line": 40,
+        "kind": "rust"
+      },
+      {
+        "name": "windows_controls_left_align_at_the_edge",
+        "line": 61,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/app/toast_ui.rs",
+    "lines": 417,
+    "tests": []
+  },
+  {
+    "path": "crates/orbit-pi/src/explorer/tree.rs",
+    "lines": 452,
+    "tests": [
+      {
+        "name": "build_orders_dirs_first_then_case_insensitively",
+        "line": 342,
+        "kind": "rust"
+      },
+      {
+        "name": "collapsed_root_shows_only_top_level",
+        "line": 354,
+        "kind": "rust"
+      },
+      {
+        "name": "expanding_reveals_children_with_indentation",
+        "line": 365,
+        "kind": "rust"
+      },
+      {
+        "name": "filter_reveals_matches_and_ancestors",
+        "line": 380,
+        "kind": "rust"
+      },
+      {
+        "name": "filter_on_directory_reveals_whole_subtree",
+        "line": 392,
+        "kind": "rust"
+      },
+      {
+        "name": "filter_is_case_insensitive_and_prunes",
+        "line": 403,
+        "kind": "rust"
+      },
+      {
+        "name": "missing_intermediate_dirs_are_synthesized",
+        "line": 411,
+        "kind": "rust"
+      },
+      {
+        "name": "dirty_dirs_are_ancestors_of_badged_files",
+        "line": 418,
+        "kind": "rust"
+      },
+      {
+        "name": "all_dir_paths_expands_every_directory",
+        "line": 426,
+        "kind": "rust"
+      },
+      {
+        "name": "status_badge_reduces_porcelain",
+        "line": 434,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/temp_files.rs",
+    "lines": 524,
+    "tests": [
+      {
+        "name": "scan_lists_the_app_folder_and_legacy_entries",
+        "line": 360,
+        "kind": "rust"
+      },
+      {
+        "name": "clean_removes_app_and_legacy_entries_but_keeps_foreign_files",
+        "line": 388,
+        "kind": "rust"
+      },
+      {
+        "name": "clean_keeps_entries_this_process_is_using",
+        "line": 415,
+        "kind": "rust"
+      },
+      {
+        "name": "scan_separates_ai_scratch_files_from_orbit_entries",
+        "line": 439,
+        "kind": "rust"
+      },
+      {
+        "name": "ai_cleanup_keeps_recent_files_and_removes_old_ones",
+        "line": 464,
+        "kind": "rust"
+      },
+      {
+        "name": "clean_treats_a_vanished_entry_as_removed",
+        "line": 487,
+        "kind": "rust"
+      },
+      {
+        "name": "embedded_pids_only_come_from_update_and_login_names",
+        "line": 506,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/terminal.rs",
+    "lines": 2982,
+    "tests": [
+      {
+        "name": "control_bytes_follow_the_c0_table",
+        "line": 2205,
+        "kind": "rust"
+      },
+      {
+        "name": "encode_key_sends_expected_sequences",
+        "line": 2216,
+        "kind": "rust"
+      },
+      {
+        "name": "prepare_grid_resolves_colors_flags_and_selection",
+        "line": 2287,
+        "kind": "rust"
+      },
+      {
+        "name": "prepare_grid_paints_the_selection",
+        "line": 2317,
+        "kind": "rust"
+      },
+      {
+        "name": "selection_side_left_stops_before_the_cursor_cell",
+        "line": 2349,
+        "kind": "rust"
+      },
+      {
+        "name": "prepare_grid_survives_a_right_prompt_round_trip",
+        "line": 2379,
+        "kind": "rust"
+      },
+      {
+        "name": "prepare_grid_places_the_cursor_and_tracks_focus",
+        "line": 2406,
+        "kind": "rust"
+      },
+      {
+        "name": "prepare_grid_reports_scrollback_position",
+        "line": 2441,
+        "kind": "rust"
+      },
+      {
+        "name": "abbreviates_the_home_directory",
+        "line": 2457,
+        "kind": "rust"
+      },
+      {
+        "name": "session_answers_a_cursor_position_report",
+        "line": 2472,
+        "kind": "rust"
+      },
+      {
+        "name": "session_runs_a_shell_command",
+        "line": 2512,
+        "kind": "rust"
+      },
+      {
+        "name": "typing_reaches_the_shell",
+        "line": 2548,
+        "kind": "gpui"
+      },
+      {
+        "name": "opening_the_panel_and_typing_reaches_the_shell",
+        "line": 2606,
+        "kind": "gpui"
+      },
+      {
+        "name": "terminal_view_draws_a_real_grid",
+        "line": 2679,
+        "kind": "gpui"
+      },
+      {
+        "name": "new_tabs_keep_the_earlier_shells_alive",
+        "line": 2742,
+        "kind": "gpui"
+      },
+      {
+        "name": "hiding_the_panel_deactivates_every_tab",
+        "line": 2767,
+        "kind": "gpui"
+      },
+      {
+        "name": "closing_a_tab_selects_its_neighbour",
+        "line": 2792,
+        "kind": "gpui"
+      },
+      {
+        "name": "closing_the_last_tab_closes_the_panel",
+        "line": 2819,
+        "kind": "gpui"
+      },
+      {
+        "name": "cycling_tabs_wraps_at_the_ends",
+        "line": 2835,
+        "kind": "gpui"
+      },
+      {
+        "name": "switching_workspaces_spares_running_shells",
+        "line": 2868,
+        "kind": "gpui"
+      },
+      {
+        "name": "shell_profiles_map_to_their_own_marks",
+        "line": 2902,
+        "kind": "rust"
+      },
+      {
+        "name": "tab_labels_fall_back_to_the_folder",
+        "line": 2934,
+        "kind": "gpui"
+      },
+      {
+        "name": "indexed_colors_cover_the_cube_and_greys",
+        "line": 2965,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/theme/tokens.rs",
+    "lines": 1421,
+    "tests": [
+      {
+        "name": "default_settings_resolve_to_zeds_default_pixels",
+        "line": 1241,
+        "kind": "rust"
+      },
+      {
+        "name": "density_anchors_hit_zeds_three_tables",
+        "line": 1262,
+        "kind": "rust"
+      },
+      {
+        "name": "density_interpolates_between_anchors",
+        "line": 1282,
+        "kind": "rust"
+      },
+      {
+        "name": "tokens_scale_with_the_ui_font_like_rems",
+        "line": 1291,
+        "kind": "rust"
+      },
+      {
+        "name": "icon_squares_add_their_padding",
+        "line": 1306,
+        "kind": "rust"
+      },
+      {
+        "name": "button_padding_follows_size",
+        "line": 1316,
+        "kind": "rust"
+      },
+      {
+        "name": "raised_buttons_cast_a_short_shadow_in_both_modes",
+        "line": 1324,
+        "kind": "rust"
+      },
+      {
+        "name": "button_icons_grow_with_the_frame",
+        "line": 1339,
+        "kind": "rust"
+      },
+      {
+        "name": "menu_entries_are_one_comfortable_line_tall",
+        "line": 1353,
+        "kind": "rust"
+      },
+      {
+        "name": "elevation_shadows_match_zed",
+        "line": 1367,
+        "kind": "rust"
+      },
+      {
+        "name": "density_buckets_for_branching_ui",
+        "line": 1397,
+        "kind": "rust"
+      },
+      {
+        "name": "durations_are_zeds",
+        "line": 1406,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/theme.rs",
+    "lines": 2131,
+    "tests": [
+      {
+        "name": "parse_theme_id",
+        "line": 1487,
+        "kind": "rust"
+      },
+      {
+        "name": "mention_token_colors_are_distinct_across_palettes",
+        "line": 1533,
+        "kind": "rust"
+      },
+      {
+        "name": "toggle_knob_stays_light_on_light_tracks",
+        "line": 1551,
+        "kind": "rust"
+      },
+      {
+        "name": "theme_catalog_labels",
+        "line": 1569,
+        "kind": "rust"
+      },
+      {
+        "name": "every_theme_has_readable_foregrounds",
+        "line": 1612,
+        "kind": "rust"
+      },
+      {
+        "name": "default_palettes_ship_the_agreed_tokens",
+        "line": 1697,
+        "kind": "rust"
+      },
+      {
+        "name": "every_palette_exposes_the_semantic_vocabulary",
+        "line": 1761,
+        "kind": "rust"
+      },
+      {
+        "name": "interactive_and_muted_foregrounds_clear_aa",
+        "line": 1809,
+        "kind": "rust"
+      },
+      {
+        "name": "selection_rows_keep_their_metadata_readable",
+        "line": 1873,
+        "kind": "rust"
+      },
+      {
+        "name": "every_theme_holds_its_surface_grammar",
+        "line": 1898,
+        "kind": "rust"
+      },
+      {
+        "name": "accent_carries_chroma",
+        "line": 1955,
+        "kind": "rust"
+      },
+      {
+        "name": "theme_appearance_matches_label",
+        "line": 1967,
+        "kind": "rust"
+      },
+      {
+        "name": "flexoki_keeps_its_own_syntax_palette",
+        "line": 2004,
+        "kind": "rust"
+      },
+      {
+        "name": "parse_language",
+        "line": 2017,
+        "kind": "rust"
+      },
+      {
+        "name": "ui_prefs_parse_rejects_out_of_range_sizes",
+        "line": 2027,
+        "kind": "rust"
+      },
+      {
+        "name": "composer_send_mode_round_trips_in_ui_prefs",
+        "line": 2057,
+        "kind": "rust"
+      },
+      {
+        "name": "composer_send_mode_missing_or_invalid_keeps_legacy_default",
+        "line": 2075,
+        "kind": "rust"
+      },
+      {
+        "name": "font_scale_helpers",
+        "line": 2091,
+        "kind": "rust"
+      },
+      {
+        "name": "palettes_differ",
+        "line": 2114,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/toast.rs",
+    "lines": 193,
+    "tests": [
+      {
+        "name": "repeat_push_refreshes_instead_of_stacking",
+        "line": 138,
+        "kind": "rust"
+      },
+      {
+        "name": "push_caps_the_stack_dropping_the_oldest",
+        "line": 151,
+        "kind": "rust"
+      },
+      {
+        "name": "dismiss_removes_only_the_named_card",
+        "line": 163,
+        "kind": "rust"
+      },
+      {
+        "name": "expire_honors_kind_ttl_and_fade",
+        "line": 174,
+        "kind": "rust"
+      },
+      {
+        "name": "longer_kinds_outlive_shorter_ones",
+        "line": 187,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/transcript.rs",
+    "lines": 4654,
+    "tests": [
+      {
+        "name": "sending_a_prompt_shows_the_live_row_immediately",
+        "line": 2536,
+        "kind": "rust"
+      },
+      {
+        "name": "the_first_streamed_step_retires_the_pending_row",
+        "line": 2556,
+        "kind": "rust"
+      },
+      {
+        "name": "abandoning_a_prompt_closes_the_pending_row",
+        "line": 2581,
+        "kind": "rust"
+      },
+      {
+        "name": "the_summary_and_the_pending_row_share_the_tail_slot",
+        "line": 2599,
+        "kind": "rust"
+      },
+      {
+        "name": "assistant_error_message_surfaces_stop_reason_error",
+        "line": 2619,
+        "kind": "rust"
+      },
+      {
+        "name": "aborted_message_carries_no_agent_error",
+        "line": 2652,
+        "kind": "rust"
+      },
+      {
+        "name": "real_session_payload_renders_changed_files_card",
+        "line": 2672,
+        "kind": "rust"
+      },
+      {
+        "name": "tool_results_never_become_rows_and_attach_to_calls",
+        "line": 2757,
+        "kind": "rust"
+      },
+      {
+        "name": "live_nested_events_render_and_settle",
+        "line": 2800,
+        "kind": "rust"
+      },
+      {
+        "name": "live_deltas_accrue_generation_time_and_survive_settle",
+        "line": 2841,
+        "kind": "rust"
+      },
+      {
+        "name": "pi_duration_ms_wins_the_generation_clock",
+        "line": 2883,
+        "kind": "rust"
+      },
+      {
+        "name": "turn_start_arms_the_live_rate_clock",
+        "line": 2922,
+        "kind": "rust"
+      },
+      {
+        "name": "generation_time_sums_every_step",
+        "line": 2934,
+        "kind": "rust"
+      },
+      {
+        "name": "nested_user_echo_dedupes_optimistic_message",
+        "line": 2969,
+        "kind": "rust"
+      },
+      {
+        "name": "image_hint_in_user_echo_does_not_duplicate_the_prompt",
+        "line": 2992,
+        "kind": "rust"
+      },
+      {
+        "name": "reloaded_user_prompt_strips_image_hint",
+        "line": 3018,
+        "kind": "rust"
+      },
+      {
+        "name": "system_loadout_message_does_not_duplicate_the_user_echo",
+        "line": 3037,
+        "kind": "rust"
+      },
+      {
+        "name": "system_messages_are_skipped_when_reloading",
+        "line": 3072,
+        "kind": "rust"
+      },
+      {
+        "name": "injected_skill_blocks_are_reduced_to_the_command",
+        "line": 3093,
+        "kind": "rust"
+      },
+      {
+        "name": "injected_skill_restatement_is_dropped_after_the_optimistic_prompt",
+        "line": 3109,
+        "kind": "rust"
+      },
+      {
+        "name": "injected_skill_end_does_not_duplicate_when_compact_differs",
+        "line": 3136,
+        "kind": "rust"
+      },
+      {
+        "name": "injected_skill_end_alone_dedupes_the_optimistic_prompt",
+        "line": 3158,
+        "kind": "rust"
+      },
+      {
+        "name": "reloaded_injected_skill_renders_as_a_readable_prompt",
+        "line": 3172,
+        "kind": "rust"
+      },
+      {
+        "name": "ten_thousand_messages_stay_workable",
+        "line": 3191,
+        "kind": "rust"
+      },
+      {
+        "name": "find_messages_matches_case_insensitively_in_order",
+        "line": 3219,
+        "kind": "rust"
+      },
+      {
+        "name": "summary_roles_parse_as_boundary_rows",
+        "line": 3230,
+        "kind": "rust"
+      },
+      {
+        "name": "summaries_stay_their_own_rows_on_load",
+        "line": 3262,
+        "kind": "rust"
+      },
+      {
+        "name": "assistant_after_summary_starts_a_new_row",
+        "line": 3284,
+        "kind": "rust"
+      },
+      {
+        "name": "live_thinking_duration_rides_the_step",
+        "line": 3298,
+        "kind": "rust"
+      },
+      {
+        "name": "live_assistant_steps_merge_into_one_row",
+        "line": 3329,
+        "kind": "rust"
+      },
+      {
+        "name": "seeded_message_start_does_not_double_the_first_think_chunk",
+        "line": 3416,
+        "kind": "rust"
+      },
+      {
+        "name": "seeded_message_start_does_not_double_the_first_text_chunk",
+        "line": 3448,
+        "kind": "rust"
+      },
+      {
+        "name": "repeated_identical_deltas_are_not_collapsed",
+        "line": 3465,
+        "kind": "rust"
+      },
+      {
+        "name": "snapshot_merges_consecutive_assistants",
+        "line": 3482,
+        "kind": "rust"
+      },
+      {
+        "name": "disk_session_payload_rebuilds_a_transcript",
+        "line": 3520,
+        "kind": "rust"
+      },
+      {
+        "name": "live_tool_result_message_attaches_without_a_row",
+        "line": 3559,
+        "kind": "rust"
+      },
+      {
+        "name": "hidden_work_is_thinking_or_tools",
+        "line": 3623,
+        "kind": "rust"
+      },
+      {
+        "name": "edit_counts_old_and_new_text",
+        "line": 3632,
+        "kind": "rust"
+      },
+      {
+        "name": "write_counts_content_as_added",
+        "line": 3643,
+        "kind": "rust"
+      },
+      {
+        "name": "write_with_empty_content_counts_zero",
+        "line": 3649,
+        "kind": "rust"
+      },
+      {
+        "name": "other_tools_have_no_diff",
+        "line": 3655,
+        "kind": "rust"
+      },
+      {
+        "name": "tool_call_from_value_keeps_path_and_stats",
+        "line": 3661,
+        "kind": "rust"
+      },
+      {
+        "name": "assistant_usage_parses_and_aggregates_across_steps",
+        "line": 3672,
+        "kind": "rust"
+      },
+      {
+        "name": "usage_is_absent_without_provider_report",
+        "line": 3708,
+        "kind": "rust"
+      },
+      {
+        "name": "diff_from_message_sums_edit_and_write",
+        "line": 3723,
+        "kind": "rust"
+      },
+      {
+        "name": "diff_from_message_unwraps_nested_message",
+        "line": 3751,
+        "kind": "rust"
+      },
+      {
+        "name": "changed_files_merges_same_path",
+        "line": 3765,
+        "kind": "rust"
+      },
+      {
+        "name": "settled_run_pins_changed_files_summary",
+        "line": 3820,
+        "kind": "rust"
+      },
+      {
+        "name": "agent_end_mid_run_does_not_pin_summary",
+        "line": 3876,
+        "kind": "rust"
+      },
+      {
+        "name": "loaded_session_shows_changed_files_summary",
+        "line": 3914,
+        "kind": "rust"
+      },
+      {
+        "name": "rail_hint_state_dismisses_once",
+        "line": 3932,
+        "kind": "rust"
+      },
+      {
+        "name": "hints_round_trip_without_clobbering_siblings",
+        "line": 3946,
+        "kind": "rust"
+      },
+      {
+        "name": "jump_turn_walks_and_refuses_edges",
+        "line": 3968,
+        "kind": "rust"
+      },
+      {
+        "name": "chat_message_parses_tool_stats",
+        "line": 3996,
+        "kind": "rust"
+      },
+      {
+        "name": "stream_updates_keep_one_list_row",
+        "line": 4015,
+        "kind": "rust"
+      },
+      {
+        "name": "mcp_tool_execution_keeps_the_wire_name_and_attaches_the_result",
+        "line": 4036,
+        "kind": "rust"
+      },
+      {
+        "name": "tool_execution_events_attach_results_by_id",
+        "line": 4099,
+        "kind": "rust"
+      },
+      {
+        "name": "tool_execution_update_streams_accumulated_output",
+        "line": 4133,
+        "kind": "rust"
+      },
+      {
+        "name": "tool_execution_end_normalizes_the_result_envelope",
+        "line": 4175,
+        "kind": "rust"
+      },
+      {
+        "name": "tool_facts_read_pi_details",
+        "line": 4206,
+        "kind": "rust"
+      },
+      {
+        "name": "live_tool_result_captures_truncation_facts",
+        "line": 4230,
+        "kind": "rust"
+      },
+      {
+        "name": "loaded_tool_results_keep_truncation_facts",
+        "line": 4256,
+        "kind": "rust"
+      },
+      {
+        "name": "real_toolcall_wire_shape_produces_one_named_tool_row",
+        "line": 4279,
+        "kind": "rust"
+      },
+      {
+        "name": "parallel_toolcalls_keep_their_own_rows",
+        "line": 4331,
+        "kind": "rust"
+      },
+      {
+        "name": "toolcall_delta_applies_arguments_when_the_buffer_parses",
+        "line": 4374,
+        "kind": "rust"
+      },
+      {
+        "name": "structured_results_keep_their_json_form",
+        "line": 4405,
+        "kind": "rust"
+      },
+      {
+        "name": "empty_result_envelope_never_leaks_protocol_json",
+        "line": 4415,
+        "kind": "rust"
+      },
+      {
+        "name": "turn_summary_prefers_the_answer_and_skips_aborted",
+        "line": 4432,
+        "kind": "rust"
+      },
+      {
+        "name": "turn_summary_reports_the_agent_error",
+        "line": 4481,
+        "kind": "rust"
+      },
+      {
+        "name": "aborted_stop_reason_marks_the_turn",
+        "line": 4501,
+        "kind": "rust"
+      },
+      {
+        "name": "message_end_carries_live_results_into_final_message",
+        "line": 4532,
+        "kind": "rust"
+      },
+      {
+        "name": "snapshot_timestamps_parse_rfc3339_and_epochs",
+        "line": 4566,
+        "kind": "rust"
+      },
+      {
+        "name": "live_assistant_end_stamps_wall_time",
+        "line": 4587,
+        "kind": "rust"
+      },
+      {
+        "name": "resync_drops_extra_list_slots",
+        "line": 4599,
+        "kind": "rust"
+      },
+      {
+        "name": "debug_load",
+        "line": 4613,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/transcript_view.rs",
+    "lines": 10024,
+    "tests": [
+      {
+        "name": "fold_label_falls_back_without_elapsed",
+        "line": 7481,
+        "kind": "rust"
+      },
+      {
+        "name": "step_thinking_duration_prefers_live_and_estimates_on_reload",
+        "line": 7490,
+        "kind": "rust"
+      },
+      {
+        "name": "split_thinking_scroll_chains_only_past_the_edges",
+        "line": 7520,
+        "kind": "rust"
+      },
+      {
+        "name": "thinking_follow_only_detaches_on_an_upward_wheel",
+        "line": 7544,
+        "kind": "rust"
+      },
+      {
+        "name": "activity_title_aggregates_every_step",
+        "line": 7566,
+        "kind": "rust"
+      },
+      {
+        "name": "activity_group_icons_dedupe_order_and_cap",
+        "line": 7605,
+        "kind": "rust"
+      },
+      {
+        "name": "duration_format_matches_spoken_forms",
+        "line": 7652,
+        "kind": "rust"
+      },
+      {
+        "name": "working_elapsed_uses_short_form",
+        "line": 7672,
+        "kind": "rust"
+      },
+      {
+        "name": "streaming_tps_prefers_reported_output_and_guards_early",
+        "line": 7682,
+        "kind": "rust"
+      },
+      {
+        "name": "live_generation_clock_spans_settled_and_streaming_steps",
+        "line": 7737,
+        "kind": "rust"
+      },
+      {
+        "name": "format_tps_reads_compactly",
+        "line": 7786,
+        "kind": "rust"
+      },
+      {
+        "name": "generation_tps_uses_output_over_active_decode_time",
+        "line": 7794,
+        "kind": "rust"
+      },
+      {
+        "name": "changed_files_title_uses_screenshot_copy",
+        "line": 7824,
+        "kind": "rust"
+      },
+      {
+        "name": "tail_summary_owns_the_single_footer",
+        "line": 7832,
+        "kind": "rust"
+      },
+      {
+        "name": "workspace_relative_path_strips_workspace_prefix",
+        "line": 7843,
+        "kind": "rust"
+      },
+      {
+        "name": "message_cost_keeps_sub_cent_precision",
+        "line": 7859,
+        "kind": "rust"
+      },
+      {
+        "name": "summary_time_label_matches_screenshot_copy",
+        "line": 7869,
+        "kind": "rust"
+      },
+      {
+        "name": "activity_icon_maps_pi_tools",
+        "line": 7903,
+        "kind": "rust"
+      },
+      {
+        "name": "activity_action_label_reads_as_a_verb",
+        "line": 7921,
+        "kind": "rust"
+      },
+      {
+        "name": "mcp_tool_names_split_into_server_and_tool",
+        "line": 7935,
+        "kind": "rust"
+      },
+      {
+        "name": "truncation_label_reports_the_line_budget",
+        "line": 7952,
+        "kind": "rust"
+      },
+      {
+        "name": "command_tools_surface_the_shell_command_not_json",
+        "line": 7977,
+        "kind": "rust"
+      },
+      {
+        "name": "codemode_previews_the_first_script_line",
+        "line": 8002,
+        "kind": "rust"
+      },
+      {
+        "name": "fetch_tools_preview_the_url_not_json",
+        "line": 8024,
+        "kind": "rust"
+      },
+      {
+        "name": "only_file_tools_get_the_file_glyph",
+        "line": 8070,
+        "kind": "rust"
+      },
+      {
+        "name": "multiline_command_preview_is_single_line_without_changing_the_command",
+        "line": 8096,
+        "kind": "rust"
+      },
+      {
+        "name": "line_diff_keeps_context_around_an_insertion",
+        "line": 8118,
+        "kind": "rust"
+      },
+      {
+        "name": "build_edit_diff_walks_pi_edit_arguments",
+        "line": 8142,
+        "kind": "rust"
+      },
+      {
+        "name": "write_diff_marks_every_line_added",
+        "line": 8172,
+        "kind": "rust"
+      },
+      {
+        "name": "section_lang_only_highlights_structured_values",
+        "line": 8192,
+        "kind": "rust"
+      },
+      {
+        "name": "first_error_line_picks_first_nonempty_string",
+        "line": 8205,
+        "kind": "rust"
+      },
+      {
+        "name": "active_user_index_tracks_streaming_turn",
+        "line": 8221,
+        "kind": "rust"
+      },
+      {
+        "name": "active_user_index_follows_viewport_when_scrolled",
+        "line": 8282,
+        "kind": "rust"
+      },
+      {
+        "name": "parse_inline_extracts_bold_code_and_links",
+        "line": 8355,
+        "kind": "rust"
+      },
+      {
+        "name": "parse_inline_keeps_unmatched_markers_literal",
+        "line": 8368,
+        "kind": "rust"
+      },
+      {
+        "name": "parse_inline_escapes_render_literally",
+        "line": 8376,
+        "kind": "rust"
+      },
+      {
+        "name": "parse_blocks_splits_paragraphs_headings_and_fences",
+        "line": 8384,
+        "kind": "rust"
+      },
+      {
+        "name": "mermaid_fences_stay_copyable_code_blocks",
+        "line": 8399,
+        "kind": "rust"
+      },
+      {
+        "name": "parse_blocks_collects_loose_and_nested_lists",
+        "line": 8413,
+        "kind": "rust"
+      },
+      {
+        "name": "parse_blocks_handles_rules_quotes_and_tables",
+        "line": 8431,
+        "kind": "rust"
+      },
+      {
+        "name": "parse_blocks_turns_standalone_images_into_image_blocks",
+        "line": 8444,
+        "kind": "rust"
+      },
+      {
+        "name": "parse_blocks_handles_github_pasted_image_tags",
+        "line": 8460,
+        "kind": "rust"
+      },
+      {
+        "name": "image_markdown_inside_prose_is_not_split",
+        "line": 8476,
+        "kind": "rust"
+      },
+      {
+        "name": "quoted_image_lines_are_recognized",
+        "line": 8485,
+        "kind": "rust"
+      },
+      {
+        "name": "signed_cdn_urls_rewrite_to_the_durable_asset_url",
+        "line": 8502,
+        "kind": "rust"
+      },
+      {
+        "name": "parse_blocks_reads_task_list_state",
+        "line": 8533,
+        "kind": "rust"
+      },
+      {
+        "name": "parse_blocks_reads_table_alignment",
+        "line": 8547,
+        "kind": "rust"
+      },
+      {
+        "name": "parse_blocks_detects_github_alerts",
+        "line": 8559,
+        "kind": "rust"
+      },
+      {
+        "name": "code_block_label_prefers_friendly_names",
+        "line": 8575,
+        "kind": "rust"
+      },
+      {
+        "name": "block_rhythm_separates_headings_more_than_paragraphs",
+        "line": 8585,
+        "kind": "rust"
+      },
+      {
+        "name": "inline_runs_pairs_link_ranges_with_urls",
+        "line": 8595,
+        "kind": "rust"
+      },
+      {
+        "name": "bare_urls_autolink_and_trim_trailing_punctuation",
+        "line": 8610,
+        "kind": "rust"
+      },
+      {
+        "name": "autolink_range_covers_the_rendered_url",
+        "line": 8646,
+        "kind": "rust"
+      },
+      {
+        "name": "autolink_mark_paints_the_hugeicon_over_its_glyph",
+        "line": 8688,
+        "kind": "gpui"
+      },
+      {
+        "name": "followup_gap_is_user_after_assistant",
+        "line": 8717,
+        "kind": "rust"
+      },
+      {
+        "name": "working_indicator_names_the_live_tool",
+        "line": 8765,
+        "kind": "rust"
+      },
+      {
+        "name": "thinking_card_settles_when_the_step_moves_on",
+        "line": 8830,
+        "kind": "rust"
+      },
+      {
+        "name": "activity_group_live_follows_the_newest_step",
+        "line": 8851,
+        "kind": "rust"
+      },
+      {
+        "name": "parse_cache_returns_the_same_blocks_for_the_same_text",
+        "line": 8875,
+        "kind": "rust"
+      },
+      {
+        "name": "selection_spans_blocks_with_partial_ends",
+        "line": 8922,
+        "kind": "rust"
+      },
+      {
+        "name": "selection_ranges_are_per_block",
+        "line": 8950,
+        "kind": "rust"
+      },
+      {
+        "name": "selection_offsets_snap_to_char_boundaries_and_shrinking_text",
+        "line": 8965,
+        "kind": "rust"
+      },
+      {
+        "name": "highlight_runs_splits_only_the_selected_slice",
+        "line": 8977,
+        "kind": "rust"
+      },
+      {
+        "name": "table_cells_keep_readable_wrapping_when_the_pane_narrows",
+        "line": 9111,
+        "kind": "gpui"
+      },
+      {
+        "name": "five_prose_columns_overflow_instead_of_squeezing_into_the_chat",
+        "line": 9166,
+        "kind": "gpui"
+      },
+      {
+        "name": "wide_table_can_scroll_to_its_last_column",
+        "line": 9194,
+        "kind": "gpui"
+      },
+      {
+        "name": "the_pending_reply_row_paints_before_any_token",
+        "line": 9275,
+        "kind": "gpui"
+      },
+      {
+        "name": "summary_cards_render_collapsed_and_expanded",
+        "line": 9337,
+        "kind": "gpui"
+      },
+      {
+        "name": "tables_fit_their_content_without_filling_the_strip_or_pane",
+        "line": 9382,
+        "kind": "gpui"
+      },
+      {
+        "name": "transcript_table_viewport_breaks_out_of_the_prose_strip",
+        "line": 9467,
+        "kind": "gpui"
+      },
+      {
+        "name": "expanded_activity_stays_inside_the_original_message_column",
+        "line": 9562,
+        "kind": "gpui"
+      },
+      {
+        "name": "repeated_tools_with_short_thoughts_do_not_accumulate_bottom_space",
+        "line": 9666,
+        "kind": "gpui"
+      },
+      {
+        "name": "transcript_drag_selects_across_paragraphs",
+        "line": 9787,
+        "kind": "gpui"
+      },
+      {
+        "name": "markdown_image_lays_out_in_the_reading_column",
+        "line": 9909,
+        "kind": "gpui"
+      },
+      {
+        "name": "quoted_reply_image_uses_the_durable_asset_url",
+        "line": 9973,
+        "kind": "gpui"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/usage/table.rs",
+    "lines": 524,
+    "tests": []
+  },
+  {
+    "path": "crates/orbit-pi/src/usage/tests.rs",
+    "lines": 1439,
+    "tests": [
+      {
+        "name": "basic_aggregation_sums_input_and_output",
+        "line": 199,
+        "kind": "rust"
+      },
+      {
+        "name": "requests_group_by_local_day_across_midnight",
+        "line": 222,
+        "kind": "rust"
+      },
+      {
+        "name": "workspace_and_model_grouping",
+        "line": 276,
+        "kind": "rust"
+      },
+      {
+        "name": "cache_math_matches_the_documented_formula",
+        "line": 321,
+        "kind": "rust"
+      },
+      {
+        "name": "cache_is_unavailable_without_cache_tokens",
+        "line": 352,
+        "kind": "rust"
+      },
+      {
+        "name": "filters_compose_across_dimensions",
+        "line": 367,
+        "kind": "rust"
+      },
+      {
+        "name": "no_matches_is_distinct_from_no_data",
+        "line": 433,
+        "kind": "rust"
+      },
+      {
+        "name": "comparison_uses_the_preceding_window",
+        "line": 498,
+        "kind": "rust"
+      },
+      {
+        "name": "partial_data_keeps_what_is_known",
+        "line": 553,
+        "kind": "rust"
+      },
+      {
+        "name": "tools_count_calls_errors_and_durations",
+        "line": 605,
+        "kind": "rust"
+      },
+      {
+        "name": "granularity_follows_the_window",
+        "line": 652,
+        "kind": "rust"
+      },
+      {
+        "name": "turns_are_counted_as_prompts",
+        "line": 695,
+        "kind": "rust"
+      },
+      {
+        "name": "empty_dataset_produces_an_empty_snapshot",
+        "line": 729,
+        "kind": "rust"
+      },
+      {
+        "name": "snapshots_are_deterministic",
+        "line": 753,
+        "kind": "rust"
+      },
+      {
+        "name": "large_dataset_stays_linear_enough",
+        "line": 799,
+        "kind": "rust"
+      },
+      {
+        "name": "csv_export_quotes_and_respects_the_filter",
+        "line": 836,
+        "kind": "rust"
+      },
+      {
+        "name": "json_export_carries_the_aggregates_including_unavailable_metrics",
+        "line": 883,
+        "kind": "rust"
+      },
+      {
+        "name": "session_rows_rank_by_tokens_and_carry_their_model",
+        "line": 915,
+        "kind": "rust"
+      },
+      {
+        "name": "session_query_filters_searches_sorts_then_paginates",
+        "line": 950,
+        "kind": "rust"
+      },
+      {
+        "name": "time_focus_narrows_without_changing_the_range",
+        "line": 1012,
+        "kind": "rust"
+      },
+      {
+        "name": "latency_metric_switches_between_average_and_percentiles",
+        "line": 1062,
+        "kind": "rust"
+      },
+      {
+        "name": "insights_only_appear_with_signal",
+        "line": 1106,
+        "kind": "rust"
+      },
+      {
+        "name": "calendar_is_monday_aligned_and_carries_daily_totals",
+        "line": 1152,
+        "kind": "rust"
+      },
+      {
+        "name": "calendar_ignores_the_date_range_but_honors_scope",
+        "line": 1229,
+        "kind": "rust"
+      },
+      {
+        "name": "calendar_drops_records_older_than_a_year",
+        "line": 1285,
+        "kind": "rust"
+      },
+      {
+        "name": "series_query_filters_sorts_then_paginates",
+        "line": 1322,
+        "kind": "rust"
+      },
+      {
+        "name": "bucket_query_filters_sorts_then_paginates",
+        "line": 1372,
+        "kind": "rust"
+      },
+      {
+        "name": "failure_query_filters_sorts_then_paginates",
+        "line": 1408,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/usage/tooltip.rs",
+    "lines": 95,
+    "tests": [
+      {
+        "name": "a_short_tooltip_is_one_line",
+        "line": 72,
+        "kind": "gpui"
+      },
+      {
+        "name": "a_long_tooltip_wraps_at_zeds_width",
+        "line": 83,
+        "kind": "gpui"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-rpc/src/types.rs",
+    "lines": 2272,
+    "tests": [
+      {
+        "name": "parses_real_get_state_response",
+        "line": 1433,
+        "kind": "rust"
+      },
+      {
+        "name": "parses_message_update_textdelta",
+        "line": 1457,
+        "kind": "rust"
+      },
+      {
+        "name": "command_wire_serializes_with_id",
+        "line": 1471,
+        "kind": "rust"
+      },
+      {
+        "name": "steer_serializes_with_message",
+        "line": 1490,
+        "kind": "rust"
+      },
+      {
+        "name": "steer_and_follow_up_carry_images",
+        "line": 1507,
+        "kind": "rust"
+      },
+      {
+        "name": "agent_control_commands_serialize_to_pi_wire_types",
+        "line": 1543,
+        "kind": "rust"
+      },
+      {
+        "name": "fork_family_serializes_like_pi_expects",
+        "line": 1622,
+        "kind": "rust"
+      },
+      {
+        "name": "session_rename_parses_and_trims",
+        "line": 1643,
+        "kind": "rust"
+      },
+      {
+        "name": "tolerates_unknown_events",
+        "line": 1655,
+        "kind": "rust"
+      },
+      {
+        "name": "framing_strips_carriage_return",
+        "line": 1661,
+        "kind": "rust"
+      },
+      {
+        "name": "get_session_stats_serializes",
+        "line": 1667,
+        "kind": "rust"
+      },
+      {
+        "name": "context_usage_from_stats_payload",
+        "line": 1677,
+        "kind": "rust"
+      },
+      {
+        "name": "context_usage_null_after_compaction",
+        "line": 1690,
+        "kind": "rust"
+      },
+      {
+        "name": "context_usage_omitted_without_model",
+        "line": 1702,
+        "kind": "rust"
+      },
+      {
+        "name": "session_usage_parses_full_get_session_stats_payload",
+        "line": 1708,
+        "kind": "rust"
+      },
+      {
+        "name": "session_usage_total_falls_back_to_bucket_sum",
+        "line": 1726,
+        "kind": "rust"
+      },
+      {
+        "name": "session_usage_absent_without_tokens",
+        "line": 1736,
+        "kind": "rust"
+      },
+      {
+        "name": "message_usage_parses_assistant_shape_with_cost_object",
+        "line": 1742,
+        "kind": "rust"
+      },
+      {
+        "name": "message_usage_prefers_total_tokens_and_sums",
+        "line": 1758,
+        "kind": "rust"
+      },
+      {
+        "name": "message_usage_ignores_zero_and_missing",
+        "line": 1774,
+        "kind": "rust"
+      },
+      {
+        "name": "message_usage_add_folds_turn_steps",
+        "line": 1784,
+        "kind": "rust"
+      },
+      {
+        "name": "cache_read_percent_is_hit_rate_over_prompt_tokens",
+        "line": 1811,
+        "kind": "rust"
+      },
+      {
+        "name": "session_state_parses_agent_control_fields",
+        "line": 1866,
+        "kind": "rust"
+      },
+      {
+        "name": "pending_queue_parses_and_restores_text",
+        "line": 1891,
+        "kind": "rust"
+      },
+      {
+        "name": "auth_commands_serialize_to_pi_wire_types",
+        "line": 1911,
+        "kind": "rust"
+      },
+      {
+        "name": "parses_auth_login_lifecycle_events",
+        "line": 1986,
+        "kind": "rust"
+      },
+      {
+        "name": "unknown_auth_event_is_forward_compatible",
+        "line": 2087,
+        "kind": "rust"
+      },
+      {
+        "name": "auth_error_codes_round_trip_and_default_to_unknown",
+        "line": 2098,
+        "kind": "rust"
+      },
+      {
+        "name": "parses_auth_list_provider_capabilities",
+        "line": 2126,
+        "kind": "rust"
+      },
+      {
+        "name": "auth_event_session_ids_are_extractable",
+        "line": 2159,
+        "kind": "rust"
+      },
+      {
+        "name": "quota_list_serializes_with_optional_provider",
+        "line": 2174,
+        "kind": "rust"
+      },
+      {
+        "name": "get_entries_serializes_with_optional_cursor",
+        "line": 2196,
+        "kind": "rust"
+      },
+      {
+        "name": "parses_quota_reports_with_windows_and_balances",
+        "line": 2218,
+        "kind": "rust"
+      },
+      {
+        "name": "canonicalizes_lowercase_plan_labels",
+        "line": 2254,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "contrib/orbit-title-extension/title.js",
+    "lines": 165,
+    "tests": []
+  },
+  {
+    "path": "contrib/orbit-title-extension/title.test.mjs",
+    "lines": 121,
+    "tests": [
+      {
+        "name": "parseConfig defaults to enabled on the active model",
+        "line": 16,
+        "kind": "node"
+      },
+      {
+        "name": "parseConfig honors disabled and a model override",
+        "line": 23,
+        "kind": "node"
+      },
+      {
+        "name": "parseConfig rejects a malformed model without failing",
+        "line": 31,
+        "kind": "node"
+      },
+      {
+        "name": "extractText reads string and block-array content",
+        "line": 37,
+        "kind": "node"
+      },
+      {
+        "name": "firstExchange finds the first user and assistant text and counts prompts",
+        "line": 50,
+        "kind": "node"
+      },
+      {
+        "name": "isTitleable requires both sides of the exchange",
+        "line": 68,
+        "kind": "node"
+      },
+      {
+        "name": "buildTitlePrompt carries the first exchange",
+        "line": 74,
+        "kind": "node"
+      },
+      {
+        "name": "normalizeTitle strips quotes, punctuation, and caps length",
+        "line": 81,
+        "kind": "node"
+      },
+      {
+        "name": "titleFromResponse joins text blocks and normalizes",
+        "line": 90,
+        "kind": "node"
+      },
+      {
+        "name": "resolveModel prefers the configured model, else the active one",
+        "line": 99,
+        "kind": "node"
+      },
+      {
+        "name": "isStaleContext recognizes a switched session",
+        "line": 118,
+        "kind": "node"
+      }
+    ]
+  }
+]

@@ -1,0 +1,178 @@
+{
+  "go_evidence_catalogue": {
+    "G1": {
+      "paths": [
+        "internal/workspace/files.go",
+        "internal/workspace/editor.go",
+        "internal/workspace/tree.go",
+        "internal/workspace/watch.go",
+        "internal/ui/files.go"
+      ],
+      "tests": [
+        "internal/workspace/files_test.go",
+        "internal/workspace/tree_test.go",
+        "internal/workspace/watch_test.go"
+      ],
+      "status": "backend_race_tests_passed_ui_partial"
+    },
+    "G2": {
+      "paths": [
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/github_templates.go",
+        "internal/gitworkbench/templates.go"
+      ],
+      "tests": [
+        "internal/workspace/git_test.go",
+        "internal/workspace/github_test.go",
+        "internal/gitworkbench/state_test.go",
+        "internal/workspace/generation_test.go",
+        "internal/workspace/process_cancel_unix_test.go"
+      ],
+      "status": "backend_and_scoped_native_controller_race_tests_passed"
+    },
+    "G3": {
+      "paths": [
+        "internal/workspace/checkpoint.go",
+        "internal/workspace/review.go",
+        "internal/ui/review.go",
+        "internal/agent/manager.go"
+      ],
+      "tests": [
+        "internal/workspace/checkpoint_test.go",
+        "internal/workspace/review_test.go"
+      ],
+      "status": "snapshot_and_review_model_race_tests_passed_ui_partial"
+    },
+    "G4": {
+      "paths": [
+        "internal/workspace/worktrees.go",
+        "internal/workspace/setup.go",
+        "internal/worktreeui/state.go",
+        "internal/worktreeui/view.go",
+        "internal/worktreeui/picker.go",
+        "internal/worktreeui/labels.go"
+      ],
+      "tests": [
+        "internal/workspace/worktrees_test.go",
+        "internal/worktreeui/state_test.go",
+        "internal/worktreeui/view_test.go",
+        "internal/worktreeui/picker_test.go"
+      ],
+      "status": "backend_controller_and_scoped_native_dialog_race_tests_passed"
+    },
+    "G5": {
+      "paths": [
+        "internal/pirpc",
+        "internal/agent"
+      ],
+      "tests": [
+        "internal/pirpc/client_test.go",
+        "internal/agent/manager_test.go",
+        "internal/agent/reducer_test.go"
+      ],
+      "status": "rpc_and_manager_race_tests_passed_product_workflow_pending"
+    },
+    "G6": {
+      "paths": [
+        "internal/preferences",
+        "internal/workbench",
+        "internal/native"
+      ],
+      "tests": [
+        "internal/preferences/store_test.go",
+        "internal/preferences/workspaces_test.go",
+        "internal/workbench/workbench_test.go",
+        "internal/native/native_test.go",
+        "internal/native/runtime_test.go",
+        "internal/native/updater_test.go",
+        "internal/native/temp_files_test.go"
+      ],
+      "status": "domain_race_tests_passed_ui_and_platform_delivery_pending"
+    },
+    "G7": {
+      "paths": [
+        "internal/terminal"
+      ],
+      "tests": [
+        "internal/terminal/panel_test.go"
+      ],
+      "status": "package_race_tests_passed_optional_live_platform_tests_not_implied"
+    },
+    "G8": {
+      "paths": [
+        "internal/ui",
+        "cmd/orbit/main.go"
+      ],
+      "tests": [
+        "internal/ui/snapshot_test.go",
+        "internal/ui/workspace_review_regression_test.go",
+        "internal/ui/viewer_parity_test.go"
+      ],
+      "status": "scoped_native_ui_race_tests_passed_full_interaction_and_pixel_parity_pending"
+    },
+    "G9": {
+      "paths": [
+        "internal/highlight/highlight.go",
+        "internal/highlight/specs.go",
+        "internal/highlight/special.go",
+        "internal/highlight/runs.go",
+        "internal/workspace/review.go",
+        "internal/gitworkbench/embedded_diff.go"
+      ],
+      "tests": [
+        "internal/highlight/highlight_test.go",
+        "internal/highlight/testdata/generate.py",
+        "internal/workspace/review_highlight_test.go",
+        "internal/gitworkbench/highlight_test.go"
+      ],
+      "status": "1204_pinned_source_oracle_cases_and_scoped_paint_contract_race_tests_passed_full_gui_pending"
+    }
+  },
+  "verification_commands": [
+    {
+      "command": "go test -race ./internal/workspace ./internal/worktreeui",
+      "result": "passed in cloud; includes real temporary Git repositories and headless native confirmation tests"
+    },
+    {
+      "command": "go test -race ./internal/workspace ./internal/worktreeui ./internal/gitworkbench ./internal/agent ./internal/pirpc ./internal/preferences ./internal/workbench ./internal/native ./internal/terminal ./internal/ui",
+      "result": "first nine packages passed; internal/ui build failed at in-progress markdown.go parser.BlockQuote symbol; owner notified; later fixes require rerun"
+    },
+    {
+      "command": "go test -race ./internal/workspace ./internal/worktreeui ./internal/gitworkbench ./internal/ui",
+      "result": "passed 2026-10-25 04:03 UTC; resolves prior transient UI compile failure; no pixel-equivalence or full interaction claim"
+    },
+    {
+      "command": "go test -race ./internal/ui -run 'TestFilesRapid|TestReviewRapid|TestLastTurn' -count=1",
+      "result": "passed: rapid hidden/workspace scan, rapid source/session/workspace Review, last-turn counter after transcript compaction; isolated temporary repositories"
+    },
+    {
+      "command": "go test -race ./internal/workspace ./internal/worktreeui ./internal/ui",
+      "result": "passed 2026-10-25 04:22 UTC; includes empty-directory watcher changes, source-derived branch suggestions/manual override, checked-out-branch dialog, operation-specific retry and transactional settings persistence; disposable local repositories only"
+    },
+    {
+      "command": "go vet ./internal/workspace ./internal/worktreeui ./internal/gitworkbench ./internal/ui",
+      "result": "passed 2026-10-25 04:22 UTC"
+    },
+    {
+      "command": "go test -race ./internal/workspace -run Watch -count=5",
+      "result": "passed 2026-10-25 04:34 UTC; native real-filesystem and injected-overflow/fallback tests repeated five times"
+    },
+    {
+      "command": "go test -race ./internal/workspace ./internal/worktreeui ./internal/gitworkbench ./internal/ui",
+      "result": "passed 2026-10-25 04:34 UTC after native fsnotify integration"
+    },
+    {
+      "command": "GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go test -c ./internal/workspace; GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 go test -c ./internal/workspace",
+      "result": "both test binaries compiled successfully 2026-10-25 04:35 UTC; not executed on those OSes"
+    },
+    {
+      "command": "go vet ./internal/workspace ./internal/worktreeui",
+      "result": "passed 2026-10-25 04:35 UTC"
+    }
+  ]
+}

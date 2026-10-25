@@ -1,0 +1,617 @@
+{
+  "schema": "orbit-acceptance-shard/v1",
+  "category": "worktrees",
+  "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "rows": [
+    {
+      "id": "W48",
+      "title": "Remove worktree asks explicit clean/dirty confirmation after reading dirty state; dirty confirmation uses `--force`; branch is never deleted. Main/unknown/locked worktrees refused by backend.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/worktree.rs",
+          "handler": "WorktreeManager::is_dirty",
+          "line": 784,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/worktree.rs#L784",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/worktree.rs",
+          "handler": "WorktreeManager::remove",
+          "line": 887,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/worktree.rs#L887",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/worktrees.rs",
+          "handler": "start_remove_worktree",
+          "line": 724,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/worktrees.rs#L724",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/worktrees.rs",
+          "handler": "remove_worktree_dialog_body",
+          "line": 2235,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/worktrees.rs#L2235",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Remove worktree asks explicit clean/dirty confirmation after reading dirty state; dirty confirmation uses `--force`; branch is never deleted. Main/unknown/locked worktrees refused by backend.",
+      "baseline_edge_state": "UI never offers remove for main. Locked remains refused even with force. Existing dirty-probe error defaults to false, but backend checks again before unforced removal. Removed-session recovery remains separate.",
+      "fixture": "Temporary main repository and worktree root, isolated HOME, controlled setup script and no user repositories.",
+      "steps": [
+        {
+          "id": "W48.behavior",
+          "dimension": "functional",
+          "action": "Remove clean and dirty disposable worktrees after inspecting confirmation; cancel first.",
+          "expected": "Remove worktree asks explicit clean/dirty confirmation after reading dirty state; dirty confirmation uses `--force`; branch is never deleted. Main/unknown/locked worktrees refused by backend.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W48.edge",
+          "dimension": "edge",
+          "action": "Main/unknown/locked worktrees are refused; force only follows dirty confirmation and branch remains after removal.",
+          "expected": "UI never offers remove for main. Locked remains refused even with force. Existing dirty-probe error defaults to false, but backend checks again before unforced removal. Removed-session recovery remains separate.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W48.error",
+          "dimension": "error",
+          "action": "Fail the current Git/setup/config write; retry after navigation and verify no prior mutation is replayed.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: UI never offers remove for main. Locked remains refused even with force. Existing dirty-probe error defaults to false, but backend checks again before unforced removal. Removed-session recovery remains separate.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W48.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W48.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W48.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W48.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/workspace/worktrees.go",
+        "internal/workspace/setup.go",
+        "internal/worktreeui/state.go",
+        "internal/worktreeui/view.go",
+        "internal/worktreeui/picker.go",
+        "internal/worktreeui/labels.go"
+      ],
+      "existing_test_candidates": [
+        "internal/workspace/worktrees_test.go",
+        "internal/worktreeui/state_test.go",
+        "internal/worktreeui/view_test.go",
+        "internal/worktreeui/picker_test.go"
+      ],
+      "inventory_evidence": "../parity/worktrees.json",
+      "source_test_inventory": "`worktree.rs::{remove_refuses_dirty_worktree_until_forced,remove_rejects_main_and_unknown_paths,lifecycle_create_list_move_lock_remove_prune}`",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Real temporary worktree operations, setup consent/failure/cancel, transactional persistence and scoped native typing/confirm/retry tests pass. Host guide preference/translation hooks exist. Complete localization, host keyboard/focus and platform/pixel equivalence remain pending.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    },
+    {
+      "id": "W49",
+      "title": "Lock/unlock, prune stale administrative entries, repair metadata after manual move, reveal and copy path. Worktree row click opens; right-click and ellipsis menus share actions.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/worktree.rs",
+          "handler": "lock",
+          "line": 925,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/worktree.rs#L925",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/worktree.rs",
+          "handler": "unlock",
+          "line": 945,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/worktree.rs#L945",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/worktree.rs",
+          "handler": "prune",
+          "line": 959,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/worktree.rs#L959",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/worktree.rs",
+          "handler": "repair",
+          "line": 966,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/worktree.rs#L966",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Lock/unlock, prune stale administrative entries, repair metadata after manual move, reveal and copy path. Worktree row click opens; right-click and ellipsis menus share actions.",
+      "baseline_edge_state": "Mutation helper serializes one operation and drops a second request rather than queuing stale row targets. Lock reason backend exists; UI currently passes none. Failures route to page banner or branch-in-use dialog.",
+      "fixture": "Temporary main repository and worktree root, isolated HOME, controlled setup script and no user repositories.",
+      "steps": [
+        {
+          "id": "W49.behavior",
+          "dimension": "functional",
+          "action": "Lock/unlock, prune stale metadata, repair manually moved worktree and copy/reveal path.",
+          "expected": "Lock/unlock, prune stale administrative entries, repair metadata after manual move, reveal and copy path. Worktree row click opens; right-click and ellipsis menus share actions.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W49.edge",
+          "dimension": "edge",
+          "action": "Failure and cancellation cannot replay a previous mutation; row/right-click/ellipsis actions refer to the same worktree.",
+          "expected": "Mutation helper serializes one operation and drops a second request rather than queuing stale row targets. Lock reason backend exists; UI currently passes none. Failures route to page banner or branch-in-use dialog.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W49.error",
+          "dimension": "error",
+          "action": "Fail the current Git/setup/config write; retry after navigation and verify no prior mutation is replayed.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Mutation helper serializes one operation and drops a second request rather than queuing stale row targets. Lock reason backend exists; UI currently passes none. Failures route to page banner or branch-in-use dialog.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W49.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W49.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W49.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W49.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/workspace/worktrees.go",
+        "internal/workspace/setup.go",
+        "internal/worktreeui/state.go",
+        "internal/worktreeui/view.go",
+        "internal/worktreeui/picker.go",
+        "internal/worktreeui/labels.go"
+      ],
+      "existing_test_candidates": [
+        "internal/workspace/worktrees_test.go",
+        "internal/worktreeui/state_test.go",
+        "internal/worktreeui/view_test.go",
+        "internal/worktreeui/picker_test.go"
+      ],
+      "inventory_evidence": "../parity/worktrees.json",
+      "source_test_inventory": "`worktree.rs::{lifecycle_create_list_move_lock_remove_prune,repair_succeeds_on_a_healthy_repository}`",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Named narrow assertions pass; remaining row steps are unverified.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3"
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [
+        {
+          "id": "W49.assert.TestFailedLockRetryDoesNotRepeatPreviousCreate",
+          "status": "PASS",
+          "expected": "Retry of a failed lock cannot replay a previous Create operation.",
+          "test": "TestFailedLockRetryDoesNotRepeatPreviousCreate",
+          "package": "github.com/charlzyx/orbit/internal/worktreeui",
+          "command": "go test -race -count=1 ./internal/worktreeui -run ^TestFailedLockRetryDoesNotRepeatPreviousCreate$",
+          "evidence": "workspace-evidence.json",
+          "last_verified_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:01:15.926506965+09:00",
+          "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
+        }
+      ],
+      "known_remaining": "Real temporary worktree operations, setup consent/failure/cancel, transactional persistence and scoped native typing/confirm/retry tests pass. Host guide preference/translation hooks exist. Complete localization, host keyboard/focus and platform/pixel equivalence remain pending.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    },
+    {
+      "id": "W50",
+      "title": "Status “Work in” picker has Local/main, linked worktrees and New; Up/Down wrap selection, Enter chooses, Escape closes/restores composer focus; mutually excludes overlapping popovers.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/worktrees.rs",
+          "handler": "work_in_chip",
+          "line": 2699,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/worktrees.rs#L2699",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/worktrees.rs",
+          "handler": "work_in_rows",
+          "line": 2449,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/worktrees.rs#L2449",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/worktrees.rs",
+          "handler": "toggle_work_in_menu",
+          "line": 2520,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/worktrees.rs#L2520",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/worktrees.rs",
+          "handler": "on_work_in_next",
+          "line": 2565,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/worktrees.rs#L2565",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Status “Work in” picker has Local/main, linked worktrees and New; Up/Down wrap selection, Enter chooses, Escape closes/restores composer focus; mutually excludes overlapping popovers.",
+      "baseline_edge_state": "Chip intentionally absent at main checkout and no-repo; shown in linked worktree. Top-bar Worktrees page remains entry point from main. Outside-click mouseup reopening guarded 200 ms.",
+      "fixture": "Temporary main repository and worktree root, isolated HOME, controlled setup script and no user repositories.",
+      "steps": [
+        {
+          "id": "W50.behavior",
+          "dimension": "functional",
+          "action": "Open Work in picker, navigate Local/linked/New using Up/Down/Enter and cancel with Escape.",
+          "expected": "Status “Work in” picker has Local/main, linked worktrees and New; Up/Down wrap selection, Enter chooses, Escape closes/restores composer focus; mutually excludes overlapping popovers.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W50.edge",
+          "dimension": "edge",
+          "action": "Wrap at boundaries, exclude overlapping popovers and restore composer focus; new worktree workflow keeps current session identity.",
+          "expected": "Chip intentionally absent at main checkout and no-repo; shown in linked worktree. Top-bar Worktrees page remains entry point from main. Outside-click mouseup reopening guarded 200 ms.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W50.error",
+          "dimension": "error",
+          "action": "Fail the current Git/setup/config write; retry after navigation and verify no prior mutation is replayed.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Chip intentionally absent at main checkout and no-repo; shown in linked worktree. Top-bar Worktrees page remains entry point from main. Outside-click mouseup reopening guarded 200 ms.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W50.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W50.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W50.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W50.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/workspace/worktrees.go",
+        "internal/workspace/setup.go",
+        "internal/worktreeui/state.go",
+        "internal/worktreeui/view.go",
+        "internal/worktreeui/picker.go",
+        "internal/worktreeui/labels.go"
+      ],
+      "existing_test_candidates": [
+        "internal/workspace/worktrees_test.go",
+        "internal/worktreeui/state_test.go",
+        "internal/worktreeui/view_test.go",
+        "internal/worktreeui/picker_test.go"
+      ],
+      "inventory_evidence": "../parity/worktrees.json",
+      "source_test_inventory": "`app/worktree_chip_tests.rs::the_work_in_chip_is_absent_at_the_main_checkout`",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Named narrow assertions pass; remaining row steps are unverified.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3"
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [
+        {
+          "id": "W50.assert.TestWorkInRowsAndNativeMenuSelection",
+          "status": "PASS",
+          "expected": "Native Work In menu uses actual main/linked/New rows and selections.",
+          "test": "TestWorkInRowsAndNativeMenuSelection",
+          "package": "github.com/charlzyx/orbit/internal/worktreeui",
+          "command": "go test -race -count=1 ./internal/worktreeui -run ^TestWorkInRowsAndNativeMenuSelection$",
+          "evidence": "workspace-evidence.json",
+          "last_verified_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:01:15.575569633+09:00",
+          "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
+        }
+      ],
+      "known_remaining": "Real temporary worktree operations, setup consent/failure/cancel, transactional persistence and scoped native typing/confirm/retry tests pass. Host guide preference/translation hooks exist. Complete localization, host keyboard/focus and platform/pixel equivalence remain pending.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    },
+    {
+      "id": "W51",
+      "title": "Worktrees refresh/busy/error/empty UI, setup banner and dismissible introductory guide. External changes trigger throttled list refresh while page visible.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/worktrees.rs",
+          "handler": "refresh_worktrees",
+          "line": 116,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/worktrees.rs#L116",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/worktrees.rs",
+          "handler": "refresh_worktrees_soon",
+          "line": 168,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/worktrees.rs#L168",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/worktrees.rs",
+          "handler": "worktree_howto_card",
+          "line": 1506,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/worktrees.rs#L1506",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/worktrees.rs",
+          "handler": "worktree_empty_state",
+          "line": 3103,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/worktrees.rs#L3103",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Worktrees refresh/busy/error/empty UI, setup banner and dismissible introductory guide. External changes trigger throttled list refresh while page visible.",
+      "baseline_edge_state": "2 s watcher-refresh throttle; fetch generation discards stale workspace result and pending refresh reruns. Guide dismissal stored via transcript hint persistence.",
+      "fixture": "Temporary main repository and worktree root, isolated HOME, controlled setup script and no user repositories.",
+      "steps": [
+        {
+          "id": "W51.behavior",
+          "dimension": "functional",
+          "action": "Refresh Worktrees while empty/loading/error, dismiss guide and inspect setup banner.",
+          "expected": "Worktrees refresh/busy/error/empty UI, setup banner and dismissible introductory guide. External changes trigger throttled list refresh while page visible.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W51.edge",
+          "dimension": "edge",
+          "action": "Burst external events inside throttle and while busy; one pending refresh must eventually occur without requiring another event.",
+          "expected": "2 s watcher-refresh throttle; fetch generation discards stale workspace result and pending refresh reruns. Guide dismissal stored via transcript hint persistence.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W51.error",
+          "dimension": "error",
+          "action": "Fail the current Git/setup/config write; retry after navigation and verify no prior mutation is replayed.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: 2 s watcher-refresh throttle; fetch generation discards stale workspace result and pending refresh reruns. Guide dismissal stored via transcript hint persistence.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W51.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W51.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W51.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W51.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/workspace/worktrees.go",
+        "internal/workspace/setup.go",
+        "internal/worktreeui/state.go",
+        "internal/worktreeui/view.go",
+        "internal/worktreeui/picker.go",
+        "internal/worktreeui/labels.go"
+      ],
+      "existing_test_candidates": [
+        "internal/workspace/worktrees_test.go",
+        "internal/worktreeui/state_test.go",
+        "internal/worktreeui/view_test.go",
+        "internal/worktreeui/picker_test.go"
+      ],
+      "inventory_evidence": "../parity/worktrees.json",
+      "source_test_inventory": "`app/worktree_howto_tests.rs::{howto_card_shows_until_dismissed,howto_card_fits_the_page_column}`",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Named narrow assertions pass; remaining row steps are unverified.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3"
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [
+        {
+          "id": "W51.assert.TestThrottledWorktreeWatchEventuallyRefreshesWithoutAnotherEvent",
+          "status": "PASS",
+          "expected": "A throttled/busy watch event yields an eventual refresh without a second event.",
+          "test": "TestThrottledWorktreeWatchEventuallyRefreshesWithoutAnotherEvent",
+          "package": "github.com/charlzyx/orbit/internal/worktreeui",
+          "command": "go test -race -count=1 ./internal/worktreeui -run ^TestThrottledWorktreeWatchEventuallyRefreshesWithoutAnotherEvent$",
+          "evidence": "workspace-evidence.json",
+          "last_verified_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:01:16.115186296+09:00",
+          "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
+        }
+      ],
+      "known_remaining": "Real temporary worktree operations, setup consent/failure/cancel, transactional persistence and scoped native typing/confirm/retry tests pass. Host guide preference/translation hooks exist. Complete localization, host keyboard/focus and platform/pixel equivalence remain pending.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    }
+  ]
+}

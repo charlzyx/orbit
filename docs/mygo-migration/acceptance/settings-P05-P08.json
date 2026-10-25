@@ -1,0 +1,643 @@
+{
+  "schema": "orbit-acceptance-shard/v1",
+  "category": "settings",
+  "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "rows": [
+    {
+      "id": "P05",
+      "title": "Provider catalog and filtering",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_rows",
+          "line": 2391,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L2391",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "ensure_provider_metadata",
+          "line": 7639,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L7639",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_refresh",
+          "line": 7665,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L7665",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Discover provider metadata from installed pi-ai with curated fallback, provider/model counts and marks, connected/auth states, search/filter cards.",
+      "baseline_edge_state": "Do not hardcode author-specific accounts/models. Unknown provider ID is humanized with fallback glyph. Refresh runs off-thread and malformed file is an error, not an empty successful reset.",
+      "fixture": "Isolated HOME and project config, dummy secret marker values, controlled package/provider/MCP executables and fake OAuth issuer; no real credentials.",
+      "steps": [
+        {
+          "id": "P05.behavior",
+          "dimension": "functional",
+          "action": "Browse providers, filter by configured/available/name and inspect capability/status indicators.",
+          "expected": "Discover provider metadata from installed pi-ai with curated fallback, provider/model counts and marks, connected/auth states, search/filter cards.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P05.edge",
+          "dimension": "edge",
+          "action": "Use providers with no models, duplicate names and unavailable credentials; clearing filter restores the full list.",
+          "expected": "Do not hardcode author-specific accounts/models. Unknown provider ID is humanized with fallback glyph. Refresh runs off-thread and malformed file is an error, not an empty successful reset.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P05.error",
+          "dimension": "error",
+          "action": "Make this setting's file write or provider/package/MCP operation fail; cancel then retry once after recovery.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Do not hardcode author-specific accounts/models. Unknown provider ID is humanized with fallback glyph. Refresh runs off-thread and malformed file is an error, not an empty successful reset.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P05.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P05.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P05.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P05.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/preferences",
+        "internal/workbench",
+        "internal/native"
+      ],
+      "existing_test_candidates": [
+        "internal/preferences/store_test.go",
+        "internal/preferences/workspaces_test.go",
+        "internal/workbench/workbench_test.go",
+        "internal/native/native_test.go",
+        "internal/native/runtime_test.go",
+        "internal/native/updater_test.go",
+        "internal/native/temp_files_test.go"
+      ],
+      "inventory_evidence": "../parity/settings.json",
+      "source_test_inventory": "T14",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-P03",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "pass_scoped",
+          "steps": [
+            "Inspect catalog including fallback diagnostic and OAuth-only provider.",
+            "Save invalid custom provider; correct it and save into temporary home.",
+            "Force disk failure; cancel masked key dialog; resize800×560."
+          ],
+          "expected": "Capability-specific controls, validated fields, no painted key, failed save keeps draft, existing key preserved when blank.",
+          "tests": [
+            "TestNativeProviderEditorValidationSecretAndMinimumSize",
+            "TestNativeProviderSaveFailureKeepsDraft",
+            "TestProviderCredentialCapabilities"
+          ],
+          "remaining": "These native/disk fixtures pass. Full provider card geometry, source account detail/quota embed and real credential flows remain unverified.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": [
+        "../settings-backend-implementation.md",
+        "../settings-backend-source-evidence.json"
+      ]
+    },
+    {
+      "id": "P06",
+      "title": "API credentials and custom providers",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_key_save",
+          "line": 7772,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L7772",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_save",
+          "line": 8027,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L8027",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_remove",
+          "line": 8103,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L8103",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Masked API-key editor, provider CRUD including ID/base URL/API family/model list, save/remove, refresh runtime credentials; special Ollama Cloud session input is stored separately.",
+      "baseline_edge_state": "Writes preserve unrelated models.json/auth.json fields and per-model fields by ID. Invalid JSON/empty keys rejected rather than clobbered. Credentials remain local; avoid logging raw secret.",
+      "fixture": "Isolated HOME and project config, dummy secret marker values, controlled package/provider/MCP executables and fake OAuth issuer; no real credentials.",
+      "steps": [
+        {
+          "id": "P06.behavior",
+          "dimension": "functional",
+          "action": "Add, edit and remove a fixture custom provider with dummy credentials; validate URL/model fields.",
+          "expected": "Masked API-key editor, provider CRUD including ID/base URL/API family/model list, save/remove, refresh runtime credentials; special Ollama Cloud session input is stored separately.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P06.edge",
+          "dimension": "edge",
+          "action": "Cancel deletion; reject invalid config and failed saves; redact dummy secret markers from logs, screenshots and errors.",
+          "expected": "Writes preserve unrelated models.json/auth.json fields and per-model fields by ID. Invalid JSON/empty keys rejected rather than clobbered. Credentials remain local; avoid logging raw secret.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P06.error",
+          "dimension": "error",
+          "action": "Make this setting's file write or provider/package/MCP operation fail; cancel then retry once after recovery.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Writes preserve unrelated models.json/auth.json fields and per-model fields by ID. Invalid JSON/empty keys rejected rather than clobbered. Credentials remain local; avoid logging raw secret.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P06.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P06.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P06.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P06.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/preferences",
+        "internal/workbench",
+        "internal/native"
+      ],
+      "existing_test_candidates": [
+        "internal/preferences/store_test.go",
+        "internal/preferences/workspaces_test.go",
+        "internal/workbench/workbench_test.go",
+        "internal/native/native_test.go",
+        "internal/native/runtime_test.go",
+        "internal/native/updater_test.go",
+        "internal/native/temp_files_test.go"
+      ],
+      "inventory_evidence": "../parity/settings.json",
+      "source_test_inventory": "T14",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-P03",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "pass_scoped",
+          "steps": [
+            "Inspect catalog including fallback diagnostic and OAuth-only provider.",
+            "Save invalid custom provider; correct it and save into temporary home.",
+            "Force disk failure; cancel masked key dialog; resize800×560."
+          ],
+          "expected": "Capability-specific controls, validated fields, no painted key, failed save keeps draft, existing key preserved when blank.",
+          "tests": [
+            "TestNativeProviderEditorValidationSecretAndMinimumSize",
+            "TestNativeProviderSaveFailureKeepsDraft",
+            "TestProviderCredentialCapabilities"
+          ],
+          "remaining": "These native/disk fixtures pass. Full provider card geometry, source account detail/quota embed and real credential flows remain unverified.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": [
+        "../settings-backend-implementation.md",
+        "../settings-backend-source-evidence.json"
+      ]
+    },
+    {
+      "id": "P07",
+      "title": "Provider OAuth lifecycle",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/auth.rs",
+          "handler": "AuthManager",
+          "line": 140,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/auth.rs#L140",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/runtime.rs",
+          "handler": "handle_auth_effects",
+          "line": 395,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/runtime.rs#L395",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_oauth_login",
+          "line": 7805,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L7805",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/platform.rs",
+          "handler": "open_terminal_command",
+          "line": 957,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/platform.rs#L957",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Auth capability/status probe, sign-in browser/device flow, cancel, timeout/restart recovery, sign-out; supported namespace uses auth.* RPC.",
+      "baseline_edge_state": "State reducer contains nonsecret display state only. Unsupported auth RPC falls back to supported terminal login path; failed opening or cancellation surfaced. Never claim sign-in from an opened URL alone.",
+      "fixture": "Isolated HOME and project config, dummy secret marker values, controlled package/provider/MCP executables and fake OAuth issuer; no real credentials.",
+      "steps": [
+        {
+          "id": "P07.behavior",
+          "dimension": "functional",
+          "action": "Start OAuth using a local fixture issuer, open/paste the returned URL and complete or cancel the flow.",
+          "expected": "Auth capability/status probe, sign-in browser/device flow, cancel, timeout/restart recovery, sign-out; supported namespace uses auth.* RPC.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P07.edge",
+          "dimension": "edge",
+          "action": "Delay success until after cancellation/restart; old callbacks must not authenticate the new request; never use real accounts in automated tests.",
+          "expected": "State reducer contains nonsecret display state only. Unsupported auth RPC falls back to supported terminal login path; failed opening or cancellation surfaced. Never claim sign-in from an opened URL alone.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P07.error",
+          "dimension": "error",
+          "action": "Make this setting's file write or provider/package/MCP operation fail; cancel then retry once after recovery.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: State reducer contains nonsecret display state only. Unsupported auth RPC falls back to supported terminal login path; failed opening or cancellation surfaced. Never claim sign-in from an opened URL alone.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P07.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P07.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P07.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P07.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/preferences",
+        "internal/workbench",
+        "internal/native"
+      ],
+      "existing_test_candidates": [
+        "internal/preferences/store_test.go",
+        "internal/preferences/workspaces_test.go",
+        "internal/workbench/workbench_test.go",
+        "internal/native/native_test.go",
+        "internal/native/runtime_test.go",
+        "internal/native/updater_test.go",
+        "internal/native/temp_files_test.go"
+      ],
+      "inventory_evidence": "../parity/settings.json",
+      "source_test_inventory": "T14",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-P04",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "partial",
+          "steps": [
+            "Start sign-in, cancel, then receive stale completion.",
+            "Use active-provider5h/peak/balance/global fallbacks and failed reports.",
+            "Inspect refresh/reset and hidden-provider preferences."
+          ],
+          "expected": "No stale sign-in overwrites later state; quota priority/unknown handling source-equivalent.",
+          "tests": [
+            "TestQuotaHeadlinePriorityAndErrorExclusion",
+            "TestQuotaFractionsAndWindowRecognition",
+            "TestQuotaResetHintAndAmount",
+            "TestQuotaReportsAreSortedWithoutChangingInput"
+          ],
+          "remaining": "Pure quota rules pass; live OAuth, full quota popup grouping/hidden-provider/MCP tabs and OS browser-return lifecycle remain unverified or incomplete.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": []
+    },
+    {
+      "id": "P08",
+      "title": "Models catalog page",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "model_rows",
+          "line": 1433,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L1433",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "models_refresh",
+          "line": 1369,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L1369",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "model_toolbar",
+          "line": 1082,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L1082",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Full model listing, search name/ID/provider, provider filter, favorites-only, favorite cards, active model chooser and catalog refresh.",
+      "baseline_edge_state": "Refresh blocked while run active; runtime/pi catalog is actual source. No results differs from no models reported; active selection agrees with composer picker.",
+      "fixture": "Isolated HOME and project config, dummy secret marker values, controlled package/provider/MCP executables and fake OAuth issuer; no real credentials.",
+      "steps": [
+        {
+          "id": "P08.behavior",
+          "dimension": "functional",
+          "action": "List models by provider; filter/search; toggle supported availability/default fields and inspect metadata.",
+          "expected": "Full model listing, search name/ID/provider, provider filter, favorites-only, favorite cards, active model chooser and catalog refresh.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P08.edge",
+          "dimension": "edge",
+          "action": "Return loading/error/empty results and a missing currently-selected model; preserve actual provider state.",
+          "expected": "Refresh blocked while run active; runtime/pi catalog is actual source. No results differs from no models reported; active selection agrees with composer picker.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P08.error",
+          "dimension": "error",
+          "action": "Make this setting's file write or provider/package/MCP operation fail; cancel then retry once after recovery.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Refresh blocked while run active; runtime/pi catalog is actual source. No results differs from no models reported; active selection agrees with composer picker.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P08.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P08.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P08.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P08.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/preferences",
+        "internal/workbench",
+        "internal/native"
+      ],
+      "existing_test_candidates": [
+        "internal/preferences/store_test.go",
+        "internal/preferences/workspaces_test.go",
+        "internal/workbench/workbench_test.go",
+        "internal/native/native_test.go",
+        "internal/native/runtime_test.go",
+        "internal/native/updater_test.go",
+        "internal/native/temp_files_test.go"
+      ],
+      "inventory_evidence": "../parity/settings.json",
+      "source_test_inventory": "T07,T12",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-C05",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "partial",
+          "steps": [
+            "Filter model picker to one/zero and recover.",
+            "Switch provider and select thinking level.",
+            "Favorite model, enable favorites-only and relaunch."
+          ],
+          "expected": "Actual catalog/capabilities; no unsupported thinking choice; favorites/recent persistence and source model cards.",
+          "tests": [
+            "TestFilteredPickersResetAndClampKeyboardSelection"
+          ],
+          "remaining": "Keyboard picker works. Source favorites-only/provider filter/detail catalog page remains incomplete; existing simple model list is not full P08.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": []
+    }
+  ]
+}

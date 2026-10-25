@@ -1,0 +1,629 @@
+{
+  "schema": "orbit-acceptance-shard/v1",
+  "category": "updates-privacy",
+  "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "rows": [
+    {
+      "id": "U01",
+      "title": "Usage data/accounting",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/usage/aggregate.rs",
+          "handler": "build_calendar",
+          "line": 475,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/usage/aggregate.rs#L475",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/collect.rs",
+          "handler": "build_index",
+          "line": 225,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/usage/collect.rs#L225",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/collect.rs",
+          "handler": "scan_store",
+          "line": 154,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/usage/collect.rs#L154",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Scan pi session assistant usage/tool calls/results into normalized index; requests, turns, tool runs, token buckets/cache hit/cost/time/errors.",
+      "baseline_edge_state": "Only real billed records; reasoning subset of output not extra tokens. Duration gaps >30 min excluded. Pricing coverage exposed; retries absent from store remain unavailable.",
+      "fixture": "Copied fixture session store, controlled clock/pricing/update responses, dummy redaction markers and disposable staging directory.",
+      "steps": [
+        {
+          "id": "U01.behavior",
+          "dimension": "functional",
+          "action": "Scan fixture sessions containing assistant usage/tool calls, cached tokens, reasoning subsets and timestamps.",
+          "expected": "Scan pi session assistant usage/tool calls/results into normalized index; requests, turns, tool runs, token buckets/cache hit/cost/time/errors.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U01.edge",
+          "dimension": "edge",
+          "action": "Include malformed records, duplicate IDs, absent price and >30-minute gaps; exclude unavailable/reasoning double-counted metrics.",
+          "expected": "Only real billed records; reasoning subset of output not extra tokens. Duration gaps >30 min excluded. Pricing coverage exposed; retries absent from store remain unavailable.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U01.error",
+          "dimension": "error",
+          "action": "Inject malformed data, unavailable I/O/network response and cancellation at the action boundary.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Only real billed records; reasoning subset of output not extra tokens. Duration gaps >30 min excluded. Pricing coverage exposed; retries absent from store remain unavailable.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U01.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U01.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U01.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U01.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/preferences",
+        "internal/workbench",
+        "internal/native"
+      ],
+      "existing_test_candidates": [
+        "internal/preferences/store_test.go",
+        "internal/preferences/workspaces_test.go",
+        "internal/workbench/workbench_test.go",
+        "internal/native/native_test.go",
+        "internal/native/runtime_test.go",
+        "internal/native/updater_test.go",
+        "internal/native/temp_files_test.go"
+      ],
+      "inventory_evidence": "../parity/updates-privacy.json",
+      "source_test_inventory": "T18",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-U01",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "pass_scoped",
+          "steps": [
+            "Scan explicit temporary Pi JSONL fixtures, including unbilled provider failures, pending tool calls and compaction.",
+            "Filter model/provider and request-only flags.",
+            "Compare cost coverage and absent duration/cache against source."
+          ],
+          "expected": "No fabricatedzero metrics, no pending-tool failure, real call-start attribution and source turn semantics.",
+          "tests": [
+            "TestUsageProjectionPreservesScopeCalendarAndMissingMetrics",
+            "TestSettingsBackendProjectionUsesModelPricingCoverage",
+            "TestSettingsBackendNativeUnbilledErrorsRemainVisible",
+            "TestLatencyPercentileRequiresSourceMinimum"
+          ],
+          "remaining": "Focused domain/projection cases pass; this does not close the complete analytics corpus or all UI displays.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": [
+        "../settings-backend-implementation.md",
+        "../settings-backend-source-evidence.json"
+      ]
+    },
+    {
+      "id": "U02",
+      "title": "Usage overview/detail surfaces",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/usage/page.rs",
+          "handler": "UsagePage",
+          "line": 876,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/usage/page.rs#L876",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Primary+U, Simple/Details modes, daily heatmap, summary KPIs, usage-over-time chart/table, signals, token-health panels, provider/model/workspace/tool breakdown and records.",
+      "baseline_edge_state": "Responsive panels use actual main-area width; first load/refresh/no-data/error/last-updated states distinct. Virtual/data-table performance and chart hover tooltips need separate verification.",
+      "fixture": "Copied fixture session store, controlled clock/pricing/update responses, dummy redaction markers and disposable staging directory.",
+      "steps": [
+        {
+          "id": "U02.behavior",
+          "dimension": "functional",
+          "action": "Open Usage in Simple and Details modes at narrow/wide widths; inspect heatmap, charts, KPIs and records.",
+          "expected": "Primary+U, Simple/Details modes, daily heatmap, summary KPIs, usage-over-time chart/table, signals, token-health panels, provider/model/workspace/tool breakdown and records.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U02.edge",
+          "dimension": "edge",
+          "action": "Delay/fail index load and refresh empty data; distinguish first load from stale refresh and preserve accurate last-updated state.",
+          "expected": "Responsive panels use actual main-area width; first load/refresh/no-data/error/last-updated states distinct. Virtual/data-table performance and chart hover tooltips need separate verification.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U02.error",
+          "dimension": "error",
+          "action": "Inject malformed data, unavailable I/O/network response and cancellation at the action boundary.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Responsive panels use actual main-area width; first load/refresh/no-data/error/last-updated states distinct. Virtual/data-table performance and chart hover tooltips need separate verification.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U02.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U02.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U02.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U02.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/preferences",
+        "internal/workbench",
+        "internal/native"
+      ],
+      "existing_test_candidates": [
+        "internal/preferences/store_test.go",
+        "internal/preferences/workspaces_test.go",
+        "internal/workbench/workbench_test.go",
+        "internal/native/native_test.go",
+        "internal/native/runtime_test.go",
+        "internal/native/updater_test.go",
+        "internal/native/temp_files_test.go"
+      ],
+      "inventory_evidence": "../parity/updates-privacy.json",
+      "source_test_inventory": "T18",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-U02",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "partial",
+          "steps": [
+            "Render loading then actual data; change mode.",
+            "Fail refresh after prior good data; render only unbilled errors.",
+            "Inspect fixed-date labelled fixture screenshots."
+          ],
+          "expected": "Source modes and honest pending/partial/error/empty states, no invented live metrics.",
+          "tests": [
+            "TestUsageNativeLoadedEmptyErrorAndModal",
+            "TestNativeUsageCapture"
+          ],
+          "remaining": "Native cards/heatmap/chart/breakdowns/session/failure rows render. Source comparison deltas, signals, detailed cache/latency panels and exact layout remain missing; screenshots are fixtures, not Rust comparisons.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": [
+        "../settings-backend-implementation.md",
+        "../settings-backend-source-evidence.json"
+      ]
+    },
+    {
+      "id": "U03",
+      "title": "Usage filters and drill-down",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/usage/model.rs",
+          "handler": "UsageFilter",
+          "line": 675,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/usage/model.rs#L675",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/page.rs",
+          "handler": "set_filter",
+          "line": 1580,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/usage/page.rs#L1580",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/page.rs",
+          "handler": "scope_to_day",
+          "line": 1758,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/usage/page.rs#L1758",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Date presets and custom calendar range, granularity, searchable multi-select workspace/provider/model, select-all/clear, active chips, day/bucket click narrowing, session/errors-only/cached-only focus.",
+      "baseline_edge_state": "One filter model drives every panel; local-time date buckets, inclusive/exclusive boundaries and zero/unknown values preserved. No separate project dimension invented.",
+      "fixture": "Copied fixture session store, controlled clock/pricing/update responses, dummy redaction markers and disposable staging directory.",
+      "steps": [
+        {
+          "id": "U03.behavior",
+          "dimension": "functional",
+          "action": "Apply each date preset/custom range, provider/model/workspace/session/tool filter; drill down and clear filters.",
+          "expected": "Date presets and custom calendar range, granularity, searchable multi-select workspace/provider/model, select-all/clear, active chips, day/bucket click narrowing, session/errors-only/cached-only focus.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U03.edge",
+          "dimension": "edge",
+          "action": "Exercise daylight-boundary dates, empty results and combinations; compare retained filters after navigation and relaunch.",
+          "expected": "One filter model drives every panel; local-time date buckets, inclusive/exclusive boundaries and zero/unknown values preserved. No separate project dimension invented.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U03.error",
+          "dimension": "error",
+          "action": "Inject malformed data, unavailable I/O/network response and cancellation at the action boundary.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: One filter model drives every panel; local-time date buckets, inclusive/exclusive boundaries and zero/unknown values preserved. No separate project dimension invented.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U03.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U03.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U03.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U03.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/preferences",
+        "internal/workbench",
+        "internal/native"
+      ],
+      "existing_test_candidates": [
+        "internal/preferences/store_test.go",
+        "internal/preferences/workspaces_test.go",
+        "internal/workbench/workbench_test.go",
+        "internal/native/native_test.go",
+        "internal/native/runtime_test.go",
+        "internal/native/updater_test.go",
+        "internal/native/temp_files_test.go"
+      ],
+      "inventory_evidence": "../parity/updates-privacy.json",
+      "source_test_inventory": "T18",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-U03",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "partial",
+          "steps": [
+            "Select multiple workspaces/providers/models.",
+            "Select calendar day outside prior date range; bucket/session drill-down; clear focus.",
+            "Use reversed custom dates; choose range with a quiet middle day."
+          ],
+          "expected": "Calendar independent of date filter, valid scope remains, date normalization and contiguous zero-activity axis.",
+          "tests": [
+            "TestSettingsBackendTrendDoesNotCompressMissingDays",
+            "TestUsageProjectionPreservesScopeCalendarAndMissingMetrics",
+            "TestUsageNativeMinimumWindowControls"
+          ],
+          "remaining": "Multi-select menus, scope fields, calendar normalization and contiguous4k guarded buckets implemented. Searchable native multi-select popup and disambiguating identical model IDs acrossproviders remain incomplete.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": [
+        "../settings-backend-implementation.md",
+        "../settings-backend-source-evidence.json"
+      ]
+    },
+    {
+      "id": "U04",
+      "title": "Usage tables and export",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/usage/page.rs",
+          "handler": "query_sessions",
+          "line": 79,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/usage/page.rs#L79",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/page.rs",
+          "handler": "export",
+          "line": 2457,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/usage/page.rs#L2457",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/page.rs",
+          "handler": "Prefs",
+          "line": 2528,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/usage/page.rs#L2528",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Search/sort/direction, column visibility/reset/resize, pagination/page sizes across session/series/daily/failure/breakdown tables, context menu and open source session; export CSV/JSON with native Save dialog.",
+      "baseline_edge_state": "usage.json persists supported view prefs only, not transient filters/data IDs. Export filtered records/aggregates as implemented; escaping, cancellation and write errors surfaced.",
+      "fixture": "Copied fixture session store, controlled clock/pricing/update responses, dummy redaction markers and disposable staging directory.",
+      "steps": [
+        {
+          "id": "U04.behavior",
+          "dimension": "functional",
+          "action": "Sort each Usage table column, page/load more and export selected data from a fixture dataset.",
+          "expected": "Search/sort/direction, column visibility/reset/resize, pagination/page sizes across session/series/daily/failure/breakdown tables, context menu and open source session; export CSV/JSON with native Save dialog.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U04.edge",
+          "dimension": "edge",
+          "action": "Use equal-sort keys, unsupported prices and CSV-special text; export no unrelated rows or secrets and preserve configured page size.",
+          "expected": "usage.json persists supported view prefs only, not transient filters/data IDs. Export filtered records/aggregates as implemented; escaping, cancellation and write errors surfaced.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U04.error",
+          "dimension": "error",
+          "action": "Inject malformed data, unavailable I/O/network response and cancellation at the action boundary.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: usage.json persists supported view prefs only, not transient filters/data IDs. Export filtered records/aggregates as implemented; escaping, cancellation and write errors surfaced.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U04.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U04.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U04.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "U04.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/preferences",
+        "internal/workbench",
+        "internal/native"
+      ],
+      "existing_test_candidates": [
+        "internal/preferences/store_test.go",
+        "internal/preferences/workspaces_test.go",
+        "internal/workbench/workbench_test.go",
+        "internal/native/native_test.go",
+        "internal/native/runtime_test.go",
+        "internal/native/updater_test.go",
+        "internal/native/temp_files_test.go"
+      ],
+      "inventory_evidence": "../parity/updates-privacy.json",
+      "source_test_inventory": "T18",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-U04",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "partial",
+          "steps": [
+            "Sort equal-metric rows both ways; paginate; open source session.",
+            "Open failure detail; Escape and native menu guard.",
+            "Choose CSV/JSON, cancel native Save, then export to disposablefile."
+          ],
+          "expected": "Stable ties, no phantom detail metrics, actual session path, source export schema and unknown fields preserved.",
+          "tests": [
+            "TestUsageSortTiesAreStable",
+            "TestUsageNativeLoadedEmptyErrorAndModal",
+            "TestSettingsBackendUsagePreferencesPreserveUnknownAndDefaultDescending"
+          ],
+          "remaining": "Stable sorting/modal/prefs cases pass; JSON/CSV backend implemented and host chooser wired. Independent table states, column visibility/resize/context menus and actual native Save interaction remain open.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": [
+        "../settings-backend-implementation.md",
+        "../settings-backend-source-evidence.json"
+      ]
+    }
+  ]
+}

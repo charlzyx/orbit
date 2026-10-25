@@ -1,0 +1,1940 @@
+{
+  "schema": "orbit-native-ui-acceptance/v1",
+  "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "generated_utc": "2026-10-25T04:59:00Z",
+  "scope": "Supplement to139-row source checklist; scoped cases only, no full-row or visual parity claim",
+  "run": "GOPATH=/workspace/shared/orbit-toolchains/gopath GOCACHE=/workspace/shared/orbit-toolchains/go-cache /workspace/shared/orbit-toolchains/go/bin/go test -race ./internal/ui ./cmd/orbit -count=1",
+  "last_observed_full_ui_race": "2026-10-25T04:57:07Z: PASS,5.537s; later integration rerun in progress",
+  "cases": [
+    {
+      "id": "UI-S01",
+      "rows": [
+        "S01"
+      ],
+      "title": "Window creation and parked lifetime",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/main_window.rs",
+          "symbol": "open",
+          "line": 77
+        },
+        {
+          "path": "crates/orbit-pi/src/main_window.rs",
+          "symbol": "spawn_heartbeat",
+          "line": 136
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "symbol": "render",
+          "line": 166
+        },
+        {
+          "path": "crates/orbit-pi/src/platform.rs",
+          "symbol": "titlebar_options",
+          "line": 1507
+        }
+      ],
+      "steps": [
+        "Start with empty isolated preferences.",
+        "Inspect native window minimum and initial maximize; close/reopen on macOS while a fake Pi session streams."
+      ],
+      "expected": "Source minimum 960×640; restore85% display width and90%height capped1440×920; one parked controller/process survives close.",
+      "tests": [
+        "TestSourceWindowRestoreBounds",
+        "TestHiddenSidebarReservesNativeTrafficLights"
+      ],
+      "functional_verdict": "partial",
+      "visual_verdict": "not_compared_to_matched_Rust_runtime",
+      "platform_verdict": "native_CPU_only_unless_explicitly_noted",
+      "remaining": "Pure restore bounds and native traffic-light clearance pass. Actual maximize/center/close/reopen/16ms-active heartbeat across all OS remains unexecuted.",
+      "full_row_parity_verified": false
+    },
+    {
+      "id": "UI-S02",
+      "rows": [
+        "S02"
+      ],
+      "title": "Geometry, fractional scaling and restored dimensions",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/layout.rs",
+          "symbol": "Layout",
+          "line": 29
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "symbol": "render",
+          "line": 166
+        },
+        {
+          "path": "crates/orbit-pi/src/app.rs",
+          "symbol": "SIDEBAR_MIN_W",
+          "line": 87
+        }
+      ],
+      "steps": [
+        "At1470×922 change scale1/1.25/1.5/2.",
+        "Drag sidebar/review/explorer/terminal widths; relaunch.",
+        "Repeat font12/14/18 and density80/100/120."
+      ],
+      "expected": "Logical rectangles stay stable under device scale; source clamps and persisted layout survive relaunch.",
+      "tests": [
+        "TestFractionalScaleKeepsLogicalComposerGeometry",
+        "TestMinimumWindowModalsKeepActionsReachable"
+      ],
+      "functional_verdict": "partial",
+      "visual_verdict": "not_compared_to_matched_Rust_runtime",
+      "platform_verdict": "native_CPU_only_unless_explicitly_noted",
+      "remaining": "DIP composer and modal bounds pass, including800×560 stress below source minimum. Full panel drag/relaunch/font-density matrix and matched pixels remain open.",
+      "full_row_parity_verified": false
+    },
+    {
+      "id": "UI-S03",
+      "rows": [
+        "S03",
+        "S04",
+        "S05"
+      ],
+      "title": "Filtered command/model keyboard selection",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/commands.rs",
+          "symbol": "COMMANDS",
+          "line": 224
+        },
+        {
+          "path": "crates/orbit-pi/src/commands.rs",
+          "symbol": "BINDINGS",
+          "line": 794
+        },
+        {
+          "path": "crates/orbit-pi/src/main.rs",
+          "symbol": "bind_keys",
+          "line": 357
+        },
+        {
+          "path": "crates/orbit-pi/src/app/pickers.rs",
+          "symbol": "run_command",
+          "line": 415
+        },
+        {
+          "path": "crates/orbit-pi/src/command_palette.rs",
+          "symbol": "CommandPalette",
+          "line": 313
+        },
+        {
+          "path": "crates/orbit-pi/src/app/pickers.rs",
+          "symbol": "toggle_command_palette",
+          "line": 288
+        },
+        {
+          "path": "crates/orbit-pi/src/app/pickers.rs",
+          "symbol": "run_palette_command",
+          "line": 387
+        },
+        {
+          "path": "crates/orbit-pi/src/main.rs",
+          "symbol": "bind_keys",
+          "line": 357
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "symbol": "on_focus_next",
+          "line": 3775
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "symbol": "focus_traversal_blocked",
+          "line": 3804
+        },
+        {
+          "path": "crates/orbit-pi/src/app/composer_ops.rs",
+          "symbol": "close_add_menu",
+          "line": 537
+        }
+      ],
+      "steps": [
+        "Open palette, move down six entries, filter to one and press Enter.",
+        "Filter to zero then restore and press Enter.",
+        "Open prompt from palette; Escape back to composer."
+      ],
+      "expected": "Filtered selection resets/clamps; zero results do not submit; stable modal keys restore focus.",
+      "tests": [
+        "TestFilteredPickersResetAndClampKeyboardSelection",
+        "TestPickerKeyboardCommit",
+        "TestModalTransitionRestoresComposerFocus"
+      ],
+      "functional_verdict": "pass_scoped",
+      "visual_verdict": "not_compared_to_matched_Rust_runtime",
+      "platform_verdict": "native_CPU_only_unless_explicitly_noted",
+      "remaining": "These exact native CPU flows pass, not every command/context or OS accelerator.",
+      "full_row_parity_verified": false
+    },
+    {
+      "id": "UI-S04",
+      "rows": [
+        "S03",
+        "C16",
+        "C20"
+      ],
+      "title": "Native menu and modal precedence",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/commands.rs",
+          "symbol": "COMMANDS",
+          "line": 224
+        },
+        {
+          "path": "crates/orbit-pi/src/commands.rs",
+          "symbol": "BINDINGS",
+          "line": 794
+        },
+        {
+          "path": "crates/orbit-pi/src/main.rs",
+          "symbol": "bind_keys",
+          "line": 357
+        },
+        {
+          "path": "crates/orbit-pi/src/app/pickers.rs",
+          "symbol": "run_command",
+          "line": 415
+        },
+        {
+          "path": "crates/orbit-pi/src/dialog.rs",
+          "symbol": "Dialog",
+          "line": 171
+        },
+        {
+          "path": "crates/orbit-pi/src/app/dialogs.rs",
+          "symbol": "handle_extension_ui_request",
+          "line": 10
+        },
+        {
+          "path": "crates/orbit-pi/src/app/dialogs.rs",
+          "symbol": "open_dialog",
+          "line": 205
+        },
+        {
+          "path": "crates/orbit-pi/src/app/dialogs.rs",
+          "symbol": "respond_to_dialog",
+          "line": 236
+        },
+        {
+          "path": "crates/orbit-pi/src/widgets.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/custom_ui.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/dialogs.rs",
+          "symbol": "apply_extension_widget",
+          "line": 76
+        },
+        {
+          "path": "crates/orbit-pi/src/app/dialogs.rs",
+          "symbol": "apply_custom_frame",
+          "line": 114
+        }
+      ],
+      "steps": [
+        "Open confirm, prompt, custom terminal, secret, image, model or palette.",
+        "Dispatch New task/Settings/Terminal through native menu.",
+        "For custom UI press Escape, then explicit Cancel."
+      ],
+      "expected": "No action mutates behind modal. Custom Escape sends ESC to Pi rather than dismissing; explicit Cancel cancels.",
+      "tests": [
+        "TestNativeMenuCannotMutateBehindModal",
+        "TestCustomDialogDoesNotDismissEscape",
+        "TestLiveCustomDialogForwardsEscape"
+      ],
+      "functional_verdict": "pass_scoped",
+      "visual_verdict": "not_compared_to_matched_Rust_runtime",
+      "platform_verdict": "native_CPU_only_unless_explicitly_noted",
+      "remaining": "Live custom test requires ORBIT_TERMINAL_TEST and pinned Ghostty; it was run previously. Ordinary default suite skips opt-in test. OS-native menu entry/accelerator dispatch remains separate.",
+      "full_row_parity_verified": false
+    },
+    {
+      "id": "UI-S05",
+      "rows": [
+        "S06",
+        "S07",
+        "S08"
+      ],
+      "title": "Session switch, workspace routing and drafts",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/sessions.rs",
+          "symbol": "SessionInfo",
+          "line": 29
+        },
+        {
+          "path": "crates/orbit-pi/src/sessions.rs",
+          "symbol": "SessionWatcher",
+          "line": 229
+        },
+        {
+          "path": "crates/orbit-pi/src/app/events.rs",
+          "symbol": "tick",
+          "line": 18
+        },
+        {
+          "path": "crates/orbit-pi/src/app/session.rs",
+          "symbol": "on_new_session",
+          "line": 581
+        },
+        {
+          "path": "crates/orbit-pi/src/app/session.rs",
+          "symbol": "can_reuse_session",
+          "line": 61
+        },
+        {
+          "path": "crates/orbit-pi/src/app/pickers.rs",
+          "symbol": "start_task_in_folder",
+          "line": 118
+        },
+        {
+          "path": "crates/orbit-pi/src/workspace_picker.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/workspace_logo.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app.rs",
+          "symbol": "ParkedSession",
+          "line": 150
+        },
+        {
+          "path": "crates/orbit-pi/src/app/session.rs",
+          "symbol": "park_active_session",
+          "line": 299
+        },
+        {
+          "path": "crates/orbit-pi/src/app/runtime.rs",
+          "symbol": "reap_idle_parked",
+          "line": 569
+        },
+        {
+          "path": "crates/orbit-pi/src/app/events.rs",
+          "symbol": "drain_parked_session",
+          "line": 541
+        }
+      ],
+      "steps": [
+        "Enter a draft with attachments, switch to another saved task then back.",
+        "Switch to a task in another repository.",
+        "Observe Git/Files/Worktrees/terminal new-tab directory without starting an extra session."
+      ],
+      "expected": "Per-session draft is retained; domain actions target selected repository; loading sessions do not overwrite new active choice.",
+      "tests": [
+        "TestDraftSurvivesSessionSwitch",
+        "TestInactiveFileLoadCannotStealSelectionAfterWorkspaceSwitch"
+      ],
+      "functional_verdict": "partial",
+      "visual_verdict": "not_compared_to_matched_Rust_runtime",
+      "platform_verdict": "native_CPU_only_unless_explicitly_noted",
+      "remaining": "Draft/inactive file generation tests pass. Whole native controller repository-switch interaction with fake Pi and all domain mutations still needs a dedicated end-to-end fixture.",
+      "full_row_parity_verified": false
+    },
+    {
+      "id": "UI-S06",
+      "rows": [
+        "S09",
+        "S10",
+        "S11",
+        "S12",
+        "S13",
+        "S14"
+      ],
+      "title": "Sidebar sessions and workspace management",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/app/sidebar.rs",
+          "symbol": "open_session_slot",
+          "line": 2509
+        },
+        {
+          "path": "crates/orbit-pi/src/app/sidebar.rs",
+          "symbol": "cycle_session",
+          "line": 2521
+        },
+        {
+          "path": "crates/orbit-pi/src/app/sidebar.rs",
+          "symbol": "on_sidebar_confirm",
+          "line": 2618
+        },
+        {
+          "path": "crates/orbit-pi/src/app/session.rs",
+          "symbol": "clone_session",
+          "line": 613
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "rename_session",
+          "line": 5836
+        },
+        {
+          "path": "crates/orbit-pi/src/sessions.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/events.rs",
+          "symbol": "tick",
+          "line": 18
+        },
+        {
+          "path": "crates/orbit-pi/src/app/sidebar.rs",
+          "symbol": "on_menu_clone_session",
+          "line": 2188
+        },
+        {
+          "path": "crates/orbit-pi/src/pins.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/archive.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/sidebar.rs",
+          "symbol": "on_menu_delete_confirm",
+          "line": 2231
+        },
+        {
+          "path": "crates/orbit-pi/src/app/sidebar.rs",
+          "symbol": "on_menu_toggle_archive",
+          "line": 2214
+        },
+        {
+          "path": "crates/orbit-pi/src/app/sidebar.rs",
+          "symbol": "build_sidebar_rows",
+          "line": 176
+        },
+        {
+          "path": "crates/orbit-pi/src/app/sidebar.rs",
+          "symbol": "build_flat_sidebar_rows",
+          "line": 370
+        },
+        {
+          "path": "crates/orbit-pi/src/app.rs",
+          "symbol": "WorkspaceSort",
+          "line": 2248
+        },
+        {
+          "path": "crates/orbit-pi/src/app.rs",
+          "symbol": "SidebarGroupBy",
+          "line": 2339
+        },
+        {
+          "path": "crates/orbit-pi/src/app/sidebar.rs",
+          "symbol": "on_workspace_remove",
+          "line": 2383
+        },
+        {
+          "path": "crates/orbit-pi/src/app/sidebar.rs",
+          "symbol": "on_workspace_open_picker",
+          "line": 2373
+        },
+        {
+          "path": "crates/orbit-pi/src/workspace_mark.rs",
+          "symbol": "WorkspaceMark",
+          "line": 13
+        },
+        {
+          "path": "crates/orbit-pi/src/app.rs",
+          "symbol": "save_workspaces"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/session.rs",
+          "symbol": "on_refresh",
+          "line": 2702
+        },
+        {
+          "path": "crates/orbit-pi/src/app/events.rs",
+          "symbol": "sync_workspace_watcher",
+          "line": 1237
+        },
+        {
+          "path": "crates/orbit-pi/src/app/refresh_tests.rs"
+        }
+      ],
+      "steps": [
+        "Use numbered/next/previous session commands.",
+        "Rename, pin, archive, restore, clone and recoverably delete.",
+        "Change workspace sort/group/mark/icon and refresh fan-out."
+      ],
+      "expected": "Source ordering, active visibility, collapse persistence, all metadata operations and contextual menu semantics match.",
+      "tests": [],
+      "functional_verdict": "failed_missing_cases",
+      "visual_verdict": "not_compared_to_matched_Rust_runtime",
+      "platform_verdict": "native_CPU_only_unless_explicitly_noted",
+      "remaining": "Backend session operations exist, but host-level interaction/restart checks are incomplete. Source workspace marks/icons, all sorting modes and sticky/active reveal presentation are not fully reconstructed.",
+      "full_row_parity_verified": false
+    },
+    {
+      "id": "UI-C01",
+      "rows": [
+        "C01"
+      ],
+      "title": "Multiline and Chinese composition",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/composer.rs",
+          "symbol": "ComposerInput",
+          "line": 55
+        },
+        {
+          "path": "crates/orbit-pi/src/main.rs",
+          "symbol": "bind_keys",
+          "line": 357
+        },
+        {
+          "path": "crates/orbit-pi/src/app/session.rs",
+          "symbol": "submit_composer_as",
+          "line": 88
+        }
+      ],
+      "steps": [
+        "Type line one, Shift+Enter, line two.",
+        "Start IME composition; Enter commits composition only.",
+        "Commit Chinese text then Enter."
+      ],
+      "expected": "No prompt during composition; native text editing and multiline text remain intact.",
+      "tests": [
+        "TestIMECompositionDoesNotSubmit",
+        "TestComposerRepeatedEnterShiftAlternateAndRejection"
+      ],
+      "functional_verdict": "pass_scoped",
+      "visual_verdict": "not_compared_to_matched_Rust_runtime",
+      "platform_verdict": "native_CPU_only_unless_explicitly_noted",
+      "remaining": "Headless composition event and multiline submission pass. Real Chinese/Japanese/Korean OS IME candidates, clipboard and accessibility remain unexecuted.",
+      "full_row_parity_verified": false
+    },
+    {
+      "id": "UI-C02",
+      "rows": [
+        "C02",
+        "C03"
+      ],
+      "title": "Delivery policy, repeated send and rejected retry",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/composer_send.rs",
+          "symbol": "SendMode",
+          "line": 10
+        },
+        {
+          "path": "crates/orbit-pi/src/app/session.rs",
+          "symbol": "submit_as",
+          "line": 129
+        },
+        {
+          "path": "crates/orbit-pi/src/theme.rs",
+          "symbol": "UiPrefs",
+          "line": 324
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "symbol": "queue_bar",
+          "line": 4532
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "symbol": "on_clear_queue",
+          "line": 4719
+        },
+        {
+          "path": "crates/orbit-pi/src/app/events.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/session.rs",
+          "symbol": "reset_queue",
+          "line": 284
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "set_follow_up_mode",
+          "line": 5580
+        }
+      ],
+      "steps": [
+        "Set follow_up; Alt+Enter sends steer.",
+        "Press Enter again with empty input.",
+        "Reject Submit during maintenance/disconnect, then retry."
+      ],
+      "expected": "One action per accepted nonempty submission; rejected draft remains; alternate mode is exact opposite.",
+      "tests": [
+        "TestComposerRepeatedEnterShiftAlternateAndRejection",
+        "TestMaintenanceGateKeepsDraftAndBlocksNewProcess"
+      ],
+      "functional_verdict": "partial",
+      "visual_verdict": "not_compared_to_matched_Rust_runtime",
+      "platform_verdict": "native_CPU_only_unless_explicitly_noted",
+      "remaining": "Exact tested sends/rejection pass. Source individual queue editing/removal and one/all queued delivery controls are incomplete in host UI.",
+      "full_row_parity_verified": false
+    },
+    {
+      "id": "UI-C03",
+      "rows": [
+        "C04"
+      ],
+      "title": "Slash and file-mention autocomplete",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/app/composer_ops.rs",
+          "symbol": "autocomplete_entries",
+          "line": 9
+        },
+        {
+          "path": "crates/orbit-pi/src/app/composer_ops.rs",
+          "symbol": "commit_entry",
+          "line": 113
+        },
+        {
+          "path": "crates/orbit-pi/src/app/composer_ops.rs",
+          "symbol": "attach_file",
+          "line": 471
+        },
+        {
+          "path": "crates/orbit-pi/src/mentions.rs"
+        }
+      ],
+      "steps": [
+        "Type / then filter a command.",
+        "Type @ then select a nested file by keyboard.",
+        "Escape cancels; accepting replaces only trigger range."
+      ],
+      "expected": "Source composer_ops autocomplete ordering, keyboard ownership and trigger replacement.",
+      "tests": [],
+      "functional_verdict": "failed_missing_implementation",
+      "visual_verdict": "not_compared_to_matched_Rust_runtime",
+      "platform_verdict": "native_CPU_only_unless_explicitly_noted",
+      "remaining": "Host currently has no source-equivalent slash/file-mention popup. Plain text commands are forwarded but are not autocomplete parity.",
+      "full_row_parity_verified": false
+    },
+    {
+      "id": "UI-C04",
+      "rows": [
+        "C05"
+      ],
+      "title": "Attachments, drag/paste and partial failure",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/app/composer_ops.rs",
+          "symbol": "attach_image",
+          "line": 435
+        },
+        {
+          "path": "crates/orbit-pi/src/app/composer_ops.rs",
+          "symbol": "on_file_drop",
+          "line": 405
+        },
+        {
+          "path": "crates/orbit-pi/src/app/events.rs",
+          "symbol": "drain_pasted_images",
+          "line": 1108
+        },
+        {
+          "path": "crates/orbit-pi/src/attachments.rs",
+          "symbol": "compress_image",
+          "line": 55
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "symbol": "lightbox_layer",
+          "line": 4733
+        }
+      ],
+      "steps": [
+        "Select multiple valid images plus unreadable/oversized files.",
+        "Paste text and image; drag files.",
+        "Remove one; switch tasks; send and inspect RPC image bytes."
+      ],
+      "expected": "Bounded read/compression, actual per-file errors, no lost draft, source paste priority and max-count behavior.",
+      "tests": [],
+      "functional_verdict": "partial",
+      "visual_verdict": "not_compared_to_matched_Rust_runtime",
+      "platform_verdict": "native_CPU_only_unless_explicitly_noted",
+      "remaining": "Attachment Prepare and transport domain tests exist; host native add/drop/clipboard/partial-failure end-to-end tests and source text-file mention semantics remain open.",
+      "full_row_parity_verified": false
+    },
+    {
+      "id": "UI-C05",
+      "rows": [
+        "C06",
+        "P08"
+      ],
+      "title": "Model/thinking/favorites",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/model_selector.rs",
+          "symbol": "ModelSelector",
+          "line": 159
+        },
+        {
+          "path": "crates/orbit-pi/src/model_selector_match.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/pickers.rs",
+          "symbol": "sync_model_selector",
+          "line": 761
+        },
+        {
+          "path": "crates/orbit-pi/src/app/session.rs",
+          "symbol": "can_choose_thinking",
+          "line": 52
+        },
+        {
+          "path": "crates/orbit-pi/src/favorites.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/recent_models.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "model_rows",
+          "line": 1433
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "models_refresh",
+          "line": 1369
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "model_toolbar",
+          "line": 1082
+        },
+        {
+          "path": "crates/orbit-pi/src/favorites.rs"
+        }
+      ],
+      "steps": [
+        "Filter model picker to one/zero and recover.",
+        "Switch provider and select thinking level.",
+        "Favorite model, enable favorites-only and relaunch."
+      ],
+      "expected": "Actual catalog/capabilities; no unsupported thinking choice; favorites/recent persistence and source model cards.",
+      "tests": [
+        "TestFilteredPickersResetAndClampKeyboardSelection"
+      ],
+      "functional_verdict": "partial",
+      "visual_verdict": "not_compared_to_matched_Rust_runtime",
+      "platform_verdict": "native_CPU_only_unless_explicitly_noted",
+      "remaining": "Keyboard picker works. Source favorites-only/provider filter/detail catalog page remains incomplete; existing simple model list is not full P08.",
+      "full_row_parity_verified": false
+    },
+    {
+      "id": "UI-C06",
+      "rows": [
+        "C07",
+        "C08"
+      ],
+      "title": "Long streamed transcript reading position",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/transcript.rs",
+          "symbol": "load_from",
+          "line": 1081
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript.rs",
+          "symbol": "apply_event",
+          "line": 1181
+        },
+        {
+          "path": "crates/orbit-pi/src/app/events.rs",
+          "symbol": "apply_messages_snapshot",
+          "line": 645
+        },
+        {
+          "path": "crates/orbit-pi/src/message_scroller.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript.rs",
+          "symbol": "jump_turn",
+          "line": 2278
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "symbol": "render_navigation_rail",
+          "line": 1396
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript.rs",
+          "symbol": "persist_hint",
+          "line": 877
+        }
+      ],
+      "steps": [
+        "Render120 variable-height messages.",
+        "Scroll up in30-DIP steps, append/grow streamed assistant message.",
+        "Jump to latest, grow again."
+      ],
+      "expected": "Stable keys retain reader position; follow resumes only at end; variable-height rows do not jump to bottom unexpectedly.",
+      "tests": [
+        "TestTranscriptVariableHeightFollowAndReaderPosition"
+      ],
+      "functional_verdict": "pass_scoped",
+      "visual_verdict": "not_compared_to_matched_Rust_runtime",
+      "platform_verdict": "native_CPU_only_unless_explicitly_noted",
+      "remaining": "Native CPU follow/read-position test passes. Source navigation rail and full turn grouping remain missing; GPU long-session/performance acceptance is open.",
+      "full_row_parity_verified": false
+    },
+    {
+      "id": "UI-C07",
+      "rows": [
+        "C09"
+      ],
+      "title": "Rich Markdown and code",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "symbol": "parse_blocks",
+          "line": 5839
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "symbol": "parse_inline",
+          "line": 5201
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "symbol": "render_block",
+          "line": 6177
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "symbol": "render_code_block",
+          "line": 6537
+        },
+        {
+          "path": "crates/orbit-pi/src/highlight.rs"
+        }
+      ],
+      "steps": [
+        "Render alerts, tables, lists, fenced code, links, images and malformed streamed fences.",
+        "Resize with code wrapping.",
+        "Change light/dark theme."
+      ],
+      "expected": "Source semantic Markdown and color-only syntax with stable font metrics.",
+      "tests": [
+        "TestMarkdownAlertAndGeometry"
+      ],
+      "functional_verdict": "partial",
+      "visual_verdict": "not_compared_to_matched_Rust_runtime",
+      "platform_verdict": "native_CPU_only_unless_explicitly_noted",
+      "remaining": "GFM alert/geometry sample passes; highlight tokenizer has1204 source-oracle cases. Whole source markdown corpus, per-message media/actions and exact spacing remain unverified.",
+      "full_row_parity_verified": false
+    },
+    {
+      "id": "UI-C08",
+      "rows": [
+        "C10",
+        "C11",
+        "C12"
+      ],
+      "title": "Transcript selection, tools and turn summaries",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "symbol": "TextSelection",
+          "line": 302
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "symbol": "text_selection_menu",
+          "line": 912
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript.rs",
+          "symbol": "selected_text",
+          "line": 1076
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript.rs",
+          "symbol": "mark_copied",
+          "line": 2271
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "symbol": "render_activity_group",
+          "line": 2387
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "symbol": "render_tool_detail",
+          "line": 3551
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "symbol": "render_tool_error_strip",
+          "line": 3512
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "symbol": "build_edit_diff",
+          "line": 3973
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "symbol": "mcp_tool_parts",
+          "line": 7391
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "symbol": "render_working_indicator",
+          "line": 4820
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "symbol": "render_message_footer",
+          "line": 4369
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "symbol": "render_summary_card",
+          "line": 1811
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "symbol": "render_changed_files",
+          "line": 7053
+        }
+      ],
+      "steps": [
+        "Select across multiple Markdown blocks/messages.",
+        "Open Bash/read/edit/write/search tool cards and errors.",
+        "Inspect finished turn duration/tokens/cost."
+      ],
+      "expected": "Source structured tool presentation, cross-block selection, context menu and turn metrics.",
+      "tests": [],
+      "functional_verdict": "failed_missing_implementation",
+      "visual_verdict": "not_compared_to_matched_Rust_runtime",
+      "platform_verdict": "native_CPU_only_unless_explicitly_noted",
+      "remaining": "Host has selectable individual text/Markdown, generic collapsible tool output and copy response. Source typed tool cards, full cross-message selection/context menu and detailed turn summaries are incomplete.",
+      "full_row_parity_verified": false
+    },
+    {
+      "id": "UI-C09",
+      "rows": [
+        "C13"
+      ],
+      "title": "Transcript search",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/app/search.rs",
+          "symbol": "TranscriptSearch",
+          "line": 12
+        },
+        {
+          "path": "crates/orbit-pi/src/app/search.rs",
+          "symbol": "sync_transcript_search",
+          "line": 71
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript.rs",
+          "symbol": "find_messages",
+          "line": 2388
+        },
+        {
+          "path": "crates/orbit-pi/src/main.rs",
+          "symbol": "bind_keys",
+          "line": 357
+        }
+      ],
+      "steps": [
+        "Search text present in assistant and tool output.",
+        "Next/previous wraps; clear/close then search again.",
+        "Stream another matching row while search is active."
+      ],
+      "expected": "Find stays distinct from command palette; active hit scroll and highlight/count are correct.",
+      "tests": [],
+      "functional_verdict": "partial",
+      "visual_verdict": "not_compared_to_matched_Rust_runtime",
+      "platform_verdict": "native_CPU_only_unless_explicitly_noted",
+      "remaining": "Search implementation exists, but dedicated interaction test and source highlight/active-hit keyboard behavior are not yet verified.",
+      "full_row_parity_verified": false
+    },
+    {
+      "id": "UI-C10",
+      "rows": [
+        "C14",
+        "C15"
+      ],
+      "title": "Stop/retry/compact and context freshness",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/app/session.rs",
+          "symbol": "on_abort",
+          "line": 417
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "symbol": "run_status_strip",
+          "line": 3882
+        },
+        {
+          "path": "crates/orbit-pi/src/app/runtime.rs",
+          "symbol": "on_command_failure",
+          "line": 50
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "compact_now",
+          "line": 5811
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "abort_retry",
+          "line": 5828
+        },
+        {
+          "path": "crates/orbit-pi/src/app/events.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/context_meter.rs",
+          "symbol": "ContextMeterData",
+          "line": 633
+        },
+        {
+          "path": "crates/orbit-pi/src/context_meter.rs",
+          "symbol": "usage_slices",
+          "line": 120
+        },
+        {
+          "path": "crates/orbit-pi/src/app/runtime.rs",
+          "symbol": "refresh_context_stats",
+          "line": 123
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "symbol": "context_button",
+          "line": 3195
+        }
+      ],
+      "steps": [
+        "Stop active run; retry a failed run.",
+        "Compact successfully and inspect missing context before refreshed stats.",
+        "Repeat failed/aborted compaction."
+      ],
+      "expected": "No cumulative-total substitute for context; missing is unknown, not0%; successful compaction invalidates old context.",
+      "tests": [
+        "TestRuntimeUsageUsesPiSessionAndContextSeparately",
+        "TestRuntimeUsageMissingOrPostCompactionIsNotZero",
+        "TestLatestAssistantUsageDoesNotReuseStalePreviousOutput"
+      ],
+      "functional_verdict": "partial",
+      "visual_verdict": "not_compared_to_matched_Rust_runtime",
+      "platform_verdict": "native_CPU_only_unless_explicitly_noted",
+      "remaining": "Pure adapters and agent compaction reducer tests pass. Full native retry/compaction indicators and every button/state transition remain open.",
+      "full_row_parity_verified": false
+    },
+    {
+      "id": "UI-C11",
+      "rows": [
+        "C16",
+        "C17",
+        "C18",
+        "C19",
+        "C20"
+      ],
+      "title": "Extension special-purpose surfaces",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/dialog.rs",
+          "symbol": "Dialog",
+          "line": 171
+        },
+        {
+          "path": "crates/orbit-pi/src/app/dialogs.rs",
+          "symbol": "handle_extension_ui_request",
+          "line": 10
+        },
+        {
+          "path": "crates/orbit-pi/src/app/dialogs.rs",
+          "symbol": "open_dialog",
+          "line": 205
+        },
+        {
+          "path": "crates/orbit-pi/src/app/dialogs.rs",
+          "symbol": "respond_to_dialog",
+          "line": 236
+        },
+        {
+          "path": "crates/orbit-pi/src/dialog.rs",
+          "symbol": "ApprovalRequest",
+          "line": 127
+        },
+        {
+          "path": "crates/orbit-pi/src/app/dialogs.rs",
+          "symbol": "open_approval",
+          "line": 260
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "symbol": "approval_bar",
+          "line": 4379
+        },
+        {
+          "path": "crates/orbit-pi/src/access.rs"
+        },
+        {
+          "path": "contrib/orbit-guard-extension/policy.js"
+        },
+        {
+          "path": "crates/orbit-pi/src/workflow.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/composer_ops.rs",
+          "symbol": "set_workflow_mode",
+          "line": 891
+        },
+        {
+          "path": "contrib/orbit-workflow-extension/index.js"
+        },
+        {
+          "path": "contrib/orbit-workflow-extension/policy.js"
+        },
+        {
+          "path": "crates/orbit-pi/src/ask.rs",
+          "symbol": "AskPrompt",
+          "line": 70
+        },
+        {
+          "path": "crates/orbit-pi/src/ask.rs",
+          "symbol": "AskReplayState",
+          "line": 140
+        },
+        {
+          "path": "crates/orbit-pi/src/app/ask.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "symbol": "ask_panel",
+          "line": 3982
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "symbol": "render_ask_card",
+          "line": 2928
+        },
+        {
+          "path": "crates/orbit-pi/src/widgets.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/custom_ui.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/dialogs.rs",
+          "symbol": "apply_extension_widget",
+          "line": 76
+        },
+        {
+          "path": "crates/orbit-pi/src/app/dialogs.rs",
+          "symbol": "apply_custom_frame",
+          "line": 114
+        }
+      ],
+      "steps": [
+        "Exercise select/confirm/input/editor and custom ANSI render.",
+        "Exercise Allow once/Always/Deny guard, Plan/Build/Ask and multi-question ask_user_question.",
+        "Set/replace/clear widgets and editor text."
+      ],
+      "expected": "Exact IDs/response types, scoped keys, no fake unsupported capability and source specialized panels.",
+      "tests": [
+        "TestCustomDialogDoesNotDismissEscape",
+        "TestLiveCustomDialogForwardsEscape"
+      ],
+      "functional_verdict": "failed_missing_cases",
+      "visual_verdict": "not_compared_to_matched_Rust_runtime",
+      "platform_verdict": "native_CPU_only_unless_explicitly_noted",
+      "remaining": "General modal and ANSI custom bridge exist. Structured questionnaire, specialized inline approval/replay, widget placement and unavailable workflow/access presentation are not fully wired. No full extension parity claim.",
+      "full_row_parity_verified": false
+    },
+    {
+      "id": "UI-P01",
+      "rows": [
+        "P01"
+      ],
+      "title": "Settings categories, search and scroll",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/app.rs",
+          "symbol": "SettingsSection",
+          "line": 2679
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "SETTINGS_SECTIONS",
+          "line": 50
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "SETTINGS_SEARCH_INDEX",
+          "line": 116
+        }
+      ],
+      "steps": [
+        "Visit all14 source sections.",
+        "Scroll a long page, switch away for8 frames, return.",
+        "Search a row label/synonym and activate result."
+      ],
+      "expected": "Source section order; retained per-page scroll; search navigates exact row with source keyboard behavior.",
+      "tests": [
+        "TestSettingsNavigationComplete",
+        "TestSettingsPageScrollRetained"
+      ],
+      "functional_verdict": "partial",
+      "visual_verdict": "not_compared_to_matched_Rust_runtime",
+      "platform_verdict": "native_CPU_only_unless_explicitly_noted",
+      "remaining": "14 sections and retained native scroll pass; fixed missing FillHeight that previously prevented long pages scrolling. Exact-row/synonym search is missing; current category-only search fails source P01.",
+      "full_row_parity_verified": false
+    },
+    {
+      "id": "UI-P02",
+      "rows": [
+        "P02",
+        "P03",
+        "P04"
+      ],
+      "title": "Runtime diagnostics and agent settings",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "runtime_rows",
+          "line": 4931
+        },
+        {
+          "path": "crates/orbit-pi/src/app/runtime.rs",
+          "symbol": "runtime_start",
+          "line": 488
+        },
+        {
+          "path": "crates/orbit-pi/src/app/runtime.rs",
+          "symbol": "runtime_stop",
+          "line": 518
+        },
+        {
+          "path": "crates/orbit-pi/src/app/runtime.rs",
+          "symbol": "runtime_restart",
+          "line": 532
+        },
+        {
+          "path": "crates/orbit-pi/src/onboarding.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/pi_install.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "symbol": "render_onboarding",
+          "line": 2664
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "symbol": "render_pi_migration",
+          "line": 2903
+        },
+        {
+          "path": "crates/orbit-pi/src/session_defaults.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/auto_title.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "agent_rows",
+          "line": 5196
+        },
+        {
+          "path": "crates/orbit-pi/src/app/runtime.rs",
+          "symbol": "apply_default_model",
+          "line": 217
+        },
+        {
+          "path": "contrib/orbit-title-extension/index.js"
+        }
+      ],
+      "steps": [
+        "Inspect active/parked PID/executable/uptime/stdout/stderr.",
+        "Start/Stop/Restart; dependency install failure/cancel.",
+        "Change defaults, auto-retry/compaction/title model; restart/resume."
+      ],
+      "expected": "Only real process fields, safe busy gates and source fresh-session-only defaults.",
+      "tests": [
+        "TestMaintenanceGateKeepsDraftAndBlocksNewProcess"
+      ],
+      "functional_verdict": "failed_missing_data",
+      "visual_verdict": "not_compared_to_matched_Rust_runtime",
+      "platform_verdict": "native_CPU_only_unless_explicitly_noted",
+      "remaining": "Host lacks actual PID/uptime/stderr/process-row adapter and complete auto-retry/follow-up/title-model controls. Native dependency/install helpers exist; action/OS integration needs execution. Do not fabricate metrics.",
+      "full_row_parity_verified": false
+    },
+    {
+      "id": "UI-P03",
+      "rows": [
+        "P05",
+        "P06"
+      ],
+      "title": "Provider catalog, typed editor and credentials",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/providers.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "provider_rows",
+          "line": 2391
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "ensure_provider_metadata",
+          "line": 7639
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "provider_refresh",
+          "line": 7665
+        },
+        {
+          "path": "crates/orbit-pi/src/providers.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "provider_key_save",
+          "line": 7772
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "provider_save",
+          "line": 8027
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "provider_remove",
+          "line": 8103
+        }
+      ],
+      "steps": [
+        "Inspect catalog including fallback diagnostic and OAuth-only provider.",
+        "Save invalid custom provider; correct it and save into temporary home.",
+        "Force disk failure; cancel masked key dialog; resize800×560."
+      ],
+      "expected": "Capability-specific controls, validated fields, no painted key, failed save keeps draft, existing key preserved when blank.",
+      "tests": [
+        "TestNativeProviderEditorValidationSecretAndMinimumSize",
+        "TestNativeProviderSaveFailureKeepsDraft",
+        "TestProviderCredentialCapabilities"
+      ],
+      "functional_verdict": "pass_scoped",
+      "visual_verdict": "not_compared_to_matched_Rust_runtime",
+      "platform_verdict": "native_CPU_only_unless_explicitly_noted",
+      "remaining": "These native/disk fixtures pass. Full provider card geometry, source account detail/quota embed and real credential flows remain unverified.",
+      "full_row_parity_verified": false
+    },
+    {
+      "id": "UI-P04",
+      "rows": [
+        "P07",
+        "P09"
+      ],
+      "title": "OAuth cancellation and quota details",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/auth.rs",
+          "symbol": "AuthManager",
+          "line": 140
+        },
+        {
+          "path": "crates/orbit-pi/src/app/runtime.rs",
+          "symbol": "handle_auth_effects",
+          "line": 395
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "provider_oauth_login",
+          "line": 7805
+        },
+        {
+          "path": "crates/orbit-pi/src/platform.rs",
+          "symbol": "open_terminal_command",
+          "line": 957
+        },
+        {
+          "path": "crates/orbit-pi/src/quota.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/quota_hidden.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/session.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/runtime.rs",
+          "symbol": "poll_quota_entries",
+          "line": 317
+        },
+        {
+          "path": "crates/orbit-pi/src/app/mcp_ui.rs",
+          "symbol": "QuotaPopupTab",
+          "line": 2447
+        }
+      ],
+      "steps": [
+        "Start sign-in, cancel, then receive stale completion.",
+        "Use active-provider5h/peak/balance/global fallbacks and failed reports.",
+        "Inspect refresh/reset and hidden-provider preferences."
+      ],
+      "expected": "No stale sign-in overwrites later state; quota priority/unknown handling source-equivalent.",
+      "tests": [
+        "TestQuotaHeadlinePriorityAndErrorExclusion",
+        "TestQuotaFractionsAndWindowRecognition",
+        "TestQuotaResetHintAndAmount",
+        "TestQuotaReportsAreSortedWithoutChangingInput"
+      ],
+      "functional_verdict": "partial",
+      "visual_verdict": "not_compared_to_matched_Rust_runtime",
+      "platform_verdict": "native_CPU_only_unless_explicitly_noted",
+      "remaining": "Pure quota rules pass; live OAuth, full quota popup grouping/hidden-provider/MCP tabs and OS browser-return lifecycle remain unverified or incomplete.",
+      "full_row_parity_verified": false
+    },
+    {
+      "id": "UI-P05",
+      "rows": [
+        "P10",
+        "P11",
+        "P12",
+        "P13"
+      ],
+      "title": "Skills and plugin resources",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/skills.rs",
+          "symbol": "discover",
+          "line": 88
+        },
+        {
+          "path": "crates/orbit-pi/src/skills.rs",
+          "symbol": "Skill",
+          "line": 52
+        },
+        {
+          "path": "crates/orbit-pi/src/app/skills_ui.rs",
+          "symbol": "render_skills_page",
+          "line": 32
+        },
+        {
+          "path": "crates/orbit-pi/src/app/skills_ui.rs",
+          "symbol": "apply_skill_action",
+          "line": 722
+        },
+        {
+          "path": "crates/orbit-pi/src/skills.rs",
+          "symbol": "set_enabled",
+          "line": 338
+        },
+        {
+          "path": "crates/orbit-pi/src/skills.rs",
+          "symbol": "delete",
+          "line": 440
+        },
+        {
+          "path": "crates/orbit-pi/src/app/skills_ui.rs",
+          "symbol": "delete_selected_skill",
+          "line": 772
+        },
+        {
+          "path": "crates/orbit-pi/src/plugins.rs",
+          "symbol": "discover",
+          "line": 99
+        },
+        {
+          "path": "crates/orbit-pi/src/plugins.rs",
+          "symbol": "install",
+          "line": 135
+        },
+        {
+          "path": "crates/orbit-pi/src/plugins.rs",
+          "symbol": "remove",
+          "line": 147
+        },
+        {
+          "path": "crates/orbit-pi/src/plugins.rs",
+          "symbol": "update",
+          "line": 157
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "plugin_run",
+          "line": 7478
+        },
+        {
+          "path": "crates/orbit-pi/src/plugins.rs",
+          "symbol": "find_updates",
+          "line": 165
+        },
+        {
+          "path": "crates/orbit-pi/src/app/plugin_update_ui.rs",
+          "symbol": "start_plugin_update_check",
+          "line": 19
+        },
+        {
+          "path": "crates/orbit-pi/src/app/plugin_update_ui.rs",
+          "symbol": "skip_plugin_updates",
+          "line": 52
+        },
+        {
+          "path": "crates/orbit-pi/src/app/plugin_update_ui.rs",
+          "symbol": "apply_plugin_updates",
+          "line": 69
+        }
+      ],
+      "steps": [
+        "Search/select Skills, inspect frontmatter-stripped detail, enable/disable/delete with cancellation.",
+        "Install by global/project scope; double-click operation, cancel, change workspace while pending.",
+        "Check/skip/clear/update actual package offers."
+      ],
+      "expected": "Source master/detail, scope/mutation serialization, stale completion rejection and precise persistence.",
+      "tests": [],
+      "functional_verdict": "integration_in_progress",
+      "visual_verdict": "not_compared_to_matched_Rust_runtime",
+      "platform_verdict": "native_CPU_only_unless_explicitly_noted",
+      "remaining": "Dedicated resourceui replaces generic host implementation and is mounted. Worker source checklist/native/race tests are in progress; do not claim completed acceptance until handoff.",
+      "full_row_parity_verified": false
+    },
+    {
+      "id": "UI-P06",
+      "rows": [
+        "P14",
+        "P15",
+        "P16",
+        "P17"
+      ],
+      "title": "Typed MCP lifecycle",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/mcp.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/mcp/manager.rs",
+          "symbol": "McpManager",
+          "line": 74
+        },
+        {
+          "path": "crates/orbit-pi/src/app/mcp_ui.rs",
+          "symbol": "mcp_rows",
+          "line": 1135
+        },
+        {
+          "path": "crates/orbit-pi/src/app/mcp_ui.rs",
+          "symbol": "mcp_handle_key",
+          "line": 1272
+        },
+        {
+          "path": "crates/orbit-pi/src/mcp.rs",
+          "symbol": "McpTransport",
+          "line": 160
+        },
+        {
+          "path": "crates/orbit-pi/src/mcp.rs",
+          "symbol": "McpExposure",
+          "line": 72
+        },
+        {
+          "path": "crates/orbit-pi/src/mcp/config.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/mcp_ui.rs",
+          "symbol": "mcp_editor_save",
+          "line": 523
+        },
+        {
+          "path": "crates/orbit-pi/src/mcp/secrets.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/mcp/config.rs",
+          "symbol": "merge_secret_lines"
+        },
+        {
+          "path": "crates/orbit-pi/src/mcp/manager.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/mcp_ui.rs",
+          "symbol": "mcp_sign_in",
+          "line": 797
+        },
+        {
+          "path": "crates/orbit-pi/src/app/mcp_ui.rs",
+          "symbol": "mcp_sign_out",
+          "line": 866
+        },
+        {
+          "path": "crates/orbit-pi/src/app/mcp_ui.rs",
+          "symbol": "tick_mcp",
+          "line": 90
+        },
+        {
+          "path": "crates/orbit-pi/src/app/mcp_ui.rs",
+          "symbol": "mcp_after_settle",
+          "line": 277
+        },
+        {
+          "path": "crates/orbit-pi/src/app/mcp_ui.rs",
+          "symbol": "mcp_force_apply",
+          "line": 301
+        },
+        {
+          "path": "crates/orbit-pi/src/app.rs",
+          "symbol": "ParkedSession",
+          "line": 150
+        }
+      ],
+      "steps": [
+        "Create/edit stdio andHTTP servers acrossglobal/project scope.",
+        "Validate timeout, exposure and secret references; cancel OAuth/remove.",
+        "Apply while task busy; verify deferred session-preserving reload."
+      ],
+      "expected": "Source typed fields, redacted status, scope-aware metadata/secrets and truthful requested-vs-applied state.",
+      "tests": [],
+      "functional_verdict": "partial",
+      "visual_verdict": "not_compared_to_matched_Rust_runtime",
+      "platform_verdict": "native_CPU_only_unless_explicitly_noted",
+      "remaining": "mcpui/workbench scoped race tests and19-case checklist pass. Host mount/deferred reload exists. Real OAuth and authoritative applied/readiness callback are not verified; Applied is deliberately not called on async restart acceptance.",
+      "full_row_parity_verified": false
+    },
+    {
+      "id": "UI-P07",
+      "rows": [
+        "P18",
+        "P19",
+        "P20"
+      ],
+      "title": "Appearance, localization and help",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/theme.rs",
+          "symbol": "UiPrefs",
+          "line": 324
+        },
+        {
+          "path": "crates/orbit-pi/src/theme.rs",
+          "symbol": "FontPrefs",
+          "line": 482
+        },
+        {
+          "path": "crates/orbit-pi/src/theme/appearance.rs",
+          "symbol": "AppearancePrefs",
+          "line": 31
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "appearance_rows",
+          "line": 5926
+        },
+        {
+          "path": "crates/orbit-pi/src/assets.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/backdrop.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/dither.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "background_controls",
+          "line": 6382
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "background_choose",
+          "line": 6569
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "symbol": "new_task_backdrop",
+          "line": 2271
+        },
+        {
+          "path": "crates/orbit-pi/src/i18n.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/main.rs",
+          "symbol": "set_app_menus",
+          "line": 626
+        },
+        {
+          "path": "crates/orbit-pi/src/theme.rs",
+          "symbol": "set_ui_prefs",
+          "line": 1468
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "shortcut_rows",
+          "line": 4672
+        },
+        {
+          "path": "crates/orbit-pi/src/commands.rs"
+        }
+      ],
+      "steps": [
+        "Change every theme/font/density/motion choice and relaunch.",
+        "Visit all sections in each of10 locales.",
+        "Configure animated/photo backdrop and inspect keyboard reference."
+      ],
+      "expected": "Source palette/tokens and persistent preferences, complete localization and backdrop.",
+      "tests": [
+        "TestTokensAndCommandRegistry",
+        "TestFractionalScaleKeepsLogicalComposerGeometry"
+      ],
+      "functional_verdict": "partial",
+      "visual_verdict": "not_compared_to_matched_Rust_runtime",
+      "platform_verdict": "native_CPU_only_unless_explicitly_noted",
+      "remaining": "10 palettes and55 binding parsing pass; many host labels remain English, backdrop integration is pending, and font/density/motion/OS contrast visual matrix remains open.",
+      "full_row_parity_verified": false
+    },
+    {
+      "id": "UI-U01",
+      "rows": [
+        "U01"
+      ],
+      "title": "Actual usage accounting and unavailable data",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/usage/collect.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/model.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/aggregate.rs"
+        }
+      ],
+      "steps": [
+        "Scan explicit temporary Pi JSONL fixtures, including unbilled provider failures, pending tool calls and compaction.",
+        "Filter model/provider and request-only flags.",
+        "Compare cost coverage and absent duration/cache against source."
+      ],
+      "expected": "No fabricatedzero metrics, no pending-tool failure, real call-start attribution and source turn semantics.",
+      "tests": [
+        "TestUsageProjectionPreservesScopeCalendarAndMissingMetrics",
+        "TestSettingsBackendProjectionUsesModelPricingCoverage",
+        "TestSettingsBackendNativeUnbilledErrorsRemainVisible",
+        "TestLatencyPercentileRequiresSourceMinimum"
+      ],
+      "functional_verdict": "pass_scoped",
+      "visual_verdict": "not_compared_to_matched_Rust_runtime",
+      "platform_verdict": "native_CPU_only_unless_explicitly_noted",
+      "remaining": "Focused domain/projection cases pass; this does not close the complete analytics corpus or all UI displays.",
+      "full_row_parity_verified": false
+    },
+    {
+      "id": "UI-U02",
+      "rows": [
+        "U02"
+      ],
+      "title": "Usage Simple/Details loading/error/empty",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/chart.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/heatmap.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/table.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/page.rs",
+          "symbol": "UsagePage",
+          "line": 876
+        }
+      ],
+      "steps": [
+        "Render loading then actual data; change mode.",
+        "Fail refresh after prior good data; render only unbilled errors.",
+        "Inspect fixed-date labelled fixture screenshots."
+      ],
+      "expected": "Source modes and honest pending/partial/error/empty states, no invented live metrics.",
+      "tests": [
+        "TestUsageNativeLoadedEmptyErrorAndModal",
+        "TestNativeUsageCapture"
+      ],
+      "functional_verdict": "partial",
+      "visual_verdict": "not_compared_to_matched_Rust_runtime",
+      "platform_verdict": "native_CPU_only_unless_explicitly_noted",
+      "remaining": "Native cards/heatmap/chart/breakdowns/session/failure rows render. Source comparison deltas, signals, detailed cache/latency panels and exact layout remain missing; screenshots are fixtures, not Rust comparisons.",
+      "full_row_parity_verified": false
+    },
+    {
+      "id": "UI-U03",
+      "rows": [
+        "U03"
+      ],
+      "title": "Date and scoped drill-down",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/usage/filters.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/model.rs",
+          "symbol": "UsageFilter",
+          "line": 675
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/page.rs",
+          "symbol": "set_filter",
+          "line": 1580
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/page.rs",
+          "symbol": "scope_to_day",
+          "line": 1758
+        }
+      ],
+      "steps": [
+        "Select multiple workspaces/providers/models.",
+        "Select calendar day outside prior date range; bucket/session drill-down; clear focus.",
+        "Use reversed custom dates; choose range with a quiet middle day."
+      ],
+      "expected": "Calendar independent of date filter, valid scope remains, date normalization and contiguous zero-activity axis.",
+      "tests": [
+        "TestSettingsBackendTrendDoesNotCompressMissingDays",
+        "TestUsageProjectionPreservesScopeCalendarAndMissingMetrics",
+        "TestUsageNativeMinimumWindowControls"
+      ],
+      "functional_verdict": "partial",
+      "visual_verdict": "not_compared_to_matched_Rust_runtime",
+      "platform_verdict": "native_CPU_only_unless_explicitly_noted",
+      "remaining": "Multi-select menus, scope fields, calendar normalization and contiguous4k guarded buckets implemented. Searchable native multi-select popup and disambiguating identical model IDs acrossproviders remain incomplete.",
+      "full_row_parity_verified": false
+    },
+    {
+      "id": "UI-U04",
+      "rows": [
+        "U04"
+      ],
+      "title": "Tables, detail dialogs and export",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/usage/page.rs",
+          "symbol": "query_sessions",
+          "line": 79
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/page.rs",
+          "symbol": "export",
+          "line": 2457
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/page.rs",
+          "symbol": "Prefs",
+          "line": 2528
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/table.rs"
+        }
+      ],
+      "steps": [
+        "Sort equal-metric rows both ways; paginate; open source session.",
+        "Open failure detail; Escape and native menu guard.",
+        "Choose CSV/JSON, cancel native Save, then export to disposablefile."
+      ],
+      "expected": "Stable ties, no phantom detail metrics, actual session path, source export schema and unknown fields preserved.",
+      "tests": [
+        "TestUsageSortTiesAreStable",
+        "TestUsageNativeLoadedEmptyErrorAndModal",
+        "TestSettingsBackendUsagePreferencesPreserveUnknownAndDefaultDescending"
+      ],
+      "functional_verdict": "partial",
+      "visual_verdict": "not_compared_to_matched_Rust_runtime",
+      "platform_verdict": "native_CPU_only_unless_explicitly_noted",
+      "remaining": "Stable sorting/modal/prefs cases pass; JSON/CSV backend implemented and host chooser wired. Independent table states, column visibility/resize/context menus and actual native Save interaction remain open.",
+      "full_row_parity_verified": false
+    },
+    {
+      "id": "UI-U05",
+      "rows": [
+        "U05",
+        "U06",
+        "U07",
+        "U10"
+      ],
+      "title": "Maintenance interrupts and retention",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/notifications.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/toast.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/events.rs",
+          "symbol": "post_notification",
+          "line": 1193
+        },
+        {
+          "path": "crates/orbit-pi/src/app/toast_ui.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/session.rs",
+          "symbol": "activate_session_from_notification",
+          "line": 1215
+        },
+        {
+          "path": "crates/orbit-pi/src/session_retention.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/retention_ui.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "privacy_rows",
+          "line": 5618
+        },
+        {
+          "path": "crates/orbit-pi/src/temp_files.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/temp_ui.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "privacy_rows",
+          "line": 5618
+        },
+        {
+          "path": "crates/orbit-pi/src/app/pi_update_ui.rs",
+          "symbol": "check_pi_update_on_launch",
+          "line": 30
+        },
+        {
+          "path": "crates/orbit-pi/src/app/pi_update_ui.rs",
+          "symbol": "finish_pi_update",
+          "line": 139
+        },
+        {
+          "path": "crates/orbit-pi/src/pi_install.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/pi_update.rs"
+        }
+      ],
+      "steps": [
+        "Hold runtime maintenance gate then send/open/change workspace.",
+        "Run retention on temporary sessions, including active/parked ones.",
+        "Cancel temp cleanup/install confirmations and inspect errors."
+      ],
+      "expected": "No prompt loss/new process during exclusive update; live sessions protected; explicit cleanup and honest progress.",
+      "tests": [
+        "TestMaintenanceGateKeepsDraftAndBlocksNewProcess",
+        "TestRetentionRunsOffThreadAndReloadsArchiveSet"
+      ],
+      "functional_verdict": "partial",
+      "visual_verdict": "not_compared_to_matched_Rust_runtime",
+      "platform_verdict": "native_CPU_only_unless_explicitly_noted",
+      "remaining": "Guard and temporary retention tests pass. Whole native update/install/temp dialogs and real OS notification lifecycle remain platform acceptance gates.",
+      "full_row_parity_verified": false
+    }
+  ]
+}

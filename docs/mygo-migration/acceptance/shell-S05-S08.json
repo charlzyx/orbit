@@ -1,0 +1,624 @@
+{
+  "schema": "orbit-acceptance-shard/v1",
+  "category": "shell",
+  "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "rows": [
+    {
+      "id": "S05",
+      "title": "Keyboard surface traversal",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/main.rs",
+          "handler": "bind_keys",
+          "line": 357,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/main.rs#L357",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "handler": "on_focus_next",
+          "line": 3775,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/view.rs#L3775",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "handler": "focus_traversal_blocked",
+          "line": 3804,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/view.rs#L3804",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/composer_ops.rs",
+          "handler": "close_add_menu",
+          "line": 537,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/composer_ops.rs#L537",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Tab/Shift+Tab traverse focusable surfaces; terminal and autocomplete consume Tab for their own meaning; modal/select/picker contexts own Enter/Escape/arrows.",
+      "baseline_edge_state": "Do not let Escape abort a run while a dialog/custom UI/menu should close; closing a popup restores focus and suppresses click-through reopen.",
+      "fixture": "Two temporary workspaces, an isolated HOME/PI_CODING_AGENT_DIR, fixture session JSONL files and controllable Pi RPC children.",
+      "steps": [
+        {
+          "id": "S05.behavior",
+          "dimension": "functional",
+          "action": "Traverse all focusable shell surfaces with Tab and Shift+Tab; dismiss the active popover with Escape.",
+          "expected": "Tab/Shift+Tab traverse focusable surfaces; terminal and autocomplete consume Tab for their own meaning; modal/select/picker contexts own Enter/Escape/arrows.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S05.edge",
+          "dimension": "edge",
+          "action": "Open nested overlays, return to the composer and verify text selection plus input focus; repeat after switching workspace.",
+          "expected": "Do not let Escape abort a run while a dialog/custom UI/menu should close; closing a popup restores focus and suppresses click-through reopen.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S05.error",
+          "dimension": "error",
+          "action": "Delay/fail session scan or runtime child used by this action; repeat while changing workspace.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Do not let Escape abort a run while a dialog/custom UI/menu should close; closing a popup restores focus and suppresses click-through reopen.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S05.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S05.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S05.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S05.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/ui",
+        "cmd/orbit/main.go"
+      ],
+      "existing_test_candidates": [
+        "internal/ui/snapshot_test.go",
+        "internal/ui/workspace_review_regression_test.go",
+        "internal/ui/viewer_parity_test.go"
+      ],
+      "inventory_evidence": "../parity/shell.json",
+      "source_test_inventory": "T03,T04",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-S03",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "pass_scoped",
+          "steps": [
+            "Open palette, move down six entries, filter to one and press Enter.",
+            "Filter to zero then restore and press Enter.",
+            "Open prompt from palette; Escape back to composer."
+          ],
+          "expected": "Filtered selection resets/clamps; zero results do not submit; stable modal keys restore focus.",
+          "tests": [
+            "TestFilteredPickersResetAndClampKeyboardSelection",
+            "TestPickerKeyboardCommit",
+            "TestModalTransitionRestoresComposerFocus"
+          ],
+          "remaining": "These exact native CPU flows pass, not every command/context or OS accelerator.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": []
+    },
+    {
+      "id": "S06",
+      "title": "Read and watch shared pi session store",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/sessions.rs",
+          "handler": "SessionInfo",
+          "line": 29,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sessions.rs#L29",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/sessions.rs",
+          "handler": "SessionWatcher",
+          "line": 229,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sessions.rs#L229",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/events.rs",
+          "handler": "tick",
+          "line": 18,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/events.rs#L18",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Discover pi JSONL sessions, names, workspace, message preview and last actual message activity; updates from CLI/external writers refresh sidebar.",
+      "baseline_edge_state": "Uses pi default session store, not a new incompatible database. Debounced background scan and cached metadata. Opening/bookkeeping writes do not count as message activity.",
+      "fixture": "Two temporary workspaces, an isolated HOME/PI_CODING_AGENT_DIR, fixture session JSONL files and controllable Pi RPC children.",
+      "steps": [
+        {
+          "id": "S06.behavior",
+          "dimension": "functional",
+          "action": "Populate a fixture pi session directory; open Orbit; append, rename, truncate and remove session files externally.",
+          "expected": "Discover pi JSONL sessions, names, workspace, message preview and last actual message activity; updates from CLI/external writers refresh sidebar.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S06.edge",
+          "dimension": "edge",
+          "action": "Use malformed JSONL, a temporarily unreadable file and a partially written final line; verify watcher recovery without duplicate sessions.",
+          "expected": "Uses pi default session store, not a new incompatible database. Debounced background scan and cached metadata. Opening/bookkeeping writes do not count as message activity.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S06.error",
+          "dimension": "error",
+          "action": "Delay/fail session scan or runtime child used by this action; repeat while changing workspace.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Uses pi default session store, not a new incompatible database. Debounced background scan and cached metadata. Opening/bookkeeping writes do not count as message activity.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S06.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S06.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S06.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S06.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/pirpc",
+        "internal/agent"
+      ],
+      "existing_test_candidates": [
+        "internal/pirpc/client_test.go",
+        "internal/agent/manager_test.go",
+        "internal/agent/reducer_test.go"
+      ],
+      "inventory_evidence": "../parity/shell.json",
+      "source_test_inventory": "T05",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-S05",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "partial",
+          "steps": [
+            "Enter a draft with attachments, switch to another saved task then back.",
+            "Switch to a task in another repository.",
+            "Observe Git/Files/Worktrees/terminal new-tab directory without starting an extra session."
+          ],
+          "expected": "Per-session draft is retained; domain actions target selected repository; loading sessions do not overwrite new active choice.",
+          "tests": [
+            "TestDraftSurvivesSessionSwitch",
+            "TestInactiveFileLoadCannotStealSelectionAfterWorkspaceSwitch"
+          ],
+          "remaining": "Draft/inactive file generation tests pass. Whole native controller repository-switch interaction with fake Pi and all domain mutations still needs a dedicated end-to-end fixture.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": []
+    },
+    {
+      "id": "S07",
+      "title": "New task and workspace selection",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/session.rs",
+          "handler": "on_new_session",
+          "line": 581,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/session.rs#L581",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/session.rs",
+          "handler": "can_reuse_session",
+          "line": 61,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/session.rs#L61",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/pickers.rs",
+          "handler": "start_task_in_folder",
+          "line": 118,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/pickers.rs#L118",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Primary+N, sidebar New Task, recent folder picker and native Browse; selected folder sets session cwd and Explorer/Git/Review context; custom workspace logo or fallback glyph.",
+      "baseline_edge_state": "Reuse only alive idle pi process; park a running session before new_session; a dead process is replaced. New-task transient panels close; draft session placeholder visible before first prompt.",
+      "fixture": "Two temporary workspaces, an isolated HOME/PI_CODING_AGENT_DIR, fixture session JSONL files and controllable Pi RPC children.",
+      "steps": [
+        {
+          "id": "S07.behavior",
+          "dimension": "functional",
+          "action": "Create a task in each of two temporary workspaces and in no-workspace mode; choose from recent and directory picker paths.",
+          "expected": "Primary+N, sidebar New Task, recent folder picker and native Browse; selected folder sets session cwd and Explorer/Git/Review context; custom workspace logo or fallback glyph.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S07.edge",
+          "dimension": "edge",
+          "action": "Cancel the picker, select a missing directory and repeat New Task while the current task is running.",
+          "expected": "Reuse only alive idle pi process; park a running session before new_session; a dead process is replaced. New-task transient panels close; draft session placeholder visible before first prompt.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S07.error",
+          "dimension": "error",
+          "action": "Delay/fail session scan or runtime child used by this action; repeat while changing workspace.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Reuse only alive idle pi process; park a running session before new_session; a dead process is replaced. New-task transient panels close; draft session placeholder visible before first prompt.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S07.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S07.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S07.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S07.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/pirpc",
+        "internal/agent"
+      ],
+      "existing_test_candidates": [
+        "internal/pirpc/client_test.go",
+        "internal/agent/manager_test.go",
+        "internal/agent/reducer_test.go"
+      ],
+      "inventory_evidence": "../parity/shell.json",
+      "source_test_inventory": "T05,T06",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-S05",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "partial",
+          "steps": [
+            "Enter a draft with attachments, switch to another saved task then back.",
+            "Switch to a task in another repository.",
+            "Observe Git/Files/Worktrees/terminal new-tab directory without starting an extra session."
+          ],
+          "expected": "Per-session draft is retained; domain actions target selected repository; loading sessions do not overwrite new active choice.",
+          "tests": [
+            "TestDraftSurvivesSessionSwitch",
+            "TestInactiveFileLoadCannotStealSelectionAfterWorkspaceSwitch"
+          ],
+          "remaining": "Draft/inactive file generation tests pass. Whole native controller repository-switch interaction with fake Pi and all domain mutations still needs a dedicated end-to-end fixture.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": [
+        "../background-acceptance.md"
+      ]
+    },
+    {
+      "id": "S08",
+      "title": "Switch/resume and parallel sessions",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app.rs",
+          "handler": "ParkedSession",
+          "line": 150,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app.rs#L150",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/session.rs",
+          "handler": "park_active_session",
+          "line": 299,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/session.rs#L299",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/runtime.rs",
+          "handler": "reap_idle_parked",
+          "line": 569,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/runtime.rs#L569",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/events.rs",
+          "handler": "drain_parked_session",
+          "line": 541,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/events.rs#L541",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Open session by sidebar/palette/notification; preserve live transcript, pending queue, widgets and busy status when parked. Sidebar shows background work.",
+      "baseline_edge_state": "At most six warm background sessions, idle TTL 300 s; evict/reap idle only, never active runs. Pending parks before a session path is known are drained/rekeyed. Stale MCP fingerprint forces fresh process on reopen.",
+      "fixture": "Two temporary workspaces, an isolated HOME/PI_CODING_AGENT_DIR, fixture session JSONL files and controllable Pi RPC children.",
+      "steps": [
+        {
+          "id": "S08.behavior",
+          "dimension": "functional",
+          "action": "Start two fixture Pi sessions; switch while one streams; return and resume a previously closed session.",
+          "expected": "Open session by sidebar/palette/notification; preserve live transcript, pending queue, widgets and busy status when parked. Sidebar shows background work.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S08.edge",
+          "dimension": "edge",
+          "action": "Crash one child and deliver its late event after switching; ensure the other session and its composer state remain isolated.",
+          "expected": "At most six warm background sessions, idle TTL 300 s; evict/reap idle only, never active runs. Pending parks before a session path is known are drained/rekeyed. Stale MCP fingerprint forces fresh process on reopen.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S08.error",
+          "dimension": "error",
+          "action": "Delay/fail session scan or runtime child used by this action; repeat while changing workspace.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: At most six warm background sessions, idle TTL 300 s; evict/reap idle only, never active runs. Pending parks before a session path is known are drained/rekeyed. Stale MCP fingerprint forces fresh process on reopen.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S08.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S08.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S08.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S08.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/pirpc",
+        "internal/agent"
+      ],
+      "existing_test_candidates": [
+        "internal/pirpc/client_test.go",
+        "internal/agent/manager_test.go",
+        "internal/agent/reducer_test.go"
+      ],
+      "inventory_evidence": "../parity/shell.json",
+      "source_test_inventory": "T06",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-S05",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "partial",
+          "steps": [
+            "Enter a draft with attachments, switch to another saved task then back.",
+            "Switch to a task in another repository.",
+            "Observe Git/Files/Worktrees/terminal new-tab directory without starting an extra session."
+          ],
+          "expected": "Per-session draft is retained; domain actions target selected repository; loading sessions do not overwrite new active choice.",
+          "tests": [
+            "TestDraftSurvivesSessionSwitch",
+            "TestInactiveFileLoadCannotStealSelectionAfterWorkspaceSwitch"
+          ],
+          "remaining": "Draft/inactive file generation tests pass. Whole native controller repository-switch interaction with fake Pi and all domain mutations still needs a dedicated end-to-end fixture.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": []
+    }
+  ]
+}

@@ -1,0 +1,103 @@
+{
+  "category": "Workbench lifecycle and shared state",
+  "rows": [
+    {
+      "id": "W01",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "One main-area feature surface at a time: Files opens while closing Settings/Git/Usage/Worktrees; return-to-chat preserves the file entity. Docked Review and Explorer are mutually exclusive. Full-width Review keeps/restores a dock width and opens the sessions sidebar.",
+      "interaction_contract": "One main-area feature surface at a time: Files opens while closing Settings/Git/Usage/Worktrees; return-to-chat preserves the file entity. Docked Review and Explorer are mutually exclusive. Full-width Review keeps/restores a dock width and opens the sessions sidebar.",
+      "state_failure_platform": "Page changes update terminal visibility rather than killing shells. Full-width close restores dock state. This is cross-surface behavior, not just styling.",
+      "sources": [
+        "`app/session.rs::open_file_in_viewer`, `close_files`, `on_toggle_project_panel`; `app.rs::sync_terminal_active`; `sidepane.rs::close`, `toggle_full_width`; `app/view.rs::render`"
+      ],
+      "tests": "`app/new_task_panels_tests.rs::{starting_a_new_task_closes_every_open_panel,closing_surfaces_with_nothing_open_is_a_no_op}`; `app/sidepane_full_width_tests.rs`",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G8",
+        "paths": [
+          "internal/ui",
+          "cmd/orbit/main.go"
+        ],
+        "tests": [
+          "internal/ui/snapshot_test.go",
+          "internal/ui/workspace_review_regression_test.go",
+          "internal/ui/viewer_parity_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "id": "W02",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Workspace edits from agent, user, editor or Git refresh docked Review, visible Git status, Explorer, active Files tab, branch status and visible Worktrees list.",
+      "interaction_contract": "Workspace edits from agent, user, editor or Git refresh docked Review, visible Git status, Explorer, active Files tab, branch status and visible Worktrees list.",
+      "state_failure_platform": "Watch is 500 ms debounced; linked-worktree per-worktree/common Git dirs are watched separately. Generated trees, Git object/log/checkpoint scratch are excluded to prevent refresh loops. No watcher backend means manual refresh remains; startup retried after workspace change, not every heartbeat.",
+      "sources": [
+        "`watch.rs::{WorkspaceWatcher,git_metadata_dirs,workspace_relevant,git_metadata_relevant}`; `app/events.rs::{tick,sync_workspace_watcher}`"
+      ],
+      "tests": "`watch.rs::{linked_worktree_metadata_dirs_are_resolved_outside_the_tree,workspace_watcher_ignores_orbit_checkpoint_scratch,workspace_watcher_ignores_changes_tab_diff_loads,workspace_watcher_reports_a_source_change}`",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G1",
+        "paths": [
+          "internal/workspace/files.go",
+          "internal/workspace/editor.go",
+          "internal/workspace/tree.go",
+          "internal/workspace/watch.go",
+          "internal/ui/files.go"
+        ],
+        "tests": [
+          "internal/workspace/files_test.go",
+          "internal/workspace/tree_test.go",
+          "internal/workspace/watch_test.go"
+        ],
+        "remaining": "Native fsnotify recursive/trailing-debounce and bounded polling fallback pass Linux filesystem/race tests. Windows/macOS cross-compile only; real host event delivery, network filesystems and all UI refresh fan-out remain acceptance gates.",
+        "specific_tests": [
+          "TestNativeWatchDetectsPreservedMetadataAndNewNestedTrees",
+          "TestNativeWatchFollowsLinkedMetadataAndIgnoresCheckpointChurn",
+          "TestNativeWatchDebouncesBurstAndFallsBackOnOverflow",
+          "TestWatchFallbackOnInitializationFailureAndCancellation",
+          "TestNativeWatchRootRecreationFallsBack",
+          "TestNativeWatchDiscoversGitCreatedAfterStartup",
+          "TestEmptyWorkspaceDoesNotWatchProcessDirectory"
+        ]
+      }
+    },
+    {
+      "id": "W03",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Resizable sidebar, Review, Explorer and terminal dimensions survive relaunch.",
+      "interaction_contract": "Resizable sidebar, Review, Explorer and terminal dimensions survive relaunch.",
+      "state_failure_platform": "`~/.orbit-pi/layout.json`; 500 ms settle debounce, finite 80–4000 px load sanity plus per-panel clamps. Only dimensions are in this store; do not infer persisted tab/process/buffer state. Current writes are best-effort and errors are ignored.",
+      "sources": [
+        "`layout.rs::{Layout,record,flush_if_settled}`; `sidepane.rs::set_width`; `explorer/panel.rs::set_width`; `terminal.rs::TerminalPanel::set_height`; `app/events.rs::tick`"
+      ],
+      "tests": "`layout.rs::{fields_round_trip,missing_and_out_of_bounds_fields_are_dropped,non_numeric_field_is_dropped,record_arms_the_settle_timer_only_on_change}`",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Layout persistence code exists; settle debounce and drag/restore interactions require acceptance."
+      }
+    }
+  ]
+}

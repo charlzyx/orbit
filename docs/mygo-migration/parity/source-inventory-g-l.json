@@ -1,0 +1,816 @@
+[
+  {
+    "path": "crates/orbit-pi/src/app/helpers.rs",
+    "lines": 1151,
+    "tests": [
+      {
+        "name": "chip_glass_keeps_the_callers_rounding",
+        "line": 1082,
+        "kind": "rust"
+      },
+      {
+        "name": "segment_positions_trim_the_group_outline",
+        "line": 1111,
+        "kind": "rust"
+      },
+      {
+        "name": "segment_positions_cover_a_group",
+        "line": 1140,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/gh.rs",
+    "lines": 952,
+    "tests": [
+      {
+        "name": "parses_versions_from_gh_output",
+        "line": 851,
+        "kind": "rust"
+      },
+      {
+        "name": "version_floor_matches_the_json_surface_we_need",
+        "line": 863,
+        "kind": "rust"
+      },
+      {
+        "name": "parses_issue_json",
+        "line": 870,
+        "kind": "rust"
+      },
+      {
+        "name": "parses_labels_json",
+        "line": 887,
+        "kind": "rust"
+      },
+      {
+        "name": "relative_time_handles_unknown_formats",
+        "line": 895,
+        "kind": "rust"
+      },
+      {
+        "name": "parses_pull_json_and_check_rollup",
+        "line": 902,
+        "kind": "rust"
+      },
+      {
+        "name": "check_buckets_prefer_the_normalized_field",
+        "line": 922,
+        "kind": "rust"
+      },
+      {
+        "name": "reviews_and_files_parse",
+        "line": 938,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/gh_templates.rs",
+    "lines": 674,
+    "tests": [
+      {
+        "name": "reads_a_plain_markdown_pull_template",
+        "line": 527,
+        "kind": "rust"
+      },
+      {
+        "name": "reads_front_matter_and_body_from_markdown",
+        "line": 544,
+        "kind": "rust"
+      },
+      {
+        "name": "flattens_a_yaml_issue_form_and_skips_config",
+        "line": 562,
+        "kind": "rust"
+      },
+      {
+        "name": "legacy_single_file_is_used_without_a_directory",
+        "line": 630,
+        "kind": "rust"
+      },
+      {
+        "name": "missing_templates_are_an_empty_list",
+        "line": 641,
+        "kind": "rust"
+      },
+      {
+        "name": "parses_this_repositorys_own_templates",
+        "line": 651,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/git.rs",
+    "lines": 1917,
+    "tests": [
+      {
+        "name": "git_runs_without_optional_locks",
+        "line": 1341,
+        "kind": "rust"
+      },
+      {
+        "name": "status_rows_split_staged_and_unstaged_with_counts",
+        "line": 1375,
+        "kind": "rust"
+      },
+      {
+        "name": "index_tree_reads_without_rewriting_the_index",
+        "line": 1405,
+        "kind": "rust"
+      },
+      {
+        "name": "remote_urls_normalize_to_host_and_path",
+        "line": 1442,
+        "kind": "rust"
+      },
+      {
+        "name": "commit_urls_follow_the_forge",
+        "line": 1466,
+        "kind": "rust"
+      },
+      {
+        "name": "history_includes_the_baseline_commit",
+        "line": 1500,
+        "kind": "rust"
+      },
+      {
+        "name": "graph_history_spans_branches_and_lays_out_the_merge",
+        "line": 1510,
+        "kind": "rust"
+      },
+      {
+        "name": "layout_graph_ignores_parents_outside_the_window",
+        "line": 1552,
+        "kind": "rust"
+      },
+      {
+        "name": "layout_graph_handles_an_octopus_merge",
+        "line": 1571,
+        "kind": "rust"
+      },
+      {
+        "name": "graph_all_refs_includes_remote_only_commits",
+        "line": 1598,
+        "kind": "rust"
+      },
+      {
+        "name": "source_modes_compare_consistent_git_snapshots",
+        "line": 1640,
+        "kind": "rust"
+      },
+      {
+        "name": "last_turn_uses_captured_checkpoints_not_the_live_worktree",
+        "line": 1679,
+        "kind": "rust"
+      },
+      {
+        "name": "last_turn_without_checkpoints_reports_an_error",
+        "line": 1704,
+        "kind": "rust"
+      },
+      {
+        "name": "off_repo_reports_not_a_repository",
+        "line": 1717,
+        "kind": "rust"
+      },
+      {
+        "name": "status_rows_keeps_the_first_lines_index_column",
+        "line": 1729,
+        "kind": "rust"
+      },
+      {
+        "name": "force_push_uses_the_lease_and_refuses_a_stale_remote",
+        "line": 1754,
+        "kind": "rust"
+      },
+      {
+        "name": "commit_detail_reports_metadata_and_files",
+        "line": 1820,
+        "kind": "rust"
+      },
+      {
+        "name": "history_follows_one_path_across_renames",
+        "line": 1838,
+        "kind": "rust"
+      },
+      {
+        "name": "history_filters_by_author_and_path",
+        "line": 1863,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/git_ops.rs",
+    "lines": 530,
+    "tests": [
+      {
+        "name": "no_operation_on_a_clean_repo",
+        "line": 385,
+        "kind": "rust"
+      },
+      {
+        "name": "a_conflicted_merge_is_detected_with_its_files",
+        "line": 393,
+        "kind": "rust"
+      },
+      {
+        "name": "skip_is_only_offered_where_git_supports_it",
+        "line": 428,
+        "kind": "rust"
+      },
+      {
+        "name": "bisect_has_no_continue",
+        "line": 437,
+        "kind": "rust"
+      },
+      {
+        "name": "refs_include_locals_remotes_and_tags_but_not_origin_head",
+        "line": 444,
+        "kind": "rust"
+      },
+      {
+        "name": "merge_and_rebase_onto_a_branch",
+        "line": 470,
+        "kind": "rust"
+      },
+      {
+        "name": "stash_round_trip",
+        "line": 500,
+        "kind": "rust"
+      },
+      {
+        "name": "rename_and_delete_branch",
+        "line": 516,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/highlight.rs",
+    "lines": 1574,
+    "tests": [
+      {
+        "name": "tags_resolve_to_specs",
+        "line": 1323,
+        "kind": "rust"
+      },
+      {
+        "name": "rust_line_classifies_keywords_types_calls_and_numbers",
+        "line": 1331,
+        "kind": "rust"
+      },
+      {
+        "name": "strings_consume_escapes_and_stop_at_the_closer",
+        "line": 1347,
+        "kind": "rust"
+      },
+      {
+        "name": "block_comments_carry_across_lines",
+        "line": 1360,
+        "kind": "rust"
+      },
+      {
+        "name": "python_triple_quoted_strings_carry_across_lines",
+        "line": 1379,
+        "kind": "rust"
+      },
+      {
+        "name": "python_decorators_and_literals",
+        "line": 1387,
+        "kind": "rust"
+      },
+      {
+        "name": "shell_treats_hash_as_a_comment_and_dollar_as_meta",
+        "line": 1406,
+        "kind": "rust"
+      },
+      {
+        "name": "shell_classifies_commands_flags_and_paths",
+        "line": 1418,
+        "kind": "rust"
+      },
+      {
+        "name": "shell_marks_operators_redirections_and_assignments",
+        "line": 1440,
+        "kind": "rust"
+      },
+      {
+        "name": "c_preprocessor_lines_are_meta_not_comments",
+        "line": 1459,
+        "kind": "rust"
+      },
+      {
+        "name": "json_highlights_keys_as_strings_and_literals",
+        "line": 1467,
+        "kind": "rust"
+      },
+      {
+        "name": "diff_lines_are_classified_whole",
+        "line": 1480,
+        "kind": "rust"
+      },
+      {
+        "name": "spans_are_ordered_disjoint_and_within_the_line",
+        "line": 1497,
+        "kind": "rust"
+      },
+      {
+        "name": "block_cache_reuses_and_matches_tokenize",
+        "line": 1538,
+        "kind": "rust"
+      },
+      {
+        "name": "every_prefix_of_a_code_block_tokenizes",
+        "line": 1551,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/http.rs",
+    "lines": 97,
+    "tests": []
+  },
+  {
+    "path": "crates/orbit-pi/src/i18n.rs",
+    "lines": 505,
+    "tests": [
+      {
+        "name": "language_locale_ids_are_supported",
+        "line": 272,
+        "kind": "rust"
+      },
+      {
+        "name": "language_names_are_autonyms",
+        "line": 298,
+        "kind": "rust"
+      },
+      {
+        "name": "system_is_the_default_persisted_preference",
+        "line": 307,
+        "kind": "rust"
+      },
+      {
+        "name": "persisted_tokens_round_trip",
+        "line": 320,
+        "kind": "rust"
+      },
+      {
+        "name": "system_locales_are_detected",
+        "line": 337,
+        "kind": "rust"
+      },
+      {
+        "name": "shipped_locale_id_only_matches_shipped_languages",
+        "line": 354,
+        "kind": "rust"
+      },
+      {
+        "name": "system_preference_list_skips_unshipped_languages",
+        "line": 372,
+        "kind": "rust"
+      },
+      {
+        "name": "system_default_resolves_to_a_shipped_locale",
+        "line": 397,
+        "kind": "rust"
+      },
+      {
+        "name": "east_asian_locales_use_east_asian_dates",
+        "line": 402,
+        "kind": "rust"
+      },
+      {
+        "name": "core_keys_resolve_in_every_locale",
+        "line": 410,
+        "kind": "rust"
+      },
+      {
+        "name": "previously_unregistered_sidebar_keys_translate",
+        "line": 426,
+        "kind": "rust"
+      },
+      {
+        "name": "newly_localized_ui_keys_translate",
+        "line": 446,
+        "kind": "rust"
+      },
+      {
+        "name": "locale_files_cover_every_english_key",
+        "line": 475,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/issue_message.rs",
+    "lines": 864,
+    "tests": [
+      {
+        "name": "parses_title_and_body_from_a_text_fence",
+        "line": 671,
+        "kind": "rust"
+      },
+      {
+        "name": "tolerates_preamble_and_trailing_prose",
+        "line": 682,
+        "kind": "rust"
+      },
+      {
+        "name": "accepts_markdown_fence_and_title_first_prose",
+        "line": 690,
+        "kind": "rust"
+      },
+      {
+        "name": "clean_title_strips_prefixes_and_punctuation",
+        "line": 704,
+        "kind": "rust"
+      },
+      {
+        "name": "process_response_rejects_blank_output",
+        "line": 711,
+        "kind": "rust"
+      },
+      {
+        "name": "heuristic_uses_the_hint_first_line_as_the_title",
+        "line": 717,
+        "kind": "rust"
+      },
+      {
+        "name": "heuristic_falls_back_to_the_branch_or_latest_commit",
+        "line": 744,
+        "kind": "rust"
+      },
+      {
+        "name": "prompt_carries_context_and_reminder",
+        "line": 767,
+        "kind": "rust"
+      },
+      {
+        "name": "template_is_embedded_and_filled_faithfully",
+        "line": 791,
+        "kind": "rust"
+      },
+      {
+        "name": "fill_first_section_prepends_without_a_heading",
+        "line": 829,
+        "kind": "rust"
+      },
+      {
+        "name": "report_prompts_ask_for_a_heading_free_body_and_carry_the_notes",
+        "line": 838,
+        "kind": "rust"
+      },
+      {
+        "name": "report_kinds_map_to_repository_labels",
+        "line": 857,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/layout.rs",
+    "lines": 217,
+    "tests": [
+      {
+        "name": "fields_round_trip",
+        "line": 165,
+        "kind": "rust"
+      },
+      {
+        "name": "missing_and_out_of_bounds_fields_are_dropped",
+        "line": 182,
+        "kind": "rust"
+      },
+      {
+        "name": "non_numeric_field_is_dropped",
+        "line": 196,
+        "kind": "rust"
+      },
+      {
+        "name": "record_arms_the_settle_timer_only_on_change",
+        "line": 202,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/lib.rs",
+    "lines": 1,
+    "tests": []
+  },
+  {
+    "path": "crates/orbit-pi/src/usage/heatmap.rs",
+    "lines": 574,
+    "tests": [
+      {
+        "name": "levels_follow_the_activity_quartiles",
+        "line": 520,
+        "kind": "rust"
+      },
+      {
+        "name": "a_single_active_day_sits_at_the_top",
+        "line": 533,
+        "kind": "rust"
+      },
+      {
+        "name": "no_activity_has_no_shade",
+        "line": 541,
+        "kind": "rust"
+      },
+      {
+        "name": "geometry_always_fills_the_width",
+        "line": 548,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-rpc/src/lib.rs",
+    "lines": 23,
+    "tests": []
+  },
+  {
+    "path": "crates/orbit-rpc/tests/live_agent_control.rs",
+    "lines": 164,
+    "tests": [
+      {
+        "name": "live_agent_control_commands_round_trip",
+        "line": 54,
+        "kind": "rust"
+      },
+      {
+        "name": "live_failed_command_reports_error",
+        "line": 126,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-rpc/tests/live_catalog.rs",
+    "lines": 74,
+    "tests": [
+      {
+        "name": "live_catalog_round_trip",
+        "line": 25,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-rpc/tests/live_model_match.rs",
+    "lines": 72,
+    "tests": [
+      {
+        "name": "live_state_model_matches_catalog",
+        "line": 14,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-rpc/tests/live_pi.rs",
+    "lines": 130,
+    "tests": [
+      {
+        "name": "live_get_state_round_trip",
+        "line": 33,
+        "kind": "rust"
+      },
+      {
+        "name": "live_process_stays_alive_with_default_session_dir",
+        "line": 71,
+        "kind": "rust"
+      },
+      {
+        "name": "live_prompt_streams_agent_events",
+        "line": 83,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-rpc/tests/live_switch_probe.rs",
+    "lines": 111,
+    "tests": [
+      {
+        "name": "probe_switch_session_mid_run",
+        "line": 28,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "contrib/orbit-guard-extension/index.js",
+    "lines": 77,
+    "tests": []
+  },
+  {
+    "path": "contrib/orbit-guard-extension/index.test.mjs",
+    "lines": 205,
+    "tests": [
+      {
+        "name": "full-access never prompts",
+        "line": 69,
+        "kind": "node"
+      },
+      {
+        "name": "supervised allows reads and prompts for edits",
+        "line": 82,
+        "kind": "node"
+      },
+      {
+        "name": "a denied call blocks with a reason",
+        "line": 96,
+        "kind": "node"
+      },
+      {
+        "name": "always allow records the tool and stops prompting for it",
+        "line": 110,
+        "kind": "node"
+      },
+      {
+        "name": "auto-accept-edits skips the prompt for edits but asks for exec",
+        "line": 127,
+        "kind": "node"
+      },
+      {
+        "name": "without a UI a confirmation-required call is blocked, not allowed",
+        "line": 140,
+        "kind": "node"
+      },
+      {
+        "name": "a dismissed or throwing prompt fails closed",
+        "line": 153,
+        "kind": "node"
+      },
+      {
+        "name": "a missing mode file behaves as full-access",
+        "line": 174,
+        "kind": "node"
+      },
+      {
+        "name": "parallel prompts are serialized, never stacked",
+        "line": 182,
+        "kind": "node"
+      }
+    ]
+  },
+  {
+    "path": "contrib/orbit-quota-extension/index.js",
+    "lines": 183,
+    "tests": []
+  },
+  {
+    "path": "contrib/orbit-quota-extension/index.test.mjs",
+    "lines": 184,
+    "tests": [
+      {
+        "name": "session start appends one normalized snapshot for configured providers",
+        "line": 79,
+        "kind": "node"
+      },
+      {
+        "name": "an unconfigured account appends nothing",
+        "line": 105,
+        "kind": "node"
+      },
+      {
+        "name": "a session-only Ollama Cloud setup still snapshots usage",
+        "line": 116,
+        "kind": "node"
+      },
+      {
+        "name": "a turn end inside the refresh gap does not append again",
+        "line": 148,
+        "kind": "node"
+      },
+      {
+        "name": "a stale activation context never throws out of the extension",
+        "line": 170,
+        "kind": "node"
+      }
+    ]
+  },
+  {
+    "path": "contrib/orbit-title-extension/index.js",
+    "lines": 165,
+    "tests": []
+  },
+  {
+    "path": "contrib/orbit-title-extension/index.test.mjs",
+    "lines": 281,
+    "tests": [
+      {
+        "name": "titles the session from the first exchange with the active model",
+        "line": 89,
+        "kind": "node"
+      },
+      {
+        "name": "uses the configured model when the setting names one",
+        "line": 106,
+        "kind": "node"
+      },
+      {
+        "name": "does nothing when the setting is disabled",
+        "line": 121,
+        "kind": "node"
+      },
+      {
+        "name": "never clobbers a name that is already set",
+        "line": 133,
+        "kind": "node"
+      },
+      {
+        "name": "titles a first turn that called tools (several assistant messages)",
+        "line": 145,
+        "kind": "node"
+      },
+      {
+        "name": "titles from a reply that leads with a thinking block",
+        "line": 169,
+        "kind": "node"
+      },
+      {
+        "name": "does not retry a completed ask that produced no title",
+        "line": 191,
+        "kind": "node"
+      },
+      {
+        "name": "the /generate-title command re-titles an already-named session",
+        "line": 211,
+        "kind": "node"
+      },
+      {
+        "name": "the /generate-title command titles a resumed session",
+        "line": 227,
+        "kind": "node"
+      },
+      {
+        "name": "leaves a resumed session with more than one user prompt alone",
+        "line": 245,
+        "kind": "node"
+      },
+      {
+        "name": "a failed ask is retried on the next settle",
+        "line": 261,
+        "kind": "node"
+      }
+    ]
+  },
+  {
+    "path": "contrib/orbit-workflow-extension/index.js",
+    "lines": 157,
+    "tests": []
+  },
+  {
+    "path": "contrib/orbit-workflow-extension/index.test.mjs",
+    "lines": 192,
+    "tests": [
+      {
+        "name": "plan mode disables write tools on session start",
+        "line": 69,
+        "kind": "node"
+      },
+      {
+        "name": "build keeps every tool",
+        "line": 79,
+        "kind": "node"
+      },
+      {
+        "name": "before_agent_start injects guidance and re-arms the mode live",
+        "line": 87,
+        "kind": "node"
+      },
+      {
+        "name": "a tool activated after session start survives a mode change",
+        "line": 103,
+        "kind": "node"
+      },
+      {
+        "name": "tool_call blocks writes in read-only modes and passes in build",
+        "line": 129,
+        "kind": "node"
+      },
+      {
+        "name": "the store for the session id wins over the env fallback",
+        "line": 153,
+        "kind": "node"
+      },
+      {
+        "name": "context drops stale guidance only when the mode adds none",
+        "line": 168,
+        "kind": "node"
+      },
+      {
+        "name": "context keeps active guidance in Plan/Ask",
+        "line": 182,
+        "kind": "node"
+      }
+    ]
+  }
+]

@@ -1,0 +1,627 @@
+[
+  {
+    "path": "crates/orbit-pi/src/app/updater_ui.rs",
+    "lines": 1321,
+    "tests": [
+      {
+        "name": "release_notes_split_into_headings_bullets_and_paragraphs",
+        "line": 1151,
+        "kind": "rust"
+      },
+      {
+        "name": "inline_notes_text_drops_code_ticks_and_bold",
+        "line": 1165,
+        "kind": "rust"
+      },
+      {
+        "name": "inline_notes_text_collapses_links_to_their_label",
+        "line": 1173,
+        "kind": "rust"
+      },
+      {
+        "name": "up_to_date_copy_names_the_version_it_checked",
+        "line": 1185,
+        "kind": "rust"
+      },
+      {
+        "name": "update_dialog_body_wraps_long_copy_inside_the_card",
+        "line": 1193,
+        "kind": "gpui"
+      },
+      {
+        "name": "update_dialog_card_keeps_its_footer_inside_the_card",
+        "line": 1241,
+        "kind": "gpui"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/app/view.rs",
+    "lines": 4773,
+    "tests": []
+  },
+  {
+    "path": "crates/orbit-pi/src/app/window_watch_tests.rs",
+    "lines": 48,
+    "tests": [
+      {
+        "name": "closing_the_window_clears_the_notification_gate",
+        "line": 11,
+        "kind": "gpui"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/app/worktree_chip_tests.rs",
+    "lines": 68,
+    "tests": [
+      {
+        "name": "the_work_in_chip_is_absent_at_the_main_checkout",
+        "line": 31,
+        "kind": "gpui"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/app/worktree_howto_tests.rs",
+    "lines": 75,
+    "tests": [
+      {
+        "name": "howto_card_shows_until_dismissed",
+        "line": 7,
+        "kind": "gpui"
+      },
+      {
+        "name": "howto_card_fits_the_page_column",
+        "line": 35,
+        "kind": "gpui"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/app/worktrees.rs",
+    "lines": 3395,
+    "tests": []
+  },
+  {
+    "path": "crates/orbit-pi/src/explorer/viewer.rs",
+    "lines": 1619,
+    "tests": [
+      {
+        "name": "loads_code_with_tokens_and_drops_the_trailing_blank_line",
+        "line": 1443,
+        "kind": "rust"
+      },
+      {
+        "name": "detects_markdown",
+        "line": 1457,
+        "kind": "rust"
+      },
+      {
+        "name": "detects_binary_from_a_nul_byte",
+        "line": 1470,
+        "kind": "rust"
+      },
+      {
+        "name": "oversized_files_are_not_read",
+        "line": 1479,
+        "kind": "rust"
+      },
+      {
+        "name": "invalid_utf8_is_decoded_lossily_not_rejected",
+        "line": 1491,
+        "kind": "rust"
+      },
+      {
+        "name": "directories_report_an_error_instead_of_panicking",
+        "line": 1502,
+        "kind": "rust"
+      },
+      {
+        "name": "image_extensions_are_recognized",
+        "line": 1510,
+        "kind": "rust"
+      },
+      {
+        "name": "rename_rewrites_display_for_a_file_and_a_subtree",
+        "line": 1520,
+        "kind": "rust"
+      },
+      {
+        "name": "active_tab_after_close_is_a_neighbour",
+        "line": 1530,
+        "kind": "rust"
+      },
+      {
+        "name": "truncated_and_lossy_content_is_not_editable",
+        "line": 1544,
+        "kind": "rust"
+      },
+      {
+        "name": "save_file_round_trips_and_is_atomic",
+        "line": 1567,
+        "kind": "rust"
+      },
+      {
+        "name": "save_file_surfaces_a_missing_directory_error",
+        "line": 1582,
+        "kind": "rust"
+      },
+      {
+        "name": "tab_strip_scrolls_when_tabs_overflow",
+        "line": 1594,
+        "kind": "gpui"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/explorer/walk.rs",
+    "lines": 189,
+    "tests": [
+      {
+        "name": "snapshot_honors_gitignore_and_keeps_empty_dirs",
+        "line": 141,
+        "kind": "rust"
+      },
+      {
+        "name": "snapshot_hides_dotfiles_until_toggled",
+        "line": 155,
+        "kind": "rust"
+      },
+      {
+        "name": "snapshot_does_not_follow_symlinks",
+        "line": 168,
+        "kind": "rust"
+      },
+      {
+        "name": "absolute_rebuilds_a_relative_path",
+        "line": 180,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/git_panel/widgets.rs",
+    "lines": 229,
+    "tests": []
+  },
+  {
+    "path": "crates/orbit-pi/src/updater.rs",
+    "lines": 2001,
+    "tests": [
+      {
+        "name": "the_newest_signed_item_wins_regardless_of_feed_order",
+        "line": 1678,
+        "kind": "rust"
+      },
+      {
+        "name": "an_unsigned_enclosure_is_never_offered",
+        "line": 1690,
+        "kind": "rust"
+      },
+      {
+        "name": "a_feed_without_signed_items_offers_nothing",
+        "line": 1700,
+        "kind": "rust"
+      },
+      {
+        "name": "versions_compare_field_by_field_not_lexically",
+        "line": 1706,
+        "kind": "rust"
+      },
+      {
+        "name": "history_lists_every_signed_item_newest_first",
+        "line": 1717,
+        "kind": "rust"
+      },
+      {
+        "name": "release_notes_come_from_the_items_description",
+        "line": 1734,
+        "kind": "rust"
+      },
+      {
+        "name": "a_feed_without_a_description_has_no_notes",
+        "line": 1751,
+        "kind": "rust"
+      },
+      {
+        "name": "an_absent_preference_file_leaves_automatic_checks_on",
+        "line": 1766,
+        "kind": "rust"
+      },
+      {
+        "name": "release_versions_cannot_become_paths",
+        "line": 1782,
+        "kind": "rust"
+      },
+      {
+        "name": "http_failure_prefers_the_root_cause",
+        "line": 1790,
+        "kind": "rust"
+      },
+      {
+        "name": "a_release_signature_verifies_and_tampering_does_not",
+        "line": 1825,
+        "kind": "rust"
+      },
+      {
+        "name": "extraction_keeps_directory_entries_and_executable_modes",
+        "line": 1858,
+        "kind": "rust"
+      },
+      {
+        "name": "only_namespaced_staging_siblings_may_be_swapped_in",
+        "line": 1905,
+        "kind": "rust"
+      },
+      {
+        "name": "extraction_rejects_an_unexpected_root",
+        "line": 1927,
+        "kind": "rust"
+      },
+      {
+        "name": "forced_init_keeps_the_checker_outside_a_managed_install",
+        "line": 1964,
+        "kind": "rust"
+      },
+      {
+        "name": "live_feed_reports_history_without_an_install",
+        "line": 1979,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/usage/view.rs",
+    "lines": 5533,
+    "tests": [
+      {
+        "name": "cache_bars_are_bottom_aligned_and_proportional",
+        "line": 5490,
+        "kind": "gpui"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/watch.rs",
+    "lines": 486,
+    "tests": [
+      {
+        "name": "workspace_relevant_keeps_sources_and_git_state",
+        "line": 273,
+        "kind": "rust"
+      },
+      {
+        "name": "workspace_relevant_drops_generated_trees_and_cruft",
+        "line": 289,
+        "kind": "rust"
+      },
+      {
+        "name": "workspace_relevant_drops_git_internals_and_orbit_scratch",
+        "line": 305,
+        "kind": "rust"
+      },
+      {
+        "name": "git_metadata_filter_keeps_head_index_and_refs",
+        "line": 328,
+        "kind": "rust"
+      },
+      {
+        "name": "linked_worktree_metadata_dirs_are_resolved_outside_the_tree",
+        "line": 354,
+        "kind": "rust"
+      },
+      {
+        "name": "workspace_watcher_ignores_orbit_checkpoint_scratch",
+        "line": 396,
+        "kind": "rust"
+      },
+      {
+        "name": "workspace_watcher_ignores_changes_tab_diff_loads",
+        "line": 429,
+        "kind": "rust"
+      },
+      {
+        "name": "workspace_watcher_reports_a_source_change",
+        "line": 465,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/widgets.rs",
+    "lines": 401,
+    "tests": [
+      {
+        "name": "plain_text_passes_through",
+        "line": 322,
+        "kind": "rust"
+      },
+      {
+        "name": "fg_256_color_becomes_a_colored_run",
+        "line": 331,
+        "kind": "rust"
+      },
+      {
+        "name": "truecolor_is_decoded",
+        "line": 339,
+        "kind": "rust"
+      },
+      {
+        "name": "attributes_apply_and_reset",
+        "line": 346,
+        "kind": "rust"
+      },
+      {
+        "name": "combined_parameters_are_honored",
+        "line": 358,
+        "kind": "rust"
+      },
+      {
+        "name": "osc_and_cursor_marker_are_stripped",
+        "line": 367,
+        "kind": "rust"
+      },
+      {
+        "name": "empty_line_keeps_its_row",
+        "line": 376,
+        "kind": "rust"
+      },
+      {
+        "name": "runs_always_cover_the_display_text",
+        "line": 386,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/workflow.rs",
+    "lines": 223,
+    "tests": [
+      {
+        "name": "wire_round_trips",
+        "line": 174,
+        "kind": "rust"
+      },
+      {
+        "name": "unknown_wire_falls_back_to_build",
+        "line": 181,
+        "kind": "rust"
+      },
+      {
+        "name": "every_mode_has_distinct_copy",
+        "line": 188,
+        "kind": "rust"
+      },
+      {
+        "name": "read_only_flags",
+        "line": 199,
+        "kind": "rust"
+      },
+      {
+        "name": "store_round_trips_per_session",
+        "line": 206,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/workspace_logo.rs",
+    "lines": 134,
+    "tests": [
+      {
+        "name": "missing_logo_is_none",
+        "line": 93,
+        "kind": "rust"
+      },
+      {
+        "name": "earliest_stem_wins_over_later_directories",
+        "line": 100,
+        "kind": "rust"
+      },
+      {
+        "name": "explicit_orbit_override_beats_root_logo",
+        "line": 109,
+        "kind": "rust"
+      },
+      {
+        "name": "extension_preference_is_svg_then_png",
+        "line": 118,
+        "kind": "rust"
+      },
+      {
+        "name": "directory_named_like_a_logo_is_not_a_hit",
+        "line": 127,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/workspace_mark.rs",
+    "lines": 215,
+    "tests": [
+      {
+        "name": "unknown_stems_and_keys_fall_back_to_the_defaults",
+        "line": 141,
+        "kind": "rust"
+      },
+      {
+        "name": "every_curated_icon_exists_in_the_embedded_set",
+        "line": 159,
+        "kind": "rust"
+      },
+      {
+        "name": "status_icons_apply_only_without_a_custom_mark",
+        "line": 170,
+        "kind": "rust"
+      },
+      {
+        "name": "default_mark_is_recognised",
+        "line": 201,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/workspace_picker.rs",
+    "lines": 503,
+    "tests": []
+  },
+  {
+    "path": "crates/orbit-pi/src/worktree.rs",
+    "lines": 1496,
+    "tests": [
+      {
+        "name": "slugify_makes_safe_defaults",
+        "line": 1046,
+        "kind": "rust"
+      },
+      {
+        "name": "valid_names_are_single_components",
+        "line": 1057,
+        "kind": "rust"
+      },
+      {
+        "name": "invalid_names_are_rejected",
+        "line": 1074,
+        "kind": "rust"
+      },
+      {
+        "name": "parser_reads_normal_branch_worktree",
+        "line": 1086,
+        "kind": "rust"
+      },
+      {
+        "name": "parser_reads_detached_worktree",
+        "line": 1103,
+        "kind": "rust"
+      },
+      {
+        "name": "parser_reads_locked_worktree_with_reason",
+        "line": 1112,
+        "kind": "rust"
+      },
+      {
+        "name": "parser_reads_prunable_worktree",
+        "line": 1120,
+        "kind": "rust"
+      },
+      {
+        "name": "parser_reads_bare_repository",
+        "line": 1131,
+        "kind": "rust"
+      },
+      {
+        "name": "parser_falls_back_to_directory_name_outside_the_root",
+        "line": 1140,
+        "kind": "rust"
+      },
+      {
+        "name": "parser_handles_unterminated_final_record",
+        "line": 1147,
+        "kind": "rust"
+      },
+      {
+        "name": "name_is_not_branch_or_path",
+        "line": 1155,
+        "kind": "rust"
+      },
+      {
+        "name": "effective_directory_prefers_repo_config",
+        "line": 1174,
+        "kind": "rust"
+      },
+      {
+        "name": "absolute_directory_stays_absolute",
+        "line": 1195,
+        "kind": "rust"
+      },
+      {
+        "name": "setup_script_resolution_requires_a_file",
+        "line": 1206,
+        "kind": "rust"
+      },
+      {
+        "name": "manager_resolves_paths_inside_the_root",
+        "line": 1217,
+        "kind": "rust"
+      },
+      {
+        "name": "lifecycle_create_list_move_lock_remove_prune",
+        "line": 1238,
+        "kind": "rust"
+      },
+      {
+        "name": "create_rejects_existing_branch_checked_out_elsewhere",
+        "line": 1326,
+        "kind": "rust"
+      },
+      {
+        "name": "create_rejects_existing_path_and_missing_repository",
+        "line": 1354,
+        "kind": "rust"
+      },
+      {
+        "name": "remove_refuses_dirty_worktree_until_forced",
+        "line": 1377,
+        "kind": "rust"
+      },
+      {
+        "name": "remove_rejects_main_and_unknown_paths",
+        "line": 1409,
+        "kind": "rust"
+      },
+      {
+        "name": "new_branch_validation_uses_git_ref_format",
+        "line": 1427,
+        "kind": "rust"
+      },
+      {
+        "name": "repair_succeeds_on_a_healthy_repository",
+        "line": 1446,
+        "kind": "rust"
+      },
+      {
+        "name": "config_round_trips_through_disk",
+        "line": 1466,
+        "kind": "rust"
+      },
+      {
+        "name": "setup_allowed_keys_are_canonical",
+        "line": 1485,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/worktree_setup.rs",
+    "lines": 233,
+    "tests": [
+      {
+        "name": "successful_script_receives_environment_variables",
+        "line": 145,
+        "kind": "rust"
+      },
+      {
+        "name": "failed_script_reports_exit_code_and_stderr",
+        "line": 173,
+        "kind": "rust"
+      },
+      {
+        "name": "missing_script_fails_without_touching_the_worktree",
+        "line": 190,
+        "kind": "rust"
+      },
+      {
+        "name": "script_runs_with_the_worktree_as_cwd",
+        "line": 204,
+        "kind": "rust"
+      },
+      {
+        "name": "outcome_combines_both_streams",
+        "line": 222,
+        "kind": "rust"
+      }
+    ]
+  }
+]

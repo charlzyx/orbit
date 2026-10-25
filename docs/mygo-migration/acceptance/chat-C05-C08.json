@@ -1,0 +1,608 @@
+{
+  "schema": "orbit-acceptance-shard/v1",
+  "category": "chat",
+  "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "rows": [
+    {
+      "id": "C05",
+      "title": "Image attachments and drag/paste",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/composer_ops.rs",
+          "handler": "attach_image",
+          "line": 435,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/composer_ops.rs#L435",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/composer_ops.rs",
+          "handler": "on_file_drop",
+          "line": 405,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/composer_ops.rs#L405",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/events.rs",
+          "handler": "drain_pasted_images",
+          "line": 1108,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/events.rs#L1108",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/attachments.rs",
+          "handler": "compress_image",
+          "line": 55,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/attachments.rs#L55",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Async native picker, external file drop, clipboard image paste, removable previews/chips, attached image lightbox; images travel with prompt/follow_up/steer.",
+      "baseline_edge_state": "Maximum eight images. PNG/JPEG compression targets 1400 px and 512 KiB base64, transparency uses WebP; caps are best effort, GIF/SVG/TIFF pass through unchanged. Source/decoding failures must not crash.",
+      "fixture": "Isolated HOME, deterministic fixture Pi RPC stream, long transcript/Unicode/image fixtures and no live provider inference.",
+      "steps": [
+        {
+          "id": "C05.behavior",
+          "dimension": "functional",
+          "action": "Attach images via picker, clipboard and drag/drop; remove one and submit another to a fixture Pi receiver.",
+          "expected": "Async native picker, external file drop, clipboard image paste, removable previews/chips, attached image lightbox; images travel with prompt/follow_up/steer.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C05.edge",
+          "dimension": "edge",
+          "action": "Reject unsupported/unreadable/oversized data without losing text; cancel picker and fail sending while attachments remain selected.",
+          "expected": "Maximum eight images. PNG/JPEG compression targets 1400 px and 512 KiB base64, transparency uses WebP; caps are best effort, GIF/SVG/TIFF pass through unchanged. Source/decoding failures must not crash.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C05.error",
+          "dimension": "error",
+          "action": "Delay, reject, cancel or disconnect the fixture RPC operation; send a late event for the previous request/session.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Maximum eight images. PNG/JPEG compression targets 1400 px and 512 KiB base64, transparency uses WebP; caps are best effort, GIF/SVG/TIFF pass through unchanged. Source/decoding failures must not crash.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C05.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C05.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C05.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C05.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/ui",
+        "cmd/orbit/main.go"
+      ],
+      "existing_test_candidates": [
+        "internal/ui/snapshot_test.go",
+        "internal/ui/workspace_review_regression_test.go",
+        "internal/ui/viewer_parity_test.go"
+      ],
+      "inventory_evidence": "../parity/chat.json",
+      "source_test_inventory": "T04",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Transport/state support is not proof of image drag/paste, structured asks or custom UI/widget rendering parity.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-C04",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "partial",
+          "steps": [
+            "Select multiple valid images plus unreadable/oversized files.",
+            "Paste text and image; drag files.",
+            "Remove one; switch tasks; send and inspect RPC image bytes."
+          ],
+          "expected": "Bounded read/compression, actual per-file errors, no lost draft, source paste priority and max-count behavior.",
+          "tests": [],
+          "remaining": "Attachment Prepare and transport domain tests exist; host native add/drop/clipboard/partial-failure end-to-end tests and source text-file mention semantics remain open.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": []
+    },
+    {
+      "id": "C06",
+      "title": "Model and thinking selectors",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/model_selector.rs",
+          "handler": "ModelSelector",
+          "line": 159,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/model_selector.rs#L159",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/pickers.rs",
+          "handler": "sync_model_selector",
+          "line": 761,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/pickers.rs#L761",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/session.rs",
+          "handler": "can_choose_thinking",
+          "line": 52,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/session.rs#L52",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Searchable model picker with provider groups, current model, favorites and recent sections; provider scope, favorite toggle, metadata and keyboard scrolling. Reasoning levels are runtime-provided.",
+      "baseline_edge_state": "No hardcoded available-model truth. Thinking picker hidden/disabled for empty or [off]-only levels. Favorites/recent stores survive restart and model provider/id form identity.",
+      "fixture": "Isolated HOME, deterministic fixture Pi RPC stream, long transcript/Unicode/image fixtures and no live provider inference.",
+      "steps": [
+        {
+          "id": "C06.behavior",
+          "dimension": "functional",
+          "action": "Open model/provider and thinking menus; select available models, cycle thinking level and start a prompt.",
+          "expected": "Searchable model picker with provider groups, current model, favorites and recent sections; provider scope, favorite toggle, metadata and keyboard scrolling. Reasoning levels are runtime-provided.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C06.edge",
+          "dimension": "edge",
+          "action": "Return empty model lists, unavailable current model and failed set_model response; preserve real server state and clear loading.",
+          "expected": "No hardcoded available-model truth. Thinking picker hidden/disabled for empty or [off]-only levels. Favorites/recent stores survive restart and model provider/id form identity.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C06.error",
+          "dimension": "error",
+          "action": "Delay, reject, cancel or disconnect the fixture RPC operation; send a late event for the previous request/session.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: No hardcoded available-model truth. Thinking picker hidden/disabled for empty or [off]-only levels. Favorites/recent stores survive restart and model provider/id form identity.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C06.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C06.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C06.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C06.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/pirpc",
+        "internal/agent"
+      ],
+      "existing_test_candidates": [
+        "internal/pirpc/client_test.go",
+        "internal/agent/manager_test.go",
+        "internal/agent/reducer_test.go"
+      ],
+      "inventory_evidence": "../parity/chat.json",
+      "source_test_inventory": "T07",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-C05",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "partial",
+          "steps": [
+            "Filter model picker to one/zero and recover.",
+            "Switch provider and select thinking level.",
+            "Favorite model, enable favorites-only and relaunch."
+          ],
+          "expected": "Actual catalog/capabilities; no unsupported thinking choice; favorites/recent persistence and source model cards.",
+          "tests": [
+            "TestFilteredPickersResetAndClampKeyboardSelection"
+          ],
+          "remaining": "Keyboard picker works. Source favorites-only/provider filter/detail catalog page remains incomplete; existing simple model list is not full P08.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": []
+    },
+    {
+      "id": "C07",
+      "title": "Stream reducer and snapshot equivalence",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/transcript.rs",
+          "handler": "load_from",
+          "line": 1081,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/transcript.rs#L1081",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript.rs",
+          "handler": "apply_event",
+          "line": 1181,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/transcript.rs#L1181",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/events.rs",
+          "handler": "apply_messages_snapshot",
+          "line": 645,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/events.rs#L645",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Snapshot get_messages and live text/thinking/tool events feed one transcript model; per-user-turn fold, tool-result association, custom messages and compaction summary cards.",
+      "baseline_edge_state": "Recover partial/missing live events and process stop; unknown payloads do not panic. Avoid duplicate optimistic user messages when snapshot arrives.",
+      "fixture": "Isolated HOME, deterministic fixture Pi RPC stream, long transcript/Unicode/image fixtures and no live provider inference.",
+      "steps": [
+        {
+          "id": "C07.behavior",
+          "dimension": "functional",
+          "action": "Replay recorded text/thinking/tool deltas and an equivalent final snapshot; compare transcript state.",
+          "expected": "Snapshot get_messages and live text/thinking/tool events feed one transcript model; per-user-turn fold, tool-result association, custom messages and compaction summary cards.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C07.edge",
+          "dimension": "edge",
+          "action": "Replay duplicated, out-of-order, partial and late old-session events; malformed records must not corrupt other rows.",
+          "expected": "Recover partial/missing live events and process stop; unknown payloads do not panic. Avoid duplicate optimistic user messages when snapshot arrives.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C07.error",
+          "dimension": "error",
+          "action": "Delay, reject, cancel or disconnect the fixture RPC operation; send a late event for the previous request/session.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Recover partial/missing live events and process stop; unknown payloads do not panic. Avoid duplicate optimistic user messages when snapshot arrives.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C07.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C07.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C07.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C07.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/pirpc",
+        "internal/agent"
+      ],
+      "existing_test_candidates": [
+        "internal/pirpc/client_test.go",
+        "internal/agent/manager_test.go",
+        "internal/agent/reducer_test.go"
+      ],
+      "inventory_evidence": "../parity/chat.json",
+      "source_test_inventory": "T08",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-C06",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "pass_scoped",
+          "steps": [
+            "Render120 variable-height messages.",
+            "Scroll up in30-DIP steps, append/grow streamed assistant message.",
+            "Jump to latest, grow again."
+          ],
+          "expected": "Stable keys retain reader position; follow resumes only at end; variable-height rows do not jump to bottom unexpectedly.",
+          "tests": [
+            "TestTranscriptVariableHeightFollowAndReaderPosition"
+          ],
+          "remaining": "Native CPU follow/read-position test passes. Source navigation rail and full turn grouping remain missing; GPU long-session/performance acceptance is open.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": []
+    },
+    {
+      "id": "C08",
+      "title": "Virtualized scrolling and navigation rail",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/transcript.rs",
+          "handler": "jump_turn",
+          "line": 2278,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/transcript.rs#L2278",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "handler": "render_navigation_rail",
+          "line": 1396,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/transcript_view.rs#L1396",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/transcript.rs",
+          "handler": "persist_hint",
+          "line": 877,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/transcript.rs#L877",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Tail-follow while at bottom, scroll-away inspection, Jump to latest, previous/next user turn, clickable rail markers/hover previews and one-time rail hint.",
+      "baseline_edge_state": "Streaming row remeasurement must keep stable scroll behavior. Rail hint dismissal persists; no full transcript rerender cost for every token.",
+      "fixture": "Isolated HOME, deterministic fixture Pi RPC stream, long transcript/Unicode/image fixtures and no live provider inference.",
+      "steps": [
+        {
+          "id": "C08.behavior",
+          "dimension": "functional",
+          "action": "Render thousands of transcript rows; scroll away from bottom while streaming; use jump-to-bottom and navigation rail.",
+          "expected": "Tail-follow while at bottom, scroll-away inspection, Jump to latest, previous/next user turn, clickable rail markers/hover previews and one-time rail hint.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C08.edge",
+          "dimension": "edge",
+          "action": "Append tokens above and below the viewport, expand tool details and switch sessions; preserve the intended scroll anchor.",
+          "expected": "Streaming row remeasurement must keep stable scroll behavior. Rail hint dismissal persists; no full transcript rerender cost for every token.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C08.error",
+          "dimension": "error",
+          "action": "Delay, reject, cancel or disconnect the fixture RPC operation; send a late event for the previous request/session.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Streaming row remeasurement must keep stable scroll behavior. Rail hint dismissal persists; no full transcript rerender cost for every token.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C08.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C08.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C08.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "C08.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/ui",
+        "cmd/orbit/main.go"
+      ],
+      "existing_test_candidates": [
+        "internal/ui/snapshot_test.go",
+        "internal/ui/workspace_review_regression_test.go",
+        "internal/ui/viewer_parity_test.go"
+      ],
+      "inventory_evidence": "../parity/chat.json",
+      "source_test_inventory": "T08",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-C06",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "pass_scoped",
+          "steps": [
+            "Render120 variable-height messages.",
+            "Scroll up in30-DIP steps, append/grow streamed assistant message.",
+            "Jump to latest, grow again."
+          ],
+          "expected": "Stable keys retain reader position; follow resumes only at end; variable-height rows do not jump to bottom unexpectedly.",
+          "tests": [
+            "TestTranscriptVariableHeightFollowAndReaderPosition"
+          ],
+          "remaining": "Native CPU follow/read-position test passes. Source navigation rail and full turn grouping remain missing; GPU long-session/performance acceptance is open.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": []
+    }
+  ]
+}

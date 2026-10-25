@@ -1,0 +1,720 @@
+{
+  "category": "Shell, navigation, sessions and workspaces",
+  "rows": [
+    {
+      "group": "Shell, navigation, sessions and workspaces",
+      "id": "S01",
+      "feature": "Native shell and one-window lifetime",
+      "interaction_contract": "Sidebar, common top bar, transcript, composer, status bar, contextual panes; initial window maximized with display-relative restore bounds and minimum 960×640. macOS Dock reopen reuses the same OrbitApp.",
+      "state_failure_platform": "App-owned heartbeat survives window closure: 16 ms active, 90 ms idle. Closing a window must not silently kill a running session. Windows/Linux closure semantics remain platform-specific.",
+      "sources": [
+        "crates/orbit-pi/src/main_window.rs::open",
+        "crates/orbit-pi/src/main_window.rs::spawn_heartbeat",
+        "crates/orbit-pi/src/app/view.rs::render",
+        "crates/orbit-pi/src/platform.rs::titlebar_options"
+      ],
+      "tests": "T01",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/main_window.rs",
+          "symbol": "open",
+          "line": 77
+        },
+        {
+          "path": "crates/orbit-pi/src/main_window.rs",
+          "symbol": "spawn_heartbeat",
+          "line": 136
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "symbol": "render",
+          "line": 166
+        },
+        {
+          "path": "crates/orbit-pi/src/platform.rs",
+          "symbol": "titlebar_options",
+          "line": 1507
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G8",
+        "paths": [
+          "internal/ui",
+          "cmd/orbit/main.go"
+        ],
+        "tests": [
+          "internal/ui/snapshot_test.go",
+          "internal/ui/workspace_review_regression_test.go",
+          "internal/ui/viewer_parity_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Shell, navigation, sessions and workspaces",
+      "id": "S02",
+      "feature": "Resizable workbench geometry",
+      "interaction_contract": "Drag sidebar, Review sidepane, Explorer and terminal splitters; clamp minimums and reserve readable main content; full-width Review is separate from width resize.",
+      "state_failure_platform": "Four sizes in ~/.orbit-pi/layout.json; writes settle after 500 ms. Invalid/nonfinite/out-of-range stored sizes discarded. Open/closed surfaces are not all persisted in this store.",
+      "sources": [
+        "crates/orbit-pi/src/layout.rs::Layout",
+        "crates/orbit-pi/src/app/view.rs::render",
+        "crates/orbit-pi/src/app.rs::SIDEBAR_MIN_W"
+      ],
+      "tests": "T01,T02",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/layout.rs",
+          "symbol": "Layout",
+          "line": 29
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "symbol": "render",
+          "line": 166
+        },
+        {
+          "path": "crates/orbit-pi/src/app.rs",
+          "symbol": "SIDEBAR_MIN_W",
+          "line": 87
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Shell, navigation, sessions and workspaces",
+      "id": "S03",
+      "feature": "Global command/action registry",
+      "interaction_contract": "Command palette, native menu, shortcuts help and pointer controls dispatch the same action identities; labels use Cmd on macOS and Ctrl elsewhere.",
+      "state_failure_platform": "Context-specific bindings override global behavior. Access/workflow/MCP and worktrees commands include palette-only entries without fabricated chords.",
+      "sources": [
+        "crates/orbit-pi/src/commands.rs::COMMANDS",
+        "crates/orbit-pi/src/commands.rs::BINDINGS",
+        "crates/orbit-pi/src/main.rs::bind_keys",
+        "crates/orbit-pi/src/app/pickers.rs::run_command"
+      ],
+      "tests": "T03",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/commands.rs",
+          "symbol": "COMMANDS",
+          "line": 224
+        },
+        {
+          "path": "crates/orbit-pi/src/commands.rs",
+          "symbol": "BINDINGS",
+          "line": 794
+        },
+        {
+          "path": "crates/orbit-pi/src/main.rs",
+          "symbol": "bind_keys",
+          "line": 357
+        },
+        {
+          "path": "crates/orbit-pi/src/app/pickers.rs",
+          "symbol": "run_command",
+          "line": 415
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G8",
+        "paths": [
+          "internal/ui",
+          "cmd/orbit/main.go"
+        ],
+        "tests": [
+          "internal/ui/snapshot_test.go",
+          "internal/ui/workspace_review_regression_test.go",
+          "internal/ui/viewer_parity_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Shell, navigation, sessions and workspaces",
+      "id": "S04",
+      "feature": "Command palette versus transcript search",
+      "interaction_contract": "Primary+P or Primary+K opens fuzzy-search sessions/commands/settings and dynamic MCP actions. Sidebar Search opens this palette, not transcript-content search. Up/down, Enter, Escape, scrim dismissal and focus return must match.",
+      "state_failure_platform": "State-driven visibility, disabled actions and active-title variants; no backend content-search service.",
+      "sources": [
+        "crates/orbit-pi/src/command_palette.rs::CommandPalette",
+        "crates/orbit-pi/src/app/pickers.rs::toggle_command_palette",
+        "crates/orbit-pi/src/app/pickers.rs::run_palette_command"
+      ],
+      "tests": "T03",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/command_palette.rs",
+          "symbol": "CommandPalette",
+          "line": 313
+        },
+        {
+          "path": "crates/orbit-pi/src/app/pickers.rs",
+          "symbol": "toggle_command_palette",
+          "line": 288
+        },
+        {
+          "path": "crates/orbit-pi/src/app/pickers.rs",
+          "symbol": "run_palette_command",
+          "line": 387
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G8",
+        "paths": [
+          "internal/ui",
+          "cmd/orbit/main.go"
+        ],
+        "tests": [
+          "internal/ui/snapshot_test.go",
+          "internal/ui/workspace_review_regression_test.go",
+          "internal/ui/viewer_parity_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Shell, navigation, sessions and workspaces",
+      "id": "S05",
+      "feature": "Keyboard surface traversal",
+      "interaction_contract": "Tab/Shift+Tab traverse focusable surfaces; terminal and autocomplete consume Tab for their own meaning; modal/select/picker contexts own Enter/Escape/arrows.",
+      "state_failure_platform": "Do not let Escape abort a run while a dialog/custom UI/menu should close; closing a popup restores focus and suppresses click-through reopen.",
+      "sources": [
+        "crates/orbit-pi/src/main.rs::bind_keys",
+        "crates/orbit-pi/src/app/view.rs::on_focus_next",
+        "crates/orbit-pi/src/app/view.rs::focus_traversal_blocked",
+        "crates/orbit-pi/src/app/composer_ops.rs::close_add_menu"
+      ],
+      "tests": "T03,T04",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/main.rs",
+          "symbol": "bind_keys",
+          "line": 357
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "symbol": "on_focus_next",
+          "line": 3775
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "symbol": "focus_traversal_blocked",
+          "line": 3804
+        },
+        {
+          "path": "crates/orbit-pi/src/app/composer_ops.rs",
+          "symbol": "close_add_menu",
+          "line": 537
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G8",
+        "paths": [
+          "internal/ui",
+          "cmd/orbit/main.go"
+        ],
+        "tests": [
+          "internal/ui/snapshot_test.go",
+          "internal/ui/workspace_review_regression_test.go",
+          "internal/ui/viewer_parity_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Shell, navigation, sessions and workspaces",
+      "id": "S06",
+      "feature": "Read and watch shared pi session store",
+      "interaction_contract": "Discover pi JSONL sessions, names, workspace, message preview and last actual message activity; updates from CLI/external writers refresh sidebar.",
+      "state_failure_platform": "Uses pi default session store, not a new incompatible database. Debounced background scan and cached metadata. Opening/bookkeeping writes do not count as message activity.",
+      "sources": [
+        "crates/orbit-pi/src/sessions.rs::SessionInfo",
+        "crates/orbit-pi/src/sessions.rs::SessionWatcher",
+        "crates/orbit-pi/src/app/events.rs::tick"
+      ],
+      "tests": "T05",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/sessions.rs",
+          "symbol": "SessionInfo",
+          "line": 29
+        },
+        {
+          "path": "crates/orbit-pi/src/sessions.rs",
+          "symbol": "SessionWatcher",
+          "line": 229
+        },
+        {
+          "path": "crates/orbit-pi/src/app/events.rs",
+          "symbol": "tick",
+          "line": 18
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G5",
+        "paths": [
+          "internal/pirpc",
+          "internal/agent"
+        ],
+        "tests": [
+          "internal/pirpc/client_test.go",
+          "internal/agent/manager_test.go",
+          "internal/agent/reducer_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Shell, navigation, sessions and workspaces",
+      "id": "S07",
+      "feature": "New task and workspace selection",
+      "interaction_contract": "Primary+N, sidebar New Task, recent folder picker and native Browse; selected folder sets session cwd and Explorer/Git/Review context; custom workspace logo or fallback glyph.",
+      "state_failure_platform": "Reuse only alive idle pi process; park a running session before new_session; a dead process is replaced. New-task transient panels close; draft session placeholder visible before first prompt.",
+      "sources": [
+        "crates/orbit-pi/src/app/session.rs::on_new_session",
+        "crates/orbit-pi/src/app/session.rs::can_reuse_session",
+        "crates/orbit-pi/src/app/pickers.rs::start_task_in_folder",
+        "crates/orbit-pi/src/workspace_picker.rs",
+        "crates/orbit-pi/src/workspace_logo.rs"
+      ],
+      "tests": "T05,T06",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/app/session.rs",
+          "symbol": "on_new_session",
+          "line": 581
+        },
+        {
+          "path": "crates/orbit-pi/src/app/session.rs",
+          "symbol": "can_reuse_session",
+          "line": 61
+        },
+        {
+          "path": "crates/orbit-pi/src/app/pickers.rs",
+          "symbol": "start_task_in_folder",
+          "line": 118
+        },
+        {
+          "path": "crates/orbit-pi/src/workspace_picker.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/workspace_logo.rs"
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G5",
+        "paths": [
+          "internal/pirpc",
+          "internal/agent"
+        ],
+        "tests": [
+          "internal/pirpc/client_test.go",
+          "internal/agent/manager_test.go",
+          "internal/agent/reducer_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Shell, navigation, sessions and workspaces",
+      "id": "S08",
+      "feature": "Switch/resume and parallel sessions",
+      "interaction_contract": "Open session by sidebar/palette/notification; preserve live transcript, pending queue, widgets and busy status when parked. Sidebar shows background work.",
+      "state_failure_platform": "At most six warm background sessions, idle TTL 300 s; evict/reap idle only, never active runs. Pending parks before a session path is known are drained/rekeyed. Stale MCP fingerprint forces fresh process on reopen.",
+      "sources": [
+        "crates/orbit-pi/src/app.rs::ParkedSession",
+        "crates/orbit-pi/src/app/session.rs::park_active_session",
+        "crates/orbit-pi/src/app/runtime.rs::reap_idle_parked",
+        "crates/orbit-pi/src/app/events.rs::drain_parked_session"
+      ],
+      "tests": "T06",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/app.rs",
+          "symbol": "ParkedSession",
+          "line": 150
+        },
+        {
+          "path": "crates/orbit-pi/src/app/session.rs",
+          "symbol": "park_active_session",
+          "line": 299
+        },
+        {
+          "path": "crates/orbit-pi/src/app/runtime.rs",
+          "symbol": "reap_idle_parked",
+          "line": 569
+        },
+        {
+          "path": "crates/orbit-pi/src/app/events.rs",
+          "symbol": "drain_parked_session",
+          "line": 541
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G5",
+        "paths": [
+          "internal/pirpc",
+          "internal/agent"
+        ],
+        "tests": [
+          "internal/pirpc/client_test.go",
+          "internal/agent/manager_test.go",
+          "internal/agent/reducer_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Shell, navigation, sessions and workspaces",
+      "id": "S09",
+      "feature": "Session navigation",
+      "interaction_contract": "Primary+1…9 targets visible sidebar order; next/previous session shortcuts; sidebar focus, up/down/home/end/Enter/Escape; active row auto-reveal through collapsed groups.",
+      "state_failure_platform": "Navigation observes current grouping, sorting, archived filtering and visible session rows. It must not point at stale hidden items.",
+      "sources": [
+        "crates/orbit-pi/src/app/sidebar.rs::open_session_slot",
+        "crates/orbit-pi/src/app/sidebar.rs::cycle_session",
+        "crates/orbit-pi/src/app/sidebar.rs::on_sidebar_confirm"
+      ],
+      "tests": "T05,T06",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/app/sidebar.rs",
+          "symbol": "open_session_slot",
+          "line": 2509
+        },
+        {
+          "path": "crates/orbit-pi/src/app/sidebar.rs",
+          "symbol": "cycle_session",
+          "line": 2521
+        },
+        {
+          "path": "crates/orbit-pi/src/app/sidebar.rs",
+          "symbol": "on_sidebar_confirm",
+          "line": 2618
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G8",
+        "paths": [
+          "internal/ui",
+          "cmd/orbit/main.go"
+        ],
+        "tests": [
+          "internal/ui/snapshot_test.go",
+          "internal/ui/workspace_review_regression_test.go",
+          "internal/ui/viewer_parity_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Shell, navigation, sessions and workspaces",
+      "id": "S10",
+      "feature": "Session metadata and title controls",
+      "interaction_contract": "Rename, generate title, copy ID/path, reveal session file, inspect session details, clone entire conversation. Active header and sidebar reconcile session_info_changed.",
+      "state_failure_platform": "Clone is shipped, rewind/fork UI is not. Clone preserves session data with new identity; invalid input/partial data is guarded. Title generation spinner and rename success feedback are distinct.",
+      "sources": [
+        "crates/orbit-pi/src/app/session.rs::clone_session",
+        "crates/orbit-pi/src/app/settings.rs::rename_session",
+        "crates/orbit-pi/src/sessions.rs",
+        "crates/orbit-pi/src/app/events.rs::tick",
+        "crates/orbit-pi/src/app/sidebar.rs::on_menu_clone_session"
+      ],
+      "tests": "T05,T06",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/app/session.rs",
+          "symbol": "clone_session",
+          "line": 613
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "rename_session",
+          "line": 5836
+        },
+        {
+          "path": "crates/orbit-pi/src/sessions.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/events.rs",
+          "symbol": "tick",
+          "line": 18
+        },
+        {
+          "path": "crates/orbit-pi/src/app/sidebar.rs",
+          "symbol": "on_menu_clone_session",
+          "line": 2188
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G5",
+        "paths": [
+          "internal/pirpc",
+          "internal/agent"
+        ],
+        "tests": [
+          "internal/pirpc/client_test.go",
+          "internal/agent/manager_test.go",
+          "internal/agent/reducer_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Shell, navigation, sessions and workspaces",
+      "id": "S11",
+      "feature": "Pin, archive and delete sessions",
+      "interaction_contract": "Session row menu supports pin/unpin, archive/unarchive, copy path, reveal and explicit delete confirmation; archived filter changes default visible list.",
+      "state_failure_platform": "Pins and archives are path-keyed Orbit stores. Session deletion removes JSONL and related pin/archive/workflow state; running-session guards matter. Archive does not rewrite pi history.",
+      "sources": [
+        "crates/orbit-pi/src/pins.rs",
+        "crates/orbit-pi/src/archive.rs",
+        "crates/orbit-pi/src/app/sidebar.rs::on_menu_delete_confirm",
+        "crates/orbit-pi/src/app/sidebar.rs::on_menu_toggle_archive"
+      ],
+      "tests": "T05",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/pins.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/archive.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/sidebar.rs",
+          "symbol": "on_menu_delete_confirm",
+          "line": 2231
+        },
+        {
+          "path": "crates/orbit-pi/src/app/sidebar.rs",
+          "symbol": "on_menu_toggle_archive",
+          "line": 2214
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G5",
+        "paths": [
+          "internal/pirpc",
+          "internal/agent"
+        ],
+        "tests": [
+          "internal/pirpc/client_test.go",
+          "internal/agent/manager_test.go",
+          "internal/agent/reducer_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Shell, navigation, sessions and workspaces",
+      "id": "S12",
+      "feature": "Workspace sidebar organization",
+      "interaction_contract": "Workspace groups or one flat list, collapsed groups, show-more session rows, sticky workspace header, workspace selection/markers; row and context-menu actions.",
+      "state_failure_platform": "workspaces.json records explicit project list, added timestamps, grouping, archive filter, marks and sort. Sort supports manual, updated, added, alphabetical ascending/descending, session count.",
+      "sources": [
+        "crates/orbit-pi/src/app/sidebar.rs::build_sidebar_rows",
+        "crates/orbit-pi/src/app/sidebar.rs::build_flat_sidebar_rows",
+        "crates/orbit-pi/src/app.rs::WorkspaceSort",
+        "crates/orbit-pi/src/app.rs::SidebarGroupBy"
+      ],
+      "tests": "T05",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/app/sidebar.rs",
+          "symbol": "build_sidebar_rows",
+          "line": 176
+        },
+        {
+          "path": "crates/orbit-pi/src/app/sidebar.rs",
+          "symbol": "build_flat_sidebar_rows",
+          "line": 370
+        },
+        {
+          "path": "crates/orbit-pi/src/app.rs",
+          "symbol": "WorkspaceSort",
+          "line": 2248
+        },
+        {
+          "path": "crates/orbit-pi/src/app.rs",
+          "symbol": "SidebarGroupBy",
+          "line": 2339
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Shell, navigation, sessions and workspaces",
+      "id": "S13",
+      "feature": "Workspace management and appearance",
+      "interaction_contract": "Add folders, open-workspace picker, copy workspace path, remove from Orbit sidebar, choose curated icon and semantic tint; active/running/archived glyph fallback.",
+      "state_failure_platform": "Removing a workspace is not deleting its folder or session files. marks validate known assets, persist with workspace list, and resolve tint against active theme.",
+      "sources": [
+        "crates/orbit-pi/src/app/sidebar.rs::on_workspace_remove",
+        "crates/orbit-pi/src/app/sidebar.rs::on_workspace_open_picker",
+        "crates/orbit-pi/src/workspace_mark.rs::WorkspaceMark",
+        "crates/orbit-pi/src/app.rs::save_workspaces"
+      ],
+      "tests": "T05",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/app/sidebar.rs",
+          "symbol": "on_workspace_remove",
+          "line": 2383
+        },
+        {
+          "path": "crates/orbit-pi/src/app/sidebar.rs",
+          "symbol": "on_workspace_open_picker",
+          "line": 2373
+        },
+        {
+          "path": "crates/orbit-pi/src/workspace_mark.rs",
+          "symbol": "WorkspaceMark",
+          "line": 13
+        },
+        {
+          "path": "crates/orbit-pi/src/app.rs",
+          "symbol": "save_workspaces"
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Shell, navigation, sessions and workspaces",
+      "id": "S14",
+      "feature": "Refresh fan-out",
+      "interaction_contract": "Primary+R refreshes sessions and the current workspace-dependent surfaces/catalogs rather than merely repainting.",
+      "state_failure_platform": "Active workspace must remain settled and background results must not overwrite a newer workspace. Session-store and workspace-watch invalidations also update usage/branch/Git/Review/Explorer.",
+      "sources": [
+        "crates/orbit-pi/src/app/session.rs::on_refresh",
+        "crates/orbit-pi/src/app/events.rs::sync_workspace_watcher",
+        "crates/orbit-pi/src/app/refresh_tests.rs"
+      ],
+      "tests": "T06",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/app/session.rs",
+          "symbol": "on_refresh",
+          "line": 2702
+        },
+        {
+          "path": "crates/orbit-pi/src/app/events.rs",
+          "symbol": "sync_workspace_watcher",
+          "line": 1237
+        },
+        {
+          "path": "crates/orbit-pi/src/app/refresh_tests.rs"
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G1",
+        "paths": [
+          "internal/workspace/files.go",
+          "internal/workspace/editor.go",
+          "internal/workspace/tree.go",
+          "internal/workspace/watch.go",
+          "internal/ui/files.go"
+        ],
+        "tests": [
+          "internal/workspace/files_test.go",
+          "internal/workspace/tree_test.go",
+          "internal/workspace/watch_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    }
+  ]
+}

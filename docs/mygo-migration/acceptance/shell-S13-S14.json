@@ -1,0 +1,302 @@
+{
+  "schema": "orbit-acceptance-shard/v1",
+  "category": "shell",
+  "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "rows": [
+    {
+      "id": "S13",
+      "title": "Workspace management and appearance",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/sidebar.rs",
+          "handler": "on_workspace_remove",
+          "line": 2383,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/sidebar.rs#L2383",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/sidebar.rs",
+          "handler": "on_workspace_open_picker",
+          "line": 2373,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/sidebar.rs#L2373",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/workspace_mark.rs",
+          "handler": "WorkspaceMark",
+          "line": 13,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/workspace_mark.rs#L13",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Add folders, open-workspace picker, copy workspace path, remove from Orbit sidebar, choose curated icon and semantic tint; active/running/archived glyph fallback.",
+      "baseline_edge_state": "Removing a workspace is not deleting its folder or session files. marks validate known assets, persist with workspace list, and resolve tint against active theme.",
+      "fixture": "Two temporary workspaces, an isolated HOME/PI_CODING_AGENT_DIR, fixture session JSONL files and controllable Pi RPC children.",
+      "steps": [
+        {
+          "id": "S13.behavior",
+          "dimension": "functional",
+          "action": "Add, rename, recolor and remove a temporary workspace using row menus; inspect its icon and active highlight.",
+          "expected": "Add folders, open-workspace picker, copy workspace path, remove from Orbit sidebar, choose curated icon and semantic tint; active/running/archived glyph fallback.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S13.edge",
+          "dimension": "edge",
+          "action": "Cancel removal, select a missing workspace, and exercise a linked worktree with the same repository root.",
+          "expected": "Removing a workspace is not deleting its folder or session files. marks validate known assets, persist with workspace list, and resolve tint against active theme.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S13.error",
+          "dimension": "error",
+          "action": "Delay/fail session scan or runtime child used by this action; repeat while changing workspace.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Removing a workspace is not deleting its folder or session files. marks validate known assets, persist with workspace list, and resolve tint against active theme.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S13.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S13.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S13.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S13.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/preferences",
+        "internal/workbench",
+        "internal/native"
+      ],
+      "existing_test_candidates": [
+        "internal/preferences/store_test.go",
+        "internal/preferences/workspaces_test.go",
+        "internal/workbench/workbench_test.go",
+        "internal/native/native_test.go",
+        "internal/native/runtime_test.go",
+        "internal/native/updater_test.go",
+        "internal/native/temp_files_test.go"
+      ],
+      "inventory_evidence": "../parity/shell.json",
+      "source_test_inventory": "T05",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-S06",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "failed_missing_cases",
+          "steps": [
+            "Use numbered/next/previous session commands.",
+            "Rename, pin, archive, restore, clone and recoverably delete.",
+            "Change workspace sort/group/mark/icon and refresh fan-out."
+          ],
+          "expected": "Source ordering, active visibility, collapse persistence, all metadata operations and contextual menu semantics match.",
+          "tests": [],
+          "remaining": "Backend session operations exist, but host-level interaction/restart checks are incomplete. Source workspace marks/icons, all sorting modes and sticky/active reveal presentation are not fully reconstructed.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": []
+    },
+    {
+      "id": "S14",
+      "title": "Refresh fan-out",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/session.rs",
+          "handler": "on_refresh",
+          "line": 2702,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/session.rs#L2702",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/events.rs",
+          "handler": "sync_workspace_watcher",
+          "line": 1237,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/events.rs#L1237",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Primary+R refreshes sessions and the current workspace-dependent surfaces/catalogs rather than merely repainting.",
+      "baseline_edge_state": "Active workspace must remain settled and background results must not overwrite a newer workspace. Session-store and workspace-watch invalidations also update usage/branch/Git/Review/Explorer.",
+      "fixture": "Two temporary workspaces, an isolated HOME/PI_CODING_AGENT_DIR, fixture session JSONL files and controllable Pi RPC children.",
+      "steps": [
+        {
+          "id": "S14.behavior",
+          "dimension": "functional",
+          "action": "Trigger the registered global Refresh action after external session, branch, file and settings changes.",
+          "expected": "Primary+R refreshes sessions and the current workspace-dependent surfaces/catalogs rather than merely repainting.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S14.edge",
+          "dimension": "edge",
+          "action": "Delay each refresh independently; switch workspace before old results return and verify correct visible targets refresh once.",
+          "expected": "Active workspace must remain settled and background results must not overwrite a newer workspace. Session-store and workspace-watch invalidations also update usage/branch/Git/Review/Explorer.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S14.error",
+          "dimension": "error",
+          "action": "Delay/fail session scan or runtime child used by this action; repeat while changing workspace.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Active workspace must remain settled and background results must not overwrite a newer workspace. Session-store and workspace-watch invalidations also update usage/branch/Git/Review/Explorer.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S14.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S14.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S14.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S14.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/workspace/files.go",
+        "internal/workspace/editor.go",
+        "internal/workspace/tree.go",
+        "internal/workspace/watch.go",
+        "internal/ui/files.go"
+      ],
+      "existing_test_candidates": [
+        "internal/workspace/files_test.go",
+        "internal/workspace/tree_test.go",
+        "internal/workspace/watch_test.go"
+      ],
+      "inventory_evidence": "../parity/shell.json",
+      "source_test_inventory": "T06",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-S06",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "failed_missing_cases",
+          "steps": [
+            "Use numbered/next/previous session commands.",
+            "Rename, pin, archive, restore, clone and recoverably delete.",
+            "Change workspace sort/group/mark/icon and refresh fan-out."
+          ],
+          "expected": "Source ordering, active visibility, collapse persistence, all metadata operations and contextual menu semantics match.",
+          "tests": [],
+          "remaining": "Backend session operations exist, but host-level interaction/restart checks are incomplete. Source workspace marks/icons, all sorting modes and sticky/active reveal presentation are not fully reconstructed.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": []
+    }
+  ]
+}

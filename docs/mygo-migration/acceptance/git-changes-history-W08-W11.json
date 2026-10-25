@@ -1,0 +1,587 @@
+{
+  "schema": "orbit-acceptance-shard/v1",
+  "category": "git-changes-history",
+  "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "rows": [
+    {
+      "id": "W08",
+      "title": "Changes uses grouped staged/unstaged Review sections with per-file Stage/Unstage and bulk Stage all/Unstage all; counts and action availability follow actual status.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/git.rs",
+          "handler": "stage_paths",
+          "line": 644,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git.rs#L644",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/git.rs",
+          "handler": "stage_all",
+          "line": 653,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git.rs#L653",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/git.rs",
+          "handler": "unstage_paths",
+          "line": 657,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git.rs#L657",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/git.rs",
+          "handler": "unstage_all",
+          "line": 666,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git.rs#L666",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Changes uses grouped staged/unstaged Review sections with per-file Stage/Unstage and bulk Stage all/Unstage all; counts and action availability follow actual status.",
+      "baseline_edge_state": "Stage uses path-separated Git arguments; stage-all includes untracked; unstage uses reset. File/section actions are rebuilt after status loads and cleared on workspace/clean-tree changes.",
+      "fixture": "Temporary repositories plus local bare remote/clones, fixture users and conflict branches; no external remote writes.",
+      "steps": [
+        {
+          "id": "W08.behavior",
+          "dimension": "functional",
+          "action": "Stage one path, unstage one path, Stage all and Unstage all in staged/unstaged grouped Changes.",
+          "expected": "Changes uses grouped staged/unstaged Review sections with per-file Stage/Unstage and bulk Stage all/Unstage all; counts and action availability follow actual status.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W08.edge",
+          "dimension": "edge",
+          "action": "Exercise partly staged files, untracked and binary content; status counts and embedded Review must update from the actual index.",
+          "expected": "Stage uses path-separated Git arguments; stage-all includes untracked; unstage uses reset. File/section actions are rebuilt after status loads and cleared on workspace/clean-tree changes.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W08.error",
+          "dimension": "error",
+          "action": "Return a controlled nonzero Git exit, cancellation or stale completion; retry only the operation still outstanding.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Stage uses path-separated Git arguments; stage-all includes untracked; unstage uses reset. File/section actions are rebuilt after status loads and cleared on workspace/clean-tree changes.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W08.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W08.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W08.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W08.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/github_templates.go",
+        "internal/gitworkbench/templates.go"
+      ],
+      "existing_test_candidates": [
+        "internal/workspace/git_test.go",
+        "internal/workspace/github_test.go",
+        "internal/gitworkbench/state_test.go",
+        "internal/workspace/generation_test.go",
+        "internal/workspace/process_cancel_unix_test.go"
+      ],
+      "inventory_evidence": "../parity/git-changes-history.json",
+      "source_test_inventory": "Git status split tests; `review.rs::grouped_sections_split_files_and_offset_the_second_group`; no direct staging UI test located.",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    },
+    {
+      "id": "W09",
+      "title": "Discard individual unstaged path or all unstaged changes through explicit confirmation; staged changes are intended to remain.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "PendingConfirm",
+          "line": 109,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L109",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "confirm_pending",
+          "line": 2770,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L2770",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "discard",
+          "line": 2341,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L2341",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "discard_all_changes",
+          "line": 2352,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L2352",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Discard individual unstaged path or all unstaged changes through explicit confirmation; staged changes are intended to remain.",
+      "baseline_edge_state": "Tracked files restore from index; untracked files are deleted by `git clean`. This is not OS Trash. Existing per-path implementation ignores both checkout/clean errors and returns success; bulk implementation ignores checkout error but propagates clean error. Preserve action semantics, do not mark failure handling verified.",
+      "fixture": "Temporary repositories plus local bare remote/clones, fixture users and conflict branches; no external remote writes.",
+      "steps": [
+        {
+          "id": "W09.behavior",
+          "dimension": "functional",
+          "action": "Request single-path and all-unstaged discard; cancel once, then confirm on disposable modified/untracked files.",
+          "expected": "Discard individual unstaged path or all unstaged changes through explicit confirmation; staged changes are intended to remain.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W09.edge",
+          "dimension": "edge",
+          "action": "Check staged blob remains unchanged and cancellation performs no mutation; failure banner must preserve the affected path.",
+          "expected": "Tracked files restore from index; untracked files are deleted by `git clean`. This is not OS Trash. Existing per-path implementation ignores both checkout/clean errors and returns success; bulk implementation ignores checkout error but propagates clean error. Preserve action semantics, do not mark failure handling verified.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W09.error",
+          "dimension": "error",
+          "action": "Return a controlled nonzero Git exit, cancellation or stale completion; retry only the operation still outstanding.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Tracked files restore from index; untracked files are deleted by `git clean`. This is not OS Trash. Existing per-path implementation ignores both checkout/clean errors and returns success; bulk implementation ignores checkout error but propagates clean error. Preserve action semantics, do not mark failure handling verified.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W09.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W09.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W09.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W09.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/github_templates.go",
+        "internal/gitworkbench/templates.go"
+      ],
+      "existing_test_candidates": [
+        "internal/workspace/git_test.go",
+        "internal/workspace/github_test.go",
+        "internal/gitworkbench/state_test.go",
+        "internal/workspace/generation_test.go",
+        "internal/workspace/process_cancel_unix_test.go"
+      ],
+      "inventory_evidence": "../parity/git-changes-history.json",
+      "source_test_inventory": "No dedicated discard regression test located.",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    },
+    {
+      "id": "W10",
+      "title": "Commit bar has editable message, include-unstaged checkbox, Commit and Commit-and-push, blank-message generation, and state-driven Push/Publish/Pull/Merge/up-to-date actions.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "on_commit",
+          "line": 2404,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L2404",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "run_git_action",
+          "line": 2589,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L2589",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "commit_bar",
+          "line": 3905,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L3905",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "bar_actions",
+          "line": 7161,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L7161",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Commit bar has editable message, include-unstaged checkbox, Commit and Commit-and-push, blank-message generation, and state-driven Push/Publish/Pull/Merge/up-to-date actions.",
+      "baseline_edge_state": "No staged work and include-unstaged off prevents commit. Generating/pending/operation flags gate keyboard commits too. Success clears message only for commit flows; failures retain it. Commit-and-push is sequential and can partially succeed.",
+      "fixture": "Temporary repositories plus local bare remote/clones, fixture users and conflict branches; no external remote writes.",
+      "steps": [
+        {
+          "id": "W10.behavior",
+          "dimension": "functional",
+          "action": "Edit commit message and include-unstaged toggle; Commit and Commit-and-push to a local bare remote.",
+          "expected": "Commit bar has editable message, include-unstaged checkbox, Commit and Commit-and-push, blank-message generation, and state-driven Push/Publish/Pull/Merge/up-to-date actions.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W10.edge",
+          "dimension": "edge",
+          "action": "Blank-message generation, no changes and rejected push must not create duplicate commits or falsely report successful push.",
+          "expected": "No staged work and include-unstaged off prevents commit. Generating/pending/operation flags gate keyboard commits too. Success clears message only for commit flows; failures retain it. Commit-and-push is sequential and can partially succeed.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W10.error",
+          "dimension": "error",
+          "action": "Return a controlled nonzero Git exit, cancellation or stale completion; retry only the operation still outstanding.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: No staged work and include-unstaged off prevents commit. Generating/pending/operation flags gate keyboard commits too. Success clears message only for commit flows; failures retain it. Commit-and-push is sequential and can partially succeed.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W10.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W10.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W10.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W10.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/github_templates.go",
+        "internal/gitworkbench/templates.go"
+      ],
+      "existing_test_candidates": [
+        "internal/workspace/git_test.go",
+        "internal/workspace/github_test.go",
+        "internal/gitworkbench/state_test.go",
+        "internal/workspace/generation_test.go",
+        "internal/workspace/process_cancel_unix_test.go"
+      ],
+      "inventory_evidence": "../parity/git-changes-history.json",
+      "source_test_inventory": "`git_panel/mod.rs::bar_actions_follow_git_state`; no end-to-end commit-and-push rollback/retry test located.",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    },
+    {
+      "id": "W11",
+      "title": "Generate conventional commit message from staged diff, optional unstaged context, original files, branch/repo and recent repository/user commit style. Generate can ask Stage all versus use already-staged content; blank-message commit chains generation into commit.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/commit_message.rs",
+          "handler": "generate",
+          "line": 41,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/commit_message.rs#L41",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/commit_message.rs",
+          "handler": "run_pi",
+          "line": 423,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/commit_message.rs#L423",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/commit_message.rs",
+          "handler": "heuristic",
+          "line": 72,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/commit_message.rs#L72",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/commit_message.rs",
+          "handler": "system_prompt",
+          "line": 244,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/commit_message.rs#L244",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Generate conventional commit message from staged diff, optional unstaged context, original files, branch/repo and recent repository/user commit style. Generate can ask Stage all versus use already-staged content; blank-message commit chains generation into commit.",
+      "baseline_edge_state": "Existing auxiliary path is `pi -p --no-tools --no-session --no-skills --no-context-files --no-approve`, NOT RPC, with selected provider/model, 180 s timeout and heuristic fallback. Extensions remain enabled for custom providers. Bounded diff/original context; result stays editable.",
+      "fixture": "Temporary repositories plus local bare remote/clones, fixture users and conflict branches; no external remote writes.",
+      "steps": [
+        {
+          "id": "W11.behavior",
+          "dimension": "functional",
+          "action": "Generate commit text from staged changes with/without unstaged inclusion and repository/user history.",
+          "expected": "Generate conventional commit message from staged diff, optional unstaged context, original files, branch/repo and recent repository/user commit style. Generate can ask Stage all versus use already-staged content; blank-message commit chains generation into commit.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W11.edge",
+          "dimension": "edge",
+          "action": "Return empty/malformed generator output, cancellation and absent Pi; verify staged-only choice never silently stages unrelated files.",
+          "expected": "Existing auxiliary path is `pi -p --no-tools --no-session --no-skills --no-context-files --no-approve`, NOT RPC, with selected provider/model, 180 s timeout and heuristic fallback. Extensions remain enabled for custom providers. Bounded diff/original context; result stays editable.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W11.error",
+          "dimension": "error",
+          "action": "Return a controlled nonzero Git exit, cancellation or stale completion; retry only the operation still outstanding.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Existing auxiliary path is `pi -p --no-tools --no-session --no-skills --no-context-files --no-approve`, NOT RPC, with selected provider/model, 180 s timeout and heuristic fallback. Extensions remain enabled for custom providers. Bounded diff/original context; result stays editable.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W11.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W11.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W11.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W11.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/github_templates.go",
+        "internal/gitworkbench/templates.go"
+      ],
+      "existing_test_candidates": [
+        "internal/workspace/git_test.go",
+        "internal/workspace/github_test.go",
+        "internal/gitworkbench/state_test.go",
+        "internal/workspace/generation_test.go",
+        "internal/workspace/process_cancel_unix_test.go"
+      ],
+      "inventory_evidence": "../parity/git-changes-history.json",
+      "source_test_inventory": "`commit_message.rs::{extracts_a_single_text_fence,splits_a_patch_into_per_file_chunks,heuristic_names_the_shared_scope,heuristic_reads_as_a_conventional_description,normalizes_bullets_and_trailing_periods_into_the_commit_shape,prompt_follows_the_vscode_structure}`",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Tool-free Pi RPC generation and repository templates are implemented; fake-process race tests verify isolation, prompt bounds, fallback, cancellation and no staging mutation. Host workflow/live inference and exact template UI acceptance remain pending.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    }
+  ]
+}

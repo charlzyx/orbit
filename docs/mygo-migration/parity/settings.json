@@ -1,0 +1,1134 @@
+{
+  "category": "Settings, providers, skills, packages and MCP",
+  "rows": [
+    {
+      "group": "Settings, providers, skills, packages and MCP",
+      "id": "P01",
+      "feature": "Settings hub and search",
+      "interaction_contract": "14 sections: General, Appearance, Shortcuts, Privacy, Runtime, Agent, Worktrees, Providers, Models, Skills, Plugins, MCP, About, Report Bug; search indexes labels/synonyms across sections, keyboard selects results.",
+      "state_failure_platform": "Section navigation, back and scroll state; empty-query/no-result behavior and popup focus must match. Existing docs that list fewer sections are stale.",
+      "sources": [
+        "crates/orbit-pi/src/app.rs::SettingsSection",
+        "crates/orbit-pi/src/app/settings.rs::SETTINGS_SECTIONS",
+        "crates/orbit-pi/src/app/settings.rs::SETTINGS_SEARCH_INDEX"
+      ],
+      "tests": "T12",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/app.rs",
+          "symbol": "SettingsSection",
+          "line": 2679
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "SETTINGS_SECTIONS",
+          "line": 50
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "SETTINGS_SEARCH_INDEX",
+          "line": 116
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Settings, providers, skills, packages and MCP",
+      "id": "P02",
+      "feature": "General and runtime inspection",
+      "interaction_contract": "Show local session store/current workspace, process status/PID/binary/uptime/stdio, last error and recent stderr, parked process count; Start/Stop/Restart.",
+      "state_failure_platform": "Runtime restart must resume current session rather than erase history. Missing executable/dead child is actionable, never Connected. State refreshes on heartbeat.",
+      "sources": [
+        "crates/orbit-pi/src/app/settings.rs::runtime_rows",
+        "crates/orbit-pi/src/app/runtime.rs::runtime_start",
+        "crates/orbit-pi/src/app/runtime.rs::runtime_stop",
+        "crates/orbit-pi/src/app/runtime.rs::runtime_restart"
+      ],
+      "tests": "T06,T12",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "runtime_rows",
+          "line": 4931
+        },
+        {
+          "path": "crates/orbit-pi/src/app/runtime.rs",
+          "symbol": "runtime_start",
+          "line": 488
+        },
+        {
+          "path": "crates/orbit-pi/src/app/runtime.rs",
+          "symbol": "runtime_stop",
+          "line": 518
+        },
+        {
+          "path": "crates/orbit-pi/src/app/runtime.rs",
+          "symbol": "runtime_restart",
+          "line": 532
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Settings, providers, skills, packages and MCP",
+      "id": "P03",
+      "feature": "First-run dependency setup",
+      "interaction_contract": "Host OS/architecture/store paths, Node/pi/git/gh detection/install guidance, refresh checks, official pi installer and npm-to-managed migration UI.",
+      "state_failure_platform": "Required versus optional dependencies differ. Managed/npm/other/custom PI_BIN installs are distinguished; unsupported package-manager installs are not silently replaced. Verify install outcome and on-PATH identity.",
+      "sources": [
+        "crates/orbit-pi/src/onboarding.rs",
+        "crates/orbit-pi/src/pi_install.rs",
+        "crates/orbit-pi/src/app/view.rs::render_onboarding",
+        "crates/orbit-pi/src/app/view.rs::render_pi_migration"
+      ],
+      "tests": "T13",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/onboarding.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/pi_install.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "symbol": "render_onboarding",
+          "line": 2664
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "symbol": "render_pi_migration",
+          "line": 2903
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Settings, providers, skills, packages and MCP",
+      "id": "P04",
+      "feature": "Agent defaults and titles",
+      "interaction_contract": "Default model/provider/thinking for NEW sessions, active model selection, Enter delivery policy, one/all follow-ups, auto-compaction/retry, automatic session titles and dedicated title model.",
+      "state_failure_platform": "session-defaults.json affects spawn and new session but not resumed model. auto-title.json supports active-model fallback; title generation after first settled exchange only.",
+      "sources": [
+        "crates/orbit-pi/src/session_defaults.rs",
+        "crates/orbit-pi/src/auto_title.rs",
+        "crates/orbit-pi/src/app/settings.rs::agent_rows",
+        "crates/orbit-pi/src/app/runtime.rs::apply_default_model",
+        "contrib/orbit-title-extension/index.js"
+      ],
+      "tests": "T07,T11,T12",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/session_defaults.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/auto_title.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "agent_rows",
+          "line": 5196
+        },
+        {
+          "path": "crates/orbit-pi/src/app/runtime.rs",
+          "symbol": "apply_default_model",
+          "line": 217
+        },
+        {
+          "path": "contrib/orbit-title-extension/index.js"
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Settings, providers, skills, packages and MCP",
+      "id": "P05",
+      "feature": "Provider catalog and filtering",
+      "interaction_contract": "Discover provider metadata from installed pi-ai with curated fallback, provider/model counts and marks, connected/auth states, search/filter cards.",
+      "state_failure_platform": "Do not hardcode author-specific accounts/models. Unknown provider ID is humanized with fallback glyph. Refresh runs off-thread and malformed file is an error, not an empty successful reset.",
+      "sources": [
+        "crates/orbit-pi/src/providers.rs",
+        "crates/orbit-pi/src/app/settings.rs::provider_rows",
+        "crates/orbit-pi/src/app/settings.rs::ensure_provider_metadata",
+        "crates/orbit-pi/src/app/settings.rs::provider_refresh"
+      ],
+      "tests": "T14",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/providers.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "provider_rows",
+          "line": 2391
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "ensure_provider_metadata",
+          "line": 7639
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "provider_refresh",
+          "line": 7665
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Settings, providers, skills, packages and MCP",
+      "id": "P06",
+      "feature": "API credentials and custom providers",
+      "interaction_contract": "Masked API-key editor, provider CRUD including ID/base URL/API family/model list, save/remove, refresh runtime credentials; special Ollama Cloud session input is stored separately.",
+      "state_failure_platform": "Writes preserve unrelated models.json/auth.json fields and per-model fields by ID. Invalid JSON/empty keys rejected rather than clobbered. Credentials remain local; avoid logging raw secret.",
+      "sources": [
+        "crates/orbit-pi/src/providers.rs",
+        "crates/orbit-pi/src/app/settings.rs::provider_key_save",
+        "crates/orbit-pi/src/app/settings.rs::provider_save",
+        "crates/orbit-pi/src/app/settings.rs::provider_remove"
+      ],
+      "tests": "T14",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/providers.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "provider_key_save",
+          "line": 7772
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "provider_save",
+          "line": 8027
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "provider_remove",
+          "line": 8103
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Settings, providers, skills, packages and MCP",
+      "id": "P07",
+      "feature": "Provider OAuth lifecycle",
+      "interaction_contract": "Auth capability/status probe, sign-in browser/device flow, cancel, timeout/restart recovery, sign-out; supported namespace uses auth.* RPC.",
+      "state_failure_platform": "State reducer contains nonsecret display state only. Unsupported auth RPC falls back to supported terminal login path; failed opening or cancellation surfaced. Never claim sign-in from an opened URL alone.",
+      "sources": [
+        "crates/orbit-pi/src/auth.rs::AuthManager",
+        "crates/orbit-pi/src/app/runtime.rs::handle_auth_effects",
+        "crates/orbit-pi/src/app/settings.rs::provider_oauth_login",
+        "crates/orbit-pi/src/platform.rs::open_terminal_command"
+      ],
+      "tests": "T14",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/auth.rs",
+          "symbol": "AuthManager",
+          "line": 140
+        },
+        {
+          "path": "crates/orbit-pi/src/app/runtime.rs",
+          "symbol": "handle_auth_effects",
+          "line": 395
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "provider_oauth_login",
+          "line": 7805
+        },
+        {
+          "path": "crates/orbit-pi/src/platform.rs",
+          "symbol": "open_terminal_command",
+          "line": 957
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Settings, providers, skills, packages and MCP",
+      "id": "P08",
+      "feature": "Models catalog page",
+      "interaction_contract": "Full model listing, search name/ID/provider, provider filter, favorites-only, favorite cards, active model chooser and catalog refresh.",
+      "state_failure_platform": "Refresh blocked while run active; runtime/pi catalog is actual source. No results differs from no models reported; active selection agrees with composer picker.",
+      "sources": [
+        "crates/orbit-pi/src/app/settings.rs::model_rows",
+        "crates/orbit-pi/src/app/settings.rs::models_refresh",
+        "crates/orbit-pi/src/app/settings.rs::model_toolbar",
+        "crates/orbit-pi/src/favorites.rs"
+      ],
+      "tests": "T07,T12",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "model_rows",
+          "line": 1433
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "models_refresh",
+          "line": 1369
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "model_toolbar",
+          "line": 1082
+        },
+        {
+          "path": "crates/orbit-pi/src/favorites.rs"
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Settings, providers, skills, packages and MCP",
+      "id": "P09",
+      "feature": "Quota headline and provider cards",
+      "interaction_contract": "Top-bar quota pill/popover and provider quota cards show windows/reset times/balance/spend, account notes/errors; active-provider priority, refresh, hidden-provider group and MCP tab.",
+      "state_failure_platform": "quota.list and bundled orbit:quota session entries merge nonsecret facts. Unknown/unsupported not fabricated. Refresh spinner minimum 450 ms and timeout 4 s; bridge polls 60 s with 3 s bootstrap polls. Hidden IDs persist.",
+      "sources": [
+        "crates/orbit-pi/src/quota.rs",
+        "crates/orbit-pi/src/quota_hidden.rs",
+        "crates/orbit-pi/src/app/session.rs",
+        "crates/orbit-pi/src/app/runtime.rs::poll_quota_entries",
+        "crates/orbit-pi/src/app/mcp_ui.rs::QuotaPopupTab"
+      ],
+      "tests": "T09",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/quota.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/quota_hidden.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/session.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/runtime.rs",
+          "symbol": "poll_quota_entries",
+          "line": 317
+        },
+        {
+          "path": "crates/orbit-pi/src/app/mcp_ui.rs",
+          "symbol": "QuotaPopupTab",
+          "line": 2447
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Settings, providers, skills, packages and MCP",
+      "id": "P10",
+      "feature": "Skills discovery and master/detail",
+      "interaction_contract": "Discover project .pi/skills, ancestor .agents/skills up to git root, global pi skills and user .agents/skills; dedupe names by precedence; filter/scope/detail markdown, invoke /skill:name, open/reveal/copy path.",
+      "state_failure_platform": "Missing required description flagged invalid; manual-only distinct from disabled. Discovery is not a package marketplace and exact +/- overrides are supported, not general glob parity with pi loader.",
+      "sources": [
+        "crates/orbit-pi/src/skills.rs::discover",
+        "crates/orbit-pi/src/skills.rs::Skill",
+        "crates/orbit-pi/src/app/skills_ui.rs::render_skills_page",
+        "crates/orbit-pi/src/app/skills_ui.rs::apply_skill_action"
+      ],
+      "tests": "T15",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/skills.rs",
+          "symbol": "discover",
+          "line": 88
+        },
+        {
+          "path": "crates/orbit-pi/src/skills.rs",
+          "symbol": "Skill",
+          "line": 52
+        },
+        {
+          "path": "crates/orbit-pi/src/app/skills_ui.rs",
+          "symbol": "render_skills_page",
+          "line": 32
+        },
+        {
+          "path": "crates/orbit-pi/src/app/skills_ui.rs",
+          "symbol": "apply_skill_action",
+          "line": 722
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Settings, providers, skills, packages and MCP",
+      "id": "P11",
+      "feature": "Skill enable/disable/delete",
+      "interaction_contract": "Toggle scope-correct skills overrides preserving unrelated settings; delete selected skill after confirmation and clear exact override.",
+      "state_failure_platform": "Deletes skill directory (or only SKILL.md at root), not OS Trash. Do not confuse this with Explorer deletion. Legacy non-array skills schema refuses overwrite.",
+      "sources": [
+        "crates/orbit-pi/src/skills.rs::set_enabled",
+        "crates/orbit-pi/src/skills.rs::delete",
+        "crates/orbit-pi/src/app/skills_ui.rs::delete_selected_skill"
+      ],
+      "tests": "T15",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/skills.rs",
+          "symbol": "set_enabled",
+          "line": 338
+        },
+        {
+          "path": "crates/orbit-pi/src/skills.rs",
+          "symbol": "delete",
+          "line": 440
+        },
+        {
+          "path": "crates/orbit-pi/src/app/skills_ui.rs",
+          "symbol": "delete_selected_skill",
+          "line": 772
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Settings, providers, skills, packages and MCP",
+      "id": "P12",
+      "feature": "Plugin package management",
+      "interaction_contract": "List npm/git/local packages with scope/kind/installed/version, search; install source, project/global scope, update/remove, reveal/open paths.",
+      "state_failure_platform": "pi CLI owns fetch/lockfile/settings changes; 240 s command timeout; malformed one-scope config still lists other scope. Project source wins duplicates; one operation at a time shows progress/result.",
+      "sources": [
+        "crates/orbit-pi/src/plugins.rs::discover",
+        "crates/orbit-pi/src/plugins.rs::install",
+        "crates/orbit-pi/src/plugins.rs::remove",
+        "crates/orbit-pi/src/plugins.rs::update",
+        "crates/orbit-pi/src/app/settings.rs::plugin_run"
+      ],
+      "tests": "T15",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/plugins.rs",
+          "symbol": "discover",
+          "line": 99
+        },
+        {
+          "path": "crates/orbit-pi/src/plugins.rs",
+          "symbol": "install",
+          "line": 135
+        },
+        {
+          "path": "crates/orbit-pi/src/plugins.rs",
+          "symbol": "remove",
+          "line": 147
+        },
+        {
+          "path": "crates/orbit-pi/src/plugins.rs",
+          "symbol": "update",
+          "line": 157
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "plugin_run",
+          "line": 7478
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Settings, providers, skills, packages and MCP",
+      "id": "P13",
+      "feature": "Plugin update offers",
+      "interaction_contract": "Launch-delayed and manual Refresh upstream check; show Update now / skip current versions; batch outcomes and later newer releases.",
+      "state_failure_platform": "5 s launch delay; PI_OFFLINE skips; 12 s probes, max four parallel. Pinned npm/local sources excluded. plugin-update-skips.json stores source→version. Results tied to checked workspace.",
+      "sources": [
+        "crates/orbit-pi/src/plugins.rs::find_updates",
+        "crates/orbit-pi/src/app/plugin_update_ui.rs::start_plugin_update_check",
+        "crates/orbit-pi/src/app/plugin_update_ui.rs::skip_plugin_updates",
+        "crates/orbit-pi/src/app/plugin_update_ui.rs::apply_plugin_updates"
+      ],
+      "tests": "T15",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/plugins.rs",
+          "symbol": "find_updates",
+          "line": 165
+        },
+        {
+          "path": "crates/orbit-pi/src/app/plugin_update_ui.rs",
+          "symbol": "start_plugin_update_check",
+          "line": 19
+        },
+        {
+          "path": "crates/orbit-pi/src/app/plugin_update_ui.rs",
+          "symbol": "skip_plugin_updates",
+          "line": 52
+        },
+        {
+          "path": "crates/orbit-pi/src/app/plugin_update_ui.rs",
+          "symbol": "apply_plugin_updates",
+          "line": 69
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Settings, providers, skills, packages and MCP",
+      "id": "P14",
+      "feature": "MCP manager and server table",
+      "interaction_contract": "Global/project-scoped server list/filter, detailed transport/status/tool counts/resources, add/edit/toggle/test/reconnect/remove, palette per-server actions and top-bar summary.",
+      "state_failure_platform": "No Orbit MCP implementation: pi executes and probes. Project names shadow global. Config and live runtime state are separate; errors, untrusted-project note and codemode reachability warning are explicit.",
+      "sources": [
+        "crates/orbit-pi/src/mcp.rs",
+        "crates/orbit-pi/src/mcp/manager.rs::McpManager",
+        "crates/orbit-pi/src/app/mcp_ui.rs::mcp_rows",
+        "crates/orbit-pi/src/app/mcp_ui.rs::mcp_handle_key"
+      ],
+      "tests": "T16",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/mcp.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/mcp/manager.rs",
+          "symbol": "McpManager",
+          "line": 74
+        },
+        {
+          "path": "crates/orbit-pi/src/app/mcp_ui.rs",
+          "symbol": "mcp_rows",
+          "line": 1135
+        },
+        {
+          "path": "crates/orbit-pi/src/app/mcp_ui.rs",
+          "symbol": "mcp_handle_key",
+          "line": 1272
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Settings, providers, skills, packages and MCP",
+      "id": "P15",
+      "feature": "MCP add/edit fields and exposure",
+      "interaction_contract": "Stdio command/args/env/cwd; streamable HTTP URL/headers; description/scope/timeout/enabled/tool exposure. Exposures codemode/codemode-deferred/deferred/direct/hidden; per-tool overrides.",
+      "state_failure_platform": "Validate names, duplicate/move/rename scope and transport fields; atomic surgical merge preserves unknown fields/unrelated servers. Invalid config cannot be overwritten by empty defaults.",
+      "sources": [
+        "crates/orbit-pi/src/mcp.rs::McpTransport",
+        "crates/orbit-pi/src/mcp.rs::McpExposure",
+        "crates/orbit-pi/src/mcp/config.rs",
+        "crates/orbit-pi/src/app/mcp_ui.rs::mcp_editor_save"
+      ],
+      "tests": "T16",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/mcp.rs",
+          "symbol": "McpTransport",
+          "line": 160
+        },
+        {
+          "path": "crates/orbit-pi/src/mcp.rs",
+          "symbol": "McpExposure",
+          "line": 72
+        },
+        {
+          "path": "crates/orbit-pi/src/mcp/config.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/mcp_ui.rs",
+          "symbol": "mcp_editor_save",
+          "line": 523
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Settings, providers, skills, packages and MCP",
+      "id": "P16",
+      "feature": "MCP secrets and auth",
+      "interaction_contract": "Literal secret form values become ${NAME} refs backed by local secrets, masks round-trip unchanged; OAuth login/cancel/logout via pi; launch and probe receive secret env.",
+      "state_failure_platform": "mcp-secrets.json Unix 0600, namespace-safe unused-secret pruning, log/error redaction. No keychain encryption claim. Probe timeout 120 s; login 300 s + 30 s cleanup grace.",
+      "sources": [
+        "crates/orbit-pi/src/mcp/secrets.rs",
+        "crates/orbit-pi/src/mcp/config.rs::merge_secret_lines",
+        "crates/orbit-pi/src/mcp/manager.rs",
+        "crates/orbit-pi/src/app/mcp_ui.rs::mcp_sign_in",
+        "crates/orbit-pi/src/app/mcp_ui.rs::mcp_sign_out"
+      ],
+      "tests": "T16",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/mcp/secrets.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/mcp/config.rs",
+          "symbol": "merge_secret_lines"
+        },
+        {
+          "path": "crates/orbit-pi/src/mcp/manager.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/mcp_ui.rs",
+          "symbol": "mcp_sign_in",
+          "line": 797
+        },
+        {
+          "path": "crates/orbit-pi/src/app/mcp_ui.rs",
+          "symbol": "mcp_sign_out",
+          "line": 866
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Settings, providers, skills, packages and MCP",
+      "id": "P17",
+      "feature": "MCP apply/reconnect lifecycle",
+      "interaction_contract": "Detect external edits/fingerprint, pending apply notice, safe idle restart/resume, defer while running, force-apply warning path; stale parked clients respawn later.",
+      "state_failure_platform": "Changes do not silently abort a live turn. Startup/probe loading, parse/connection/auth failure, reconnect outcome and updated fingerprints require independent states.",
+      "sources": [
+        "crates/orbit-pi/src/app/mcp_ui.rs::tick_mcp",
+        "crates/orbit-pi/src/app/mcp_ui.rs::mcp_after_settle",
+        "crates/orbit-pi/src/app/mcp_ui.rs::mcp_force_apply",
+        "crates/orbit-pi/src/app.rs::ParkedSession"
+      ],
+      "tests": "T16,T06",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/app/mcp_ui.rs",
+          "symbol": "tick_mcp",
+          "line": 90
+        },
+        {
+          "path": "crates/orbit-pi/src/app/mcp_ui.rs",
+          "symbol": "mcp_after_settle",
+          "line": 277
+        },
+        {
+          "path": "crates/orbit-pi/src/app/mcp_ui.rs",
+          "symbol": "mcp_force_apply",
+          "line": 301
+        },
+        {
+          "path": "crates/orbit-pi/src/app.rs",
+          "symbol": "ParkedSession",
+          "line": 150
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Settings, providers, skills, packages and MCP",
+      "id": "P18",
+      "feature": "Appearance and typography",
+      "interaction_contract": "System/light/dark, separate remembered light/dark themes, full bundled theme catalog and live previews; UI/code fonts, UI/terminal/editor sizes, density, sidebar and reduce-motion.",
+      "state_failure_platform": "Theme, ui.json and fonts.json retain choices; sizes 11/12/13/14/15/16/18/20, densities 80–120 in steps of 5. Invalid legacy prefs default/migrate. Theme changes repaint all surfaces consistently.",
+      "sources": [
+        "crates/orbit-pi/src/theme.rs::UiPrefs",
+        "crates/orbit-pi/src/theme.rs::FontPrefs",
+        "crates/orbit-pi/src/theme/appearance.rs::AppearancePrefs",
+        "crates/orbit-pi/src/app/settings.rs::appearance_rows",
+        "crates/orbit-pi/src/assets.rs"
+      ],
+      "tests": "T17",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/theme.rs",
+          "symbol": "UiPrefs",
+          "line": 324
+        },
+        {
+          "path": "crates/orbit-pi/src/theme.rs",
+          "symbol": "FontPrefs",
+          "line": 482
+        },
+        {
+          "path": "crates/orbit-pi/src/theme/appearance.rs",
+          "symbol": "AppearancePrefs",
+          "line": 31
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "appearance_rows",
+          "line": 5926
+        },
+        {
+          "path": "crates/orbit-pi/src/assets.rs"
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Native code exists; this row is not validated end to end."
+      }
+    },
+    {
+      "group": "Settings, providers, skills, packages and MCP",
+      "id": "P19",
+      "feature": "Backdrop customization",
+      "interaction_contract": "Animated ordered-dither new-task field, optional background image, image picker/reset, blur/pixel-size/bottom-fade tuning and preview.",
+      "state_failure_platform": "Decode/cache off paint path, bounded resize/blur; reduce motion freezes perpetual animation. Persisted backdrop state and image failures need faithful fallback.",
+      "sources": [
+        "crates/orbit-pi/src/backdrop.rs",
+        "crates/orbit-pi/src/dither.rs",
+        "crates/orbit-pi/src/app/settings.rs::background_controls",
+        "crates/orbit-pi/src/app/settings.rs::background_choose",
+        "crates/orbit-pi/src/app/view.rs::new_task_backdrop"
+      ],
+      "tests": "T17",
+      "baseline_status": "source_present",
+      "migration_status": "pending_ui_feature",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/backdrop.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/dither.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "background_controls",
+          "line": 6382
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "background_choose",
+          "line": 6569
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "symbol": "new_task_backdrop",
+          "line": 2271
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Backdrop preferences/source audit exist; original ordered-dither field, image/blur/pixel/fade controls and preview are not yet reconstructed."
+      }
+    },
+    {
+      "group": "Settings, providers, skills, packages and MCP",
+      "id": "P20",
+      "feature": "Localization and shortcuts reference",
+      "interaction_contract": "System locale plus English, zh-CN, Japanese, Korean, Spanish, French, German, pt-BR, Russian, Italian; live translated placeholder/menu rebuild; categorized shortcut help.",
+      "state_failure_platform": "Source en.yml + generated locale files. Native macOS menus follow language changes; keyboard label modifier names vary by OS. Accessibility is incomplete, not an implied guarantee.",
+      "sources": [
+        "crates/orbit-pi/src/i18n.rs",
+        "crates/orbit-pi/src/main.rs::set_app_menus",
+        "crates/orbit-pi/src/theme.rs::set_ui_prefs",
+        "crates/orbit-pi/src/app/settings.rs::shortcut_rows",
+        "crates/orbit-pi/src/commands.rs"
+      ],
+      "tests": "T03,T17",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/i18n.rs"
+        },
+        {
+          "path": "crates/orbit-pi/src/main.rs",
+          "symbol": "set_app_menus",
+          "line": 626
+        },
+        {
+          "path": "crates/orbit-pi/src/theme.rs",
+          "symbol": "set_ui_prefs",
+          "line": 1468
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "symbol": "shortcut_rows",
+          "line": 4672
+        },
+        {
+          "path": "crates/orbit-pi/src/commands.rs"
+        }
+      ],
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G6",
+        "paths": [
+          "internal/preferences",
+          "internal/workbench",
+          "internal/native"
+        ],
+        "tests": [
+          "internal/preferences/store_test.go",
+          "internal/preferences/workspaces_test.go",
+          "internal/workbench/workbench_test.go",
+          "internal/native/native_test.go",
+          "internal/native/runtime_test.go",
+          "internal/native/updater_test.go",
+          "internal/native/temp_files_test.go"
+        ],
+        "remaining": "Locale assets and command registry exist, but hard-coded English labels and context-specific bindings prevent full localization/shortcut parity."
+      }
+    }
+  ]
+}

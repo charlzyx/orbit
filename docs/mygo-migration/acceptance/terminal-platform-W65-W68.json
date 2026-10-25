@@ -1,0 +1,567 @@
+{
+  "schema": "orbit-acceptance-shard/v1",
+  "category": "terminal-platform",
+  "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "rows": [
+    {
+      "id": "W65",
+      "title": "Terminal tabs display login-shell icon, OSC title or folder fallback, own cwd tooltip; tab strip scrolls; next/previous wrap; resize height; restart only active tab in original cwd, preserving others; exited overlay and startup error state.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/terminal.rs",
+          "handler": "ShellProfile",
+          "line": 466,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/terminal.rs#L466",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/terminal.rs",
+          "handler": "label",
+          "line": 1052,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/terminal.rs#L1052",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/terminal.rs",
+          "handler": "tooltip",
+          "line": 1041,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/terminal.rs#L1041",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/terminal.rs",
+          "handler": "cycle_tab",
+          "line": 1782,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/terminal.rs#L1782",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Terminal tabs display login-shell icon, OSC title or folder fallback, own cwd tooltip; tab strip scrolls; next/previous wrap; resize height; restart only active tab in original cwd, preserving others; exited overlay and startup error state.",
+      "baseline_edge_state": "Restart minimum 650 ms visible feedback. Hidden/full-page-suppressed terminal stops requesting frames without killing shells. Platform-specific new/close tab chords avoid Ctrl-T/Ctrl-W shell conflicts on non-macOS.",
+      "fixture": "Disposable native host or CPU test harness, real temporary PTY where supported, controlled shell/byte recorder and stub external apps.",
+      "steps": [
+        {
+          "id": "W65.behavior",
+          "dimension": "functional",
+          "action": "Change OSC title, cycle tabs, scroll tab strip, resize and restart active terminal in original cwd.",
+          "expected": "Terminal tabs display login-shell icon, OSC title or folder fallback, own cwd tooltip; tab strip scrolls; next/previous wrap; resize height; restart only active tab in original cwd, preserving others; exited overlay and startup error state.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W65.edge",
+          "dimension": "edge",
+          "action": "Show exited overlay/exit status and relaunch only active tab; hidden terminal invalidation and other shell state remain intact.",
+          "expected": "Restart minimum 650 ms visible feedback. Hidden/full-page-suppressed terminal stops requesting frames without killing shells. Platform-specific new/close tab chords avoid Ctrl-T/Ctrl-W shell conflicts on non-macOS.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W65.error",
+          "dimension": "error",
+          "action": "Exit/fail the active child or external-app stub while hidden/unfocused; exercise restart and missing-platform capability.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Restart minimum 650 ms visible feedback. Hidden/full-page-suppressed terminal stops requesting frames without killing shells. Platform-specific new/close tab chords avoid Ctrl-T/Ctrl-W shell conflicts on non-macOS.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W65.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W65.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W65.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W65.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/terminal"
+      ],
+      "existing_test_candidates": [
+        "internal/terminal/panel_test.go"
+      ],
+      "inventory_evidence": "../parity/terminal-platform.json",
+      "source_test_inventory": "`terminal.rs::{shell_profiles_map_to_their_own_marks,tab_labels_fall_back_to_the_folder,cycling_tabs_wraps_at_the_ends,hiding_the_panel_deactivates_every_tab}`",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Terminal package race tests pass; optional live tests and macOS/Windows packaged delivery not established by this run.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    },
+    {
+      "id": "W66",
+      "title": "Open-in discovers installed editors/terminals/file manager once off-thread with real app icons. macOS catalog VS Code/Cursor/Zed/Finder/Terminal/Termy/iTerm2/Kitty/Ghostty/Warp/Xcode/Rider/Android Studio; Windows catalog VS Code/Cursor/Zed/Explorer/Windows Terminal/Rider/Android Studio.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/platform.rs",
+          "handler": "ExternalApp",
+          "line": 22,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/platform.rs#L22",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/platform.rs",
+          "handler": "OPEN_IN_CATALOG",
+          "line": 41,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/platform.rs#L41",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/platform.rs",
+          "handler": "detect_open_in_apps",
+          "line": 138,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/platform.rs#L138",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/open_in.rs",
+          "handler": "detect_open_in_apps",
+          "line": 18,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/open_in.rs#L18",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Open-in discovers installed editors/terminals/file manager once off-thread with real app icons. macOS catalog VS Code/Cursor/Zed/Finder/Terminal/Termy/iTerm2/Kitty/Ghostty/Warp/Xcode/Rider/Android Studio; Windows catalog VS Code/Cursor/Zed/Explorer/Windows Terminal/Rider/Android Studio.",
+      "baseline_edge_state": "macOS Launch Services bundle IDs incl alternate variants; icons rasterized at 36 px for 18 px slot. Windows executable/PATH/environment expansion and serialized icon extraction/fallback. Linux currently returns empty catalog; UI absent, not simulated installed apps.",
+      "fixture": "Disposable native host or CPU test harness, real temporary PTY where supported, controlled shell/byte recorder and stub external apps.",
+      "steps": [
+        {
+          "id": "W66.behavior",
+          "dimension": "functional",
+          "action": "Run installed-app detection off-thread with fixture platform locations; inspect recognized apps and real icons.",
+          "expected": "Open-in discovers installed editors/terminals/file manager once off-thread with real app icons. macOS catalog VS Code/Cursor/Zed/Finder/Terminal/Termy/iTerm2/Kitty/Ghostty/Warp/Xcode/Rider/Android Studio; Windows catalog VS Code/Cursor/Zed/Explorer/Windows Terminal/Rider/Android Studio.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W66.edge",
+          "dimension": "edge",
+          "action": "Missing/invalid app binaries and platform-only catalog entries are not presented as installed; cache refresh follows source contract.",
+          "expected": "macOS Launch Services bundle IDs incl alternate variants; icons rasterized at 36 px for 18 px slot. Windows executable/PATH/environment expansion and serialized icon extraction/fallback. Linux currently returns empty catalog; UI absent, not simulated installed apps.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W66.error",
+          "dimension": "error",
+          "action": "Exit/fail the active child or external-app stub while hidden/unfocused; exercise restart and missing-platform capability.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: macOS Launch Services bundle IDs incl alternate variants; icons rasterized at 36 px for 18 px slot. Windows executable/PATH/environment expansion and serialized icon extraction/fallback. Linux currently returns empty catalog; UI absent, not simulated installed apps.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W66.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W66.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W66.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W66.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/preferences",
+        "internal/workbench",
+        "internal/native"
+      ],
+      "existing_test_candidates": [
+        "internal/preferences/store_test.go",
+        "internal/preferences/workspaces_test.go",
+        "internal/workbench/workbench_test.go",
+        "internal/native/native_test.go",
+        "internal/native/runtime_test.go",
+        "internal/native/updater_test.go",
+        "internal/native/temp_files_test.go"
+      ],
+      "inventory_evidence": "../parity/terminal-platform.json",
+      "source_test_inventory": "`platform.rs::{open_in_catalog_includes_rider_stable_and_eap,open_in_app_icon_is_rasterized_at_the_menu_pixel_size,windows_extracts_a_png_icon_for_explorer,windows_always_detects_file_explorer,windows_expands_environment_paths}` (platform-gated)",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native helpers/domain tests pass; real platform integrations and UI selection flows remain pending.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    },
+    {
+      "id": "W67",
+      "title": "Split open-in control: preferred app primary action and searchable installed-app menu; selecting app opens current workspace and remembers choice. Primary fallback opening does not overwrite unavailable preference.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/open_in.rs",
+          "handler": "on_open_in_primary",
+          "line": 77,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/open_in.rs#L77",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/open_in.rs",
+          "handler": "on_open_in_caret",
+          "line": 96,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/open_in.rs#L96",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/open_in.rs",
+          "handler": "open_workspace_in_app",
+          "line": 40,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/open_in.rs#L40",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/open_in.rs",
+          "handler": "render_open_in_control",
+          "line": 126,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/open_in.rs#L126",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Split open-in control: preferred app primary action and searchable installed-app menu; selecting app opens current workspace and remembers choice. Primary fallback opening does not overwrite unavailable preference.",
+      "baseline_edge_state": "Requires workspace and installed catalog; dropdown focuses filter, excludes Work-in menu, 200 ms dismiss guard. macOS Termy uses encoded `termy://new?dir=…`; Windows Terminal uses `-d`. Native launch itself is best-effort.",
+      "fixture": "Disposable native host or CPU test harness, real temporary PTY where supported, controlled shell/byte recorder and stub external apps.",
+      "steps": [
+        {
+          "id": "W67.behavior",
+          "dimension": "functional",
+          "action": "Use preferred Open In primary action and searchable menu; select another installed app.",
+          "expected": "Split open-in control: preferred app primary action and searchable installed-app menu; selecting app opens current workspace and remembers choice. Primary fallback opening does not overwrite unavailable preference.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W67.edge",
+          "dimension": "edge",
+          "action": "Temporarily remove saved app and use fallback; primary fallback must not overwrite remembered unavailable preference.",
+          "expected": "Requires workspace and installed catalog; dropdown focuses filter, excludes Work-in menu, 200 ms dismiss guard. macOS Termy uses encoded `termy://new?dir=…`; Windows Terminal uses `-d`. Native launch itself is best-effort.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W67.error",
+          "dimension": "error",
+          "action": "Exit/fail the active child or external-app stub while hidden/unfocused; exercise restart and missing-platform capability.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Requires workspace and installed catalog; dropdown focuses filter, excludes Work-in menu, 200 ms dismiss guard. macOS Termy uses encoded `termy://new?dir=…`; Windows Terminal uses `-d`. Native launch itself is best-effort.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W67.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W67.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W67.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W67.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/preferences",
+        "internal/workbench",
+        "internal/native"
+      ],
+      "existing_test_candidates": [
+        "internal/preferences/store_test.go",
+        "internal/preferences/workspaces_test.go",
+        "internal/workbench/workbench_test.go",
+        "internal/native/native_test.go",
+        "internal/native/runtime_test.go",
+        "internal/native/updater_test.go",
+        "internal/native/temp_files_test.go"
+      ],
+      "inventory_evidence": "../parity/terminal-platform.json",
+      "source_test_inventory": "Preference/catalog tests below; no end-to-end native app-launch test located.",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native helpers/domain tests pass; real platform integrations and UI selection flows remain pending.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    },
+    {
+      "id": "W68",
+      "title": "Open-in preference resolution: workspace-specific choice, legacy global fallback, platform file manager, then first installed app. Temporarily unavailable saved app stays remembered for reinstall.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/platform.rs",
+          "handler": "OpenInPrefs",
+          "line": 887,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/platform.rs#L887",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/platform.rs",
+          "handler": "preferred_app",
+          "line": 913,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/platform.rs#L913",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/platform.rs",
+          "handler": "remember",
+          "line": 930,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/platform.rs#L930",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/platform.rs",
+          "handler": "persist_to",
+          "line": 941,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/platform.rs#L941",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Open-in preference resolution: workspace-specific choice, legacy global fallback, platform file manager, then first installed app. Temporarily unavailable saved app stays remembered for reinstall.",
+      "baseline_edge_state": "`~/.orbit-pi/open-in.json`; serialized async saves and temp-file atomic replacement; save failure toast. Missing file defaults, malformed/unreadable logs and defaults.",
+      "fixture": "Disposable native host or CPU test harness, real temporary PTY where supported, controlled shell/byte recorder and stub external apps.",
+      "steps": [
+        {
+          "id": "W68.behavior",
+          "dimension": "functional",
+          "action": "Set workspace-specific then legacy global Open In preferences; remove/reinstall preferred app fixture.",
+          "expected": "Open-in preference resolution: workspace-specific choice, legacy global fallback, platform file manager, then first installed app. Temporarily unavailable saved app stays remembered for reinstall.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W68.edge",
+          "dimension": "edge",
+          "action": "Resolve workspace/global/file-manager/first-installed precedence exactly and preserve unavailable choice across restart.",
+          "expected": "`~/.orbit-pi/open-in.json`; serialized async saves and temp-file atomic replacement; save failure toast. Missing file defaults, malformed/unreadable logs and defaults.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W68.error",
+          "dimension": "error",
+          "action": "Exit/fail the active child or external-app stub while hidden/unfocused; exercise restart and missing-platform capability.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: `~/.orbit-pi/open-in.json`; serialized async saves and temp-file atomic replacement; save failure toast. Missing file defaults, malformed/unreadable logs and defaults.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W68.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W68.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W68.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W68.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/preferences",
+        "internal/workbench",
+        "internal/native"
+      ],
+      "existing_test_candidates": [
+        "internal/preferences/store_test.go",
+        "internal/preferences/workspaces_test.go",
+        "internal/workbench/workbench_test.go",
+        "internal/native/native_test.go",
+        "internal/native/runtime_test.go",
+        "internal/native/updater_test.go",
+        "internal/native/temp_files_test.go"
+      ],
+      "inventory_evidence": "../parity/terminal-platform.json",
+      "source_test_inventory": "`platform.rs::{open_in_legacy_global_choice_is_preserved_as_fallback,open_in_workspace_choices_are_independent_and_survive_reload,open_in_unavailable_workspace_app_falls_back_without_forgetting_choice,open_in_defaults_to_file_manager_then_first_installed_app,open_in_persistence_creates_and_replaces_preferences}`",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native helpers/domain tests pass; real platform integrations and UI selection flows remain pending.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    }
+  ]
+}

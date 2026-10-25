@@ -58,8 +58,7 @@ The cloud has not accessed the user's Mac, browser, credentials or server.
 The user created `https://github.com/charlzyx/orbit` after the available connector
 was found not to expose repository creation. GitHub now verifies `fork: true`,
 with both parent and source equal to `imrj05/orbit`, and the authenticated account
-has push permission. No migration push is claimed until its remote commit is
-verified.
+has push permission. The initial source checkpoint below has now been remotely verified.
 
 ## Reports
 
@@ -69,3 +68,21 @@ verified.
 
 The native Go framework choice is confirmed. A skin-only implementation, Rust
 backend sidecar, or browser/webview replacement would not satisfy the request.
+
+## Published Go checkpoint
+
+The initial native source checkpoint is commit
+`80580ee3cffe8eab19b9399d7813fa6be61ec6d9` on
+[`charlzyx/orbit: redesign/mygo-rpc`](https://github.com/charlzyx/orbit/tree/redesign/mygo-rpc).
+The entire frozen Go source passed race tests and vet, including three real
+credential-free Pi integration cases and real disposable PTY/native-grid tests.
+The actual `cmd/orbit` executable cross-built with cgo disabled for all six
+Linux/macOS/Windows amd64/arm64 targets. These checks do not prove native OS
+integration or completed feature/pixel parity. Hosted Go CI also passed for
+that exact checkpoint.
+
+The first hosted reference capture failed because a shallow checkout lacked
+the pinned source SHA, before compiling or opening an app. Commit `ae3d5c8`
+fixes that fixture and captures both original and Go native desktop windows.
+Its pixel/OS outcome must be recorded from actual artifacts, not inferred from
+the workflow's presence.

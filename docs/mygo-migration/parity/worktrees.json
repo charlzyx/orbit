@@ -1,0 +1,404 @@
+{
+  "category": "Worktrees and setup lifecycle",
+  "rows": [
+    {
+      "id": "W40",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Worktrees page lists Git-discovered main/linked/external worktrees with independent name/path/branch, active/bare/detached/locked/prunable markers and reasons.",
+      "interaction_contract": "Worktrees page lists Git-discovered main/linked/external worktrees with independent name/path/branch, active/bare/detached/locked/prunable markers and reasons.",
+      "state_failure_platform": "`git worktree list --porcelain -z`, older-Git fallback; main root found from Git even when opened in linked worktree. Non-repo is actionable error; canonical/lexical paths prevent alias confusion.",
+      "sources": [
+        "`worktree.rs::{Worktree,parse_worktree_list,WorktreeManager::repository_root,WorktreeManager::list,same_path}`; `app/worktrees.rs::{refresh_worktrees,worktree_row,worktree_markers}`"
+      ],
+      "tests": "`worktree.rs` parser tests for normal/detached/locked/prunable/bare/external/unterminated records; `name_is_not_branch_or_path`",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G4",
+        "paths": [
+          "internal/workspace/worktrees.go",
+          "internal/workspace/setup.go",
+          "internal/worktreeui/state.go",
+          "internal/worktreeui/view.go",
+          "internal/worktreeui/picker.go",
+          "internal/worktreeui/labels.go"
+        ],
+        "tests": [
+          "internal/workspace/worktrees_test.go",
+          "internal/worktreeui/state_test.go",
+          "internal/worktreeui/view_test.go",
+          "internal/worktreeui/picker_test.go"
+        ],
+        "remaining": "Real temporary worktree operations, setup consent/failure/cancel, transactional persistence and scoped native typing/confirm/retry tests pass. Host guide preference/translation hooks exist. Complete localization, host keyboard/focus and platform/pixel equivalence remain pending."
+      }
+    },
+    {
+      "id": "W41",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Create worktree from existing local/remote branch or a new branch with optional start point; separate editable display/directory name and branch name, auto-derived new branch until user edits it; quick-create suggests unused branch slug plus suffix.",
+      "interaction_contract": "Create worktree from existing local/remote branch or a new branch with optional start point; separate editable display/directory name and branch name, auto-derived new branch until user edits it; quick-create suggests unused branch slug plus suffix.",
+      "state_failure_platform": "New target under configured root; branch refs validated by Git. Branch choices async; default avoids active branch where possible. Root created when absent. Existing checked-out branch produces dialog to open its existing worktree.",
+      "sources": [
+        "`app/worktrees.rs::{open_create_worktree_dialog,submit_create_worktree,perform_worktree_create,open_new_worktree_from_work_in,suggest_worktree_name}`; `worktree.rs::{resolve_path,check_create_target,create_new_branch,create_from_existing_branch}`"
+      ],
+      "tests": "`worktree.rs::{slugify_makes_safe_defaults,valid_names_are_single_components,invalid_names_are_rejected,create_rejects_existing_branch_checked_out_elsewhere,create_rejects_existing_path_and_missing_repository,new_branch_validation_uses_git_ref_format}`",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G4",
+        "paths": [
+          "internal/workspace/worktrees.go",
+          "internal/workspace/setup.go",
+          "internal/worktreeui/state.go",
+          "internal/worktreeui/view.go",
+          "internal/worktreeui/picker.go",
+          "internal/worktreeui/labels.go"
+        ],
+        "tests": [
+          "internal/workspace/worktrees_test.go",
+          "internal/worktreeui/state_test.go",
+          "internal/worktreeui/view_test.go",
+          "internal/worktreeui/picker_test.go"
+        ],
+        "remaining": "Real temporary worktree operations, setup consent/failure/cancel, transactional persistence and scoped native typing/confirm/retry tests pass. Host guide preference/translation hooks exist. Complete localization, host keyboard/focus and platform/pixel equivalence remain pending.",
+        "specific_tests": [
+          "TestWorktreeSlugMatchesSourceSuggestions",
+          "TestCreateSuggestionsPreserveManualBranchAndModes",
+          "TestNativeCreateNameTypingDerivesBranchUntilManualEdit",
+          "TestBranchAlreadyUsedOpensExistingWorktreeDialog",
+          "TestNativeBranchInUseOpenRequiresExplicitClick"
+        ]
+      }
+    },
+    {
+      "id": "W42",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Worktree validation rejects empty/dot/parent/separator names, root escape, existing paths, missing repo and branch conflict. Creation errors keep actionable context rather than pretending success.",
+      "interaction_contract": "Worktree validation rejects empty/dot/parent/separator names, root escape, existing paths, missing repo and branch conflict. Creation errors keep actionable context rather than pretending success.",
+      "state_failure_platform": "Windows also rejects reserved device names/characters; normalization and canonical same-path checks matter on symlinks. Branch-in-use dialog offers navigation, not automatic branch duplication.",
+      "sources": [
+        "`worktree.rs::{WorktreeError,validate_name,normalize_lexically,canonical_or,is_within,check_create_target}`; `app/worktrees.rs::{finish_worktree_error,branch_in_use_dialog_body}`"
+      ],
+      "tests": "Worktree validation and branch-in-use tests above; `manager_resolves_paths_inside_the_root`",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G4",
+        "paths": [
+          "internal/workspace/worktrees.go",
+          "internal/workspace/setup.go",
+          "internal/worktreeui/state.go",
+          "internal/worktreeui/view.go",
+          "internal/worktreeui/picker.go",
+          "internal/worktreeui/labels.go"
+        ],
+        "tests": [
+          "internal/workspace/worktrees_test.go",
+          "internal/worktreeui/state_test.go",
+          "internal/worktreeui/view_test.go",
+          "internal/worktreeui/picker_test.go"
+        ],
+        "remaining": "Real temporary worktree operations, setup consent/failure/cancel, transactional persistence and scoped native typing/confirm/retry tests pass. Host guide preference/translation hooks exist. Complete localization, host keyboard/focus and platform/pixel equivalence remain pending."
+      }
+    },
+    {
+      "id": "W43",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Settings configure worktree root, setup-script path, run-setup automatically and open-after-create. Repository `.orbit/worktree.json` overrides root/script, not global booleans.",
+      "interaction_contract": "Settings configure worktree root, setup-script path, run-setup automatically and open-after-create. Repository `.orbit/worktree.json` overrides root/script, not global booleans.",
+      "state_failure_platform": "Global `~/.orbit-pi/worktrees.json`, defaults `.wt` and `.orbit/worktree-setup.sh`, auto-setup/open true. Absolute and `~/` paths supported. Missing/malformed config falls back safely; setup must be existing file.",
+      "sources": [
+        "`worktree.rs::{WorktreeConfig,WorktreeRepoConfig,expand_path,effective_directory,effective_setup_script}`; `app/worktrees.rs::{worktree_settings_rows,toggle_worktree_run_setup_auto,toggle_worktree_open_after_create}`"
+      ],
+      "tests": "`worktree.rs::{effective_directory_prefers_repo_config,absolute_directory_stays_absolute,setup_script_resolution_requires_a_file,config_round_trips_through_disk}`",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G4",
+        "paths": [
+          "internal/workspace/worktrees.go",
+          "internal/workspace/setup.go",
+          "internal/worktreeui/state.go",
+          "internal/worktreeui/view.go",
+          "internal/worktreeui/picker.go",
+          "internal/worktreeui/labels.go"
+        ],
+        "tests": [
+          "internal/workspace/worktrees_test.go",
+          "internal/worktreeui/state_test.go",
+          "internal/worktreeui/view_test.go",
+          "internal/worktreeui/picker_test.go"
+        ],
+        "remaining": "Real temporary worktree operations, setup consent/failure/cancel, transactional persistence and scoped native typing/confirm/retry tests pass. Host guide preference/translation hooks exist. Complete localization, host keyboard/focus and platform/pixel equivalence remain pending."
+      }
+    },
+    {
+      "id": "W44",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "First setup-script run per repository requires explicit AllowSetup dialog; create dialog can disable setup for that worktree.",
+      "interaction_contract": "First setup-script run per repository requires explicit AllowSetup dialog; create dialog can disable setup for that worktree.",
+      "state_failure_platform": "Permission remembered under canonical repo root in `allowed_setup_repos`. Script executes arbitrary user-controlled commands; do not bypass the permission merely while restyling create UI. Permission config writes currently best-effort in controller.",
+      "sources": [
+        "`worktree.rs::{setup_allowed,allow_setup,setup_repo_key}`; `app/worktrees.rs::{submit_create_worktree,confirm_worktree_dialog,allow_setup_dialog_body}`"
+      ],
+      "tests": "`worktree.rs::setup_allowed_keys_are_canonical`; no full confirmation-click test located.",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G4",
+        "paths": [
+          "internal/workspace/worktrees.go",
+          "internal/workspace/setup.go",
+          "internal/worktreeui/state.go",
+          "internal/worktreeui/view.go",
+          "internal/worktreeui/picker.go",
+          "internal/worktreeui/labels.go"
+        ],
+        "tests": [
+          "internal/workspace/worktrees_test.go",
+          "internal/worktreeui/state_test.go",
+          "internal/worktreeui/view_test.go",
+          "internal/worktreeui/picker_test.go"
+        ],
+        "remaining": "Real temporary worktree operations, setup consent/failure/cancel, transactional persistence and scoped native typing/confirm/retry tests pass. Host guide preference/translation hooks exist. Complete localization, host keyboard/focus and platform/pixel equivalence remain pending.",
+        "specific_tests": [
+          "TestSetupAllowRemembersCanonicalRepositoryBeforeCreation",
+          "TestSettingsPersistenceFailureIsTransactionalAndRetryable"
+        ]
+      }
+    },
+    {
+      "id": "W45",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Setup runs after successful Git creation and before automatic opening; expandable captured stdout/stderr/exit result, success/warning toasts, retry, dismiss and manual open.",
+      "interaction_contract": "Setup runs after successful Git creation and before automatic opening; expandable captured stdout/stderr/exit result, success/warning toasts, retry, dismiss and manual open.",
+      "state_failure_platform": "Background subprocess cwd is new worktree; `ORBIT_ROOT_PATH`, `ORBIT_WORKTREE_PATH`, `GIT_TERMINAL_PROMPT=0`. Unix `/bin/sh`, Windows `cmd /C` (POSIX script not magically supported). Failure keeps created worktree and suppresses auto-open. No timeout or live output streaming in this module.",
+      "sources": [
+        "`worktree_setup.rs::{SetupOutcome,script_command,run}`; `app/worktrees.rs::{begin_worktree_setup,spawn_setup_script,retry_worktree_setup,worktree_setup_banner}`"
+      ],
+      "tests": "`worktree_setup.rs::{successful_script_receives_environment_variables,failed_script_reports_exit_code_and_stderr,missing_script_fails_without_touching_the_worktree,script_runs_with_the_worktree_as_cwd,outcome_combines_both_streams}`",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G4",
+        "paths": [
+          "internal/workspace/worktrees.go",
+          "internal/workspace/setup.go",
+          "internal/worktreeui/state.go",
+          "internal/worktreeui/view.go",
+          "internal/worktreeui/picker.go",
+          "internal/worktreeui/labels.go"
+        ],
+        "tests": [
+          "internal/workspace/worktrees_test.go",
+          "internal/worktreeui/state_test.go",
+          "internal/worktreeui/view_test.go",
+          "internal/worktreeui/picker_test.go"
+        ],
+        "remaining": "Real temporary worktree operations, setup consent/failure/cancel, transactional persistence and scoped native typing/confirm/retry tests pass. Host guide preference/translation hooks exist. Complete localization, host keyboard/focus and platform/pixel equivalence remain pending."
+      }
+    },
+    {
+      "id": "W46",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Open worktree adds workspace, persists current directory and synchronizes Review/Git/Explorer/new-terminal context; historical sessions retain their recorded workspace. Missing cold-session cwd shows unavailable dialog with locate/worktrees action, no silent substitution for a deleted directory.",
+      "interaction_contract": "Open worktree adds workspace, persists current directory and synchronizes Review/Git/Explorer/new-terminal context; historical sessions retain their recorded workspace. Missing cold-session cwd shows unavailable dialog with locate/worktrees action, no silent substitution for a deleted directory.",
+      "state_failure_platform": "`set_current_workspace` canonicalizes and resets cached worktree root/fetch generation. Opening a worktree itself does not explicitly respawn an existing pi process in this method; distinguish selected-workspace update from a new RPC-session cwd guarantee.",
+      "sources": [
+        "`app/worktrees.rs::{open_worktree,worktree_unavailable_dialog_body}`; `app.rs::{set_current_workspace,sync_review_context}`; `app/session.rs::open_session` cold path around lines 827–858"
+      ],
+      "tests": "No direct end-to-end worktree-to-active-pi-cwd test located; source requires follow-up runtime verification.",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G4",
+        "paths": [
+          "internal/workspace/worktrees.go",
+          "internal/workspace/setup.go",
+          "internal/worktreeui/state.go",
+          "internal/worktreeui/view.go",
+          "internal/worktreeui/picker.go",
+          "internal/worktreeui/labels.go"
+        ],
+        "tests": [
+          "internal/workspace/worktrees_test.go",
+          "internal/worktreeui/state_test.go",
+          "internal/worktreeui/view_test.go",
+          "internal/worktreeui/picker_test.go"
+        ],
+        "remaining": "Real temporary worktree operations, setup consent/failure/cancel, transactional persistence and scoped native typing/confirm/retry tests pass. Host guide preference/translation hooks exist. Complete localization, host keyboard/focus and platform/pixel equivalence remain pending."
+      }
+    },
+    {
+      "id": "W47",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Rename worktree directory under configured root or move to explicit resolved destination, preserving branch; reject blank/existing/no-op target. Active selected workspace follows moved path.",
+      "interaction_contract": "Rename worktree directory under configured root or move to explicit resolved destination, preserving branch; reject blank/existing/no-op target. Active selected workspace follows moved path.",
+      "state_failure_platform": "Uses `git worktree move`, not blind filesystem rename; mutation runs off-thread and refreshes list. Main-worktree menu omits rename/move.",
+      "sources": [
+        "`worktree.rs::WorktreeManager::move_to`; `app/worktrees.rs::{start_rename_worktree,start_move_worktree,submit_move_worktree,worktree_row_menu}`"
+      ],
+      "tests": "`worktree.rs::lifecycle_create_list_move_lock_remove_prune`",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G4",
+        "paths": [
+          "internal/workspace/worktrees.go",
+          "internal/workspace/setup.go",
+          "internal/worktreeui/state.go",
+          "internal/worktreeui/view.go",
+          "internal/worktreeui/picker.go",
+          "internal/worktreeui/labels.go"
+        ],
+        "tests": [
+          "internal/workspace/worktrees_test.go",
+          "internal/worktreeui/state_test.go",
+          "internal/worktreeui/view_test.go",
+          "internal/worktreeui/picker_test.go"
+        ],
+        "remaining": "Real temporary worktree operations, setup consent/failure/cancel, transactional persistence and scoped native typing/confirm/retry tests pass. Host guide preference/translation hooks exist. Complete localization, host keyboard/focus and platform/pixel equivalence remain pending.",
+        "specific_tests": [
+          "TestWorktreeMoveResolvesMainRootAndRenameConfiguredRoot",
+          "TestWorktreeLifecyclePreservesBranches"
+        ]
+      }
+    },
+    {
+      "id": "W48",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Remove worktree asks explicit clean/dirty confirmation after reading dirty state; dirty confirmation uses `--force`; branch is never deleted. Main/unknown/locked worktrees refused by backend.",
+      "interaction_contract": "Remove worktree asks explicit clean/dirty confirmation after reading dirty state; dirty confirmation uses `--force`; branch is never deleted. Main/unknown/locked worktrees refused by backend.",
+      "state_failure_platform": "UI never offers remove for main. Locked remains refused even with force. Existing dirty-probe error defaults to false, but backend checks again before unforced removal. Removed-session recovery remains separate.",
+      "sources": [
+        "`worktree.rs::{WorktreeManager::is_dirty,WorktreeManager::remove}`; `app/worktrees.rs::{start_remove_worktree,remove_worktree_dialog_body,confirm_worktree_dialog}`"
+      ],
+      "tests": "`worktree.rs::{remove_refuses_dirty_worktree_until_forced,remove_rejects_main_and_unknown_paths,lifecycle_create_list_move_lock_remove_prune}`",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G4",
+        "paths": [
+          "internal/workspace/worktrees.go",
+          "internal/workspace/setup.go",
+          "internal/worktreeui/state.go",
+          "internal/worktreeui/view.go",
+          "internal/worktreeui/picker.go",
+          "internal/worktreeui/labels.go"
+        ],
+        "tests": [
+          "internal/workspace/worktrees_test.go",
+          "internal/worktreeui/state_test.go",
+          "internal/worktreeui/view_test.go",
+          "internal/worktreeui/picker_test.go"
+        ],
+        "remaining": "Real temporary worktree operations, setup consent/failure/cancel, transactional persistence and scoped native typing/confirm/retry tests pass. Host guide preference/translation hooks exist. Complete localization, host keyboard/focus and platform/pixel equivalence remain pending."
+      }
+    },
+    {
+      "id": "W49",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Lock/unlock, prune stale administrative entries, repair metadata after manual move, reveal and copy path. Worktree row click opens; right-click and ellipsis menus share actions.",
+      "interaction_contract": "Lock/unlock, prune stale administrative entries, repair metadata after manual move, reveal and copy path. Worktree row click opens; right-click and ellipsis menus share actions.",
+      "state_failure_platform": "Mutation helper serializes one operation and drops a second request rather than queuing stale row targets. Lock reason backend exists; UI currently passes none. Failures route to page banner or branch-in-use dialog.",
+      "sources": [
+        "`worktree.rs::{lock,unlock,prune,repair}`; `app/worktrees.rs::{run_worktree_mutation,lock_worktree,unlock_worktree,prune_worktrees,repair_worktrees,reveal_worktree,copy_worktree_path}`"
+      ],
+      "tests": "`worktree.rs::{lifecycle_create_list_move_lock_remove_prune,repair_succeeds_on_a_healthy_repository}`",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G4",
+        "paths": [
+          "internal/workspace/worktrees.go",
+          "internal/workspace/setup.go",
+          "internal/worktreeui/state.go",
+          "internal/worktreeui/view.go",
+          "internal/worktreeui/picker.go",
+          "internal/worktreeui/labels.go"
+        ],
+        "tests": [
+          "internal/workspace/worktrees_test.go",
+          "internal/worktreeui/state_test.go",
+          "internal/worktreeui/view_test.go",
+          "internal/worktreeui/picker_test.go"
+        ],
+        "remaining": "Real temporary worktree operations, setup consent/failure/cancel, transactional persistence and scoped native typing/confirm/retry tests pass. Host guide preference/translation hooks exist. Complete localization, host keyboard/focus and platform/pixel equivalence remain pending."
+      }
+    },
+    {
+      "id": "W50",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Status “Work in” picker has Local/main, linked worktrees and New; Up/Down wrap selection, Enter chooses, Escape closes/restores composer focus; mutually excludes overlapping popovers.",
+      "interaction_contract": "Status “Work in” picker has Local/main, linked worktrees and New; Up/Down wrap selection, Enter chooses, Escape closes/restores composer focus; mutually excludes overlapping popovers.",
+      "state_failure_platform": "Chip intentionally absent at main checkout and no-repo; shown in linked worktree. Top-bar Worktrees page remains entry point from main. Outside-click mouseup reopening guarded 200 ms.",
+      "sources": [
+        "`app/worktrees.rs::{work_in_chip,work_in_rows,toggle_work_in_menu,on_work_in_next,on_work_in_prev,on_work_in_confirm,run_work_in_item}`; `app/view.rs` header-more-worktrees"
+      ],
+      "tests": "`app/worktree_chip_tests.rs::the_work_in_chip_is_absent_at_the_main_checkout`",
+      "baseline_status": "source_present",
+      "migration_status": "partial_native_picker_tested_host_acceptance_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G4",
+        "paths": [
+          "internal/workspace/worktrees.go",
+          "internal/workspace/setup.go",
+          "internal/worktreeui/state.go",
+          "internal/worktreeui/view.go",
+          "internal/worktreeui/picker.go",
+          "internal/worktreeui/labels.go"
+        ],
+        "tests": [
+          "internal/workspace/worktrees_test.go",
+          "internal/worktreeui/state_test.go",
+          "internal/worktreeui/view_test.go",
+          "internal/worktreeui/picker_test.go"
+        ],
+        "remaining": "Real temporary worktree operations, setup consent/failure/cancel, transactional persistence and scoped native typing/confirm/retry tests pass. Host guide preference/translation hooks exist. Complete localization, host keyboard/focus and platform/pixel equivalence remain pending."
+      }
+    },
+    {
+      "id": "W51",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Worktrees refresh/busy/error/empty UI, setup banner and dismissible introductory guide. External changes trigger throttled list refresh while page visible.",
+      "interaction_contract": "Worktrees refresh/busy/error/empty UI, setup banner and dismissible introductory guide. External changes trigger throttled list refresh while page visible.",
+      "state_failure_platform": "2 s watcher-refresh throttle; fetch generation discards stale workspace result and pending refresh reruns. Guide dismissal stored via transcript hint persistence.",
+      "sources": [
+        "`app/worktrees.rs::{refresh_worktrees,refresh_worktrees_soon,worktree_howto_card,worktree_empty_state,worktrees_error_banner}`"
+      ],
+      "tests": "`app/worktree_howto_tests.rs::{howto_card_shows_until_dismissed,howto_card_fits_the_page_column}`",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G4",
+        "paths": [
+          "internal/workspace/worktrees.go",
+          "internal/workspace/setup.go",
+          "internal/worktreeui/state.go",
+          "internal/worktreeui/view.go",
+          "internal/worktreeui/picker.go",
+          "internal/worktreeui/labels.go"
+        ],
+        "tests": [
+          "internal/workspace/worktrees_test.go",
+          "internal/worktreeui/state_test.go",
+          "internal/worktreeui/view_test.go",
+          "internal/worktreeui/picker_test.go"
+        ],
+        "remaining": "Real temporary worktree operations, setup consent/failure/cancel, transactional persistence and scoped native typing/confirm/retry tests pass. Host guide preference/translation hooks exist. Complete localization, host keyboard/focus and platform/pixel equivalence remain pending."
+      }
+    }
+  ]
+}

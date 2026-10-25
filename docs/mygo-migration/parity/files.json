@@ -1,0 +1,286 @@
+{
+  "category": "Explorer and file editor",
+  "rows": [
+    {
+      "id": "W52",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Explorer scans workspace with nested/global Git ignores and `.ignore`, keeps empty directories, directories-first case-insensitive order, hidden-files toggle, Git status badges and dirty-ancestor markings, filter including matching subtree/ancestors.",
+      "interaction_contract": "Explorer scans workspace with nested/global Git ignores and `.ignore`, keeps empty directories, directories-first case-insensitive order, hidden-files toggle, Git status badges and dirty-ancestor markings, filter including matching subtree/ancestors.",
+      "state_failure_platform": "Off-thread snapshot; max 50,000 entries and depth 24, entry-cap truncation surfaced. Symlinks/special/non-UTF8 paths omitted; missing root returns empty snapshot; scan errors are skipped. Not a recursive search of file contents.",
+      "sources": [
+        "`explorer/walk.rs::{snapshot,Snapshot}`; `explorer/tree.rs::{TreeIndex,StatusBadge,visible_rows}`; `explorer/panel.rs::ensure_loaded`"
+      ],
+      "tests": "`explorer/walk.rs::{snapshot_honors_gitignore_and_keeps_empty_dirs,snapshot_hides_dotfiles_until_toggled,snapshot_does_not_follow_symlinks}`; tree sorting/filter/badge/ancestor tests",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G1",
+        "paths": [
+          "internal/workspace/files.go",
+          "internal/workspace/editor.go",
+          "internal/workspace/tree.go",
+          "internal/workspace/watch.go",
+          "internal/ui/files.go"
+        ],
+        "tests": [
+          "internal/workspace/files_test.go",
+          "internal/workspace/tree_test.go",
+          "internal/workspace/watch_test.go"
+        ],
+        "remaining": "File/ignore/editor/autosave/read-only/failure tests pass; native explorer/editor keyboard and visual acceptance remain pending. Dedicated native-controller stale source/session/workspace/hidden-toggle regressions pass under -race.",
+        "specific_tests": [
+          "TestWatcherTracksEmptyDirectoriesAndOrdinaryLogsObjects",
+          "TestWatcherDoesNotObserveCheckpointScratchOrRefs",
+          "TestFilesRapidHiddenToggleAndWorkspaceRejectStaleScan"
+        ]
+      }
+    },
+    {
+      "id": "W53",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Explorer virtualized rows, active-file highlight/reveal and ancestor expansion; mouse activate expands folder or opens file. Up/Down/Home/End, Left/Right folder collapse/expand, platform+Left/Right all collapse/expand, Enter/Space activate.",
+      "interaction_contract": "Explorer virtualized rows, active-file highlight/reveal and ancestor expansion; mouse activate expands folder or opens file. Up/Down/Home/End, Left/Right folder collapse/expand, platform+Left/Right all collapse/expand, Enter/Space activate.",
+      "state_failure_platform": "Inline name editor owns Enter/Escape; tree Escape closes row menu or clears filter before global abort. Workspace change resets tree/cursor/active/entry/delete/notice state.",
+      "sources": [
+        "`explorer/panel.rs::{set_workspace,set_active,reveal_active,on_key_down,activate,expand_all,collapse_all}`"
+      ],
+      "tests": "`explorer/tree.rs::{collapsed_root_shows_only_top_level,expanding_reveals_children_with_indentation,all_dir_paths_expands_every_directory}`; no full keyboard event test located.",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G1",
+        "paths": [
+          "internal/workspace/files.go",
+          "internal/workspace/editor.go",
+          "internal/workspace/tree.go",
+          "internal/workspace/watch.go",
+          "internal/ui/files.go"
+        ],
+        "tests": [
+          "internal/workspace/files_test.go",
+          "internal/workspace/tree_test.go",
+          "internal/workspace/watch_test.go"
+        ],
+        "remaining": "File/ignore/editor/autosave/read-only/failure tests pass; native explorer/editor keyboard and visual acceptance remain pending."
+      }
+    },
+    {
+      "id": "W54",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Explorer row context menu at pointer, viewport-flipping: folder expand/collapse, New File/Folder, Rename/Delete; file Open/Rename/Delete; both default-app open, reveal, copy absolute and relative path. Header has creation/refresh/collapse/hidden controls.",
+      "interaction_contract": "Explorer row context menu at pointer, viewport-flipping: folder expand/collapse, New File/Folder, Rename/Delete; file Open/Rename/Delete; both default-app open, reveal, copy absolute and relative path. Header has creation/refresh/collapse/hidden controls.",
+      "state_failure_platform": "Context menu outside-dismiss guard; OS integration varies by platform. Menu dispatch stops inappropriate row propagation.",
+      "sources": [
+        "`explorer/panel.rs::{header,context_menu,open_menu,dismiss_menu,selected_dir}`; `platform.rs::{open_path_default,reveal_in_file_manager}`"
+      ],
+      "tests": "`explorer/panel.rs::parent_of_splits_workspace_paths`; no native OS-open interaction test located.",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G1",
+        "paths": [
+          "internal/workspace/files.go",
+          "internal/workspace/editor.go",
+          "internal/workspace/tree.go",
+          "internal/workspace/watch.go",
+          "internal/ui/files.go"
+        ],
+        "tests": [
+          "internal/workspace/files_test.go",
+          "internal/workspace/tree_test.go",
+          "internal/workspace/watch_test.go"
+        ],
+        "remaining": "File/ignore/editor/autosave/read-only/failure tests pass; native explorer/editor keyboard and visual acceptance remain pending."
+      }
+    },
+    {
+      "id": "W55",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "New file/folder inline name field in selected folder/root, Enter confirm/Escape cancel. File creation opens new editable tab; folder creation refreshes tree; success toast/error strip.",
+      "interaction_contract": "New file/folder inline name field in selected folder/root, Enter confirm/Escape cancel. File creation opens new editable tab; folder creation refreshes tree; success toast/error strip.",
+      "state_failure_platform": "Name rejects dot/parent/slash/backslash/NUL/control/>255-byte names. `create_new` prevents truncation; mkdir one level and fails if existing. Disk I/O off UI thread.",
+      "sources": [
+        "`explorer/panel.rs::{start_new_file,start_new_folder,begin_entry,commit_entry}`; `explorer/ops.rs::{validate_name,create_file,create_dir}`; `app/session.rs::on_file_op`"
+      ],
+      "tests": "`explorer/ops.rs::{validate_rejects_unsafe_names,create_file_is_create_new_not_truncate,create_dir_is_one_level_and_refuses_existing}`; `explorer/panel.rs::inline_prompt_input_fills_the_row`",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G1",
+        "paths": [
+          "internal/workspace/files.go",
+          "internal/workspace/editor.go",
+          "internal/workspace/tree.go",
+          "internal/workspace/watch.go",
+          "internal/ui/files.go"
+        ],
+        "tests": [
+          "internal/workspace/files_test.go",
+          "internal/workspace/tree_test.go",
+          "internal/workspace/watch_test.go"
+        ],
+        "remaining": "File/ignore/editor/autosave/read-only/failure tests pass; native explorer/editor keyboard and visual acceptance remain pending."
+      }
+    },
+    {
+      "id": "W56",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Rename file/folder within parent with open-tab subtree reconciliation; Delete confirms before dispatch, closes affected tabs without writing, refreshes tree.",
+      "interaction_contract": "Rename file/folder within parent with open-tab subtree reconciliation; Delete confirms before dispatch, closes affected tabs without writing, refreshes tree.",
+      "state_failure_platform": "Refuses dirty open tabs below target; no-overwrite rename. macOS NSFileManager Trash recoverable, Windows/Linux permanent deletion; confirmation wording is conditional. Failures remain Explorer notice. No file drag/drop move/copy implementation in audited panel.",
+      "sources": [
+        "`explorer/ops.rs::rename`; `explorer/panel.rs::{start_rename,request_delete,delete_prompt}`; `app/session.rs::on_file_op`; `explorer/viewer.rs::{has_dirty_under,reconcile_rename,close_under}`; `platform.rs::{TRASH_IS_RECOVERABLE,trash_path}`"
+      ],
+      "tests": "`explorer/ops.rs::{rename_moves_within_the_same_directory,rename_refuses_to_overwrite_and_allows_no_op}`; `explorer/viewer.rs::rename_rewrites_display_for_a_file_and_a_subtree`",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G1",
+        "paths": [
+          "internal/workspace/files.go",
+          "internal/workspace/editor.go",
+          "internal/workspace/tree.go",
+          "internal/workspace/watch.go",
+          "internal/ui/files.go"
+        ],
+        "tests": [
+          "internal/workspace/files_test.go",
+          "internal/workspace/tree_test.go",
+          "internal/workspace/watch_test.go"
+        ],
+        "remaining": "File/ignore/editor/autosave/read-only/failure tests pass; native explorer/editor keyboard and visual acceptance remain pending.",
+        "integration_tests": [
+          "internal/ui/viewer_parity_test.go"
+        ]
+      }
+    },
+    {
+      "id": "W57",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Files has multi-tab editor, existing-tab activation preserves buffer, scrolling tab strip, close tab selects neighbor; last close exits Files. Hide preserves tabs and flushes dirty edits.",
+      "interaction_contract": "Files has multi-tab editor, existing-tab activation preserves buffer, scrolling tab strip, close tab selects neighbor; last close exits Files. Hide preserves tabs and flushes dirty edits.",
+      "state_failure_platform": "Tabs/buffers are in-memory entity state, no reopen-last-tabs disk store located. First load spinner, later loads keep old content; per-tab generation rejects obsolete reads. `secondary-W` tab close, `secondary-shift-W` surface close.",
+      "sources": [
+        "`explorer/viewer.rs::{FileViewer,show,activate,close_tab,hide,read,tab_strip,active_after_close}`; `main.rs` Files bindings"
+      ],
+      "tests": "`explorer/viewer.rs::{active_tab_after_close_is_a_neighbour,tab_strip_scrolls_when_tabs_overflow}`",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G1",
+        "paths": [
+          "internal/workspace/files.go",
+          "internal/workspace/editor.go",
+          "internal/workspace/tree.go",
+          "internal/workspace/watch.go",
+          "internal/ui/files.go"
+        ],
+        "tests": [
+          "internal/workspace/files_test.go",
+          "internal/workspace/tree_test.go",
+          "internal/workspace/watch_test.go"
+        ],
+        "remaining": "File/ignore/editor/autosave/read-only/failure tests pass; native explorer/editor keyboard and visual acceptance remain pending."
+      }
+    },
+    {
+      "id": "W58",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Code/text editing reuses ComposerInput with syntax paint, gutter, no wrap, fill-area layout; selection/navigation, cut/copy/paste, undo/redo, newlines and save shortcuts work in Editor context without sending chat.",
+      "interaction_contract": "Code/text editing reuses ComposerInput with syntax paint, gutter, no wrap, fill-area layout; selection/navigation, cut/copy/paste, undo/redo, newlines and save shortcuts work in Editor context without sending chat.",
+      "state_failure_platform": "`Editor Files` context overrides Composer behaviors. No language-server completion/refactor/multi-file search/replacement/three-way merge or debugger implemented in audited editor.",
+      "sources": [
+        "`explorer/viewer.rs::{show,seed_editor,editor_body}`; `main.rs` Editor bindings lines 410–440; `composer.rs` shared text engine"
+      ],
+      "tests": "Viewer load/token tests; shared composer tests own editing primitives; no end-to-end editor parity test suite located.",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G1",
+        "paths": [
+          "internal/workspace/files.go",
+          "internal/workspace/editor.go",
+          "internal/workspace/tree.go",
+          "internal/workspace/watch.go",
+          "internal/ui/files.go"
+        ],
+        "tests": [
+          "internal/workspace/files_test.go",
+          "internal/workspace/tree_test.go",
+          "internal/workspace/watch_test.go"
+        ],
+        "remaining": "File/ignore/editor/autosave/read-only/failure tests pass; native explorer/editor keyboard and visual acceptance remain pending."
+      }
+    },
+    {
+      "id": "W59",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Autosave 500 ms debounce flushes ALL dirty tabs; manual save does same. Status chips show saved/unsaved/saving/failed/changed-on-disk. Watch reload updates clean buffer; dirty buffer retained and conflict flag shown; self-save echo preserves caret/scroll.",
+      "interaction_contract": "Autosave 500 ms debounce flushes ALL dirty tabs; manual save does same. Status chips show saved/unsaved/saving/failed/changed-on-disk. Watch reload updates clean buffer; dirty buffer retained and conflict flag shown; self-save echo preserves caret/scroll.",
+      "state_failure_platform": "Sibling temp-write+rename with direct-write fallback. Failure marks still-open tab dirty. Close dispatches async flush then removes tab, so close-time save failure cannot remain visible in removed tab. Conflict badge is not an autosave lock/merge resolver.",
+      "sources": [
+        "`explorer/viewer.rs::{on_editor_changed,schedule_save,flush_all,flush,save_file,seed_editor,reload,status_chip}`"
+      ],
+      "tests": "`explorer/viewer.rs::{save_file_round_trips_and_is_atomic,save_file_surfaces_a_missing_directory_error}`; no close-time failure or conflicting-autosave test located.",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G1",
+        "paths": [
+          "internal/workspace/files.go",
+          "internal/workspace/editor.go",
+          "internal/workspace/tree.go",
+          "internal/workspace/watch.go",
+          "internal/ui/files.go"
+        ],
+        "tests": [
+          "internal/workspace/files_test.go",
+          "internal/workspace/tree_test.go",
+          "internal/workspace/watch_test.go"
+        ],
+        "remaining": "Global debounce, atomic mode-preserving saves, external conflict flags, edits-during-slow-save, nonblocking snapshots and retaining tabs changed during close are race-tested. Full native editor keyboard/status/visual parity remains open."
+      }
+    },
+    {
+      "id": "W60",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Markdown rendered preview/source toggle uses live edited buffer; image preview for PNG/JPEG/GIF/WebP/BMP/TIFF/SVG; code/text read-only fallback for lossy/truncated content; binary/too-large/read-error honest states. Toolbar shows relative path, byte size/lines/truncation/save status.",
+      "interaction_contract": "Markdown rendered preview/source toggle uses live edited buffer; image preview for PNG/JPEG/GIF/WebP/BMP/TIFF/SVG; code/text read-only fallback for lossy/truncated content; binary/too-large/read-error honest states. Toolbar shows relative path, byte size/lines/truncation/save status.",
+      "state_failure_platform": "2 MiB file cap before read (including images); 200,000-line cap; NUL sniff first 8,000 bytes; invalid UTF-8 decoded lossily but never editable. Image format guard does not imply ICO/AVIF decode support.",
+      "sources": [
+        "`explorer/viewer.rs::{Mode,FileContent::editable,load,is_image,image_format,toolbar,body,toggle_markdown_preview}`"
+      ],
+      "tests": "`explorer/viewer.rs::{loads_code_with_tokens_and_drops_the_trailing_blank_line,detects_markdown,detects_binary_from_a_nul_byte,oversized_files_are_not_read,invalid_utf8_is_decoded_lossily_not_rejected,directories_report_an_error_instead_of_panicking,image_extensions_are_recognized,truncated_and_lossy_content_is_not_editable}`",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G1",
+        "paths": [
+          "internal/workspace/files.go",
+          "internal/workspace/editor.go",
+          "internal/workspace/tree.go",
+          "internal/workspace/watch.go",
+          "internal/ui/files.go"
+        ],
+        "tests": [
+          "internal/workspace/files_test.go",
+          "internal/workspace/tree_test.go",
+          "internal/workspace/watch_test.go"
+        ],
+        "remaining": "File/ignore/editor/autosave/read-only/failure tests pass; native explorer/editor keyboard and visual acceptance remain pending.",
+        "integration_tests": [
+          "internal/ui/viewer_parity_test.go"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,607 @@
+{
+  "schema": "orbit-acceptance-shard/v1",
+  "category": "shell",
+  "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "rows": [
+    {
+      "id": "S09",
+      "title": "Session navigation",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/sidebar.rs",
+          "handler": "open_session_slot",
+          "line": 2509,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/sidebar.rs#L2509",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/sidebar.rs",
+          "handler": "cycle_session",
+          "line": 2521,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/sidebar.rs#L2521",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/sidebar.rs",
+          "handler": "on_sidebar_confirm",
+          "line": 2618,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/sidebar.rs#L2618",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Primary+1…9 targets visible sidebar order; next/previous session shortcuts; sidebar focus, up/down/home/end/Enter/Escape; active row auto-reveal through collapsed groups.",
+      "baseline_edge_state": "Navigation observes current grouping, sorting, archived filtering and visible session rows. It must not point at stale hidden items.",
+      "fixture": "Two temporary workspaces, an isolated HOME/PI_CODING_AGENT_DIR, fixture session JSONL files and controllable Pi RPC children.",
+      "steps": [
+        {
+          "id": "S09.behavior",
+          "dimension": "functional",
+          "action": "Navigate next/previous session and session history using source commands; return to a running session.",
+          "expected": "Primary+1…9 targets visible sidebar order; next/previous session shortcuts; sidebar focus, up/down/home/end/Enter/Escape; active row auto-reveal through collapsed groups.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S09.edge",
+          "dimension": "edge",
+          "action": "Exercise first/last boundaries, archived sessions and a deleted history target without opening the wrong workspace.",
+          "expected": "Navigation observes current grouping, sorting, archived filtering and visible session rows. It must not point at stale hidden items.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S09.error",
+          "dimension": "error",
+          "action": "Delay/fail session scan or runtime child used by this action; repeat while changing workspace.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Navigation observes current grouping, sorting, archived filtering and visible session rows. It must not point at stale hidden items.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S09.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S09.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S09.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S09.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/ui",
+        "cmd/orbit/main.go"
+      ],
+      "existing_test_candidates": [
+        "internal/ui/snapshot_test.go",
+        "internal/ui/workspace_review_regression_test.go",
+        "internal/ui/viewer_parity_test.go"
+      ],
+      "inventory_evidence": "../parity/shell.json",
+      "source_test_inventory": "T05,T06",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-S06",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "failed_missing_cases",
+          "steps": [
+            "Use numbered/next/previous session commands.",
+            "Rename, pin, archive, restore, clone and recoverably delete.",
+            "Change workspace sort/group/mark/icon and refresh fan-out."
+          ],
+          "expected": "Source ordering, active visibility, collapse persistence, all metadata operations and contextual menu semantics match.",
+          "tests": [],
+          "remaining": "Backend session operations exist, but host-level interaction/restart checks are incomplete. Source workspace marks/icons, all sorting modes and sticky/active reveal presentation are not fully reconstructed.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": []
+    },
+    {
+      "id": "S10",
+      "title": "Session metadata and title controls",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/session.rs",
+          "handler": "clone_session",
+          "line": 613,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/session.rs#L613",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "rename_session",
+          "line": 5836,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L5836",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/events.rs",
+          "handler": "tick",
+          "line": 18,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/events.rs#L18",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/sidebar.rs",
+          "handler": "on_menu_clone_session",
+          "line": 2188,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/sidebar.rs#L2188",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Rename, generate title, copy ID/path, reveal session file, inspect session details, clone entire conversation. Active header and sidebar reconcile session_info_changed.",
+      "baseline_edge_state": "Clone is shipped, rewind/fork UI is not. Clone preserves session data with new identity; invalid input/partial data is guarded. Title generation spinner and rename success feedback are distinct.",
+      "fixture": "Two temporary workspaces, an isolated HOME/PI_CODING_AGENT_DIR, fixture session JSONL files and controllable Pi RPC children.",
+      "steps": [
+        {
+          "id": "S10.behavior",
+          "dimension": "functional",
+          "action": "Rename a session, allow automatic title generation, edit metadata and inspect title in sidebar and header.",
+          "expected": "Rename, generate title, copy ID/path, reveal session file, inspect session details, clone entire conversation. Active header and sidebar reconcile session_info_changed.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S10.edge",
+          "dimension": "edge",
+          "action": "Return an empty or failed generated title; manually rename while generation is pending; reopen the session.",
+          "expected": "Clone is shipped, rewind/fork UI is not. Clone preserves session data with new identity; invalid input/partial data is guarded. Title generation spinner and rename success feedback are distinct.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S10.error",
+          "dimension": "error",
+          "action": "Delay/fail session scan or runtime child used by this action; repeat while changing workspace.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Clone is shipped, rewind/fork UI is not. Clone preserves session data with new identity; invalid input/partial data is guarded. Title generation spinner and rename success feedback are distinct.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S10.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S10.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S10.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S10.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/pirpc",
+        "internal/agent"
+      ],
+      "existing_test_candidates": [
+        "internal/pirpc/client_test.go",
+        "internal/agent/manager_test.go",
+        "internal/agent/reducer_test.go"
+      ],
+      "inventory_evidence": "../parity/shell.json",
+      "source_test_inventory": "T05,T06",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-S06",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "failed_missing_cases",
+          "steps": [
+            "Use numbered/next/previous session commands.",
+            "Rename, pin, archive, restore, clone and recoverably delete.",
+            "Change workspace sort/group/mark/icon and refresh fan-out."
+          ],
+          "expected": "Source ordering, active visibility, collapse persistence, all metadata operations and contextual menu semantics match.",
+          "tests": [],
+          "remaining": "Backend session operations exist, but host-level interaction/restart checks are incomplete. Source workspace marks/icons, all sorting modes and sticky/active reveal presentation are not fully reconstructed.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": []
+    },
+    {
+      "id": "S11",
+      "title": "Pin, archive and delete sessions",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/sidebar.rs",
+          "handler": "on_menu_delete_confirm",
+          "line": 2231,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/sidebar.rs#L2231",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/sidebar.rs",
+          "handler": "on_menu_toggle_archive",
+          "line": 2214,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/sidebar.rs#L2214",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Session row menu supports pin/unpin, archive/unarchive, copy path, reveal and explicit delete confirmation; archived filter changes default visible list.",
+      "baseline_edge_state": "Pins and archives are path-keyed Orbit stores. Session deletion removes JSONL and related pin/archive/workflow state; running-session guards matter. Archive does not rewrite pi history.",
+      "fixture": "Two temporary workspaces, an isolated HOME/PI_CODING_AGENT_DIR, fixture session JSONL files and controllable Pi RPC children.",
+      "steps": [
+        {
+          "id": "S11.behavior",
+          "dimension": "functional",
+          "action": "Pin and unpin; archive and restore; request deletion and first cancel, then confirm on a disposable session.",
+          "expected": "Session row menu supports pin/unpin, archive/unarchive, copy path, reveal and explicit delete confirmation; archived filter changes default visible list.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S11.edge",
+          "dimension": "edge",
+          "action": "Filter archived sessions, delete a currently selected fixture session and verify fallback selection and on-disk recovery contract.",
+          "expected": "Pins and archives are path-keyed Orbit stores. Session deletion removes JSONL and related pin/archive/workflow state; running-session guards matter. Archive does not rewrite pi history.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S11.error",
+          "dimension": "error",
+          "action": "Delay/fail session scan or runtime child used by this action; repeat while changing workspace.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Pins and archives are path-keyed Orbit stores. Session deletion removes JSONL and related pin/archive/workflow state; running-session guards matter. Archive does not rewrite pi history.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S11.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S11.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S11.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S11.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/pirpc",
+        "internal/agent"
+      ],
+      "existing_test_candidates": [
+        "internal/pirpc/client_test.go",
+        "internal/agent/manager_test.go",
+        "internal/agent/reducer_test.go"
+      ],
+      "inventory_evidence": "../parity/shell.json",
+      "source_test_inventory": "T05",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-S06",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "failed_missing_cases",
+          "steps": [
+            "Use numbered/next/previous session commands.",
+            "Rename, pin, archive, restore, clone and recoverably delete.",
+            "Change workspace sort/group/mark/icon and refresh fan-out."
+          ],
+          "expected": "Source ordering, active visibility, collapse persistence, all metadata operations and contextual menu semantics match.",
+          "tests": [],
+          "remaining": "Backend session operations exist, but host-level interaction/restart checks are incomplete. Source workspace marks/icons, all sorting modes and sticky/active reveal presentation are not fully reconstructed.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": []
+    },
+    {
+      "id": "S12",
+      "title": "Workspace sidebar organization",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/sidebar.rs",
+          "handler": "build_sidebar_rows",
+          "line": 176,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/sidebar.rs#L176",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/sidebar.rs",
+          "handler": "build_flat_sidebar_rows",
+          "line": 370,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/sidebar.rs#L370",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app.rs",
+          "handler": "WorkspaceSort",
+          "line": 2248,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app.rs#L2248",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app.rs",
+          "handler": "SidebarGroupBy",
+          "line": 2339,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app.rs#L2339",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Workspace groups or one flat list, collapsed groups, show-more session rows, sticky workspace header, workspace selection/markers; row and context-menu actions.",
+      "baseline_edge_state": "workspaces.json records explicit project list, added timestamps, grouping, archive filter, marks and sort. Sort supports manual, updated, added, alphabetical ascending/descending, session count.",
+      "fixture": "Two temporary workspaces, an isolated HOME/PI_CODING_AGENT_DIR, fixture session JSONL files and controllable Pi RPC children.",
+      "steps": [
+        {
+          "id": "S12.behavior",
+          "dimension": "functional",
+          "action": "Sort/group workspace sidebar, drag manual order if offered, collapse a group and toggle archived visibility.",
+          "expected": "Workspace groups or one flat list, collapsed groups, show-more session rows, sticky workspace header, workspace selection/markers; row and context-menu actions.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S12.edge",
+          "dimension": "edge",
+          "action": "Use duplicate display names and sessions with missing workspace paths; relaunch from the same fixture preference store.",
+          "expected": "workspaces.json records explicit project list, added timestamps, grouping, archive filter, marks and sort. Sort supports manual, updated, added, alphabetical ascending/descending, session count.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S12.error",
+          "dimension": "error",
+          "action": "Delay/fail session scan or runtime child used by this action; repeat while changing workspace.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: workspaces.json records explicit project list, added timestamps, grouping, archive filter, marks and sort. Sort supports manual, updated, added, alphabetical ascending/descending, session count.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S12.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S12.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S12.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S12.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/preferences",
+        "internal/workbench",
+        "internal/native"
+      ],
+      "existing_test_candidates": [
+        "internal/preferences/store_test.go",
+        "internal/preferences/workspaces_test.go",
+        "internal/workbench/workbench_test.go",
+        "internal/native/native_test.go",
+        "internal/native/runtime_test.go",
+        "internal/native/updater_test.go",
+        "internal/native/temp_files_test.go"
+      ],
+      "inventory_evidence": "../parity/shell.json",
+      "source_test_inventory": "T05",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-S06",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "failed_missing_cases",
+          "steps": [
+            "Use numbered/next/previous session commands.",
+            "Rename, pin, archive, restore, clone and recoverably delete.",
+            "Change workspace sort/group/mark/icon and refresh fan-out."
+          ],
+          "expected": "Source ordering, active visibility, collapse persistence, all metadata operations and contextual menu semantics match.",
+          "tests": [],
+          "remaining": "Backend session operations exist, but host-level interaction/restart checks are incomplete. Source workspace marks/icons, all sorting modes and sticky/active reveal presentation are not fully reconstructed.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": []
+    }
+  ]
+}

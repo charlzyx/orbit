@@ -1,0 +1,598 @@
+{
+  "schema": "orbit-acceptance-index/v1",
+  "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "published_implementation_reference": {
+    "sha": "80580ee3cffe8eab19b9399d7813fa6be61ec6d9",
+    "url": "https://github.com/charlzyx/orbit/commit/80580ee3cffe8eab19b9399d7813fa6be61ec6d9",
+    "scope": "Reference only. Current dirty-tree evidence is NOT attributed to this commit."
+  },
+  "row_count": 139,
+  "step_count": 973,
+  "expanded_row_specific_steps": 297,
+  "unexpanded_draft_gates": 676,
+  "narrow_assertions_passed": 24,
+  "full_feature_pass_count": 0,
+  "status_enum": [
+    "NOT_IMPLEMENTED",
+    "PARTIAL",
+    "UNTESTED",
+    "PASS",
+    "BLOCKED"
+  ],
+  "categories": [
+    {
+      "category": "shell",
+      "title": "Shell, navigation, sessions and workspaces",
+      "count": 14,
+      "verdict_totals": {
+        "functional": {
+          "PARTIAL": 14
+        },
+        "visual": {
+          "UNTESTED": 14
+        },
+        "native_os": {
+          "UNTESTED": 14
+        }
+      },
+      "shards": [
+        {
+          "ids": [
+            "S01",
+            "S02",
+            "S03",
+            "S04"
+          ],
+          "json": "shell-S01-S04.json",
+          "markdown": "shell-S01-S04.md"
+        },
+        {
+          "ids": [
+            "S05",
+            "S06",
+            "S07",
+            "S08"
+          ],
+          "json": "shell-S05-S08.json",
+          "markdown": "shell-S05-S08.md"
+        },
+        {
+          "ids": [
+            "S09",
+            "S10",
+            "S11",
+            "S12"
+          ],
+          "json": "shell-S09-S12.json",
+          "markdown": "shell-S09-S12.md"
+        },
+        {
+          "ids": [
+            "S13",
+            "S14"
+          ],
+          "json": "shell-S13-S14.json",
+          "markdown": "shell-S13-S14.md"
+        }
+      ]
+    },
+    {
+      "category": "chat",
+      "title": "Composer, transcript and interactive agent surfaces",
+      "count": 20,
+      "verdict_totals": {
+        "functional": {
+          "PARTIAL": 19,
+          "NOT_IMPLEMENTED": 1
+        },
+        "visual": {
+          "UNTESTED": 20
+        },
+        "native_os": {
+          "UNTESTED": 20
+        }
+      },
+      "shards": [
+        {
+          "ids": [
+            "C01",
+            "C02",
+            "C03",
+            "C04"
+          ],
+          "json": "chat-C01-C04.json",
+          "markdown": "chat-C01-C04.md"
+        },
+        {
+          "ids": [
+            "C05",
+            "C06",
+            "C07",
+            "C08"
+          ],
+          "json": "chat-C05-C08.json",
+          "markdown": "chat-C05-C08.md"
+        },
+        {
+          "ids": [
+            "C09",
+            "C10",
+            "C11",
+            "C12"
+          ],
+          "json": "chat-C09-C12.json",
+          "markdown": "chat-C09-C12.md"
+        },
+        {
+          "ids": [
+            "C13",
+            "C14",
+            "C15",
+            "C16"
+          ],
+          "json": "chat-C13-C16.json",
+          "markdown": "chat-C13-C16.md"
+        },
+        {
+          "ids": [
+            "C17",
+            "C18",
+            "C19",
+            "C20"
+          ],
+          "json": "chat-C17-C20.json",
+          "markdown": "chat-C17-C20.md"
+        }
+      ]
+    },
+    {
+      "category": "settings",
+      "title": "Settings, providers, skills, packages and MCP",
+      "count": 20,
+      "verdict_totals": {
+        "functional": {
+          "PARTIAL": 16,
+          "UNTESTED": 4
+        },
+        "visual": {
+          "UNTESTED": 20
+        },
+        "native_os": {
+          "UNTESTED": 20
+        }
+      },
+      "shards": [
+        {
+          "ids": [
+            "P01",
+            "P02",
+            "P03",
+            "P04"
+          ],
+          "json": "settings-P01-P04.json",
+          "markdown": "settings-P01-P04.md"
+        },
+        {
+          "ids": [
+            "P05",
+            "P06",
+            "P07",
+            "P08"
+          ],
+          "json": "settings-P05-P08.json",
+          "markdown": "settings-P05-P08.md"
+        },
+        {
+          "ids": [
+            "P09",
+            "P10",
+            "P11",
+            "P12"
+          ],
+          "json": "settings-P09-P12.json",
+          "markdown": "settings-P09-P12.md"
+        },
+        {
+          "ids": [
+            "P13",
+            "P14",
+            "P15",
+            "P16"
+          ],
+          "json": "settings-P13-P16.json",
+          "markdown": "settings-P13-P16.md"
+        },
+        {
+          "ids": [
+            "P17",
+            "P18",
+            "P19",
+            "P20"
+          ],
+          "json": "settings-P17-P20.json",
+          "markdown": "settings-P17-P20.md"
+        }
+      ]
+    },
+    {
+      "category": "updates-privacy",
+      "title": "Usage analytics, update, privacy and release behavior",
+      "count": 14,
+      "verdict_totals": {
+        "functional": {
+          "PARTIAL": 8,
+          "UNTESTED": 6
+        },
+        "visual": {
+          "UNTESTED": 14
+        },
+        "native_os": {
+          "UNTESTED": 14
+        }
+      },
+      "shards": [
+        {
+          "ids": [
+            "U01",
+            "U02",
+            "U03",
+            "U04"
+          ],
+          "json": "updates-privacy-U01-U04.json",
+          "markdown": "updates-privacy-U01-U04.md"
+        },
+        {
+          "ids": [
+            "U05",
+            "U06",
+            "U07",
+            "U08"
+          ],
+          "json": "updates-privacy-U05-U08.json",
+          "markdown": "updates-privacy-U05-U08.md"
+        },
+        {
+          "ids": [
+            "U09",
+            "U10",
+            "U11",
+            "U12"
+          ],
+          "json": "updates-privacy-U09-U12.json",
+          "markdown": "updates-privacy-U09-U12.md"
+        },
+        {
+          "ids": [
+            "U13",
+            "U14"
+          ],
+          "json": "updates-privacy-U13-U14.json",
+          "markdown": "updates-privacy-U13-U14.md"
+        }
+      ]
+    },
+    {
+      "category": "workbench-lifecycle",
+      "title": "Workbench lifecycle and shared state",
+      "count": 3,
+      "verdict_totals": {
+        "functional": {
+          "UNTESTED": 2,
+          "PARTIAL": 1
+        },
+        "visual": {
+          "UNTESTED": 3
+        },
+        "native_os": {
+          "UNTESTED": 3
+        }
+      },
+      "shards": [
+        {
+          "ids": [
+            "W01",
+            "W02",
+            "W03"
+          ],
+          "json": "workbench-lifecycle-W01-W03.json",
+          "markdown": "workbench-lifecycle-W01-W03.md"
+        }
+      ]
+    },
+    {
+      "category": "git-changes-history",
+      "title": "Git changes, history, graph and repository operations",
+      "count": 16,
+      "verdict_totals": {
+        "functional": {
+          "UNTESTED": 16
+        },
+        "visual": {
+          "UNTESTED": 16
+        },
+        "native_os": {
+          "UNTESTED": 16
+        }
+      },
+      "shards": [
+        {
+          "ids": [
+            "W04",
+            "W05",
+            "W06",
+            "W07"
+          ],
+          "json": "git-changes-history-W04-W07.json",
+          "markdown": "git-changes-history-W04-W07.md"
+        },
+        {
+          "ids": [
+            "W08",
+            "W09",
+            "W10",
+            "W11"
+          ],
+          "json": "git-changes-history-W08-W11.json",
+          "markdown": "git-changes-history-W08-W11.md"
+        },
+        {
+          "ids": [
+            "W12",
+            "W13",
+            "W14",
+            "W15"
+          ],
+          "json": "git-changes-history-W12-W15.json",
+          "markdown": "git-changes-history-W12-W15.md"
+        },
+        {
+          "ids": [
+            "W16",
+            "W17",
+            "W18",
+            "W19"
+          ],
+          "json": "git-changes-history-W16-W19.json",
+          "markdown": "git-changes-history-W16-W19.md"
+        }
+      ]
+    },
+    {
+      "category": "github",
+      "title": "GitHub issues and pull requests",
+      "count": 11,
+      "verdict_totals": {
+        "functional": {
+          "UNTESTED": 11
+        },
+        "visual": {
+          "UNTESTED": 11
+        },
+        "native_os": {
+          "UNTESTED": 11
+        }
+      },
+      "shards": [
+        {
+          "ids": [
+            "W20",
+            "W21",
+            "W22",
+            "W23"
+          ],
+          "json": "github-W20-W23.json",
+          "markdown": "github-W20-W23.md"
+        },
+        {
+          "ids": [
+            "W24",
+            "W25",
+            "W26",
+            "W27"
+          ],
+          "json": "github-W24-W27.json",
+          "markdown": "github-W24-W27.md"
+        },
+        {
+          "ids": [
+            "W28",
+            "W29",
+            "W30"
+          ],
+          "json": "github-W28-W30.json",
+          "markdown": "github-W28-W30.md"
+        }
+      ]
+    },
+    {
+      "category": "review",
+      "title": "Review and turn checkpoints",
+      "count": 9,
+      "verdict_totals": {
+        "functional": {
+          "UNTESTED": 7,
+          "PARTIAL": 2
+        },
+        "visual": {
+          "UNTESTED": 9
+        },
+        "native_os": {
+          "UNTESTED": 9
+        }
+      },
+      "shards": [
+        {
+          "ids": [
+            "W31",
+            "W32",
+            "W33",
+            "W34"
+          ],
+          "json": "review-W31-W34.json",
+          "markdown": "review-W31-W34.md"
+        },
+        {
+          "ids": [
+            "W35",
+            "W36",
+            "W37",
+            "W38"
+          ],
+          "json": "review-W35-W38.json",
+          "markdown": "review-W35-W38.md"
+        },
+        {
+          "ids": [
+            "W39"
+          ],
+          "json": "review-W39-W39.json",
+          "markdown": "review-W39-W39.md"
+        }
+      ]
+    },
+    {
+      "category": "worktrees",
+      "title": "Worktrees and setup lifecycle",
+      "count": 12,
+      "verdict_totals": {
+        "functional": {
+          "UNTESTED": 4,
+          "PARTIAL": 8
+        },
+        "visual": {
+          "UNTESTED": 12
+        },
+        "native_os": {
+          "UNTESTED": 12
+        }
+      },
+      "shards": [
+        {
+          "ids": [
+            "W40",
+            "W41",
+            "W42",
+            "W43"
+          ],
+          "json": "worktrees-W40-W43.json",
+          "markdown": "worktrees-W40-W43.md"
+        },
+        {
+          "ids": [
+            "W44",
+            "W45",
+            "W46",
+            "W47"
+          ],
+          "json": "worktrees-W44-W47.json",
+          "markdown": "worktrees-W44-W47.md"
+        },
+        {
+          "ids": [
+            "W48",
+            "W49",
+            "W50",
+            "W51"
+          ],
+          "json": "worktrees-W48-W51.json",
+          "markdown": "worktrees-W48-W51.md"
+        }
+      ]
+    },
+    {
+      "category": "files",
+      "title": "Explorer and file editor",
+      "count": 9,
+      "verdict_totals": {
+        "functional": {
+          "UNTESTED": 6,
+          "PARTIAL": 3
+        },
+        "visual": {
+          "UNTESTED": 9
+        },
+        "native_os": {
+          "UNTESTED": 9
+        }
+      },
+      "shards": [
+        {
+          "ids": [
+            "W52",
+            "W53",
+            "W54",
+            "W55"
+          ],
+          "json": "files-W52-W55.json",
+          "markdown": "files-W52-W55.md"
+        },
+        {
+          "ids": [
+            "W56",
+            "W57",
+            "W58",
+            "W59"
+          ],
+          "json": "files-W56-W59.json",
+          "markdown": "files-W56-W59.md"
+        },
+        {
+          "ids": [
+            "W60"
+          ],
+          "json": "files-W60-W60.json",
+          "markdown": "files-W60-W60.md"
+        }
+      ]
+    },
+    {
+      "category": "terminal-platform",
+      "title": "Terminal, platform and window lifetime",
+      "count": 11,
+      "verdict_totals": {
+        "functional": {
+          "UNTESTED": 11
+        },
+        "visual": {
+          "UNTESTED": 11
+        },
+        "native_os": {
+          "UNTESTED": 11
+        }
+      },
+      "shards": [
+        {
+          "ids": [
+            "W61",
+            "W62",
+            "W63",
+            "W64"
+          ],
+          "json": "terminal-platform-W61-W64.json",
+          "markdown": "terminal-platform-W61-W64.md"
+        },
+        {
+          "ids": [
+            "W65",
+            "W66",
+            "W67",
+            "W68"
+          ],
+          "json": "terminal-platform-W65-W68.json",
+          "markdown": "terminal-platform-W65-W68.md"
+        },
+        {
+          "ids": [
+            "W69",
+            "W70",
+            "W71"
+          ],
+          "json": "terminal-platform-W69-W71.json",
+          "markdown": "terminal-platform-W69-W71.md"
+        }
+      ]
+    }
+  ],
+  "manifest_evidence": "workspace-evidence.json",
+  "rules": "PASS requires the named complete acceptance scope, exact tested revision and evidence. Visual and native OS verdicts are independent. Pending/blocked source captures never inherit domain-test PASS."
+}

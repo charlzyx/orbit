@@ -1,0 +1,647 @@
+{
+  "schema": "orbit-acceptance-shard/v1",
+  "category": "shell",
+  "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "rows": [
+    {
+      "id": "S01",
+      "title": "Native shell and one-window lifetime",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/main_window.rs",
+          "handler": "open",
+          "line": 77,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/main_window.rs#L77",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/main_window.rs",
+          "handler": "spawn_heartbeat",
+          "line": 136,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/main_window.rs#L136",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "handler": "render",
+          "line": 166,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/view.rs#L166",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/platform.rs",
+          "handler": "titlebar_options",
+          "line": 1507,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/platform.rs#L1507",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Sidebar, common top bar, transcript, composer, status bar, contextual panes; initial window maximized with display-relative restore bounds and minimum 960×640. macOS Dock reopen reuses the same OrbitApp.",
+      "baseline_edge_state": "App-owned heartbeat survives window closure: 16 ms active, 90 ms idle. Closing a window must not silently kill a running session. Windows/Linux closure semantics remain platform-specific.",
+      "fixture": "Two temporary workspaces, an isolated HOME/PI_CODING_AGENT_DIR, fixture session JSONL files and controllable Pi RPC children.",
+      "steps": [
+        {
+          "id": "S01.behavior",
+          "dimension": "functional",
+          "action": "Launch against displays 1280×800 and 1920×1080 and a no-display-metadata fixture; inspect initial window options, then unmaximize.",
+          "expected": "Initially maximized and focused, minimum960×640. Restore bounds are min(displayWidth×0.85,1440) by min(displayHeight×0.9,920), centered; no-display fallback1240×840. Composer is focused and app id is dev.orbit.pi.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S01.edge",
+          "dimension": "edge",
+          "action": "Verify same session and process identity after reopening; test a window smaller than the source minimum.",
+          "expected": "App-owned heartbeat survives window closure: 16 ms active, 90 ms idle. Closing a window must not silently kill a running session. Windows/Linux closure semantics remain platform-specific.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S01.error",
+          "dimension": "error",
+          "action": "Inject failure from the native open_window adapter, then retry opening without creating another app controller.",
+          "expected": "The source logs 'Orbit: could not open the main window' and returns; no success window handle, duplicate OrbitApp or duplicate heartbeat is created.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S01.loading",
+          "dimension": "loading",
+          "action": "Start a fixture streaming Pi session, close all windows, advance the heartbeat, finish the session and reopen.",
+          "expected": "The app-owned heartbeat still drains while windowless:90ms idle and16ms active after each observed tick; repaint is unnecessary without a window. This is not a window-loading spinner.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S01.persistence",
+          "dimension": "persistence",
+          "action": "Record OrbitApp identity and child PID; close the macOS window without quitting; reopen from Dock and compare.",
+          "expected": "The same global shell entity and existing Pi child are reused. This gate concerns in-process retention, not disk session restoration after full app exit.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S01.keyboard",
+          "dimension": "keyboard",
+          "action": "Use native window close and the macOS application reopen event; inspect app command bindings for a dedicated resize/reopen action.",
+          "expected": "No app-specific resize or reopen keyboard chord is invented. Composer focus is restored by open(); normal OS window controls retain their native behavior.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S01.repeat",
+          "dimension": "repeat",
+          "action": "Close and reopen the main window three times while a controlled Pi child emits numbered events.",
+          "expected": "One retained controller and child, one heartbeat; every event is reduced once and returning window shows the current session. Actual macOS Dock behavior remains a native-OS gate.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/ui",
+        "cmd/orbit/main.go"
+      ],
+      "existing_test_candidates": [
+        "internal/ui/snapshot_test.go",
+        "internal/ui/workspace_review_regression_test.go",
+        "internal/ui/viewer_parity_test.go"
+      ],
+      "inventory_evidence": "../parity/shell.json",
+      "source_test_inventory": "T01",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-S01",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "partial",
+          "steps": [
+            "Start with empty isolated preferences.",
+            "Inspect native window minimum and initial maximize; close/reopen on macOS while a fake Pi session streams."
+          ],
+          "expected": "Source minimum 960×640; restore85% display width and90%height capped1440×920; one parked controller/process survives close.",
+          "tests": [
+            "TestSourceWindowRestoreBounds",
+            "TestHiddenSidebarReservesNativeTrafficLights"
+          ],
+          "remaining": "Pure restore bounds and native traffic-light clearance pass. Actual maximize/center/close/reopen/16ms-active heartbeat across all OS remains unexecuted.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": []
+    },
+    {
+      "id": "S02",
+      "title": "Resizable workbench geometry",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/layout.rs",
+          "handler": "Layout",
+          "line": 29,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/layout.rs#L29",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "handler": "render",
+          "line": 166,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/view.rs#L166",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app.rs",
+          "handler": "SIDEBAR_MIN_W",
+          "line": 87,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app.rs#L87",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Drag sidebar, Review sidepane, Explorer and terminal splitters; clamp minimums and reserve readable main content; full-width Review is separate from width resize.",
+      "baseline_edge_state": "Four sizes in ~/.orbit-pi/layout.json; writes settle after 500 ms. Invalid/nonfinite/out-of-range stored sizes discarded. Open/closed surfaces are not all persisted in this store.",
+      "fixture": "Two temporary workspaces, an isolated HOME/PI_CODING_AGENT_DIR, fixture session JSONL files and controllable Pi RPC children.",
+      "steps": [
+        {
+          "id": "S02.behavior",
+          "dimension": "functional",
+          "action": "Drag Sidebar, Review, Explorer and Terminal below minimum, to a normal size and above maximum; toggle full-width Review independently.",
+          "expected": "Sidebar default248/min200; Review default460/min300/drag max900; Explorer default248/min172/max460; Terminal default260/min96. Main content retains480px reserve where the source resize handler applies it. Full-width Review preserves its separate restore width.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S02.edge",
+          "dimension": "edge",
+          "action": "Persist a valid size, then supply negative, huge and nonfinite saved values in a copied home; relaunch.",
+          "expected": "Four sizes in ~/.orbit-pi/layout.json; writes settle after 500 ms. Invalid/nonfinite/out-of-range stored sizes discarded. Open/closed surfaces are not all persisted in this store.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S02.error",
+          "dimension": "error",
+          "action": "Make the fixture ~/.orbit-pi/layout.json parent unwritable; drag and allow the settle flush. Restore permission, change a size again and flush.",
+          "expected": "Pinned Layout.persist ignores write errors: current live size remains, old disk state is not falsely claimed updated, and a later changed size can persist. This action has no session-scan or Pi dependency.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S02.loading",
+          "dimension": "loading",
+          "action": "Record a size change at t=0; flush at499ms and500ms. Record an identical value at400ms and repeat.",
+          "expected": "No disk write before500ms; one flush when changed value has settled. Recording the same value does not rearm the timer. Resizing is immediate and has no loading spinner.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S02.persistence",
+          "dimension": "persistence",
+          "action": "Persist sidebar_width248, sidepane_width460, explorer_width300, terminal_height260 in ~/.orbit-pi/layout.json; relaunch. Repeat with missing, text,10,99999 and nonfinite parsed fields.",
+          "expected": "Only those four sizes belong to this store. Numeric finite values in inclusive80…4000 survive parsing before panel-specific clamps; invalid fields become absent/default independently. Malformed file defaults all fields. Open panels, fonts and theme are not restored by this file.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S02.keyboard",
+          "dimension": "keyboard",
+          "action": "After resizing use Cmd+B/Ctrl+B, Cmd+Shift+E/Ctrl+Shift+E and Cmd+J/Ctrl+J to toggle Sidebar, Explorer and Terminal; reopen each.",
+          "expected": "The registered source panel actions toggle visibility without treating those keys as resize commands; remembered size is retained. Review ToggleSidePanel has no chord in this command entry, so no invented key is required.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S02.repeat",
+          "dimension": "repeat",
+          "action": "Perform100 pointer size updates, stop, then leave the splitter stationary and reopen the panel three times.",
+          "expected": "Live geometry updates without writing per pixel; one settled write per changed burst. Stationary input does not repeatedly rewrite layout.json; visibility toggles retain size.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/preferences",
+        "internal/workbench",
+        "internal/native"
+      ],
+      "existing_test_candidates": [
+        "internal/preferences/store_test.go",
+        "internal/preferences/workspaces_test.go",
+        "internal/workbench/workbench_test.go",
+        "internal/native/native_test.go",
+        "internal/native/runtime_test.go",
+        "internal/native/updater_test.go",
+        "internal/native/temp_files_test.go"
+      ],
+      "inventory_evidence": "../parity/shell.json",
+      "source_test_inventory": "T01,T02",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-S02",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "partial",
+          "steps": [
+            "At1470×922 change scale1/1.25/1.5/2.",
+            "Drag sidebar/review/explorer/terminal widths; relaunch.",
+            "Repeat font12/14/18 and density80/100/120."
+          ],
+          "expected": "Logical rectangles stay stable under device scale; source clamps and persisted layout survive relaunch.",
+          "tests": [
+            "TestFractionalScaleKeepsLogicalComposerGeometry",
+            "TestMinimumWindowModalsKeepActionsReachable"
+          ],
+          "remaining": "DIP composer and modal bounds pass, including800×560 stress below source minimum. Full panel drag/relaunch/font-density matrix and matched pixels remain open.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": []
+    },
+    {
+      "id": "S03",
+      "title": "Global command/action registry",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/commands.rs",
+          "handler": "COMMANDS",
+          "line": 224,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/commands.rs#L224",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/commands.rs",
+          "handler": "BINDINGS",
+          "line": 794,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/commands.rs#L794",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/main.rs",
+          "handler": "bind_keys",
+          "line": 357,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/main.rs#L357",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/pickers.rs",
+          "handler": "run_command",
+          "line": 415,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/pickers.rs#L415",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Command palette, native menu, shortcuts help and pointer controls dispatch the same action identities; labels use Cmd on macOS and Ctrl elsewhere.",
+      "baseline_edge_state": "Context-specific bindings override global behavior. Access/workflow/MCP and worktrees commands include palette-only entries without fabricated chords.",
+      "fixture": "Two temporary workspaces, an isolated HOME/PI_CODING_AGENT_DIR, fixture session JSONL files and controllable Pi RPC children.",
+      "steps": [
+        {
+          "id": "S03.behavior",
+          "dimension": "functional",
+          "action": "Enumerate every BINDINGS entry; invoke the matching menu, palette action and keyboard chord from its declared focus context.",
+          "expected": "Command palette, native menu, shortcuts help and pointer controls dispatch the same action identities; labels use Cmd on macOS and Ctrl elsewhere.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S03.edge",
+          "dimension": "edge",
+          "action": "Repeat each chord from composer, editor, terminal and dialog focus; verify out-of-context actions are not dispatched.",
+          "expected": "Context-specific bindings override global behavior. Access/workflow/MCP and worktrees commands include palette-only entries without fabricated chords.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S03.error",
+          "dimension": "error",
+          "action": "Delay/fail session scan or runtime child used by this action; repeat while changing workspace.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Context-specific bindings override global behavior. Access/workflow/MCP and worktrees commands include palette-only entries without fabricated chords.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S03.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S03.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S03.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S03.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/ui",
+        "cmd/orbit/main.go"
+      ],
+      "existing_test_candidates": [
+        "internal/ui/snapshot_test.go",
+        "internal/ui/workspace_review_regression_test.go",
+        "internal/ui/viewer_parity_test.go"
+      ],
+      "inventory_evidence": "../parity/shell.json",
+      "source_test_inventory": "T03",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-S03",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "pass_scoped",
+          "steps": [
+            "Open palette, move down six entries, filter to one and press Enter.",
+            "Filter to zero then restore and press Enter.",
+            "Open prompt from palette; Escape back to composer."
+          ],
+          "expected": "Filtered selection resets/clamps; zero results do not submit; stable modal keys restore focus.",
+          "tests": [
+            "TestFilteredPickersResetAndClampKeyboardSelection",
+            "TestPickerKeyboardCommit",
+            "TestModalTransitionRestoresComposerFocus"
+          ],
+          "remaining": "These exact native CPU flows pass, not every command/context or OS accelerator.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        },
+        {
+          "id": "UI-S04",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "pass_scoped",
+          "steps": [
+            "Open confirm, prompt, custom terminal, secret, image, model or palette.",
+            "Dispatch New task/Settings/Terminal through native menu.",
+            "For custom UI press Escape, then explicit Cancel."
+          ],
+          "expected": "No action mutates behind modal. Custom Escape sends ESC to Pi rather than dismissing; explicit Cancel cancels.",
+          "tests": [
+            "TestNativeMenuCannotMutateBehindModal",
+            "TestCustomDialogDoesNotDismissEscape",
+            "TestLiveCustomDialogForwardsEscape"
+          ],
+          "remaining": "Live custom test requires ORBIT_TERMINAL_TEST and pinned Ghostty; it was run previously. Ordinary default suite skips opt-in test. OS-native menu entry/accelerator dispatch remains separate.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": []
+    },
+    {
+      "id": "S04",
+      "title": "Command palette versus transcript search",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/command_palette.rs",
+          "handler": "CommandPalette",
+          "line": 313,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/command_palette.rs#L313",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/pickers.rs",
+          "handler": "toggle_command_palette",
+          "line": 288,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/pickers.rs#L288",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/pickers.rs",
+          "handler": "run_palette_command",
+          "line": 387,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/pickers.rs#L387",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Primary+P or Primary+K opens fuzzy-search sessions/commands/settings and dynamic MCP actions. Sidebar Search opens this palette, not transcript-content search. Up/down, Enter, Escape, scrim dismissal and focus return must match.",
+      "baseline_edge_state": "State-driven visibility, disabled actions and active-title variants; no backend content-search service.",
+      "fixture": "Two temporary workspaces, an isolated HOME/PI_CODING_AGENT_DIR, fixture session JSONL files and controllable Pi RPC children.",
+      "steps": [
+        {
+          "id": "S04.behavior",
+          "dimension": "functional",
+          "action": "Open sidebar Search and the command palette; search a session title, command label and settings synonym; select each result.",
+          "expected": "Primary+P or Primary+K opens fuzzy-search sessions/commands/settings and dynamic MCP actions. Sidebar Search opens this palette, not transcript-content search. Up/down, Enter, Escape, scrim dismissal and focus return must match.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S04.edge",
+          "dimension": "edge",
+          "action": "Enter text that appears only inside a transcript; confirm palette does not pretend to be transcript search; test no matches and Escape.",
+          "expected": "State-driven visibility, disabled actions and active-title variants; no backend content-search service.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S04.error",
+          "dimension": "error",
+          "action": "Delay/fail session scan or runtime child used by this action; repeat while changing workspace.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: State-driven visibility, disabled actions and active-title variants; no backend content-search service.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S04.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S04.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S04.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "S04.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/ui",
+        "cmd/orbit/main.go"
+      ],
+      "existing_test_candidates": [
+        "internal/ui/snapshot_test.go",
+        "internal/ui/workspace_review_regression_test.go",
+        "internal/ui/viewer_parity_test.go"
+      ],
+      "inventory_evidence": "../parity/shell.json",
+      "source_test_inventory": "T03",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-S03",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "pass_scoped",
+          "steps": [
+            "Open palette, move down six entries, filter to one and press Enter.",
+            "Filter to zero then restore and press Enter.",
+            "Open prompt from palette; Escape back to composer."
+          ],
+          "expected": "Filtered selection resets/clamps; zero results do not submit; stable modal keys restore focus.",
+          "tests": [
+            "TestFilteredPickersResetAndClampKeyboardSelection",
+            "TestPickerKeyboardCommit",
+            "TestModalTransitionRestoresComposerFocus"
+          ],
+          "remaining": "These exact native CPU flows pass, not every command/context or OS accelerator.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": []
+    }
+  ]
+}

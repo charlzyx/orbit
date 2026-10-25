@@ -1,0 +1,636 @@
+{
+  "schema": "orbit-acceptance-shard/v1",
+  "category": "settings",
+  "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "rows": [
+    {
+      "id": "P09",
+      "title": "Quota headline and provider cards",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/runtime.rs",
+          "handler": "poll_quota_entries",
+          "line": 317,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/runtime.rs#L317",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/mcp_ui.rs",
+          "handler": "QuotaPopupTab",
+          "line": 2447,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/mcp_ui.rs#L2447",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Top-bar quota pill/popover and provider quota cards show windows/reset times/balance/spend, account notes/errors; active-provider priority, refresh, hidden-provider group and MCP tab.",
+      "baseline_edge_state": "quota.list and bundled orbit:quota session entries merge nonsecret facts. Unknown/unsupported not fabricated. Refresh spinner minimum 450 ms and timeout 4 s; bridge polls 60 s with 3 s bootstrap polls. Hidden IDs persist.",
+      "fixture": "Isolated HOME and project config, dummy secret marker values, controlled package/provider/MCP executables and fake OAuth issuer; no real credentials.",
+      "steps": [
+        {
+          "id": "P09.behavior",
+          "dimension": "functional",
+          "action": "Refresh quota for supported fixture providers and inspect headline/detail cards and reset times.",
+          "expected": "Top-bar quota pill/popover and provider quota cards show windows/reset times/balance/spend, account notes/errors; active-provider priority, refresh, hidden-provider group and MCP tab.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P09.edge",
+          "dimension": "edge",
+          "action": "Exercise unsupported, unauthenticated, expired and rate-limited responses; show unknown quota honestly and stop stale polling.",
+          "expected": "quota.list and bundled orbit:quota session entries merge nonsecret facts. Unknown/unsupported not fabricated. Refresh spinner minimum 450 ms and timeout 4 s; bridge polls 60 s with 3 s bootstrap polls. Hidden IDs persist.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P09.error",
+          "dimension": "error",
+          "action": "Make this setting's file write or provider/package/MCP operation fail; cancel then retry once after recovery.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: quota.list and bundled orbit:quota session entries merge nonsecret facts. Unknown/unsupported not fabricated. Refresh spinner minimum 450 ms and timeout 4 s; bridge polls 60 s with 3 s bootstrap polls. Hidden IDs persist.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P09.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P09.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P09.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P09.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/preferences",
+        "internal/workbench",
+        "internal/native"
+      ],
+      "existing_test_candidates": [
+        "internal/preferences/store_test.go",
+        "internal/preferences/workspaces_test.go",
+        "internal/workbench/workbench_test.go",
+        "internal/native/native_test.go",
+        "internal/native/runtime_test.go",
+        "internal/native/updater_test.go",
+        "internal/native/temp_files_test.go"
+      ],
+      "inventory_evidence": "../parity/settings.json",
+      "source_test_inventory": "T09",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-P04",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "partial",
+          "steps": [
+            "Start sign-in, cancel, then receive stale completion.",
+            "Use active-provider5h/peak/balance/global fallbacks and failed reports.",
+            "Inspect refresh/reset and hidden-provider preferences."
+          ],
+          "expected": "No stale sign-in overwrites later state; quota priority/unknown handling source-equivalent.",
+          "tests": [
+            "TestQuotaHeadlinePriorityAndErrorExclusion",
+            "TestQuotaFractionsAndWindowRecognition",
+            "TestQuotaResetHintAndAmount",
+            "TestQuotaReportsAreSortedWithoutChangingInput"
+          ],
+          "remaining": "Pure quota rules pass; live OAuth, full quota popup grouping/hidden-provider/MCP tabs and OS browser-return lifecycle remain unverified or incomplete.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": []
+    },
+    {
+      "id": "P10",
+      "title": "Skills discovery and master/detail",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/skills.rs",
+          "handler": "discover",
+          "line": 88,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/skills.rs#L88",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/skills.rs",
+          "handler": "Skill",
+          "line": 52,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/skills.rs#L52",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/skills_ui.rs",
+          "handler": "render_skills_page",
+          "line": 32,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/skills_ui.rs#L32",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/skills_ui.rs",
+          "handler": "apply_skill_action",
+          "line": 722,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/skills_ui.rs#L722",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Discover project .pi/skills, ancestor .agents/skills up to git root, global pi skills and user .agents/skills; dedupe names by precedence; filter/scope/detail markdown, invoke /skill:name, open/reveal/copy path.",
+      "baseline_edge_state": "Missing required description flagged invalid; manual-only distinct from disabled. Discovery is not a package marketplace and exact +/- overrides are supported, not general glob parity with pi loader.",
+      "fixture": "Isolated HOME and project config, dummy secret marker values, controlled package/provider/MCP executables and fake OAuth issuer; no real credentials.",
+      "steps": [
+        {
+          "id": "P10.behavior",
+          "dimension": "functional",
+          "action": "Discover global/project skills; search, select and inspect metadata/content/location in master-detail view.",
+          "expected": "Discover project .pi/skills, ancestor .agents/skills up to git root, global pi skills and user .agents/skills; dedupe names by precedence; filter/scope/detail markdown, invoke /skill:name, open/reveal/copy path.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P10.edge",
+          "dimension": "edge",
+          "action": "Use duplicate names, missing SKILL.md, malformed frontmatter and inaccessible directories; preserve scope attribution.",
+          "expected": "Missing required description flagged invalid; manual-only distinct from disabled. Discovery is not a package marketplace and exact +/- overrides are supported, not general glob parity with pi loader.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P10.error",
+          "dimension": "error",
+          "action": "Make this setting's file write or provider/package/MCP operation fail; cancel then retry once after recovery.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Missing required description flagged invalid; manual-only distinct from disabled. Discovery is not a package marketplace and exact +/- overrides are supported, not general glob parity with pi loader.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P10.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P10.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P10.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P10.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/preferences",
+        "internal/workbench",
+        "internal/native"
+      ],
+      "existing_test_candidates": [
+        "internal/preferences/store_test.go",
+        "internal/preferences/workspaces_test.go",
+        "internal/workbench/workbench_test.go",
+        "internal/native/native_test.go",
+        "internal/native/runtime_test.go",
+        "internal/native/updater_test.go",
+        "internal/native/temp_files_test.go"
+      ],
+      "inventory_evidence": "../parity/settings.json",
+      "source_test_inventory": "T15",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-P05",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "integration_in_progress",
+          "steps": [
+            "Search/select Skills, inspect frontmatter-stripped detail, enable/disable/delete with cancellation.",
+            "Install by global/project scope; double-click operation, cancel, change workspace while pending.",
+            "Check/skip/clear/update actual package offers."
+          ],
+          "expected": "Source master/detail, scope/mutation serialization, stale completion rejection and precise persistence.",
+          "tests": [],
+          "remaining": "Dedicated resourceui replaces generic host implementation and is mounted. Worker source checklist/native/race tests are in progress; do not claim completed acceptance until handoff.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": [
+        "../settings-backend-implementation.md",
+        "../settings-backend-source-evidence.json"
+      ]
+    },
+    {
+      "id": "P11",
+      "title": "Skill enable/disable/delete",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/skills.rs",
+          "handler": "set_enabled",
+          "line": 338,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/skills.rs#L338",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/skills.rs",
+          "handler": "delete",
+          "line": 440,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/skills.rs#L440",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/skills_ui.rs",
+          "handler": "delete_selected_skill",
+          "line": 772,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/skills_ui.rs#L772",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Toggle scope-correct skills overrides preserving unrelated settings; delete selected skill after confirmation and clear exact override.",
+      "baseline_edge_state": "Deletes skill directory (or only SKILL.md at root), not OS Trash. Do not confuse this with Explorer deletion. Legacy non-array skills schema refuses overwrite.",
+      "fixture": "Isolated HOME and project config, dummy secret marker values, controlled package/provider/MCP executables and fake OAuth issuer; no real credentials.",
+      "steps": [
+        {
+          "id": "P11.behavior",
+          "dimension": "functional",
+          "action": "Enable/disable a selected skill and request deletion in a disposable copied skill directory.",
+          "expected": "Toggle scope-correct skills overrides preserving unrelated settings; delete selected skill after confirmation and clear exact override.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P11.edge",
+          "dimension": "edge",
+          "action": "Cancel deletion, simulate permission failure and refresh externally renamed skills; do not delete outside resolved skill roots.",
+          "expected": "Deletes skill directory (or only SKILL.md at root), not OS Trash. Do not confuse this with Explorer deletion. Legacy non-array skills schema refuses overwrite.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P11.error",
+          "dimension": "error",
+          "action": "Make this setting's file write or provider/package/MCP operation fail; cancel then retry once after recovery.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Deletes skill directory (or only SKILL.md at root), not OS Trash. Do not confuse this with Explorer deletion. Legacy non-array skills schema refuses overwrite.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P11.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P11.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P11.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P11.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/preferences",
+        "internal/workbench",
+        "internal/native"
+      ],
+      "existing_test_candidates": [
+        "internal/preferences/store_test.go",
+        "internal/preferences/workspaces_test.go",
+        "internal/workbench/workbench_test.go",
+        "internal/native/native_test.go",
+        "internal/native/runtime_test.go",
+        "internal/native/updater_test.go",
+        "internal/native/temp_files_test.go"
+      ],
+      "inventory_evidence": "../parity/settings.json",
+      "source_test_inventory": "T15",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-P05",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "integration_in_progress",
+          "steps": [
+            "Search/select Skills, inspect frontmatter-stripped detail, enable/disable/delete with cancellation.",
+            "Install by global/project scope; double-click operation, cancel, change workspace while pending.",
+            "Check/skip/clear/update actual package offers."
+          ],
+          "expected": "Source master/detail, scope/mutation serialization, stale completion rejection and precise persistence.",
+          "tests": [],
+          "remaining": "Dedicated resourceui replaces generic host implementation and is mounted. Worker source checklist/native/race tests are in progress; do not claim completed acceptance until handoff.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": [
+        "../settings-backend-implementation.md",
+        "../settings-backend-source-evidence.json"
+      ]
+    },
+    {
+      "id": "P12",
+      "title": "Plugin package management",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/plugins.rs",
+          "handler": "discover",
+          "line": 99,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/plugins.rs#L99",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/plugins.rs",
+          "handler": "install",
+          "line": 135,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/plugins.rs#L135",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/plugins.rs",
+          "handler": "remove",
+          "line": 147,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/plugins.rs#L147",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/plugins.rs",
+          "handler": "update",
+          "line": 157,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/plugins.rs#L157",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "List npm/git/local packages with scope/kind/installed/version, search; install source, project/global scope, update/remove, reveal/open paths.",
+      "baseline_edge_state": "pi CLI owns fetch/lockfile/settings changes; 240 s command timeout; malformed one-scope config still lists other scope. Project source wins duplicates; one operation at a time shows progress/result.",
+      "fixture": "Isolated HOME and project config, dummy secret marker values, controlled package/provider/MCP executables and fake OAuth issuer; no real credentials.",
+      "steps": [
+        {
+          "id": "P12.behavior",
+          "dimension": "functional",
+          "action": "Install, remove and inspect a fixture plugin package at each supported scope using a controlled package command.",
+          "expected": "List npm/git/local packages with scope/kind/installed/version, search; install source, project/global scope, update/remove, reveal/open paths.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P12.edge",
+          "dimension": "edge",
+          "action": "Cancel/fail installation, repeat clicks and return malformed package metadata; keep real package status rather than optimistic success.",
+          "expected": "pi CLI owns fetch/lockfile/settings changes; 240 s command timeout; malformed one-scope config still lists other scope. Project source wins duplicates; one operation at a time shows progress/result.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P12.error",
+          "dimension": "error",
+          "action": "Make this setting's file write or provider/package/MCP operation fail; cancel then retry once after recovery.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: pi CLI owns fetch/lockfile/settings changes; 240 s command timeout; malformed one-scope config still lists other scope. Project source wins duplicates; one operation at a time shows progress/result.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P12.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P12.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P12.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "P12.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/preferences",
+        "internal/workbench",
+        "internal/native"
+      ],
+      "existing_test_candidates": [
+        "internal/preferences/store_test.go",
+        "internal/preferences/workspaces_test.go",
+        "internal/workbench/workbench_test.go",
+        "internal/native/native_test.go",
+        "internal/native/runtime_test.go",
+        "internal/native/updater_test.go",
+        "internal/native/temp_files_test.go"
+      ],
+      "inventory_evidence": "../parity/settings.json",
+      "source_test_inventory": "T15",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [
+        {
+          "id": "UI-P05",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "integration_in_progress",
+          "steps": [
+            "Search/select Skills, inspect frontmatter-stripped detail, enable/disable/delete with cancellation.",
+            "Install by global/project scope; double-click operation, cancel, change workspace while pending.",
+            "Check/skip/clear/update actual package offers."
+          ],
+          "expected": "Source master/detail, scope/mutation serialization, stale completion rejection and precise persistence.",
+          "tests": [],
+          "remaining": "Dedicated resourceui replaces generic host implementation and is mounted. Worker source checklist/native/race tests are in progress; do not claim completed acceptance until handoff.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": [
+        "../settings-backend-implementation.md",
+        "../settings-backend-source-evidence.json"
+      ]
+    }
+  ]
+}

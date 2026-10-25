@@ -1,0 +1,630 @@
+{
+  "schema": "orbit-acceptance-shard/v1",
+  "category": "review",
+  "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "rows": [
+    {
+      "id": "W31",
+      "title": "Review sources: Last Turn, Uncommitted, Unstaged, Staged, Committed and Branch. Comparisons respectively use turn refs; HEAD→worktree; index→worktree; HEAD→index; branch base→HEAD; branch base→worktree.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/review.rs",
+          "handler": "Source",
+          "line": 28,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/review.rs#L28",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/git.rs",
+          "handler": "collect_review_diff",
+          "line": 304,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git.rs#L304",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/git.rs",
+          "handler": "resolve_range",
+          "line": 333,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git.rs#L333",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/git.rs",
+          "handler": "branch_base",
+          "line": 426,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git.rs#L426",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Review sources: Last Turn, Uncommitted, Unstaged, Staged, Committed and Branch. Comparisons respectively use turn refs; HEAD→worktree; index→worktree; HEAD→index; branch base→HEAD; branch base→worktree.",
+      "baseline_edge_state": "Default branch comparison searches local main/master distinct from current, else HEAD; unborn HEAD uses empty tree. Last Turn unavailable without session/completed checkpoint and falls back on session switch. Exact existing semantics must not be replaced by a generic `git diff`.",
+      "fixture": "Temporary Git repository with differing HEAD/index/worktree/branch/turn snapshots, Unicode/quoted paths and complete/compact/binary patches.",
+      "steps": [
+        {
+          "id": "W31.behavior",
+          "dimension": "functional",
+          "action": "Create distinct baseline/index/worktree/branch/turn states; select all six Review sources.",
+          "expected": "Review sources: Last Turn, Uncommitted, Unstaged, Staged, Committed and Branch. Comparisons respectively use turn refs; HEAD→worktree; index→worktree; HEAD→index; branch base→HEAD; branch base→worktree.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W31.edge",
+          "dimension": "edge",
+          "action": "Use unborn HEAD, no main/master and absent turn checkpoint; compare exact trees and honest source-specific unavailable state.",
+          "expected": "Default branch comparison searches local main/master distinct from current, else HEAD; unborn HEAD uses empty tree. Last Turn unavailable without session/completed checkpoint and falls back on session switch. Exact existing semantics must not be replaced by a generic `git diff`.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W31.error",
+          "dimension": "error",
+          "action": "Fail a first load and same-source refresh separately; finish an earlier request after a newer source/workspace selection.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Default branch comparison searches local main/master distinct from current, else HEAD; unborn HEAD uses empty tree. Last Turn unavailable without session/completed checkpoint and falls back on session switch. Exact existing semantics must not be replaced by a generic `git diff`.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W31.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W31.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W31.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W31.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/workspace/checkpoint.go",
+        "internal/workspace/review.go",
+        "internal/ui/review.go",
+        "internal/agent/manager.go"
+      ],
+      "existing_test_candidates": [
+        "internal/workspace/checkpoint_test.go",
+        "internal/workspace/review_test.go"
+      ],
+      "inventory_evidence": "../parity/review.json",
+      "source_test_inventory": "`git.rs::{source_modes_compare_consistent_git_snapshots,last_turn_uses_captured_checkpoints_not_the_live_worktree,last_turn_without_checkpoints_reports_an_error,off_repo_reports_not_a_repository}`",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Six-source immutable snapshots/checkpoint attribution/diff model tested; native review interaction/presentation parity remains pending.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    },
+    {
+      "id": "W32",
+      "title": "Snapshot tracked and untracked files at turn start/end into session-keyed `refs/orbit/session-…` checkpoint commits; recover latest completed turn after restart and continue numbering.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/checkpoint.rs",
+          "handler": "capture_turn_start",
+          "line": 114,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/checkpoint.rs#L114",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/checkpoint.rs",
+          "handler": "capture_turn",
+          "line": 155,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/checkpoint.rs#L155",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/checkpoint.rs",
+          "handler": "capture_worktree_commit",
+          "line": 189,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/checkpoint.rs#L189",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/checkpoint.rs",
+          "handler": "checkpoint_ref",
+          "line": 90,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/checkpoint.rs#L90",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Snapshot tracked and untracked files at turn start/end into session-keyed `refs/orbit/session-…` checkpoint commits; recover latest completed turn after restart and continue numbering.",
+      "baseline_edge_state": "Isolated temporary index preserves real index/HEAD/worktree; ref-safe session key and atomic ref updates. Non-repo capture no-ops. Index read uses copied temporary index to avoid file-watch loops.",
+      "fixture": "Temporary Git repository with differing HEAD/index/worktree/branch/turn snapshots, Unicode/quoted paths and complete/compact/binary patches.",
+      "steps": [
+        {
+          "id": "W32.behavior",
+          "dimension": "functional",
+          "action": "Capture tracked/untracked turn-start/end snapshots, restart manager and continue turn numbering.",
+          "expected": "Snapshot tracked and untracked files at turn start/end into session-keyed `refs/orbit/session-…` checkpoint commits; recover latest completed turn after restart and continue numbering.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W32.edge",
+          "dimension": "edge",
+          "action": "Verify real index/HEAD/worktree unchanged, concurrent checkpoints serialized, non-repository no-op and failed capture diagnostic.",
+          "expected": "Isolated temporary index preserves real index/HEAD/worktree; ref-safe session key and atomic ref updates. Non-repo capture no-ops. Index read uses copied temporary index to avoid file-watch loops.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W32.error",
+          "dimension": "error",
+          "action": "Fail a first load and same-source refresh separately; finish an earlier request after a newer source/workspace selection.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Isolated temporary index preserves real index/HEAD/worktree; ref-safe session key and atomic ref updates. Non-repo capture no-ops. Index read uses copied temporary index to avoid file-watch loops.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W32.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W32.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W32.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W32.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/workspace/checkpoint.go",
+        "internal/workspace/review.go",
+        "internal/ui/review.go",
+        "internal/agent/manager.go"
+      ],
+      "existing_test_candidates": [
+        "internal/workspace/checkpoint_test.go",
+        "internal/workspace/review_test.go"
+      ],
+      "inventory_evidence": "../parity/review.json",
+      "source_test_inventory": "`checkpoint.rs::{captures_tracked_and_untracked_files_without_touching_the_index,each_turn_diffs_only_its_own_changes,latest_turn_lists_the_sessions_ending_checkpoints}`; `git.rs::index_tree_reads_without_rewriting_the_index`",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Six-source immutable snapshots/checkpoint attribution/diff model tested; native review interaction/presentation parity remains pending.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    },
+    {
+      "id": "W33",
+      "title": "Last Turn attribution handles branch switches during or between turns and dirty files on target branch; starting metadata retains HEAD, branch and repository refs.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/checkpoint.rs",
+          "handler": "TurnStartMetadata",
+          "line": 30,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/checkpoint.rs#L30",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/checkpoint.rs",
+          "handler": "prepare_turn_diff_base",
+          "line": 241,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/checkpoint.rs#L241",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/checkpoint.rs",
+          "handler": "target_branch_start",
+          "line": 285,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/checkpoint.rs#L285",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/checkpoint.rs",
+          "handler": "virtual_branch_start",
+          "line": 317,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/checkpoint.rs#L317",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Last Turn attribution handles branch switches during or between turns and dirty files on target branch; starting metadata retains HEAD, branch and repository refs.",
+      "baseline_edge_state": "Branch-aware virtual start/diff base prevents a whole branch switch from appearing as agent edits. Checkpoint display is read-only review, not a user-facing rewind/restore workflow.",
+      "fixture": "Temporary Git repository with differing HEAD/index/worktree/branch/turn snapshots, Unicode/quoted paths and complete/compact/binary patches.",
+      "steps": [
+        {
+          "id": "W33.behavior",
+          "dimension": "functional",
+          "action": "Switch branches during a turn and start with dirty changes on the destination branch.",
+          "expected": "Last Turn attribution handles branch switches during or between turns and dirty files on target branch; starting metadata retains HEAD, branch and repository refs.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W33.edge",
+          "dimension": "edge",
+          "action": "Last Turn must exclude unrelated branch switch and preexisting destination dirt while retaining actual agent changes.",
+          "expected": "Branch-aware virtual start/diff base prevents a whole branch switch from appearing as agent edits. Checkpoint display is read-only review, not a user-facing rewind/restore workflow.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W33.error",
+          "dimension": "error",
+          "action": "Fail a first load and same-source refresh separately; finish an earlier request after a newer source/workspace selection.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Branch-aware virtual start/diff base prevents a whole branch switch from appearing as agent edits. Checkpoint display is read-only review, not a user-facing rewind/restore workflow.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W33.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W33.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W33.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W33.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/workspace/checkpoint.go",
+        "internal/workspace/review.go",
+        "internal/ui/review.go",
+        "internal/agent/manager.go"
+      ],
+      "existing_test_candidates": [
+        "internal/workspace/checkpoint_test.go",
+        "internal/workspace/review_test.go"
+      ],
+      "inventory_evidence": "../parity/review.json",
+      "source_test_inventory": "`checkpoint.rs::{branch_switch_during_a_turn_is_not_attributed_to_the_turn,worktree_capture_keeps_dirty_files_on_the_target_branch_out_of_the_turn}`",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Six-source immutable snapshots/checkpoint attribution/diff model tested; native review interaction/presentation parity remains pending.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    },
+    {
+      "id": "W34",
+      "title": "Review parses file/hunk/section headers, added/deleted/context/meta lines, old/new line numbers, binary rows, totals and paint-only syntax. Diff/stat reads are off-thread.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/git.rs",
+          "handler": "MAX_HYDRATED_PATCH_BYTES",
+          "line": 31,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git.rs#L31",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/git.rs",
+          "handler": "collect_review_diff_inner",
+          "line": 312,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git.rs#L312",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/git.rs",
+          "handler": "diff_output",
+          "line": 445,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git.rs#L445",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/review.rs",
+          "handler": "parse_collected",
+          "line": 350,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/review.rs#L350",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Review parses file/hunk/section headers, added/deleted/context/meta lines, old/new line numbers, binary rows, totals and paint-only syntax. Diff/stat reads are off-thread.",
+      "baseline_edge_state": "Full context retained only up to 32 MiB hydrated patch, otherwise 3-line compact diff with honest nonexpandable gaps; visible rendering cap 50,000 rows and truncation flag. No fabricated content past cap.",
+      "fixture": "Temporary Git repository with differing HEAD/index/worktree/branch/turn snapshots, Unicode/quoted paths and complete/compact/binary patches.",
+      "steps": [
+        {
+          "id": "W34.behavior",
+          "dimension": "functional",
+          "action": "Parse multi-file, binary, grouped, quoted-path, synthetic and full/compact patches; inspect line numbers and syntax.",
+          "expected": "Review parses file/hunk/section headers, added/deleted/context/meta lines, old/new line numbers, binary rows, totals and paint-only syntax. Diff/stat reads are off-thread.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W34.edge",
+          "dimension": "edge",
+          "action": "Reverse numstat order, omit a file from stats, cross multiline token carries, exceed 32 MiB/50k limits and expand hidden context.",
+          "expected": "Full context retained only up to 32 MiB hydrated patch, otherwise 3-line compact diff with honest nonexpandable gaps; visible rendering cap 50,000 rows and truncation flag. No fabricated content past cap.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W34.error",
+          "dimension": "error",
+          "action": "Fail a first load and same-source refresh separately; finish an earlier request after a newer source/workspace selection.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Full context retained only up to 32 MiB hydrated patch, otherwise 3-line compact diff with honest nonexpandable gaps; visible rendering cap 50,000 rows and truncation flag. No fabricated content past cap.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W34.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W34.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W34.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W34.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/workspace/checkpoint.go",
+        "internal/workspace/review.go",
+        "internal/ui/review.go",
+        "internal/agent/manager.go",
+        "internal/highlight",
+        "internal/gitworkbench/embedded_diff.go"
+      ],
+      "existing_test_candidates": [
+        "internal/workspace/checkpoint_test.go",
+        "internal/workspace/review_test.go",
+        "internal/highlight/highlight_test.go",
+        "internal/workspace/review_highlight_test.go",
+        "internal/gitworkbench/highlight_test.go"
+      ],
+      "inventory_evidence": "../parity/review.json",
+      "source_test_inventory": "`review.rs::{parses_file_headers_gaps_line_numbers_and_syntax,numstat_marks_binary_rows,grouped_sections_split_files_and_offset_the_second_group,compact_patches_report_gaps_without_retained_context}`",
+      "verdicts": {
+        "functional": {
+          "status": "PARTIAL",
+          "reason": "Named narrow assertions pass; remaining row steps are unverified.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3"
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [
+        {
+          "id": "W34.assert.TestPinnedSourceOracle",
+          "status": "PASS",
+          "expected": "All 1,204 exact pinned-source lexical cases match across 16 languages.",
+          "test": "TestPinnedSourceOracle",
+          "package": "github.com/charlzyx/orbit/internal/highlight",
+          "command": "go test -race -count=1 ./internal/highlight -run ^TestPinnedSourceOracle$",
+          "evidence": "workspace-evidence.json",
+          "last_verified_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:01:15.372038317+09:00",
+          "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
+        },
+        {
+          "id": "W34.assert.TestReviewHighlightCarriesSeparateSidesAndResetsAtHunks",
+          "status": "PASS",
+          "expected": "Old/new carries are independent; context uses new side; file/hunk boundaries reset state.",
+          "test": "TestReviewHighlightCarriesSeparateSidesAndResetsAtHunks",
+          "package": "github.com/charlzyx/orbit/internal/workspace",
+          "command": "go test -race -count=1 ./internal/workspace -run ^TestReviewHighlightCarriesSeparateSidesAndResetsAtHunks$",
+          "evidence": "workspace-evidence.json",
+          "last_verified_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:01:17.757038767+09:00",
+          "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
+        },
+        {
+          "id": "W34.assert.TestReviewSourceHeaderPathsMetadataAndSyntheticHunks",
+          "status": "PASS",
+          "expected": "File identity follows diff paths, source-hidden metadata stays hidden, synthetic hunks have no invented positions.",
+          "test": "TestReviewSourceHeaderPathsMetadataAndSyntheticHunks",
+          "package": "github.com/charlzyx/orbit/internal/workspace",
+          "command": "go test -race -count=1 ./internal/workspace -run ^TestReviewSourceHeaderPathsMetadataAndSyntheticHunks$",
+          "evidence": "workspace-evidence.json",
+          "last_verified_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:01:17.757352028+09:00",
+          "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
+        },
+        {
+          "id": "W34.assert.TestReviewHeaderEscapesAndCompactAsymmetricGaps",
+          "status": "PASS",
+          "expected": "Quoted/space paths decode and compact gaps account for both old and new ranges.",
+          "test": "TestReviewHeaderEscapesAndCompactAsymmetricGaps",
+          "package": "github.com/charlzyx/orbit/internal/workspace",
+          "command": "go test -race -count=1 ./internal/workspace -run ^TestReviewHeaderEscapesAndCompactAsymmetricGaps$",
+          "evidence": "workspace-evidence.json",
+          "last_verified_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:01:17.757421483+09:00",
+          "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
+        },
+        {
+          "id": "W34.assert.TestDiffColorSpansPreserveEveryByteAndFontMetrics",
+          "status": "PASS",
+          "expected": "Git paint spans concatenate exact text and change color only, including dynamic palette callback.",
+          "test": "TestDiffColorSpansPreserveEveryByteAndFontMetrics",
+          "package": "github.com/charlzyx/orbit/internal/gitworkbench",
+          "command": "go test -race -count=1 ./internal/gitworkbench -run ^TestDiffColorSpansPreserveEveryByteAndFontMetrics$",
+          "evidence": "workspace-evidence.json",
+          "last_verified_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:01:15.557164225+09:00",
+          "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
+        }
+      ],
+      "known_remaining": "Paint-only lexer matches 1,204 pinned Rust oracle cases; separate-side carries, hidden context, split/group retention and Git color-only spans tested. Full parser variant audit, transcript/editor mounting and native rendered parity remain pending. See G9 and highlight-parity.md; historical Waku license claim remains unverified.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    }
+  ]
+}

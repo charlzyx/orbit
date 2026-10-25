@@ -1,0 +1,565 @@
+{
+  "category": "Git changes, history, graph and repository operations",
+  "rows": [
+    {
+      "id": "W04",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Git has six tabs: Changes, History, Graph, Stashes, Issues and Pull requests. Header/back, branch row, refresh, contextual busy/empty/error states and shortcuts invoke controllers.",
+      "interaction_contract": "Git has six tabs: Changes, History, Graph, Stashes, Issues and Pull requests. Header/back, branch row, refresh, contextual busy/empty/error states and shortcuts invoke controllers.",
+      "state_failure_platform": "`show` wakes embedded Review; `hide` parks it. Workspace changes clear relevant cached lists/details/filters/templates. Manual refresh re-probes gh and spins for at least 650 ms. Watch refresh does not accidentally grow History/Graph pagination.",
+      "sources": [
+        "`git_panel/mod.rs::{GitTab,set_tab,show,hide,set_context,refresh,refresh_all,refresh_from_button,tab_loading}`; `commands.rs::BINDINGS`"
+      ],
+      "tests": "`git_panel/mod.rs::tests` covers commit-bar state, not six-tab end-to-end UI. Registry tests cover binding/spec consistency.",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G2",
+        "paths": [
+          "internal/workspace/git.go",
+          "internal/workspace/git_ops.go",
+          "internal/workspace/github.go",
+          "internal/gitworkbench/state.go",
+          "internal/gitworkbench/view.go",
+          "internal/workspace/generation.go",
+          "internal/workspace/github_templates.go",
+          "internal/gitworkbench/templates.go"
+        ],
+        "tests": [
+          "internal/workspace/git_test.go",
+          "internal/workspace/github_test.go",
+          "internal/gitworkbench/state_test.go",
+          "internal/workspace/generation_test.go",
+          "internal/workspace/process_cancel_unix_test.go"
+        ],
+        "remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending."
+      }
+    },
+    {
+      "id": "W05",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Git branch/status discovery includes staged and unstaged status columns, original rename path, per-side additions/deletions, untracked counts, ahead/behind and unborn/detached conditions.",
+      "interaction_contract": "Git branch/status discovery includes staged and unstaged status columns, original rename path, per-side additions/deletions, untracked counts, ahead/behind and unborn/detached conditions.",
+      "state_failure_platform": "Git CLI, not libgit2. `GIT_OPTIONAL_LOCKS=0` avoids read-triggered index writes; untracked binary or >2 MiB files report zero counted lines. Status collection failure paints unavailable state.",
+      "sources": [
+        "`git.rs::{command,current_branch,status_rows,StatusRow,numstat_map,untracked_line_count,ahead_behind,has_commits}`; `git_panel/mod.rs::{refresh_status,refresh_branch}`"
+      ],
+      "tests": "`git.rs::{git_runs_without_optional_locks,status_rows_split_staged_and_unstaged_with_counts,status_rows_keeps_the_first_lines_index_column}`",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G2",
+        "paths": [
+          "internal/workspace/git.go",
+          "internal/workspace/git_ops.go",
+          "internal/workspace/github.go",
+          "internal/gitworkbench/state.go",
+          "internal/gitworkbench/view.go",
+          "internal/workspace/generation.go",
+          "internal/workspace/github_templates.go",
+          "internal/gitworkbench/templates.go"
+        ],
+        "tests": [
+          "internal/workspace/git_test.go",
+          "internal/workspace/github_test.go",
+          "internal/gitworkbench/state_test.go",
+          "internal/workspace/generation_test.go",
+          "internal/workspace/process_cancel_unix_test.go"
+        ],
+        "remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending."
+      }
+    },
+    {
+      "id": "W06",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Branch picker searches and groups current/recent/local/remote refs; checkout local or create/check out a local tracking branch for remote. Recent selection is derived from HEAD reflog.",
+      "interaction_contract": "Branch picker searches and groups current/recent/local/remote refs; checkout local or create/check out a local tracking branch for remote. Recent selection is derived from HEAD reflog.",
+      "state_failure_platform": "`switch` falls back to `checkout`; refs are read from Git. Error banners show actual failure; branch operation busy state, menu focus and 200 ms outside-dismiss guards prevent accidental reopening.",
+      "sources": [
+        "`git.rs::{list_branches,recent_branches,checkout_branch,checkout_remote_branch}`; `git_panel/mod.rs::{branch_menu,checkout_branch_ref,toggle_branch_menu}`; `branch_picker.rs`; `app/pickers.rs`"
+      ],
+      "tests": "`git_ops.rs::refs_include_locals_remotes_and_tags_but_not_origin_head`; no direct branch-picker interaction test located in these audited modules.",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G2",
+        "paths": [
+          "internal/workspace/git.go",
+          "internal/workspace/git_ops.go",
+          "internal/workspace/github.go",
+          "internal/gitworkbench/state.go",
+          "internal/gitworkbench/view.go",
+          "internal/workspace/generation.go",
+          "internal/workspace/github_templates.go",
+          "internal/gitworkbench/templates.go"
+        ],
+        "tests": [
+          "internal/workspace/git_test.go",
+          "internal/workspace/github_test.go",
+          "internal/gitworkbench/state_test.go",
+          "internal/workspace/generation_test.go",
+          "internal/workspace/process_cancel_unix_test.go"
+        ],
+        "remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending."
+      }
+    },
+    {
+      "id": "W07",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "New branch, rename current branch, safe branch delete; branch merge/rebase ref picker includes local/remote/tag refs. Merge offers normal fast-forward-permitted, no-ff and squash modes. Dirty rebase uses autostash.",
+      "interaction_contract": "New branch, rename current branch, safe branch delete; branch merge/rebase ref picker includes local/remote/tag refs. Merge offers normal fast-forward-permitted, no-ff and squash modes. Dirty rebase uses autostash.",
+      "state_failure_platform": "Safe delete `-d` first; “not fully merged” triggers explicit force-delete `-D` confirmation. Git validates/checks operations; UI closes menus before dispatch.",
+      "sources": [
+        "`git_panel/mod.rs::{open_branch_prompt,confirm_branch_prompt,delete_branch,merge_ref,rebase_ref,ref_picker_popup}`; `git_ops.rs::{merge_ref,rebase_ref,rename_branch,delete_branch}`"
+      ],
+      "tests": "`git_ops.rs::{merge_and_rebase_onto_a_branch,rename_and_delete_branch,refs_include_locals_remotes_and_tags_but_not_origin_head}`",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G2",
+        "paths": [
+          "internal/workspace/git.go",
+          "internal/workspace/git_ops.go",
+          "internal/workspace/github.go",
+          "internal/gitworkbench/state.go",
+          "internal/gitworkbench/view.go",
+          "internal/workspace/generation.go",
+          "internal/workspace/github_templates.go",
+          "internal/gitworkbench/templates.go"
+        ],
+        "tests": [
+          "internal/workspace/git_test.go",
+          "internal/workspace/github_test.go",
+          "internal/gitworkbench/state_test.go",
+          "internal/workspace/generation_test.go",
+          "internal/workspace/process_cancel_unix_test.go"
+        ],
+        "remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending."
+      }
+    },
+    {
+      "id": "W08",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Changes uses grouped staged/unstaged Review sections with per-file Stage/Unstage and bulk Stage all/Unstage all; counts and action availability follow actual status.",
+      "interaction_contract": "Changes uses grouped staged/unstaged Review sections with per-file Stage/Unstage and bulk Stage all/Unstage all; counts and action availability follow actual status.",
+      "state_failure_platform": "Stage uses path-separated Git arguments; stage-all includes untracked; unstage uses reset. File/section actions are rebuilt after status loads and cleared on workspace/clean-tree changes.",
+      "sources": [
+        "`git.rs::{stage_paths,stage_all,unstage_paths,unstage_all}`; `git_panel/mod.rs::{install_review_actions,install_review_section_actions,stage,unstage,stage_all,unstage_all,after_git}`"
+      ],
+      "tests": "Git status split tests; `review.rs::grouped_sections_split_files_and_offset_the_second_group`; no direct staging UI test located.",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G2",
+        "paths": [
+          "internal/workspace/git.go",
+          "internal/workspace/git_ops.go",
+          "internal/workspace/github.go",
+          "internal/gitworkbench/state.go",
+          "internal/gitworkbench/view.go",
+          "internal/workspace/generation.go",
+          "internal/workspace/github_templates.go",
+          "internal/gitworkbench/templates.go"
+        ],
+        "tests": [
+          "internal/workspace/git_test.go",
+          "internal/workspace/github_test.go",
+          "internal/gitworkbench/state_test.go",
+          "internal/workspace/generation_test.go",
+          "internal/workspace/process_cancel_unix_test.go"
+        ],
+        "remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending."
+      }
+    },
+    {
+      "id": "W09",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Discard individual unstaged path or all unstaged changes through explicit confirmation; staged changes are intended to remain.",
+      "interaction_contract": "Discard individual unstaged path or all unstaged changes through explicit confirmation; staged changes are intended to remain.",
+      "state_failure_platform": "Tracked files restore from index; untracked files are deleted by `git clean`. This is not OS Trash. Existing per-path implementation ignores both checkout/clean errors and returns success; bulk implementation ignores checkout error but propagates clean error. Preserve action semantics, do not mark failure handling verified.",
+      "sources": [
+        "`git_panel/mod.rs::{PendingConfirm,confirm_pending,discard,discard_all_changes}`; `git.rs::{discard_paths,discard_unstaged}`"
+      ],
+      "tests": "No dedicated discard regression test located.",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G2",
+        "paths": [
+          "internal/workspace/git.go",
+          "internal/workspace/git_ops.go",
+          "internal/workspace/github.go",
+          "internal/gitworkbench/state.go",
+          "internal/gitworkbench/view.go",
+          "internal/workspace/generation.go",
+          "internal/workspace/github_templates.go",
+          "internal/gitworkbench/templates.go"
+        ],
+        "tests": [
+          "internal/workspace/git_test.go",
+          "internal/workspace/github_test.go",
+          "internal/gitworkbench/state_test.go",
+          "internal/workspace/generation_test.go",
+          "internal/workspace/process_cancel_unix_test.go"
+        ],
+        "remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending."
+      }
+    },
+    {
+      "id": "W10",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Commit bar has editable message, include-unstaged checkbox, Commit and Commit-and-push, blank-message generation, and state-driven Push/Publish/Pull/Merge/up-to-date actions.",
+      "interaction_contract": "Commit bar has editable message, include-unstaged checkbox, Commit and Commit-and-push, blank-message generation, and state-driven Push/Publish/Pull/Merge/up-to-date actions.",
+      "state_failure_platform": "No staged work and include-unstaged off prevents commit. Generating/pending/operation flags gate keyboard commits too. Success clears message only for commit flows; failures retain it. Commit-and-push is sequential and can partially succeed.",
+      "sources": [
+        "`git_panel/mod.rs::{on_commit,run_git_action,commit_bar,bar_actions}`; `git.rs::commit`"
+      ],
+      "tests": "`git_panel/mod.rs::bar_actions_follow_git_state`; no end-to-end commit-and-push rollback/retry test located.",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G2",
+        "paths": [
+          "internal/workspace/git.go",
+          "internal/workspace/git_ops.go",
+          "internal/workspace/github.go",
+          "internal/gitworkbench/state.go",
+          "internal/gitworkbench/view.go",
+          "internal/workspace/generation.go",
+          "internal/workspace/github_templates.go",
+          "internal/gitworkbench/templates.go"
+        ],
+        "tests": [
+          "internal/workspace/git_test.go",
+          "internal/workspace/github_test.go",
+          "internal/gitworkbench/state_test.go",
+          "internal/workspace/generation_test.go",
+          "internal/workspace/process_cancel_unix_test.go"
+        ],
+        "remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending."
+      }
+    },
+    {
+      "id": "W11",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Generate conventional commit message from staged diff, optional unstaged context, original files, branch/repo and recent repository/user commit style. Generate can ask Stage all versus use already-staged content; blank-message commit chains generation into commit.",
+      "interaction_contract": "Generate conventional commit message from staged diff, optional unstaged context, original files, branch/repo and recent repository/user commit style. Generate can ask Stage all versus use already-staged content; blank-message commit chains generation into commit.",
+      "state_failure_platform": "Existing auxiliary path is `pi -p --no-tools --no-session --no-skills --no-context-files --no-approve`, NOT RPC, with selected provider/model, 180 s timeout and heuristic fallback. Extensions remain enabled for custom providers. Bounded diff/original context; result stays editable.",
+      "sources": [
+        "`commit_message.rs::{generate,run_pi,heuristic,system_prompt,user_prompt,normalize}`; `git_panel/mod.rs::{request_generate,stage_all_and_generate,generate_from_staged,generate_then}`"
+      ],
+      "tests": "`commit_message.rs::{extracts_a_single_text_fence,splits_a_patch_into_per_file_chunks,heuristic_names_the_shared_scope,heuristic_reads_as_a_conventional_description,normalizes_bullets_and_trailing_periods_into_the_commit_shape,prompt_follows_the_vscode_structure}`",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G2",
+        "paths": [
+          "internal/workspace/git.go",
+          "internal/workspace/git_ops.go",
+          "internal/workspace/github.go",
+          "internal/gitworkbench/state.go",
+          "internal/gitworkbench/view.go",
+          "internal/workspace/generation.go",
+          "internal/workspace/github_templates.go",
+          "internal/gitworkbench/templates.go"
+        ],
+        "tests": [
+          "internal/workspace/git_test.go",
+          "internal/workspace/github_test.go",
+          "internal/gitworkbench/state_test.go",
+          "internal/workspace/generation_test.go",
+          "internal/workspace/process_cancel_unix_test.go"
+        ],
+        "remaining": "Tool-free Pi RPC generation and repository templates are implemented; fake-process race tests verify isolation, prompt bounds, fallback, cancellation and no staging mutation. Host workflow/live inference and exact template UI acceptance remain pending."
+      }
+    },
+    {
+      "id": "W12",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Fetch, push/publish with upstream creation, ff-only pull, merge upstream, rebase upstream with autostash, Sync and force-with-lease. Sync fetches, pulls/merges when behind, then pushes when ahead.",
+      "interaction_contract": "Fetch, push/publish with upstream creation, ff-only pull, merge upstream, rebase upstream with autostash, Sync and force-with-lease. Sync fetches, pulls/merges when behind, then pushes when ahead.",
+      "state_failure_platform": "Push with an existing upstream does not reinterpret auth/network failure as missing-upstream. Forced push never uses bare `--force` and requires UI confirmation. Rejected push triggers best-effort fetch to update counts and available recovery.",
+      "sources": [
+        "`git.rs::{fetch,push,pull,merge_upstream,rebase_upstream,sync,push_force_with_lease}`; `git_panel/mod.rs::{sync_controls,sync_menu,run_git_action,fetch_remote}`"
+      ],
+      "tests": "`git.rs::force_push_uses_the_lease_and_refuses_a_stale_remote`; commit-bar state test.",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G2",
+        "paths": [
+          "internal/workspace/git.go",
+          "internal/workspace/git_ops.go",
+          "internal/workspace/github.go",
+          "internal/gitworkbench/state.go",
+          "internal/gitworkbench/view.go",
+          "internal/workspace/generation.go",
+          "internal/workspace/github_templates.go",
+          "internal/gitworkbench/templates.go"
+        ],
+        "tests": [
+          "internal/workspace/git_test.go",
+          "internal/workspace/github_test.go",
+          "internal/gitworkbench/state_test.go",
+          "internal/workspace/generation_test.go",
+          "internal/workspace/process_cancel_unix_test.go"
+        ],
+        "remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending."
+      }
+    },
+    {
+      "id": "W13",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Persistent copyable Git failure banner classifies push rejection/divergence/conflicts/dirty-overwrite/auth/network/no-upstream, secret scanning, file-size/LFS/protected-branch/hooks, missing remote/repository and unknown failures. Offers only matching recovery.",
+      "interaction_contract": "Persistent copyable Git failure banner classifies push rejection/divergence/conflicts/dirty-overwrite/auth/network/no-upstream, secret scanning, file-size/LFS/protected-branch/hooks, missing remote/repository and unknown failures. Offers only matching recovery.",
+      "state_failure_platform": "Full raw stderr survives until dismiss or later success; not a fleeting/truncated toast. Recovery may pull/merge/rebase/force-with-lease/continue/skip/abort/open conflict/publish/retry. Reauthenticate only copies `gh auth login`; it does not automatically run login. Server-rule failures have no fake repair button.",
+      "sources": [
+        "`git_panel/failure.rs::{FailureKind,ActionError,RecoveryAction,classify}`; `git_panel/mod.rs::{failure_banner,set_failure,recover}`"
+      ],
+      "tests": "`git_panel/failure.rs::tests` includes server-side rejection precedence, auth/network, dirty-worktree, no-upstream, unknown failure and detail cleaning cases.",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G2",
+        "paths": [
+          "internal/workspace/git.go",
+          "internal/workspace/git_ops.go",
+          "internal/workspace/github.go",
+          "internal/gitworkbench/state.go",
+          "internal/gitworkbench/view.go",
+          "internal/workspace/generation.go",
+          "internal/workspace/github_templates.go",
+          "internal/gitworkbench/templates.go"
+        ],
+        "tests": [
+          "internal/workspace/git_test.go",
+          "internal/workspace/github_test.go",
+          "internal/gitworkbench/state_test.go",
+          "internal/workspace/generation_test.go",
+          "internal/workspace/process_cancel_unix_test.go"
+        ],
+        "remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending."
+      }
+    },
+    {
+      "id": "W14",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Detect and display in-progress merge/rebase/cherry-pick/revert/bisect, conflict count and up to eight file links. Open conflicts in Files; continue once no conflicts; skip only rebase/cherry-pick; confirm abort.",
+      "interaction_contract": "Detect and display in-progress merge/rebase/cherry-pick/revert/bisect, conflict count and up to eight file links. Open conflicts in Files; continue once no conflicts; skip only rebase/cherry-pick; confirm abort.",
+      "state_failure_platform": "Worktree-safe Git-dir resolution. `GIT_EDITOR`/`GIT_SEQUENCE_EDITOR=:` avoid interactive editor blocking. Bisect has no meaningful continue and returns an explicit error; abort is `bisect reset`. This is conflict assistance, not a three-way merge editor or new cherry-pick/revert/bisect UI.",
+      "sources": [
+        "`git_ops.rs::{InProgress,operation_state,conflicted_files,continue_operation,abort_operation,skip_operation}`; `git_panel/mod.rs::{operation_bar,open_conflicts,run_operation}`"
+      ],
+      "tests": "`git_ops.rs::{a_conflicted_merge_is_detected_with_its_files,skip_is_only_offered_where_git_supports_it,bisect_has_no_continue,no_operation_on_a_clean_repo}`",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G2",
+        "paths": [
+          "internal/workspace/git.go",
+          "internal/workspace/git_ops.go",
+          "internal/workspace/github.go",
+          "internal/gitworkbench/state.go",
+          "internal/gitworkbench/view.go",
+          "internal/workspace/generation.go",
+          "internal/workspace/github_templates.go",
+          "internal/gitworkbench/templates.go"
+        ],
+        "tests": [
+          "internal/workspace/git_test.go",
+          "internal/workspace/github_test.go",
+          "internal/gitworkbench/state_test.go",
+          "internal/workspace/generation_test.go",
+          "internal/workspace/process_cancel_unix_test.go"
+        ],
+        "remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending."
+      }
+    },
+    {
+      "id": "W15",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Stashes tab lists newest first; create stash including untracked, pop, apply without removal and drop.",
+      "interaction_contract": "Stashes tab lists newest first; create stash including untracked, pop, apply without removal and drop.",
+      "state_failure_platform": "Git owns stash persistence. UI currently creates no custom message and drops without a separate PendingConfirm path. Backend supports optional stash message even though UI does not expose it.",
+      "sources": [
+        "`git_ops.rs::{StashEntry,list_stashes,stash_push,stash_pop,stash_apply,stash_drop}`; `git_panel/mod.rs::{stashes_tab,stash_push,stash_pop,stash_apply,stash_drop}`"
+      ],
+      "tests": "`git_ops.rs::stash_round_trip`",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G2",
+        "paths": [
+          "internal/workspace/git.go",
+          "internal/workspace/git_ops.go",
+          "internal/workspace/github.go",
+          "internal/gitworkbench/state.go",
+          "internal/gitworkbench/view.go",
+          "internal/workspace/generation.go",
+          "internal/workspace/github_templates.go",
+          "internal/gitworkbench/templates.go"
+        ],
+        "tests": [
+          "internal/workspace/git_test.go",
+          "internal/workspace/github_test.go",
+          "internal/gitworkbench/state_test.go",
+          "internal/workspace/generation_test.go",
+          "internal/workspace/process_cancel_unix_test.go"
+        ],
+        "remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending."
+      }
+    },
+    {
+      "id": "W16",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "History shows current branch commit list, optional all-refs filter, author filtering by author interaction, path/file history with follow-renames, removable filter chips and Load more.",
+      "interaction_contract": "History shows current branch commit list, optional all-refs filter, author filtering by author interaction, path/file history with follow-renames, removable filter chips and Load more.",
+      "state_failure_platform": "`HISTORY_PAGE=40`; refresh expands requested window (initial request uses max(existing,40)+40). Watch-driven status refresh intentionally avoids growing it. Backend also supports grep, but no History grep control was located.",
+      "sources": [
+        "`git.rs::{HistoryFilter,history_filtered,history_by_author}`; `git_panel/mod.rs::{refresh_history,history_tab,history_filter_bar,filter_history_author,filter_history_path,toggle_all_branches}`"
+      ],
+      "tests": "`git.rs::{history_includes_the_baseline_commit,history_follows_one_path_across_renames,history_filters_by_author_and_path}`",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G2",
+        "paths": [
+          "internal/workspace/git.go",
+          "internal/workspace/git_ops.go",
+          "internal/workspace/github.go",
+          "internal/gitworkbench/state.go",
+          "internal/gitworkbench/view.go",
+          "internal/workspace/generation.go",
+          "internal/workspace/github_templates.go",
+          "internal/gitworkbench/templates.go"
+        ],
+        "tests": [
+          "internal/workspace/git_test.go",
+          "internal/workspace/github_test.go",
+          "internal/gitworkbench/state_test.go",
+          "internal/workspace/generation_test.go",
+          "internal/workspace/process_cancel_unix_test.go"
+        ],
+        "remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending."
+      }
+    },
+    {
+      "id": "W17",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Expand/collapse commit detail with subject/body/hash/author/committer/parents/refs and changed-file statistics; copy/open external commit links. File menu opens current file, current uncommitted diff, OS reveal, path copy or follow-renames history.",
+      "interaction_contract": "Expand/collapse commit detail with subject/body/hash/author/committer/parents/refs and changed-file statistics; copy/open external commit links. File menu opens current file, current uncommitted diff, OS reveal, path copy or follow-renames history.",
+      "state_failure_platform": "File details capped at 300 rendered rows with remainder summary. `file_actions_menu` receives a hash but currently ignores it for Open diff, so this is NOT a historical per-commit diff viewer. Remote URLs cover GitHub/GitLab/Bitbucket/known GitHub/GitLab/Bitbucket hosts; URL syntax variants.",
+      "sources": [
+        "`git.rs::{CommitDetail,commit_detail,commit_files,RemoteWeb,remote_web}`; `git_panel/mod.rs::{toggle_commit,commit_detail_body,file_actions_menu}`"
+      ],
+      "tests": "`git.rs::{commit_detail_reports_metadata_and_files,remote_urls_normalize_to_host_and_path,commit_urls_follow_the_forge}`",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G2",
+        "paths": [
+          "internal/workspace/git.go",
+          "internal/workspace/git_ops.go",
+          "internal/workspace/github.go",
+          "internal/gitworkbench/state.go",
+          "internal/gitworkbench/view.go",
+          "internal/workspace/generation.go",
+          "internal/workspace/github_templates.go",
+          "internal/gitworkbench/templates.go"
+        ],
+        "tests": [
+          "internal/workspace/git_test.go",
+          "internal/workspace/github_test.go",
+          "internal/gitworkbench/state_test.go",
+          "internal/workspace/generation_test.go",
+          "internal/workspace/process_cancel_unix_test.go"
+        ],
+        "remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending."
+      }
+    },
+    {
+      "id": "W18",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Graph draws branch lanes, merge edges, refs and commit metadata; all-refs option includes remote-only commits and Load more deepens history.",
+      "interaction_contract": "Graph draws branch lanes, merge edges, refs and commit metadata; all-refs option includes remote-only commits and Load more deepens history.",
+      "state_failure_platform": "Layout tolerates parent commits outside current window and octopus merges. Graph has independent loading/error states.",
+      "sources": [
+        "`git.rs::{GraphCommit,GraphRow,graph_history,layout_graph}`; `git_panel/mod.rs::{refresh_graph,graph_tab}`"
+      ],
+      "tests": "`git.rs::{graph_history_spans_branches_and_lays_out_the_merge,layout_graph_ignores_parents_outside_the_window,layout_graph_handles_an_octopus_merge,graph_all_refs_includes_remote_only_commits}`",
+      "baseline_status": "source_present",
+      "migration_status": "partial_code_full_parity_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G2",
+        "paths": [
+          "internal/workspace/git.go",
+          "internal/workspace/git_ops.go",
+          "internal/workspace/github.go",
+          "internal/gitworkbench/state.go",
+          "internal/gitworkbench/view.go",
+          "internal/workspace/generation.go",
+          "internal/workspace/github_templates.go",
+          "internal/gitworkbench/templates.go"
+        ],
+        "tests": [
+          "internal/workspace/git_test.go",
+          "internal/workspace/github_test.go",
+          "internal/gitworkbench/state_test.go",
+          "internal/workspace/generation_test.go",
+          "internal/workspace/process_cancel_unix_test.go"
+        ],
+        "remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending."
+      }
+    },
+    {
+      "id": "W19",
+      "group": "Workbench, Git, Review, worktrees, files and terminal",
+      "feature": "Git author avatars resolve from email-to-login override, GitHub noreply address, then handle-shaped name; fallback is stable colored initials. GitHub signed-in account chip shows current gh identity.",
+      "interaction_contract": "Git author avatars resolve from email-to-login override, GitHub noreply address, then handle-shaped name; fallback is stable colored initials. GitHub signed-in account chip shows current gh identity.",
+      "state_failure_platform": "`~/.orbit-pi/git-avatars.json` read once; malformed map/invalid handles ignored. Remote avatar loading/failure falls back to monogram, not wrong arbitrary user.",
+      "sources": [
+        "`git_panel/mod.rs::{github_avatar_url,resolve_github_login,avatar_login_overrides,monogram_chip,github_account_chip}`; `gh.rs::current_user`"
+      ],
+      "tests": "`git_panel/mod.rs::{avatar_url_prefers_noreply_email_login,avatar_url_falls_back_to_handle_shaped_name,avatar_url_uses_email_login_override}`",
+      "baseline_status": "source_present",
+      "migration_status": "partial_native_avatar_implemented_acceptance_pending",
+      "full_parity_verified": false,
+      "go_evidence": {
+        "catalogue": "G2",
+        "paths": [
+          "internal/workspace/git.go",
+          "internal/workspace/git_ops.go",
+          "internal/workspace/github.go",
+          "internal/gitworkbench/state.go",
+          "internal/gitworkbench/view.go",
+          "internal/workspace/generation.go",
+          "internal/workspace/github_templates.go",
+          "internal/gitworkbench/templates.go"
+        ],
+        "tests": [
+          "internal/workspace/git_test.go",
+          "internal/workspace/github_test.go",
+          "internal/gitworkbench/state_test.go",
+          "internal/workspace/generation_test.go",
+          "internal/workspace/process_cancel_unix_test.go"
+        ],
+        "remaining": "Avatar email/login overrides, async cache/photo/fallback and author filters are implemented; live external image behavior, visual geometry and full interactions remain pending."
+      }
+    }
+  ]
+}

@@ -1,0 +1,414 @@
+{
+  "schema": "orbit-acceptance-shard/v1",
+  "category": "terminal-platform",
+  "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "rows": [
+    {
+      "id": "W69",
+      "title": "Platform helpers reveal files, default-open paths, launch interactive external terminal commands, open browser links and find home directory.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/platform.rs",
+          "handler": "reveal_in_file_manager",
+          "line": 605,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/platform.rs#L605",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/platform.rs",
+          "handler": "open_path_default",
+          "line": 664,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/platform.rs#L664",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/platform.rs",
+          "handler": "open_terminal_command",
+          "line": 957,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/platform.rs#L957",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/platform.rs",
+          "handler": "open_url",
+          "line": 1013,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/platform.rs#L1013",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Platform helpers reveal files, default-open paths, launch interactive external terminal commands, open browser links and find home directory.",
+      "baseline_edge_state": "macOS open/AppleScript, Windows explorer-select/cmd start, Linux xdg-open parent and available terminal fallback. Browser helper permits HTTP(S) only. Home fallback includes USERPROFILE and HOMEDRIVE/HOMEPATH, not HOME alone.",
+      "fixture": "Disposable native host or CPU test harness, real temporary PTY where supported, controlled shell/byte recorder and stub external apps.",
+      "steps": [
+        {
+          "id": "W69.behavior",
+          "dimension": "functional",
+          "action": "Reveal file, default-open path, launch interactive terminal command and open browser URL in controlled native stubs.",
+          "expected": "Platform helpers reveal files, default-open paths, launch interactive external terminal commands, open browser links and find home directory.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W69.edge",
+          "dimension": "edge",
+          "action": "Reject unsafe URL schemes/arguments and missing home/app; record exact target without launching unrequested external actions in CI.",
+          "expected": "macOS open/AppleScript, Windows explorer-select/cmd start, Linux xdg-open parent and available terminal fallback. Browser helper permits HTTP(S) only. Home fallback includes USERPROFILE and HOMEDRIVE/HOMEPATH, not HOME alone.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W69.error",
+          "dimension": "error",
+          "action": "Exit/fail the active child or external-app stub while hidden/unfocused; exercise restart and missing-platform capability.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: macOS open/AppleScript, Windows explorer-select/cmd start, Linux xdg-open parent and available terminal fallback. Browser helper permits HTTP(S) only. Home fallback includes USERPROFILE and HOMEDRIVE/HOMEPATH, not HOME alone.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W69.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W69.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W69.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W69.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/preferences",
+        "internal/workbench",
+        "internal/native"
+      ],
+      "existing_test_candidates": [
+        "internal/preferences/store_test.go",
+        "internal/preferences/workspaces_test.go",
+        "internal/workbench/workbench_test.go",
+        "internal/native/native_test.go",
+        "internal/native/runtime_test.go",
+        "internal/native/updater_test.go",
+        "internal/native/temp_files_test.go"
+      ],
+      "inventory_evidence": "../parity/terminal-platform.json",
+      "source_test_inventory": "`platform.rs::only_http_urls_are_opened`; platform probing tests; native integration needs device/runtime coverage.",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native helpers/domain tests pass; real platform integrations and UI selection flows remain pending.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    },
+    {
+      "id": "W70",
+      "title": "One shell entity survives closing and reopening main window (macOS Dock reopen); main window opens maximized with screen-relative restore size/minimum 960×640. Background heartbeat continues windowless. Windows/Linux have own minimize/maximize/restore/close/drag behavior; macOS native traffic-light chrome.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/main_window.rs",
+          "handler": "Shell",
+          "line": 30,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/main_window.rs#L30",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/main_window.rs",
+          "handler": "shell",
+          "line": 58,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/main_window.rs#L58",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/main_window.rs",
+          "handler": "open",
+          "line": 77,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/main_window.rs#L77",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/main_window.rs",
+          "handler": "install_reopen_handler",
+          "line": 42,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/main_window.rs#L42",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "One shell entity survives closing and reopening main window (macOS Dock reopen); main window opens maximized with screen-relative restore size/minimum 960×640. Background heartbeat continues windowless. Windows/Linux have own minimize/maximize/restore/close/drag behavior; macOS native traffic-light chrome.",
+      "baseline_edge_state": "Shell Global retains pi/transcript/feature entities. App-bound heartbeat is 90 ms idle, 16 ms active, not old documented window-bound behavior. macOS minimum 13, Windows build floor 17763 in host support checks.",
+      "fixture": "Disposable native host or CPU test harness, real temporary PTY where supported, controlled shell/byte recorder and stub external apps.",
+      "steps": [
+        {
+          "id": "W70.behavior",
+          "dimension": "functional",
+          "action": "Launch/close/reopen native window while a session runs, inspect maximized/restore/minimum bounds.",
+          "expected": "One shell entity survives closing and reopening main window (macOS Dock reopen); main window opens maximized with screen-relative restore size/minimum 960×640. Background heartbeat continues windowless. Windows/Linux have own minimize/maximize/restore/close/drag behavior; macOS native traffic-light chrome.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W70.edge",
+          "dimension": "edge",
+          "action": "Run actual macOS Dock reopen and Windows/Linux closure checks separately; cross-build cannot satisfy windowless heartbeat/process identity.",
+          "expected": "Shell Global retains pi/transcript/feature entities. App-bound heartbeat is 90 ms idle, 16 ms active, not old documented window-bound behavior. macOS minimum 13, Windows build floor 17763 in host support checks.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W70.error",
+          "dimension": "error",
+          "action": "Exit/fail the active child or external-app stub while hidden/unfocused; exercise restart and missing-platform capability.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Shell Global retains pi/transcript/feature entities. App-bound heartbeat is 90 ms idle, 16 ms active, not old documented window-bound behavior. macOS minimum 13, Windows build floor 17763 in host support checks.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W70.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W70.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W70.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W70.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/preferences",
+        "internal/workbench",
+        "internal/native"
+      ],
+      "existing_test_candidates": [
+        "internal/preferences/store_test.go",
+        "internal/preferences/workspaces_test.go",
+        "internal/workbench/workbench_test.go",
+        "internal/native/native_test.go",
+        "internal/native/runtime_test.go",
+        "internal/native/updater_test.go",
+        "internal/native/temp_files_test.go"
+      ],
+      "inventory_evidence": "../parity/terminal-platform.json",
+      "source_test_inventory": "`main_window.rs::reopening_reuses_the_parked_shell` only handoff, because GPUI test zoom is unimplemented; `app/window_watch_tests.rs::closing_the_window_clears_the_notification_gate`; platform OS-version tests.",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native helpers/domain tests pass; real platform integrations and UI selection flows remain pending.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    },
+    {
+      "id": "W71",
+      "title": "Keyboard commands, menu/palette actions and UI buttons share registered actions; Git tab shortcuts are actually platform+Alt+1…6, not stale prose saying Cmd+1…6.",
+      "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/commands.rs",
+          "handler": "CommandId",
+          "line": 22,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/commands.rs#L22",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/commands.rs",
+          "handler": "BINDINGS",
+          "line": 794,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/commands.rs#L794",
+          "resolution": "definition_located"
+        }
+      ],
+      "baseline_behavior": "Keyboard commands, menu/palette actions and UI buttons share registered actions; Git tab shortcuts are actually platform+Alt+1…6, not stale prose saying Cmd+1…6.",
+      "baseline_edge_state": "`secondary` resolves platform vocabulary; terminal context and Review context override global bindings deliberately. First-run new task closes panels and menus as a coordinated reset.",
+      "fixture": "Disposable native host or CPU test harness, real temporary PTY where supported, controlled shell/byte recorder and stub external apps.",
+      "steps": [
+        {
+          "id": "W71.behavior",
+          "dimension": "functional",
+          "action": "Enumerate source CommandId/BINDINGS and compare menu/palette/button dispatch with actual key events.",
+          "expected": "Keyboard commands, menu/palette actions and UI buttons share registered actions; Git tab shortcuts are actually platform+Alt+1…6, not stale prose saying Cmd+1…6.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W71.edge",
+          "dimension": "edge",
+          "action": "Verify Git tabs use Primary+Alt+1…6; test editor/terminal/dialog focus isolation and each platform's displayed chord labels.",
+          "expected": "`secondary` resolves platform vocabulary; terminal context and Review context override global bindings deliberately. First-run new task closes panels and menus as a coordinated reset.",
+          "status": "UNTESTED",
+          "specification": "ROW_SPECIFIC",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W71.error",
+          "dimension": "error",
+          "action": "Exit/fail the active child or external-app stub while hidden/unfocused; exercise restart and missing-platform capability.",
+          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: `secondary` resolves platform vocabulary; terminal context and Review context override global bindings deliberately. First-run new task closes panels and menus as a coordinated reset.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W71.loading",
+          "dimension": "loading",
+          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
+          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W71.persistence",
+          "dimension": "persistence",
+          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
+          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W71.keyboard",
+          "dimension": "keyboard",
+          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
+          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        },
+        {
+          "id": "W71.repeat",
+          "dimension": "repeat",
+          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
+          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "status": "UNTESTED",
+          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "last_verified_sha": null
+        }
+      ],
+      "go_mapping": [
+        "internal/ui",
+        "cmd/orbit/main.go"
+      ],
+      "existing_test_candidates": [
+        "internal/ui/snapshot_test.go",
+        "internal/ui/workspace_review_regression_test.go",
+        "internal/ui/viewer_parity_test.go"
+      ],
+      "inventory_evidence": "../parity/terminal-platform.json",
+      "source_test_inventory": "Command registry/spec tests; `app/new_task_panels_tests.rs`; no broad visual regression or real-platform input suite found for these interactions.",
+      "verdicts": {
+        "functional": {
+          "status": "UNTESTED",
+          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "last_verified_sha": null,
+          "last_partial_evidence_sha": null
+        },
+        "visual": {
+          "status": "UNTESTED",
+          "reason": "No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state.",
+          "last_verified_sha": null
+        },
+        "native_os": {
+          "status": "UNTESTED",
+          "reason": "This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.",
+          "last_verified_sha": null
+        }
+      },
+      "assertion_results": [],
+      "known_remaining": "Native code exists; this row is not validated end to end.",
+      "full_parity_verified": false,
+      "supplemental_cases": [],
+      "additional_evidence": []
+    }
+  ]
+}

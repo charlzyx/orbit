@@ -1,0 +1,1639 @@
+[
+  {
+    "path": "crates/orbit-pi/src/app/mcp_ui.rs",
+    "lines": 3247,
+    "tests": [
+      {
+        "name": "filter_matches_name_description_and_transport",
+        "line": 3179,
+        "kind": "rust"
+      },
+      {
+        "name": "transport_summary_shortens_long_arg_lists",
+        "line": 3190,
+        "kind": "rust"
+      },
+      {
+        "name": "status_glyphs_never_rely_on_color_alone",
+        "line": 3209,
+        "kind": "rust"
+      },
+      {
+        "name": "connection_errors_get_an_actionable_hint",
+        "line": 3237,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/app/new_task_panels_tests.rs",
+    "lines": 69,
+    "tests": [
+      {
+        "name": "starting_a_new_task_closes_every_open_panel",
+        "line": 18,
+        "kind": "gpui"
+      },
+      {
+        "name": "closing_surfaces_with_nothing_open_is_a_no_op",
+        "line": 56,
+        "kind": "gpui"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/app/new_task_reconnect_tests.rs",
+    "lines": 204,
+    "tests": [
+      {
+        "name": "an_exited_pi_process_never_reuses_the_session",
+        "line": 86,
+        "kind": "gpui"
+      },
+      {
+        "name": "a_missing_pi_process_never_reuses_the_session",
+        "line": 112,
+        "kind": "gpui"
+      },
+      {
+        "name": "a_running_turn_never_reuses_the_session",
+        "line": 125,
+        "kind": "gpui"
+      },
+      {
+        "name": "an_idle_live_session_reuses_the_process_for_the_new_task",
+        "line": 141,
+        "kind": "gpui"
+      },
+      {
+        "name": "dropping_an_exited_process_clears_its_exit_banner",
+        "line": 175,
+        "kind": "gpui"
+      },
+      {
+        "name": "dropping_a_healthy_process_keeps_unrelated_errors",
+        "line": 194,
+        "kind": "gpui"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/app/open_in.rs",
+    "lines": 329,
+    "tests": []
+  },
+  {
+    "path": "crates/orbit-pi/src/app/pi_update_ui.rs",
+    "lines": 271,
+    "tests": []
+  },
+  {
+    "path": "crates/orbit-pi/src/app/pickers.rs",
+    "lines": 774,
+    "tests": []
+  },
+  {
+    "path": "crates/orbit-pi/src/app/plugin_update_ui.rs",
+    "lines": 134,
+    "tests": []
+  },
+  {
+    "path": "crates/orbit-pi/src/app/popup_layout_tests.rs",
+    "lines": 1089,
+    "tests": [
+      {
+        "name": "local_snap_anchor_covers_the_chip_near_the_viewport_top",
+        "line": 80,
+        "kind": "gpui"
+      },
+      {
+        "name": "settings_select_popup_opens_below_its_chip",
+        "line": 104,
+        "kind": "gpui"
+      },
+      {
+        "name": "settings_select_popup_flips_above_near_the_viewport_bottom",
+        "line": 133,
+        "kind": "gpui"
+      },
+      {
+        "name": "settings_popup_list_keeps_a_viewport_in_zero_height_context",
+        "line": 191,
+        "kind": "gpui"
+      },
+      {
+        "name": "max_h_collapses_uniform_list_in_zero_height_context",
+        "line": 210,
+        "kind": "gpui"
+      },
+      {
+        "name": "worktree_advanced_menu_opens_below_its_button",
+        "line": 235,
+        "kind": "gpui"
+      },
+      {
+        "name": "worktree_advanced_button_click_toggles_the_menu_closed",
+        "line": 278,
+        "kind": "gpui"
+      },
+      {
+        "name": "context_menu_shell_lays_out_on_zeds_metrics",
+        "line": 352,
+        "kind": "gpui"
+      },
+      {
+        "name": "modal_card_uses_zeds_header_and_footer_metrics",
+        "line": 460,
+        "kind": "gpui"
+      },
+      {
+        "name": "model_picker_arrows_move_the_highlight",
+        "line": 492,
+        "kind": "gpui"
+      },
+      {
+        "name": "model_picker_arrows_work_after_the_palette_route",
+        "line": 578,
+        "kind": "gpui"
+      },
+      {
+        "name": "chip_click_does_not_let_the_composer_steal_picker_focus",
+        "line": 658,
+        "kind": "gpui"
+      },
+      {
+        "name": "quota_popup_scrolls_instead_of_clipping_its_last_card",
+        "line": 785,
+        "kind": "gpui"
+      },
+      {
+        "name": "quota_popup_moves_hidden_providers_into_their_own_group",
+        "line": 857,
+        "kind": "gpui"
+      },
+      {
+        "name": "quota_popup_mcp_tab_swaps_the_pane",
+        "line": 915,
+        "kind": "gpui"
+      },
+      {
+        "name": "model_and_thinking_pickers_stay_shut_while_running",
+        "line": 1039,
+        "kind": "gpui"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/app/refresh_tests.rs",
+    "lines": 62,
+    "tests": [
+      {
+        "name": "refresh_reaches_every_open_surface",
+        "line": 14,
+        "kind": "gpui"
+      },
+      {
+        "name": "refresh_is_quiet_with_no_page_open",
+        "line": 49,
+        "kind": "gpui"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/app/retention_ui.rs",
+    "lines": 73,
+    "tests": []
+  },
+  {
+    "path": "crates/orbit-pi/src/app/runtime.rs",
+    "lines": 580,
+    "tests": []
+  },
+  {
+    "path": "crates/orbit-pi/src/explorer/mod.rs",
+    "lines": 20,
+    "tests": []
+  },
+  {
+    "path": "crates/orbit-pi/src/explorer/ops.rs",
+    "lines": 197,
+    "tests": [
+      {
+        "name": "validate_rejects_unsafe_names",
+        "line": 128,
+        "kind": "rust"
+      },
+      {
+        "name": "create_file_is_create_new_not_truncate",
+        "line": 141,
+        "kind": "rust"
+      },
+      {
+        "name": "create_dir_is_one_level_and_refuses_existing",
+        "line": 155,
+        "kind": "rust"
+      },
+      {
+        "name": "rename_moves_within_the_same_directory",
+        "line": 168,
+        "kind": "rust"
+      },
+      {
+        "name": "rename_refuses_to_overwrite_and_allows_no_op",
+        "line": 181,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/explorer/panel.rs",
+    "lines": 1757,
+    "tests": [
+      {
+        "name": "parent_of_splits_workspace_paths",
+        "line": 1681,
+        "kind": "rust"
+      },
+      {
+        "name": "inline_prompt_input_fills_the_row",
+        "line": 1691,
+        "kind": "gpui"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/git_panel/mod.rs",
+    "lines": 8893,
+    "tests": [
+      {
+        "name": "bar_actions_follow_git_state",
+        "line": 8795,
+        "kind": "rust"
+      },
+      {
+        "name": "avatar_url_prefers_noreply_email_login",
+        "line": 8826,
+        "kind": "rust"
+      },
+      {
+        "name": "avatar_url_falls_back_to_handle_shaped_name",
+        "line": 8848,
+        "kind": "rust"
+      },
+      {
+        "name": "avatar_url_uses_email_login_override",
+        "line": 8862,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/main.rs",
+    "lines": 680,
+    "tests": []
+  },
+  {
+    "path": "crates/orbit-pi/src/main_window.rs",
+    "lines": 194,
+    "tests": [
+      {
+        "name": "reopening_reuses_the_parked_shell",
+        "line": 172,
+        "kind": "gpui"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/mcp/manager.rs",
+    "lines": 1515,
+    "tests": [
+      {
+        "name": "add_update_enable_disable_remove_round_trip",
+        "line": 1059,
+        "kind": "rust"
+      },
+      {
+        "name": "project_scope_lands_in_the_project_file",
+        "line": 1095,
+        "kind": "rust"
+      },
+      {
+        "name": "moving_scope_removes_the_old_entry",
+        "line": 1108,
+        "kind": "rust"
+      },
+      {
+        "name": "secrets_are_stored_before_the_config_write",
+        "line": 1126,
+        "kind": "rust"
+      },
+      {
+        "name": "removing_a_server_prunes_only_its_generated_secrets",
+        "line": 1147,
+        "kind": "rust"
+      },
+      {
+        "name": "removing_in_one_project_keeps_another_projects_secrets",
+        "line": 1182,
+        "kind": "rust"
+      },
+      {
+        "name": "an_unreadable_secrets_store_is_reported_not_clobbered",
+        "line": 1218,
+        "kind": "rust"
+      },
+      {
+        "name": "an_unreadable_metadata_file_is_reported_and_clears_on_refresh",
+        "line": 1266,
+        "kind": "rust"
+      },
+      {
+        "name": "invalid_definitions_are_rejected_before_any_write",
+        "line": 1295,
+        "kind": "rust"
+      },
+      {
+        "name": "apply_probe_folds_status_tools_and_scrubbed_errors",
+        "line": 1312,
+        "kind": "rust"
+      },
+      {
+        "name": "a_fatal_probe_marks_enabled_servers_failed",
+        "line": 1344,
+        "kind": "rust"
+      },
+      {
+        "name": "refresh_picks_up_external_configuration_changes",
+        "line": 1358,
+        "kind": "rust"
+      },
+      {
+        "name": "fingerprint_tracks_files_and_staleness",
+        "line": 1386,
+        "kind": "rust"
+      },
+      {
+        "name": "probe_json_parses_pis_shape",
+        "line": 1397,
+        "kind": "rust"
+      },
+      {
+        "name": "probe_json_tolerates_missing_optional_fields",
+        "line": 1436,
+        "kind": "rust"
+      },
+      {
+        "name": "probe_json_requires_a_servers_array",
+        "line": 1443,
+        "kind": "rust"
+      },
+      {
+        "name": "live_probe_reads_a_server_orbit_wrote",
+        "line": 1483,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/mcp.rs",
+    "lines": 557,
+    "tests": [
+      {
+        "name": "secret_references_reads_whole_and_wrapped_values",
+        "line": 459,
+        "kind": "rust"
+      },
+      {
+        "name": "pure_references_are_distinguished_from_wrappers",
+        "line": 476,
+        "kind": "rust"
+      },
+      {
+        "name": "exposure_round_trips_every_mode",
+        "line": 483,
+        "kind": "rust"
+      },
+      {
+        "name": "scope_paths_match_pi",
+        "line": 492,
+        "kind": "rust"
+      },
+      {
+        "name": "status_parsing_maps_pis_states",
+        "line": 506,
+        "kind": "rust"
+      },
+      {
+        "name": "oauth_candidates_follow_pis_rule",
+        "line": 519,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/mentions.rs",
+    "lines": 747,
+    "tests": [
+      {
+        "name": "classify_scope_folds_pi_provenance",
+        "line": 471,
+        "kind": "rust"
+      },
+      {
+        "name": "slash_triggers_only_at_start_before_whitespace",
+        "line": 541,
+        "kind": "rust"
+      },
+      {
+        "name": "at_trigger_runs_from_token_start_to_caret",
+        "line": 560,
+        "kind": "rust"
+      },
+      {
+        "name": "tokenize_colors_leading_command_and_files",
+        "line": 581,
+        "kind": "rust"
+      },
+      {
+        "name": "tokenize_leaves_paths_and_emails_plain",
+        "line": 603,
+        "kind": "rust"
+      },
+      {
+        "name": "tokenize_handles_multiline_and_repeats",
+        "line": 613,
+        "kind": "rust"
+      },
+      {
+        "name": "filter_ranks_prefix_matches_first",
+        "line": 624,
+        "kind": "rust"
+      },
+      {
+        "name": "filter_is_fuzzy_and_basename_first",
+        "line": 651,
+        "kind": "rust"
+      },
+      {
+        "name": "filter_is_case_insensitive_and_capped",
+        "line": 673,
+        "kind": "rust"
+      },
+      {
+        "name": "workspace_walk_skips_ignorable_dirs",
+        "line": 682,
+        "kind": "rust"
+      },
+      {
+        "name": "highlight_wraps_both_ways",
+        "line": 698,
+        "kind": "rust"
+      },
+      {
+        "name": "file_badges_map_by_extension",
+        "line": 716,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/message_scroller.rs",
+    "lines": 706,
+    "tests": [
+      {
+        "name": "remeasure_toggle_keeps_the_reader_anchored",
+        "line": 436,
+        "kind": "gpui"
+      },
+      {
+        "name": "remeasure_toggle_holds_a_pinned_row_that_is_itself_toggled",
+        "line": 473,
+        "kind": "gpui"
+      },
+      {
+        "name": "remeasure_toggle_keeps_a_short_run_bottom_pinned",
+        "line": 511,
+        "kind": "gpui"
+      },
+      {
+        "name": "streaming_preserves_the_readers_offset_inside_the_live_row",
+        "line": 542,
+        "kind": "gpui"
+      },
+      {
+        "name": "streaming_and_appending_below_history_keep_the_visible_row_fixed",
+        "line": 591,
+        "kind": "gpui"
+      },
+      {
+        "name": "chained_scroll_leaves_the_tail_and_resumes_following_at_the_bottom",
+        "line": 621,
+        "kind": "gpui"
+      },
+      {
+        "name": "programmatic_scroll_updates_the_viewport_hint",
+        "line": 658,
+        "kind": "rust"
+      },
+      {
+        "name": "state_starts_following_tail",
+        "line": 679,
+        "kind": "rust"
+      },
+      {
+        "name": "append_prepend_splice_and_reset",
+        "line": 687,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/model_selector.rs",
+    "lines": 2448,
+    "tests": [
+      {
+        "name": "metrics_follow_the_picker_tokens",
+        "line": 1607,
+        "kind": "rust"
+      },
+      {
+        "name": "scroll_offset_is_negative_when_scrolled_down",
+        "line": 1619,
+        "kind": "rust"
+      },
+      {
+        "name": "scroll_offset_zero_at_top",
+        "line": 1626,
+        "kind": "rust"
+      },
+      {
+        "name": "scroll_offset_centers_selected_row",
+        "line": 1631,
+        "kind": "rust"
+      },
+      {
+        "name": "headers_shift_scroll_math",
+        "line": 1643,
+        "kind": "rust"
+      },
+      {
+        "name": "rows_share_one_tight_rhythm",
+        "line": 1659,
+        "kind": "rust"
+      },
+      {
+        "name": "models_group_by_provider_with_headers",
+        "line": 1702,
+        "kind": "rust"
+      },
+      {
+        "name": "scoped_provider_flattens_the_list",
+        "line": 1729,
+        "kind": "rust"
+      },
+      {
+        "name": "favorites_pin_a_section_above_providers",
+        "line": 1755,
+        "kind": "rust"
+      },
+      {
+        "name": "favorites_scope_shows_only_favorites",
+        "line": 1794,
+        "kind": "rust"
+      },
+      {
+        "name": "recents_pin_a_section_above_favorites",
+        "line": 1817,
+        "kind": "rust"
+      },
+      {
+        "name": "a_model_that_is_both_recent_and_favorite_pins_once",
+        "line": 1859,
+        "kind": "rust"
+      },
+      {
+        "name": "recents_scope_lists_most_recent_first",
+        "line": 1900,
+        "kind": "rust"
+      },
+      {
+        "name": "provider_scope_pins_its_own_recents",
+        "line": 1932,
+        "kind": "rust"
+      },
+      {
+        "name": "filter_drops_empty_providers",
+        "line": 1972,
+        "kind": "rust"
+      },
+      {
+        "name": "every_builtin_provider_has_an_embedded_brand_mark",
+        "line": 1996,
+        "kind": "rust"
+      },
+      {
+        "name": "custom_provider_marks_resolve_to_embedded_assets",
+        "line": 2014,
+        "kind": "rust"
+      },
+      {
+        "name": "aliased_provider_ids_reuse_their_brand_mark",
+        "line": 2027,
+        "kind": "rust"
+      },
+      {
+        "name": "unknown_providers_fall_back_to_the_cloud_glyph",
+        "line": 2048,
+        "kind": "rust"
+      },
+      {
+        "name": "capped_list_keeps_rows_at_the_two_line_token_height",
+        "line": 2057,
+        "kind": "gpui"
+      },
+      {
+        "name": "arrow_keys_survive_the_open_pin",
+        "line": 2175,
+        "kind": "gpui"
+      },
+      {
+        "name": "an_unchanged_catalog_sync_keeps_the_highlight",
+        "line": 2211,
+        "kind": "gpui"
+      },
+      {
+        "name": "a_pending_open_pin_does_not_undo_a_press",
+        "line": 2255,
+        "kind": "gpui"
+      },
+      {
+        "name": "arrow_keys_resolve_inside_the_anchored_popup",
+        "line": 2285,
+        "kind": "gpui"
+      },
+      {
+        "name": "arrow_keys_work_with_the_real_keymap",
+        "line": 2331,
+        "kind": "gpui"
+      },
+      {
+        "name": "popover_width_rhythm_and_footer_are_stable",
+        "line": 2395,
+        "kind": "gpui"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/model_selector_match.rs",
+    "lines": 103,
+    "tests": [
+      {
+        "name": "matches_by_catalog_id",
+        "line": 53,
+        "kind": "rust"
+      },
+      {
+        "name": "matches_when_state_name_differs_by_hyphens",
+        "line": 64,
+        "kind": "rust"
+      },
+      {
+        "name": "matches_by_name_when_id_empty",
+        "line": 75,
+        "kind": "rust"
+      },
+      {
+        "name": "matches_live_glm_shape",
+        "line": 86,
+        "kind": "rust"
+      },
+      {
+        "name": "rejects_different_provider",
+        "line": 98,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/notifications.rs",
+    "lines": 490,
+    "tests": [
+      {
+        "name": "preview_collapses_whitespace_and_truncates_on_a_word",
+        "line": 437,
+        "kind": "rust"
+      },
+      {
+        "name": "preview_drops_control_characters",
+        "line": 448,
+        "kind": "rust"
+      },
+      {
+        "name": "prefs_read_known_fields_and_default_the_rest",
+        "line": 453,
+        "kind": "rust"
+      },
+      {
+        "name": "applescript_literal_escapes_quotes_and_backslashes",
+        "line": 483,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/onboarding.rs",
+    "lines": 555,
+    "tests": [
+      {
+        "name": "install_hints_match_the_host",
+        "line": 355,
+        "kind": "rust"
+      },
+      {
+        "name": "every_dependency_has_an_install_hint",
+        "line": 383,
+        "kind": "rust"
+      },
+      {
+        "name": "pi_install_facts_report_the_method_and_path",
+        "line": 404,
+        "kind": "rust"
+      },
+      {
+        "name": "host_facts_cover_the_platform_and_the_stores",
+        "line": 431,
+        "kind": "rust"
+      },
+      {
+        "name": "reports_expected_dependencies",
+        "line": 459,
+        "kind": "rust"
+      },
+      {
+        "name": "node_probes_the_node_binary",
+        "line": 481,
+        "kind": "rust"
+      },
+      {
+        "name": "ready_only_when_all_required_installed",
+        "line": 496,
+        "kind": "rust"
+      },
+      {
+        "name": "finds_pi_in_npm_global_and_pi_shim_dirs",
+        "line": 520,
+        "kind": "rust"
+      },
+      {
+        "name": "finds_node_in_version_manager_dirs",
+        "line": 535,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/pi_install.rs",
+    "lines": 843,
+    "tests": [
+      {
+        "name": "official_invocation_uses_the_documented_script",
+        "line": 580,
+        "kind": "rust"
+      },
+      {
+        "name": "install_and_update_helpers_target_the_official_script",
+        "line": 593,
+        "kind": "rust"
+      },
+      {
+        "name": "unsupported_platforms_get_no_shell_installer",
+        "line": 601,
+        "kind": "rust"
+      },
+      {
+        "name": "detection_separates_official_from_npm_and_other",
+        "line": 609,
+        "kind": "rust"
+      },
+      {
+        "name": "marker_validation_rejects_stray_directories",
+        "line": 641,
+        "kind": "rust"
+      },
+      {
+        "name": "plan_install_prevents_a_second_managed_install",
+        "line": 673,
+        "kind": "rust"
+      },
+      {
+        "name": "plan_update_picks_the_mechanism_by_install_kind",
+        "line": 693,
+        "kind": "rust"
+      },
+      {
+        "name": "path_resolution_compares_real_targets",
+        "line": 721,
+        "kind": "rust"
+      },
+      {
+        "name": "run_invocation_reports_success_and_failure",
+        "line": 740,
+        "kind": "rust"
+      },
+      {
+        "name": "migration_via_the_fake_installer_keeps_user_data",
+        "line": 773,
+        "kind": "rust"
+      },
+      {
+        "name": "version_of_reads_the_launcher",
+        "line": 832,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/pi_update.rs",
+    "lines": 155,
+    "tests": [
+      {
+        "name": "versions_compare_field_by_field_not_lexically",
+        "line": 117,
+        "kind": "rust"
+      },
+      {
+        "name": "failure_detail_prefers_pi_error_and_strips_color",
+        "line": 129,
+        "kind": "rust"
+      },
+      {
+        "name": "strip_ansi_keeps_plain_text",
+        "line": 142,
+        "kind": "rust"
+      },
+      {
+        "name": "live_latest_version_answers_while_online",
+        "line": 150,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/pins.rs",
+    "lines": 164,
+    "tests": [
+      {
+        "name": "toggle_adds_then_removes",
+        "line": 140,
+        "kind": "rust"
+      },
+      {
+        "name": "identity_is_the_exact_path",
+        "line": 150,
+        "kind": "rust"
+      },
+      {
+        "name": "remove_forgets_a_pin",
+        "line": 157,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/platform.rs",
+    "lines": 1861,
+    "tests": [
+      {
+        "name": "chord_labels_use_the_platform_vocabulary",
+        "line": 1534,
+        "kind": "rust"
+      },
+      {
+        "name": "open_in_catalog_includes_rider_stable_and_eap",
+        "line": 1595,
+        "kind": "rust"
+      },
+      {
+        "name": "open_in_app_icon_is_rasterized_at_the_menu_pixel_size",
+        "line": 1609,
+        "kind": "rust"
+      },
+      {
+        "name": "open_in_legacy_global_choice_is_preserved_as_fallback",
+        "line": 1620,
+        "kind": "rust"
+      },
+      {
+        "name": "open_in_workspace_choices_are_independent_and_survive_reload",
+        "line": 1634,
+        "kind": "rust"
+      },
+      {
+        "name": "open_in_unavailable_workspace_app_falls_back_without_forgetting_choice",
+        "line": 1663,
+        "kind": "rust"
+      },
+      {
+        "name": "open_in_defaults_to_file_manager_then_first_installed_app",
+        "line": 1687,
+        "kind": "rust"
+      },
+      {
+        "name": "windows_extracts_a_png_icon_for_explorer",
+        "line": 1703,
+        "kind": "rust"
+      },
+      {
+        "name": "windows_always_detects_file_explorer",
+        "line": 1716,
+        "kind": "rust"
+      },
+      {
+        "name": "windows_expands_environment_paths",
+        "line": 1730,
+        "kind": "rust"
+      },
+      {
+        "name": "open_in_persistence_creates_and_replaces_preferences",
+        "line": 1740,
+        "kind": "rust"
+      },
+      {
+        "name": "only_http_urls_are_opened",
+        "line": 1768,
+        "kind": "rust"
+      },
+      {
+        "name": "windows_label_follows_the_build_number",
+        "line": 1779,
+        "kind": "rust"
+      },
+      {
+        "name": "macos_label_keeps_major_and_minor",
+        "line": 1795,
+        "kind": "rust"
+      },
+      {
+        "name": "os_release_prefers_pretty_name",
+        "line": 1806,
+        "kind": "rust"
+      },
+      {
+        "name": "macos_below_the_floor_is_unsupported",
+        "line": 1821,
+        "kind": "rust"
+      },
+      {
+        "name": "windows_below_the_floor_is_unsupported",
+        "line": 1838,
+        "kind": "rust"
+      },
+      {
+        "name": "host_label_is_never_empty",
+        "line": 1855,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/plugins.rs",
+    "lines": 813,
+    "tests": [
+      {
+        "name": "parses_npm_sources",
+        "line": 696,
+        "kind": "rust"
+      },
+      {
+        "name": "reads_npm_view_version_shapes",
+        "line": 718,
+        "kind": "rust"
+      },
+      {
+        "name": "only_unpinned_npm_sources_are_checked",
+        "line": 728,
+        "kind": "rust"
+      },
+      {
+        "name": "extracts_a_valid_git_head_from_ls_remote_output",
+        "line": 742,
+        "kind": "rust"
+      },
+      {
+        "name": "parses_git_sources",
+        "line": 751,
+        "kind": "rust"
+      },
+      {
+        "name": "parses_local_sources",
+        "line": 779,
+        "kind": "rust"
+      },
+      {
+        "name": "resolves_install_paths",
+        "line": 789,
+        "kind": "rust"
+      },
+      {
+        "name": "reads_string_and_object_packages",
+        "line": 804,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/providers.rs",
+    "lines": 1316,
+    "tests": [
+      {
+        "name": "brand_aliases_and_skips_monochrome_brands",
+        "line": 981,
+        "kind": "rust"
+      },
+      {
+        "name": "humanizes_unknown_ids",
+        "line": 1001,
+        "kind": "rust"
+      },
+      {
+        "name": "discovers_pi_catalog_when_installed",
+        "line": 1012,
+        "kind": "rust"
+      },
+      {
+        "name": "parses_introspected_providers",
+        "line": 1030,
+        "kind": "rust"
+      },
+      {
+        "name": "introspects_pi_providers_when_installed",
+        "line": 1043,
+        "kind": "rust"
+      },
+      {
+        "name": "counts_models_per_catalog_file",
+        "line": 1058,
+        "kind": "rust"
+      },
+      {
+        "name": "lists_every_builtin_with_unique_ids",
+        "line": 1081,
+        "kind": "rust"
+      },
+      {
+        "name": "round_trips_api_keys_and_preserves_other_credentials",
+        "line": 1098,
+        "kind": "rust"
+      },
+      {
+        "name": "rejects_empty_api_keys",
+        "line": 1128,
+        "kind": "rust"
+      },
+      {
+        "name": "stores_ollama_cloud_session_outside_the_provider_credential",
+        "line": 1138,
+        "kind": "rust"
+      },
+      {
+        "name": "a_real_ollama_key_wins_over_the_session_in_the_ui",
+        "line": 1185,
+        "kind": "rust"
+      },
+      {
+        "name": "rewrites_a_legacy_session_stored_under_the_provider_id",
+        "line": 1198,
+        "kind": "rust"
+      },
+      {
+        "name": "rejects_a_session_value_without_a_cookie_pair",
+        "line": 1217,
+        "kind": "rust"
+      },
+      {
+        "name": "round_trips_and_preserves_unrelated_config",
+        "line": 1230,
+        "kind": "rust"
+      },
+      {
+        "name": "preserves_per_model_fields_by_id",
+        "line": 1274,
+        "kind": "rust"
+      },
+      {
+        "name": "malformed_json_is_an_error_not_a_wipe",
+        "line": 1299,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/quota.rs",
+    "lines": 680,
+    "tests": [
+      {
+        "name": "parses_and_caches_reports",
+        "line": 299,
+        "kind": "rust"
+      },
+      {
+        "name": "merges_single_provider_refresh",
+        "line": 311,
+        "kind": "rust"
+      },
+      {
+        "name": "unsupported_pi_marks_fallback_and_ignores_errors",
+        "line": 328,
+        "kind": "rust"
+      },
+      {
+        "name": "disconnect_keeps_reports_but_reprobes",
+        "line": 339,
+        "kind": "rust"
+      },
+      {
+        "name": "note_renders_under_windows_that_expose_no_reset",
+        "line": 348,
+        "kind": "rust"
+      },
+      {
+        "name": "reports_are_sorted_and_skip_empty_entries",
+        "line": 401,
+        "kind": "rust"
+      },
+      {
+        "name": "peak_window_picks_the_highest_fraction",
+        "line": 424,
+        "kind": "rust"
+      },
+      {
+        "name": "peak_window_ignores_errored_reports",
+        "line": 443,
+        "kind": "rust"
+      },
+      {
+        "name": "peak_window_is_none_for_balance_only",
+        "line": 460,
+        "kind": "rust"
+      },
+      {
+        "name": "headline_prefers_the_active_providers_five_hour_window",
+        "line": 481,
+        "kind": "rust"
+      },
+      {
+        "name": "headline_falls_back_within_the_active_provider",
+        "line": 507,
+        "kind": "rust"
+      },
+      {
+        "name": "headline_falls_back_to_the_accounts_five_hour_window",
+        "line": 545,
+        "kind": "rust"
+      },
+      {
+        "name": "headline_skips_errored_reports_and_notes_only_providers",
+        "line": 569,
+        "kind": "rust"
+      },
+      {
+        "name": "five_hour_matcher_covers_adapter_wording",
+        "line": 601,
+        "kind": "rust"
+      },
+      {
+        "name": "bridge_entries_merge_without_flipping_support",
+        "line": 634,
+        "kind": "rust"
+      },
+      {
+        "name": "bridge_entries_use_the_newest_snapshot",
+        "line": 653,
+        "kind": "rust"
+      },
+      {
+        "name": "bridge_entries_absent_or_empty_are_a_noop",
+        "line": 670,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/quota_hidden.rs",
+    "lines": 119,
+    "tests": [
+      {
+        "name": "toggle_adds_then_removes",
+        "line": 95,
+        "kind": "rust"
+      },
+      {
+        "name": "identity_is_the_provider_id",
+        "line": 105,
+        "kind": "rust"
+      },
+      {
+        "name": "distinct_providers_are_independent",
+        "line": 112,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/recent_models.rs",
+    "lines": 164,
+    "tests": [
+      {
+        "name": "touch_moves_a_model_to_the_front",
+        "line": 130,
+        "kind": "rust"
+      },
+      {
+        "name": "touch_inserts_new_and_caps_the_list",
+        "line": 146,
+        "kind": "rust"
+      },
+      {
+        "name": "identity_is_provider_and_id",
+        "line": 158,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/review.rs",
+    "lines": 1406,
+    "tests": [
+      {
+        "name": "parses_file_headers_gaps_line_numbers_and_syntax",
+        "line": 1008,
+        "kind": "rust"
+      },
+      {
+        "name": "grouped_sections_split_files_and_offset_the_second_group",
+        "line": 1027,
+        "kind": "rust"
+      },
+      {
+        "name": "full_context_collapses_around_changes_and_label_expands_everything",
+        "line": 1113,
+        "kind": "rust"
+      },
+      {
+        "name": "directional_expansion_reveals_one_hundred_lines_from_the_gap_edge",
+        "line": 1151,
+        "kind": "rust"
+      },
+      {
+        "name": "count_expansion_reveals_one_hundred_lines_from_both_edges",
+        "line": 1188,
+        "kind": "rust"
+      },
+      {
+        "name": "file_header_lookup_tracks_gap_expansion",
+        "line": 1210,
+        "kind": "rust"
+      },
+      {
+        "name": "compact_patches_report_gaps_without_retained_context",
+        "line": 1254,
+        "kind": "rust"
+      },
+      {
+        "name": "tree_rows_share_directories_collapse_and_filter",
+        "line": 1269,
+        "kind": "rust"
+      },
+      {
+        "name": "numstat_marks_binary_rows",
+        "line": 1355,
+        "kind": "rust"
+      },
+      {
+        "name": "max_content_cells_includes_context_still_hidden_in_gaps",
+        "line": 1362,
+        "kind": "rust"
+      },
+      {
+        "name": "content_cells_counts_tabs_and_wide_glyphs",
+        "line": 1390,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/rpc_patches.rs",
+    "lines": 658,
+    "tests": [
+      {
+        "name": "finds_chunks_by_anchor_not_name",
+        "line": 576,
+        "kind": "rust"
+      },
+      {
+        "name": "config_round_trips_enabled_and_saved_package_root",
+        "line": 592,
+        "kind": "rust"
+      },
+      {
+        "name": "state_round_trips_and_matches_by_identity",
+        "line": 616,
+        "kind": "rust"
+      },
+      {
+        "name": "lock_is_exclusive_and_releases_on_drop",
+        "line": 639,
+        "kind": "rust"
+      },
+      {
+        "name": "embedded_scripts_are_the_real_contrib_patches",
+        "line": 649,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "crates/orbit-pi/src/usage/mod.rs",
+    "lines": 35,
+    "tests": []
+  },
+  {
+    "path": "crates/orbit-pi/src/usage/model.rs",
+    "lines": 1042,
+    "tests": []
+  },
+  {
+    "path": "crates/orbit-pi/src/usage/page.rs",
+    "lines": 2657,
+    "tests": []
+  },
+  {
+    "path": "crates/orbit-rpc/tests/quota_fake_pi.rs",
+    "lines": 151,
+    "tests": [
+      {
+        "name": "routes_quota_list_and_parses_reports",
+        "line": 67,
+        "kind": "rust"
+      },
+      {
+        "name": "forwards_extension_paths_as_pi_flags",
+        "line": 102,
+        "kind": "rust"
+      }
+    ]
+  },
+  {
+    "path": "contrib/orbit-guard-extension/policy.js",
+    "lines": 178,
+    "tests": []
+  },
+  {
+    "path": "contrib/orbit-guard-extension/policy.test.mjs",
+    "lines": 142,
+    "tests": [
+      {
+        "name": "classify buckets built-in tools by effect",
+        "line": 29,
+        "kind": "node"
+      },
+      {
+        "name": "normalizeMode falls back for unknown or missing values",
+        "line": 45,
+        "kind": "node"
+      },
+      {
+        "name": "supervised allows reads and asks for mutations",
+        "line": 52,
+        "kind": "node"
+      },
+      {
+        "name": "auto-accept-edits allows edits and asks for exec/other",
+        "line": 61,
+        "kind": "node"
+      },
+      {
+        "name": "full-access allows everything",
+        "line": 69,
+        "kind": "node"
+      },
+      {
+        "name": "an allowlisted tool is allowed even in a confined mode",
+        "line": 75,
+        "kind": "node"
+      },
+      {
+        "name": "an unknown mode is treated as the default, never as allow-all of a stricter mode",
+        "line": 80,
+        "kind": "node"
+      },
+      {
+        "name": "formatTitle encodes the tool and detail Orbit parses",
+        "line": 84,
+        "kind": "node"
+      },
+      {
+        "name": "summarize prefers the salient argument and stays single-line",
+        "line": 92,
+        "kind": "node"
+      },
+      {
+        "name": "readMode reads the mode file and degrades on any failure",
+        "line": 100,
+        "kind": "node"
+      },
+      {
+        "name": "allowlist round-trips per mode and degrades on failure",
+        "line": 116,
+        "kind": "node"
+      },
+      {
+        "name": "path helpers point under ~/.orbit-pi",
+        "line": 133,
+        "kind": "node"
+      }
+    ]
+  },
+  {
+    "path": "contrib/orbit-workflow-extension/policy.js",
+    "lines": 210,
+    "tests": []
+  },
+  {
+    "path": "contrib/orbit-workflow-extension/policy.test.mjs",
+    "lines": 97,
+    "tests": [
+      {
+        "name": "normalizeMode falls back to build",
+        "line": 21,
+        "kind": "node"
+      },
+      {
+        "name": "allowedTools subtracts the disabled write tools",
+        "line": 28,
+        "kind": "node"
+      },
+      {
+        "name": "applyToolScoping keeps tools activated after session start",
+        "line": 37,
+        "kind": "node"
+      },
+      {
+        "name": "applyToolScoping restores only what it removed",
+        "line": 53,
+        "kind": "node"
+      },
+      {
+        "name": "build never blocks",
+        "line": 64,
+        "kind": "node"
+      },
+      {
+        "name": "plan and ask block the write tools",
+        "line": 69,
+        "kind": "node"
+      },
+      {
+        "name": "plan and ask gate bash by the allowlist",
+        "line": 74,
+        "kind": "node"
+      },
+      {
+        "name": "non-bash tools are not gated",
+        "line": 88,
+        "kind": "node"
+      },
+      {
+        "name": "guidance differs per mode",
+        "line": 93,
+        "kind": "node"
+      }
+    ]
+  },
+  {
+    "path": "contrib/pi-quota-rpc/quota-handler.js",
+    "lines": 1159,
+    "tests": []
+  },
+  {
+    "path": "contrib/pi-quota-rpc/quota-handler.test.mjs",
+    "lines": 524,
+    "tests": [
+      {
+        "name": "google reports unsupported without a network request",
+        "line": 105,
+        "kind": "node"
+      },
+      {
+        "name": "google-vertex shares the Gemini explanation",
+        "line": 116,
+        "kind": "node"
+      },
+      {
+        "name": "ollama without a cloud credential explains how to add one",
+        "line": 123,
+        "kind": "node"
+      },
+      {
+        "name": "ollama local placeholder is never treated as a cloud key",
+        "line": 136,
+        "kind": "node"
+      },
+      {
+        "name": "OllamaCloudParser reads legacy session and weekly meters",
+        "line": 148,
+        "kind": "node"
+      },
+      {
+        "name": "OllamaCloudParser returns no windows for unrelated markup",
+        "line": 169,
+        "kind": "node"
+      },
+      {
+        "name": "OllamaCloudParser handles zero usage as a real value, not missing",
+        "line": 176,
+        "kind": "node"
+      },
+      {
+        "name": "only these three ids are registered for the network-free no-credential path",
+        "line": 187,
+        "kind": "node"
+      },
+      {
+        "name": "dispatch returns every connected provider report",
+        "line": 194,
+        "kind": "node"
+      },
+      {
+        "name": "a single-provider request narrows the target",
+        "line": 203,
+        "kind": "node"
+      },
+      {
+        "name": "sanitize redacts credential-shaped substrings",
+        "line": 210,
+        "kind": "node"
+      },
+      {
+        "name": "baseten sends an ISO range and sums the billing usage categories",
+        "line": 219,
+        "kind": "node"
+      },
+      {
+        "name": "ollama with a real cloud key maps the monthly credit fraction",
+        "line": 255,
+        "kind": "node"
+      },
+      {
+        "name": "ollama-cloud (third-party provider id) uses the stored cloud key",
+        "line": 277,
+        "kind": "node"
+      },
+      {
+        "name": "OllamaCloudParser reads the live markup: duplicate labels, tooltip, data-time",
+        "line": 312,
+        "kind": "node"
+      },
+      {
+        "name": "ollama merges settings-page resets into the API report",
+        "line": 327,
+        "kind": "node"
+      },
+      {
+        "name": "ollama keeps the API report when the session page is expired",
+        "line": 363,
+        "kind": "node"
+      },
+      {
+        "name": "ollama with a session parses the legacy settings page",
+        "line": 401,
+        "kind": "node"
+      },
+      {
+        "name": "ollama expired session degrades to a sign-in error, not a crash",
+        "line": 428,
+        "kind": "node"
+      },
+      {
+        "name": "ollama changed markup reports an error instead of a fake zero",
+        "line": 450,
+        "kind": "node"
+      },
+      {
+        "name": "ollama reads a legacy session stored under the provider id",
+        "line": 470,
+        "kind": "node"
+      },
+      {
+        "name": "ollama real cloud key wins when a session is also stored",
+        "line": 492,
+        "kind": "node"
+      },
+      {
+        "name": "the local placeholder key is never sent to ollama.com",
+        "line": 512,
+        "kind": "node"
+      }
+    ]
+  }
+]

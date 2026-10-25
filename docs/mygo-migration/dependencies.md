@@ -16,7 +16,15 @@ attributions remain intact.
 - gopkg.in/yaml.v3: actual YAML frontmatter parsing for user `SKILL.md` files,
   including block scalars and quoted values. A line-split substitute would reject
   valid skills. Locale assets use their existing generated flat-key parser.
-- purego, go-text/typesetting, x/net and x/text are pinned transitive MyGo modules.
+- fsnotify v1.10.1, BSD-3-Clause: native filesystem notification backends for
+  Linux, macOS/BSD and Windows. Orbit adds recursive directory registration and
+  trailing debounce; resource/backend failures use bounded metadata polling.
+  Polling cannot detect same-size writes that preserve modification time.
+  Native notifications on NFS/SMB/FUSE are not guaranteed by fsnotify.
+  Notice: `licenses/fsnotify-BSD-3-Clause.txt`. Official versioned reference:
+  https://pkg.go.dev/github.com/fsnotify/fsnotify@v1.10.1
+- purego, go-text/typesetting, x/net and x/text are pinned transitive MyGo modules;
+  x/sys is required by the native filesystem watcher.
 - MyGo's terminal plugin downloads its pinned native Ghostty VT library on first
   use. This is the upstream framework's native terminal engine, not a Rust app
   sidecar. Tests distinguish its real PTY integration from domain-only tests.
