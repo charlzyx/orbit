@@ -41,7 +41,7 @@ def wait_ready(window, pid, output, phase, timeout=45, poll=1, consecutive=3):
             rows, frame = cap.capture(path)
             good, detail, frame = cap.readiness(path, rows, frame, REQUIRED[phase], ordinal)
             streak = streak + 1 if good else 0
-            observations.append(dict(sample=ordinal, image=str(path.relative_to(out)),
+            observations.append(dict(sample=ordinal, imagePath=str(path.relative_to(out)),
                                      ready=good, consecutive=streak, **detail, **frame))
             result.update(samples=ordinal, consecutiveReadySamples=streak)
             proof_path.write_text(json.dumps(result, indent=2) + '\n')

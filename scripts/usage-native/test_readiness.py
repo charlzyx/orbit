@@ -17,6 +17,30 @@ def rows(text):
 
 
 class UsageReadinessTests(unittest.TestCase):
+    def test_real_capture_schema_keeps_image_dimensions_and_path(self):
+        # Exercise Capture.capture itself, not a fake result dictionary. Only
+        # the native subprocess boundary is stubbed with raw recorded OCR.
+        with tempfile.TemporaryDirectory() as directory:
+            tsv = (HERE / 'testdata' / 'completed-go-simple.tsv').read_text()
+            def native(*args):
+                if args[:2] == ('xdotool', 'getwindowgeometry'):
+                    return 'WIDTH=1470\nHEIGHT=922'
+                if args[0] == 'import':
+                    Path(args[-1]).write_bytes(b'unchanged-whole-native-frame')
+                    return ''
+                if args[0] == 'identify': return '1470 922'
+                if args[0] == 'tesseract': return tsv
+                if args[:2] == ('xdotool', 'getwindowname'): return 'Orbit'
+                self.fail(f'Unexpected native command {args}')
+            with patch.object(u.capture, 'run', side_effect=native), patch.object(u.capture.os, 'kill'), patch.object(u.time, 'sleep'):
+                result = u.wait_ready('42', 123, directory, 'simple')
+            self.assertEqual(result['samples'], 3)
+            for sample in result['observations']:
+                self.assertEqual(sample['image'], [1470, 922])
+                self.assertEqual(sample['client'], [1470, 922])
+                self.assertTrue((Path(directory) / sample['imagePath']).is_file())
+                self.assertEqual(sample['pngSha256'], u.capture.sha(Path(directory) / sample['imagePath']))
+
     def test_loading_usage_with_titles_is_never_completed(self):
         required = u.REQUIRED['simple']
         for marker in ('Loading local usage…', 'Loading local usage...', 'Unable to load usage data', 'Unable to read usage data', 'Refreshing…', 'Refreshing.', 'permission denied', 'No usage data yet'):
@@ -36,7 +60,7 @@ class UsageReadinessTests(unittest.TestCase):
                 good = next(observations)
                 path.write_bytes(b'whole-window-' + str(good).encode())
                 path.with_suffix('.tsv').write_text('unmodified-ocr')
-                return rows(' '.join(u.REQUIRED['simple']) + ('' if good else ' Loading local usage…')), {'pngSha256': u.capture.sha(path), 'ocrSha256': u.capture.sha(path.with_suffix('.tsv'))}
+                return rows(' '.join(u.REQUIRED['simple']) + ('' if good else ' Loading local usage…')), {'image': [1470, 922], 'client': [1470, 922], 'window': '42', 'title': 'Orbit', 'pngSha256': u.capture.sha(path), 'ocrSha256': u.capture.sha(path.with_suffix('.tsv'))}
             with patch.object(u.capture.Capture, 'capture', side_effect=frame), patch.object(u.time, 'sleep'), patch.object(u.capture, 'run') as command:
                 result = u.wait_ready('42', 123, directory, 'simple')
             command.assert_not_called()
@@ -49,7 +73,7 @@ class UsageReadinessTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             def frame(path):
                 path.write_bytes(b'skeleton'); path.with_suffix('.tsv').write_text('loading')
-                return rows('Loading local usage…'), {}
+                return rows('Loading local usage…'), {'image': [1470, 922], 'client': [1470, 922], 'window': '42', 'title': 'Orbit'}
             with patch.object(u.capture.Capture, 'capture', side_effect=frame), patch.object(u.time, 'monotonic', side_effect=[0, 0, 2]), patch.object(u.time, 'sleep'), patch.object(u.capture, 'run') as command:
                 with self.assertRaisesRegex(RuntimeError, 'did not become ready'):
                     u.wait_ready('42', 123, directory, 'simple', timeout=1)
@@ -103,7 +127,7 @@ class UsageReadinessTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             def frame(path):
                 path.write_bytes(b'whole-window'); path.with_suffix('.tsv').write_text('raw')
-                return rows(' '.join(u.REQUIRED['simple'])), {}
+                return rows(' '.join(u.REQUIRED['simple'])), {'image': [1470, 922], 'client': [1470, 922], 'window': '42', 'title': 'Orbit'}
             with patch.object(u.capture.Capture, 'capture', side_effect=frame), patch.object(u.time, 'monotonic', side_effect=[0, 0, 0, 0, 2]), patch.object(u.time, 'sleep'):
                 with self.assertRaisesRegex(RuntimeError, 'deadline'):
                     u.wait_ready('42', 123, directory, 'simple', timeout=1)
