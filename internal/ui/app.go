@@ -105,16 +105,15 @@ type Action struct {
 }
 type Options struct {
 	// UI-owned task identity and intent generation for delayed attachment work.
-	AttachmentContext     func() (agent.WorkflowTarget, uint64, bool)
-	RefreshModels         func() error
-	QueryModelCatalog     func()
-	BeginRuntimeOperation func() (func(), error)
-	Version               string
-	Custom                *orbiterm.CustomPanel
-	Updater               *native.Updater
-	Store                 *preferences.Store
-	OnAction              func(Action)
-	Terminal              *orbiterm.Panel
+	AttachmentContext func() (agent.WorkflowTarget, uint64, bool)
+	RefreshModels     func() error
+	QueryModelCatalog func()
+	Version           string
+	Custom            *orbiterm.CustomPanel
+	Updater           *native.Updater
+	Store             *preferences.Store
+	OnAction          func(Action)
+	Terminal          *orbiterm.Panel
 	// Optional workbench modules mount their actual native views here.
 	Pages            map[string]func(*ui.Context)
 	OnPage           func(string)

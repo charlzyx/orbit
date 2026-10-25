@@ -1,6 +1,6 @@
-# 验证清单与剩余范围（19:59 UTC）
+# 验证清单与剩余范围（20:24 UTC；wave8 整合前）
 
-**安装包仍是 `.4`。** 以下开发源码改进并不在该安装包里；只有重新发布且明确告知后才能按新版验收。当前已公开开发源码为 `918805045b7e9c77ab252f72a70652cfb8438920`，其最终本地 vet、全仓 race、arm64 编译通过；同 SHA migration run `40228444291` 的四项 job（proc、aggregate、Go native、Rust reference native）均通过；这仍不代表所有状态已逐张验收。Rust 基线仍为 `299a32bc87fe3d4851bdb902d9c03dcf9bf99cac`。
+**安装包仍是 `.4`。** 以下开发源码改进并不在该安装包里；只有重新发布且明确告知后才能按新版验收。本批整合前的公开源码基线为 `0173c5e6e7cf69b470d2bfd67382f0efed04cb63`（wave7）；其最终本地 vet、全仓 race（UI 587.024s）、arm64 编译通过，同 SHA migration `40230109801` 四项 job 均通过。本提交新增内容与边界见 [wave8-frozen-integration.md](wave8-frozen-integration.md)。前一 `918805` migration run `40228444291` 四项 job 全通过；这仍不代表所有状态已逐张验收。Rust 基线仍为 `299a32bc87fe3d4851bdb902d9c03dcf9bf99cac`。
 
 ## 明天优先验证（按风险/日常行为）
 
@@ -17,17 +17,17 @@
 |---|---|---|
 | C04/C05 | caret 路径、Mention、六格式单图、菜单焦点、附件 owner、异步对话框 | 真实拖放/剪贴板/IME/确认和完整混合内容行为 |
 | C08 | 消息导航轨道、预览、选择保留窄 overlay | 静态 Chat 两态捕获仍被身份门禁阻止，物理选择未验收 |
-| C09 | 有边界的网络/data raster、owner 缓存/预览隔离 | 同 slot 内容修订下一批；SVG/private hosts 有意不支持，table/list/code 尚在源核对；不是完整 C09 |
+| C09 | 有边界的网络/data raster、owner 缓存/预览隔离 | 同 slot 内容修订已公开，仍有其他内容布局差异；SVG/private hosts 有意不支持，table/list/code 尚在源核对；不是完整 C09 |
 | C14/C15 | typed retry、compaction、Context details/缺值、目标归属 | 真实提供商事件、真实取消/压缩、状态全覆盖未验收 |
-| P03 | 只读依赖 setup、exact-owner 恢复、main-only 布局 | npm 确认迁移 UI 下一批；任何真实安装/迁移均未执行 |
+| P03 | 只读依赖 setup、exact-owner 恢复、main-only 布局 | npm 确认迁移 UI 已公开（fixture 验证）；任何真实安装/迁移均未执行 |
 | P17 | MCP ACK、parked 指纹、启动 probe/状态 tab | 真实端点/认证与扩展配置组合未验收 |
 | P20/S05 | 一部分可见文字、Reset localized label、surface traversal/Appearance focus | 其余 accessible names、菜单/全页语言、原生键盘/AX 未完整覆盖 |
-| S10/S11/S12/S13 | 目标绑定 metadata/export、删除 reservation、workspace 菜单/sticky | palette Delete/Pin 下一批；外部文件替换竞态和 Mac 大小写别名残余 |
+| S10/S11/S12/S13 | 目标绑定 metadata/export、删除 reservation、workspace 菜单/sticky | palette Delete/Pin 已公开；Rename 对话框目标修正下一批；外部文件替换竞态和 Mac 大小写别名残余 |
 | W35/W36/W54/W55 | Review/embedded diff pan/sticky/context、Explorer inline/menus | Git 外层结构、字形/换行/像素、filesystem rename/autosave 原子性残余 |
 
-## 正在下一批，尚未公开
+## 本批与紧随批次边界
 
-Palette Delete 确认固定目标、Pin 当前路径、inline image 内容 revision、Review 文件标题/计数、npm-only setup 显式确认卡片。每项有独立 source review 与临时 fixture 回归，仍需组合全仓门禁后才能算已发布源码。
+本提交包含可见模型 Refresh、死代码清理、Pi 通知/自动更新回执、ragged 表格与 metadata receipt CI 门禁；详见 wave8 证据。Rename exact-live API、更新 worker settlement、pending 附件 Submit 和剩余菜单/复制行为继续独立验证。不能将本提交或下一批当成 `.4` 安装包已有能力。
 
 ## 原生证据边界
 

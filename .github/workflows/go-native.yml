@@ -27,6 +27,40 @@ jobs:
           ORBIT_REQUIRE_PROC_CHILDREN: "1"
         run: python3 -m unittest discover -s scripts/chat-native -p 'test_thread_children.py' -v
 
+  receipt-guard-regression:
+    needs: proc-guard-regression
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22.23.4'
+      - name: Materialize pinned reference patch sources only
+        run: |
+          git fetch --depth=1 origin 299a32bc87fe3d4851bdb902d9c03dcf9bf99cac
+          git worktree add --detach /tmp/orbit-receipt-reference 299a32bc87fe3d4851bdb902d9c03dcf9bf99cac
+      - name: Install public pinned Pi and independent fixed-integrity vendor input
+        run: |
+          npm install --prefix /tmp/orbit-receipt-pi-runtime @earendil-works/pi-coding-agent@1.4.0
+          curl --fail --silent --show-error --location --proto '=https' --max-time 60 --max-filesize 67108864 'https://registry.npmjs.org/@earendil-works/pi-coding-agent/-/pi-coding-agent-1.4.0.tgz' -o /tmp/orbit-receipt-vendor.tgz
+      - name: Require real Node22 Pi receipts and worker-thread ancestry without skips
+        env:
+          ORBIT_REQUIRE_PROC_CHILDREN: "1"
+          ORBIT_RECEIPT_PI_RUNTIME: /tmp/orbit-receipt-pi-runtime
+          ORBIT_RECEIPT_VENDOR_ARCHIVE: /tmp/orbit-receipt-vendor.tgz
+          ORBIT_RECEIPT_RUST_SOURCE: /tmp/orbit-receipt-reference
+        run: |
+          set -o pipefail
+          export ORBIT_RECEIPT_NODE="$(command -v node)"
+          mkdir -p capture/receipt-regression
+          python3 scripts/chat-native/run_receipt_regression.py 2>&1 | tee capture/receipt-regression/proof.log
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: chat-receipt-metadata-regression
+          path: capture/receipt-regression/
+
   test:
     runs-on: ubuntu-24.04
     env:
@@ -45,7 +79,9 @@ jobs:
       - name: Install pinned Pi for credential-free protocol integration
         run: npm install --prefix /tmp/orbit-pi-runtime @earendil-works/pi-coding-agent@1.4.0
       - run: scripts/go-native.sh vet ./...
-      - run: scripts/go-native.sh test -race ./...
+      - # Total suite budget: added mounted regressions exceed the old 10m package limit.
+        # Serial package execution reduces contention; individual assertions/timeouts are unchanged.
+        run: scripts/go-native.sh test -race -p 1 -timeout 20m ./...
         env:
           ORBIT_PI_INTEGRATION_BIN: /tmp/orbit-pi-runtime/node_modules/.bin/pi
           ORBIT_TERMINAL_TEST: "1"
@@ -81,7 +117,7 @@ jobs:
           path: capture/
 
   reference-desktop:
-    needs: proc-guard-regression
+    needs: [proc-guard-regression, receipt-guard-regression]
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
@@ -100,6 +136,8 @@ jobs:
         run: |
           git fetch --depth=1 origin 299a32bc87fe3d4851bdb902d9c03dcf9bf99cac
           git worktree add --detach /tmp/orbit-reference 299a32bc87fe3d4851bdb902d9c03dcf9bf99cac
+      - name: Verify verbatim pinned Rust ragged-table parser fixture
+        run: python3 scripts/markdown-parity/check-rust-table.py /tmp/orbit-reference
       - name: Cache pinned reference build
         uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
         with:
@@ -120,7 +158,7 @@ jobs:
           path: capture/
 
   native-desktop:
-    needs: proc-guard-regression
+    needs: [proc-guard-regression, receipt-guard-regression]
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:

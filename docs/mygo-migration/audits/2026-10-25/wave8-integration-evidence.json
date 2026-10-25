@@ -1,0 +1,98 @@
+{
+  "schema": 1,
+  "parent": "0173c5e6e7cf69b470d2bfd67382f0efed04cb63",
+  "releaseUnchanged": ".4",
+  "runtimeHashes": {
+    "count": 595,
+    "unchanged": true
+  },
+  "patches": [
+    {
+      "name": "orbit-legacy-runtime-cleanup-candidate.patch",
+      "sha256": "ee1367bbc8f0dacd7d82ef3e9d9ca8329aab95841c874c6055ea666bfc85cac9"
+    },
+    {
+      "name": "orbit-visible-refresh-frozen-2010.patch",
+      "sha256": "dbd82c082fe6571fbd3d16679d4118b7adc8c38c9a32fd01509a01591411d78c"
+    },
+    {
+      "name": "orbit-pi-migration-notice-candidate.patch",
+      "sha256": "5d3e03c6456ae194b7cfcb0c93120301e318f320eb0608c4b9aa0333536904d3"
+    },
+    {
+      "name": "orbit-pi-update-notices-candidate.patch",
+      "sha256": "228489db12dc49e856a02c9249520a1ee6a6ca3f8ca505a1b0778dcca282b3b4"
+    },
+    {
+      "name": "orbit-pi-update-receipt-candidate.patch",
+      "sha256": "2915e6aaa7c7daa873c14944fcca7e4d4dca89fb93e4915542703e9ace9e3d9f"
+    },
+    {
+      "name": "orbit-pi-update-target-candidate.patch",
+      "sha256": "30aa61422fecca56a4339db7a0c4b02f4c9bc61ac91e62d09f2e36c833790b36"
+    },
+    {
+      "name": "orbit-markdown-ragged-table-v3-review.patch",
+      "sha256": "d79cbf933dfeea6b3c9f182474269087b618e1fde950c75ad4b218669ee20621"
+    },
+    {
+      "name": "orbit-chat-receipt-final-2015.patch",
+      "sha256": "43ac9819a3c988159a202b1b4704f7f7ba745bb7b94805c9e1e915d0d976fa1e"
+    },
+    {
+      "name": "orbit-chat-receipt-ci-only-2019.patch",
+      "sha256": "d4223545350d5913480a18008a1c02210e810c3937866b5549a80db49113360b"
+    }
+  ],
+  "integrationNotes": [
+    "cleanup run.go manually preserves npm RequestSetupMigration hooks",
+    "receipt workflow merges default-off existing configuration; no one-shot marker",
+    "Rust fixture added to existing pinned reference job; explicit crate name only",
+    "canonical suite uses -p1 -timeout20m; application/individual waits/assertions unchanged"
+  ],
+  "gates": {
+    "vet": "PASS",
+    "allPackagesRace": "PASS",
+    "raceFlags": "-race -p 1 -timeout 20m -json ./...",
+    "packageSeconds": {
+      "github.com/charlzyx/orbit": 2.436,
+      "github.com/charlzyx/orbit/cmd/orbit": 1.03,
+      "github.com/charlzyx/orbit/internal/agent": 148.762,
+      "github.com/charlzyx/orbit/internal/appbundle": 7.9719999999999995,
+      "github.com/charlzyx/orbit/internal/attachments": 29.956,
+      "github.com/charlzyx/orbit/internal/background": 1.874,
+      "github.com/charlzyx/orbit/internal/bugreportui": 8.814,
+      "github.com/charlzyx/orbit/internal/composerui": 4.06,
+      "github.com/charlzyx/orbit/internal/diagnosticlog": 1.2389999999999999,
+      "github.com/charlzyx/orbit/internal/gitworkbench": 33.606,
+      "github.com/charlzyx/orbit/internal/highlight": 1.385,
+      "github.com/charlzyx/orbit/internal/markdownimage": 2.668,
+      "github.com/charlzyx/orbit/internal/mcpui": 3.846,
+      "github.com/charlzyx/orbit/internal/modelui": 5.162,
+      "github.com/charlzyx/orbit/internal/native": 71.647,
+      "github.com/charlzyx/orbit/internal/pirpc": 7.923,
+      "github.com/charlzyx/orbit/internal/preferences": 1.514,
+      "github.com/charlzyx/orbit/internal/resourceui": 5.871,
+      "github.com/charlzyx/orbit/internal/runtimepath": 1.048,
+      "github.com/charlzyx/orbit/internal/terminal": 1.858,
+      "github.com/charlzyx/orbit/internal/transcriptui": 1.901,
+      "github.com/charlzyx/orbit/internal/ui": 516.84,
+      "github.com/charlzyx/orbit/internal/workbench": 17.365,
+      "github.com/charlzyx/orbit/internal/workspace": 8.523,
+      "github.com/charlzyx/orbit/internal/worktreeui": 2.85
+    },
+    "darwinArm64": "PASS",
+    "chainExit": 0,
+    "combinedFocusedUISeconds": 24.366,
+    "combinedResourceSeconds": 1.936,
+    "python": "50 tests: 47 pass, 3 explicit local/opt-in skips",
+    "realNode22Metadata": "2 tests: metadata both renderers PASS38.553s, ancestry capability SKIP locally",
+    "hostedReceiptAncestry": "NOT_RUN before publication; required 2 tests zero skips in new CI job",
+    "verbatimRustParser": "NOT_RUN locally; required existing reference CI step"
+  },
+  "retainedFailures": [
+    "status-notice standalone full suite timeout600.055s at newly starting case0s; isolated exactcase+notice3x14.993s PASS; final combined suite passed",
+    "Rename90ebb intentionally NOT included: rejects legitimate unpersisted live rename; safe replacement nextwave",
+    "glyph prototype NOT included: pristine and candidate same allocation KNOWN FAIL"
+  ]
+}

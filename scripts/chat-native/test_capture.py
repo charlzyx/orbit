@@ -13,7 +13,7 @@ SUITE=json.loads((HERE.parent.parent/'testdata/chat-native/cases.json').read_tex
 IDENTITY={'pid':123,'startTicks':'1234','exe':'/selected/binary'}
 
 def instance(out):
-    x=object.__new__(c.Capture);c.base.Capture.__init__(x,'42',123,out,copy.deepcopy(SUITE));x.identity=IDENTITY;return x
+    x=object.__new__(c.Capture);c.base.Capture.__init__(x,'42',123,out,copy.deepcopy(SUITE));x.identity=IDENTITY;x.receipts=None;return x
 
 def run(*args):
     if args[1]=='getwindowpid':return '123'
@@ -89,7 +89,7 @@ class AdditionalGuards(unittest.TestCase):
         with tempfile.TemporaryDirectory()as d:
             Path(d,'capture-result.json').write_text('prior proof')
             with patch.object(c,'process_identity')as identity:
-                with self.assertRaises(ValueError):c.Capture('42',123,d,SUITE,'/binary','/pi')
+                with self.assertRaises(ValueError):c.Capture('42',123,d,SUITE,'/binary','/pi','/expected','hash')
                 identity.assert_not_called()
             self.assertEqual(Path(d,'capture-result.json').read_text(),'prior proof')
     def test_result_explicitly_keeps_context_blocked(self):

@@ -18,7 +18,7 @@ class RealThreadChildren(unittest.TestCase):
         self.assertIn('ORBIT_REQUIRE_PROC_CHILDREN: "1"',source)
         self.assertIn("-p 'test_thread_children.py' -v",source)
         for job in ('reference-desktop','native-desktop'):
-            self.assertIn('  '+job+':\n    needs: proc-guard-regression\n',source)
+            self.assertIn('  '+job+':\n    needs: [proc-guard-regression, receipt-guard-regression]\n',source)
 
     def test_worker_thread_owned_rpc_child_is_found_but_unrelated_root_is_not(self):
         parent=os.getpid()

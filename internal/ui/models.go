@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/charlzyx/orbit/internal/agent"
@@ -90,11 +89,10 @@ func (x *Controller) refreshModelCatalog() error {
 	a.Async(func() func() {
 		defer release()
 		env, runErr := svc.SecretEnv()
-		var out native.CommandOutput
 		if runErr == nil {
 			ctx, cancel := context.WithTimeout(x.background, 2*time.Minute)
 			defer cancel()
-			out, runErr = native.RefreshPiModelCatalogWithConfig(ctx, native.ModelCatalogOptions{Binary: binary, Home: home, PiDir: piDir, Workspace: dir, Environment: append(os.Environ(), env...)})
+			_, runErr = native.RefreshPiModelCatalogWithConfig(ctx, native.ModelCatalogOptions{Binary: binary, Home: home, PiDir: piDir, Workspace: dir, Environment: append(os.Environ(), env...)})
 		}
 		if runErr == nil {
 			if x.Agent.Snapshot().ActiveSession.Workspace == "" {
@@ -107,10 +105,8 @@ func (x *Controller) refreshModelCatalog() error {
 		if runErr != nil {
 			detail = svc.Redact(runErr.Error())
 		}
-		output := svc.Redact(strings.TrimSpace(string(out.Stdout) + "\n" + string(out.Stderr)))
 		return func() {
 			x.catalogRefreshing = false
-			a.nativeSettings.output = output
 			if a.Models != nil {
 				a.Models.SetRefreshState(false, detail)
 			}

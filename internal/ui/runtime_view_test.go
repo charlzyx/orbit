@@ -12,7 +12,6 @@ func TestNativeRuntimeUsesRealSnapshotAndStoppedUnknowns(t *testing.T) {
 	a := fixture(t)
 	a.page = "settings"
 	a.settingsPage = "runtime"
-	a.nativeSettings.runtimeLoaded = true
 	now := time.Date(2026, 10, 25, 0, 0, 0, 0, time.UTC)
 	a.Runtime = agent.RuntimeSnapshot{Transport: "stdio JSONL", ConfiguredExecutable: "/fixture/pi", Active: &agent.RuntimeProcess{PID: 4321, Executable: "/fixture/node", StartedAt: now, Uptime: 2*time.Minute + 3*time.Second, Alive: true, State: "idle", RecentStderr: []string{"explicit fixture diagnostic"}}, Parked: []agent.RuntimeProcess{{PID: 6789, SessionName: "Fixture background", State: "busy", Alive: true}}}
 	var actions []Action

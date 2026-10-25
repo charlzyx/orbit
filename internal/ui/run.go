@@ -151,7 +151,7 @@ func NewController(o RunOptions) (*Controller, error) {
 	}
 	x.Updater = native.NewUpdater(updateOptions)
 	x.Terminal = orbiterm.NewPanel(orbiterm.Options{Workspace: o.Workspace, Height: float32(s.Layout().TerminalHeight), Font: ghostty.Font{Family: s.Fonts().CodeFamily, Size: float32(s.UI().TerminalFontSize), LineHeight: 1, Features: []string{"-calt", "-liga", "-dlig"}}, OnChange: invalidate, OnError: func(e error) { x.enqueue(func() { x.UI.Notify(e.Error(), true) }) }, OpenLink: func(url string) bool { x.enqueue(func() { x.UI.save(native.OpenURL(url)) }); return true }})
-	x.UI = New(Options{BeginRuntimeOperation: x.beginRuntimeOperation, Updater: x.Updater, Version: o.Version, Store: s, Workspace: o.Workspace, PiBinary: o.PiBinary, Terminal: x.Terminal, OnAction: x.Action, Pages: map[string]func(*ui.Context){}})
+	x.UI = New(Options{Updater: x.Updater, Version: o.Version, Store: s, Workspace: o.Workspace, PiBinary: o.PiBinary, Terminal: x.Terminal, OnAction: x.Action, Pages: map[string]func(*ui.Context){}})
 	x.UI.Options.RefreshModels = x.refreshModelCatalog
 	x.UI.Options.QueryModelCatalog = func() {
 		if !x.Agent.Snapshot().Connected {
@@ -610,6 +610,7 @@ func (x *Controller) Action(a Action) {
 		u.RefreshFiles()
 		x.Git.Refresh()
 		x.Worktrees.Refresh()
+		x.refreshVisibleModels()
 	case "RefreshModels":
 		e = x.refreshModelCatalog()
 	case "RefreshProviders":
@@ -661,8 +662,6 @@ func (x *Controller) Action(a Action) {
 		x.requestSetupMigration()
 	case "RefreshSetup":
 		x.refreshSetup()
-	case "CheckPiUpdate":
-		u.checkPiUpdate()
 	case "ChoosePiBinary":
 		u.Prompt("Pi executable path", m.PiBinary(), func(p string) {
 			if !x.sessionGate.TryRLock() {
@@ -868,33 +867,7 @@ func Run(o RunOptions) error {
 		}
 		x.runRetention(false)
 		if !o.Offline && o.PiBinary == "" && x.Agent.PiBinary() == "" {
-			native.CheckPiUpdateOnLaunch(x.background, native.PiLaunchUpdateOptions{Busy: func() bool { return x.maintenance.Load() || x.Agent.AnyBusy() }, BeginUpdate: func() (func(), bool) {
-				release, err := x.beginRuntimeOperation()
-				if err == nil && x.Agent.PiBinary() != "" {
-					release()
-					return nil, false
-				}
-				return release, err == nil
-			}, OnEvent: func(event native.PiUpdateEvent) {
-				x.enqueue(func() {
-					s := &x.UI.nativeSettings
-					s.latest, s.installation = event.Latest, event.Installation
-					if len(event.Dependencies) > 0 {
-						s.dependencies = event.Dependencies
-						s.runtimeLoaded = true
-					}
-					s.output = event.Detail
-					switch event.State {
-					case "updated":
-						x.UI.Notify("Pi updated to "+event.Installation.Version, false)
-						x.Action(Action{Kind: "RuntimeChanged"})
-					case "failed":
-						x.UI.Notify("Pi update failed: "+event.Detail, true)
-					case "migration_required":
-						x.UI.Notify("A managed Pi installation is available. Review migration in Settings → Runtime.", false)
-					}
-				})
-			}})
+			x.startPiLaunchUpdate(native.CheckPiUpdateOnLaunch)
 		}
 	}, x.startHeartbeat)
 	o.Smoke.Start(x.background, func() appbundle.SmokeSnapshot {

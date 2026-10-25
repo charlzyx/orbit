@@ -10,6 +10,8 @@ import time
 HERE=Path(__file__).resolve().parent
 spec=importlib.util.spec_from_file_location('static_chat_base_capture',HERE.parent/'workbench-native/capture.py')
 base=importlib.util.module_from_spec(spec);spec.loader.exec_module(base)
+receipt_spec=importlib.util.spec_from_file_location('chat_launch_receipt',HERE/'launch_receipt.py')
+receipt_module=importlib.util.module_from_spec(receipt_spec);receipt_spec.loader.exec_module(receipt_module)
 EXPECTED_ACTIONS=[[{'key':'ctrl+1'}],[{'key':'ctrl+Up'}]]
 BEFORE={'CHAT01':['Static Chat fixture'],'CHAT02':['CHAT TAIL READY']}
 
@@ -31,7 +33,12 @@ def lineage_live(lineage):
         return True
     except (FileNotFoundError,ProcessLookupError):return False
 
-def owned_rpc_children(pid,pi_entry):
+def read_cmdline(pid):
+    with Path(f'/proc/{pid}/cmdline').open('rb') as command_file: raw=command_file.read(32769)
+    if len(raw)>32768:raise ValueError('Owned child argv exceeds diagnostic bound')
+    return raw
+
+def owned_rpc_children(pid,pi_entry,receipts=None,rejected=None):
     # Linux task/TID/children is thread-local, not the whole process group.
     # Enumerate only threads in this already-owned ancestry; never scan /proc
     # globally or infer ownership from a matching executable name.
@@ -65,9 +72,17 @@ def owned_rpc_children(pid,pi_entry):
                         pending.append((child,branch))
                 except (FileNotFoundError,ProcessLookupError):continue
             if current==pid:continue  # Root is never its own descendant.
-            argv=Path(f'/proc/{current}/cmdline').read_bytes().split(b'\0')
+            argv=read_cmdline(current).split(b'\0')
             args=[s.decode('utf-8','replace')for s in argv if s]
-            if any(args[i:i+2]==['--mode','rpc'] for i in range(len(args)-1)) and any(s.startswith('/') and Path(s).resolve()==pi_entry for s in args):
+            if receipts is not None:
+                proof=receipts.candidate(lineage[-1],lineage[-2])
+                if proof is not None and lineage_live(lineage):
+                    found.append(dict(identity=lineage[-1],argvDiagnostic=args,ancestry=lineage,launchReceipt=proof))
+                elif rejected is not None:
+                    rejected.append(dict(identity=lineage[-1],argvDiagnostic=[x[:256] for x in args[:32]],reason='not pinned Node executable' if lineage[-1]['exe']!=receipts.cfg['node'] else 'no matching launch receipt'))
+            elif any(args[i:i+2]==['--mode','rpc'] for i in range(len(args)-1)) and any(s.startswith('/') and Path(s).resolve()==pi_entry for s in args):
+                # Legacy scanner retained solely for its synthetic proc tests.
+                # Production Capture always constructs a receipt verifier.
                 if lineage_live(lineage):found.append(dict(identity=lineage[-1],argv=args,ancestry=lineage))
         except (FileNotFoundError,ProcessLookupError):continue
     if process_identity(pid)!=root:raise ValueError('Capture process changed during descendant scan')
@@ -83,13 +98,15 @@ def validate_suite(suite):
         raise ValueError('Only two approved static Chat inputs are supported; no prompt/compact/hover/drag/scroll/model/auth')
 
 class Capture(base.Capture):
-    def __init__(self,window,pid,out,suite,binary,pi_entry):
+    def __init__(self,window,pid,out,suite,binary,pi_entry,expected,expected_hash):
         validate_suite(suite)
         if any((Path(out)/p).exists() for p in ('actions.json','capture-result.json','evidence')):raise ValueError('Refusing prior capture evidence reuse')
         if pid<=0 or not str(window).isdigit():raise ValueError('Invalid native process/window identity')
         super().__init__(window,pid,out,suite)
         self.identity=process_identity(pid)
         self.pi_entry=Path(pi_entry).resolve(strict=True)
+        self.receipts=receipt_module.Verifier(expected,expected_hash)
+        if self.receipts.cfg["entry"]!=str(self.pi_entry):raise ValueError("Receipt entry differs from selected pinned Pi")
         if self.identity['exe']!=str(Path(binary).resolve(strict=True)):raise ValueError('Window process is not selected capture binary')
 
     def guard(self,active=False):
@@ -105,9 +122,10 @@ class Capture(base.Capture):
     def capture(self,path):
         self.guard();captured=time.monotonic()
         rows,metadata=super().capture(path)
-        children=owned_rpc_children(self.pid,self.pi_entry)
+        rejected=[]
+        children=owned_rpc_children(self.pid,self.pi_entry,self.receipts,rejected)
         self.guard()
-        return rows,dict(metadata,processIdentity=self.identity,capturedMonotonic=captured,rpcChildren=children)
+        return rows,dict(metadata,processIdentity=self.identity,capturedMonotonic=captured,rpcChildren=children,rpcRejected=rejected)
 
     def readiness(self,image,rows,metadata,required,sample):
         if not metadata.get('rpcChildren'):
@@ -120,7 +138,7 @@ class Capture(base.Capture):
         age=time.monotonic()-frame['capturedMonotonic']
         if not 0<=age<=5:raise ValueError('Screenshot input proof expired; no input')
         if base.sha(image)!=frame['pngSha256']:raise ValueError('Screenshot changed after target verification; no input')
-        children=owned_rpc_children(self.pid,self.pi_entry)
+        children=owned_rpc_children(self.pid,self.pi_entry,self.receipts)
         self.guard(active=True)
         observed=[item.get('identity') for item in frame.get('rpcChildren',[])]
         if not any(item['identity'] in observed for item in children):
@@ -158,12 +176,12 @@ class Capture(base.Capture):
         path.write_text(json.dumps(result,indent=2)+'\n')
 
 def main():
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('window');p.add_argument('pid',type=int);p.add_argument('out',type=Path);p.add_argument('cases',type=Path);p.add_argument('binary',type=Path);p.add_argument('pi_entry',type=Path)
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('window');p.add_argument('pid',type=int);p.add_argument('out',type=Path);p.add_argument('cases',type=Path);p.add_argument('binary',type=Path);p.add_argument('pi_entry',type=Path);p.add_argument('expected',type=Path);p.add_argument('expected_hash')
     a=p.parse_args();suite=json.loads(a.cases.read_text())
     if any((a.out/p).exists()for p in ('actions.json','capture-result.json','evidence')):raise ValueError('Refusing prior capture evidence reuse')
     capture=None
     try:
-        capture=Capture(a.window,a.pid,a.out,suite,a.binary,a.pi_entry)
+        capture=Capture(a.window,a.pid,a.out,suite,a.binary,a.pi_entry,a.expected,a.expected_hash)
         capture.settle(dict(id='STARTUP',image='evidence/startup.png',require=['Static Chat fixture']))
         capture.execute()
     except Exception as error:

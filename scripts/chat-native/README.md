@@ -165,3 +165,106 @@ record its actual URL/outcome and remove the push disjunct in the next ordinary
 source commit. The same event matrix continues passing with manual-only
 restored and then requires the formerly matching second push to be off too.
 This local diff does not publish or dispatch the run.
+
+### Receipt-based Pi ownership candidate (not yet native validated)
+
+The second capture independently stopped on both renderers at STARTUP, with no
+input. Pi 1.4's real CLI sets `process.title = "pi"`; the successful live Node
+process can expose only `pi` in Linux `/proc/PID/cmdline`, losing both the entry
+path and `--mode rpc`. A matching process title is **not** pinned-runtime proof.
+
+`launch_receipt.py` installs a fresh capture-only `PI_BIN` launcher inside the
+controlled Pi package root, so both package discovery and normal app patches
+still target the real package. It forwards version checks without a receipt and
+execs the real pinned Node/CLI with exactly the renderer's source argv, preserving
+PID and stdio. No synthetic RPC/output, prompt, provider/model/auth changes or UI
+input is introduced. The independently prepared expected manifest precedes any
+child receipt. Capture checks nonce, PID/startTicks/parent, exact executable and
+args, package/Node/module hashes, and its existing live owned ancestry/window/fresh
+frame constraints. Mutable argv/title are bounded diagnostics only.
+
+Package records include the complete bounded package tree (up to 4096 regular
+files, 8192 visited entries, 256 MiB), not just the tiny importing CLI entry.
+Same-byte patch passes really rewrite stat timestamps; stat changes may trigger
+at most 32 rehash events and 512 MiB cumulative package hashing per verifier,
+always compared to the **original independent SHA**. New content is rejected,
+never self-blessed; stable frames do stat checks without repeated bundle hashing.
+Node and source-module replacement are rejected. Ledger fanout is at most 16
+records plus the expected manifest, with bounded no-follow JSON, 0700/0600,
+no-overwrite atomic receipts. Rejected owned candidates are recorded (bounded).
+
+Threat boundary: this is provenance instrumentation in a trusted credential-free
+CI fixture. Nonces/permissions do not authenticate against malicious same-UID
+code that can rewrite the harness or package. Stat/hash rechecks narrow ordinary
+replacement races but do not prove hostile same-UID pathname TOCTOU impossible.
+The package inventory covers Pi itself, not a complete transitive npm supply-chain
+attestation. Existing native-process ancestry/PID reuse checks are still required.
+
+Local real validation uses official SHA-verified Node22.23.4 and real Pi1.4,
+both source argument vectors and four real extensions, and only `get_state`.
+The actual Go and pinned Rust custom-ui/quota/auth patch scripts are applied
+twice, with unchanged expected content and real package-root JS resolver calls.
+This is **not** a complete native renderer launch: Go's production package-root
+resolver is separately unit-tested; Rust's is source-reviewed, not locally built.
+The local sandbox lacks `/proc/PID/task/TID/children`, so full worker-thread live
+ancestry remains explicitly unverified. The real-Pi test spawns on a worker thread
+and requires the full owned scan where supported; `ORBIT_REQUIRE_PROC_CHILDREN=1`
+makes missing ancestry a failure, never a skip. A future independently reviewed
+Ubuntu regression must establish that proof before any native retry. No workflow
+change or native retry is included in this candidate.
+
+Opt-in metadata-only regression (no native UI):
+
+```
+ORBIT_RECEIPT_NODE=/absolute/node22.23.4/bin/node \
+ORBIT_RECEIPT_PI_RUNTIME=/absolute/isolated-pi-runtime \
+ORBIT_RECEIPT_RUST_SOURCE=/absolute/pinned-rust-source \
+ORBIT_REQUIRE_PROC_CHILDREN=1 \
+python3 -m unittest discover -s scripts/chat-native -p test_receipt_real_pi.py -v
+```
+
+Independent vendor provenance is required before `prepare`: download only the
+public Pi1.4.0 tarball and verify the hard-coded SHA512 integrity **before** parsing
+it. Safe bounded extraction rejects absolute/escaping/duplicate/nonregular/link
+members and never runs npm package lifecycle scripts. In a separate temporary
+reference tree, execute only the reviewed source-root custom-ui/quota/auth patch
+scripts with exact pinned Node; fingerprint those source files before/after.
+The entire resulting reference file set+SHA must equal the installed Pi package
+before a ledger/launcher is created. The expected manifest records vendor archive
+SHA/integrity and patch-source fingerprints separately from receipts. Runtime
+logs/ledger are outside the package; the **only** package exclusion is the exact
+independently generated capture launcher, whose full bytes are checked. Same-version
+extra or altered package files do not acquire approval by appearing in a snapshot.
+Node provenance remains the pinned setup-node distribution; the local proof used
+the official Node22.23.4 archive and official SHASUMS256 check. This is not signature
+verification of the npm registry or attestation of transitive dependency packages.
+
+The real regression additionally requires `ORBIT_RECEIPT_VENDOR_ARCHIVE` pointing
+to that fixed-integrity public vendor tarball. Its output includes independent
+package-content, patch-source, Node, and vendor hashes for each renderer proof.
+
+Local frozen proof: 48 Python tests pass (4 explicit opt-in/platform skips),
+real Node22/Pi both renderer probes pass (23.397s; one explicit ancestry-platform
+skip), Go production package resolver race test passes (1.035s). Complete hashes
+and honest scope are in the handoff `receipt-proof-manifest.json`; local receipt
+acceptance is not full hosted ancestry proof. The Go and Rust patch references
+produce distinct expected package hashes, and are not interchangeable.
+
+### Required Ubuntu metadata regression wiring (no native retry authorization)
+
+`receipt-guard-regression` now runs the real Node22/Pi source/vendor/receipt probe
+on Ubuntu24 after `proc-guard-regression`. Both desktop jobs depend on both gates.
+`run_receipt_regression.py` requires explicit absolute fixture paths, required
+kernel-ancestry mode, exactly two real tests and **zero skips**; pipeline exit
+status is preserved with `pipefail`. Its saved artifact is metadata proof only.
+The real child is spawned from a live non-main Python thread, and the test checks
+that this thread is still alive during scanning and that a child cannot be its
+own authoritative root. No display, native application, key/mouse automation,
+provider/model/auth or fabricated RPC traffic is added to this job.
+
+Chat remains default-off on ordinary push/pull_request and false manual input;
+only the existing explicit manual true input can request it. Wiring tests verify
+the dependency/event rules. Local wiring suite: 50 tests PASS with four honest
+opt-in/platform skips. This does not assert that the required Ubuntu job has
+already run or passed; that external proof is still pending normal publication
+by the coordinator after independent review.

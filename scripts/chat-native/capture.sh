@@ -17,10 +17,19 @@ cmp "$output/fixture-before.json" "$repo_root/testdata/chat-native/manifest.json
 # Actual Pi, four read-only commands. Context must remain unknown without auth.
 python3 "$repo_root/scripts/chat-native/preflight.py" "$pi_binary" "$fixture" "$output/pi-preflight.json"
 install -d -m 700 "$fixture/runtime" "$fixture/config" "$fixture/cache"
+# Independent expected manifest, before the app/launcher can issue any receipt.
+pi_entry=$(realpath "$pi_binary")
+package_root=$(dirname "$(dirname "$(dirname "$pi_entry")")")
+vendor_archive="$output/pi-vendor-1.4.0.tgz"
+curl --fail --silent --show-error --location --proto '=https' --max-time 60 --max-filesize 67108864 'https://registry.npmjs.org/@earendil-works/pi-coding-agent/-/pi-coding-agent-1.4.0.tgz' -o "$vendor_archive"
+receipt_config=$(python3 "$repo_root/scripts/chat-native/launch_receipt.py" "$package_root" "$node_binary" "$fixture" "$output/launch-ledger" "$kind" "$vendor_archive" "$source_root")
+receipt_expected=$(python3 -c 'import json,sys;print(json.load(sys.stdin)["expected"])' <<<"$receipt_config")
+receipt_hash=$(python3 -c 'import json,sys;print(json.load(sys.stdin)["expectedSha256"])' <<<"$receipt_config")
+receipt_launcher=$(python3 -c 'import json,sys;print(json.load(sys.stdin)["launcher"])' <<<"$receipt_config")
 app_env=(env -i "HOME=$fixture/home" "XDG_CONFIG_HOME=$fixture/config" "XDG_CACHE_HOME=$fixture/cache" "XDG_RUNTIME_DIR=$fixture/runtime"
  "PATH=/tmp/orbit-pi-runtime/node_modules/.bin:$(dirname "$node_binary"):/usr/local/bin:/usr/bin:/bin" "DISPLAY=$DISPLAY" "GDK_BACKEND=x11" "GDK_SCALE=1" "GDK_DPI_SCALE=1"
  "LIBGL_ALWAYS_SOFTWARE=1" "LANG=C.UTF-8" "LC_ALL=C.UTF-8" "TZ=UTC" "SHELL=/bin/bash" "TERM=xterm-256color"
- "PI_CODING_AGENT_DIR=$fixture/home/.pi/agent" "PI_OFFLINE=1" "PI_SKIP_VERSION_CHECK=1" "GIT_CONFIG_NOSYSTEM=1" "GIT_CONFIG_GLOBAL=/dev/null" "GIT_TERMINAL_PROMPT=0")
+ "PI_BIN=$receipt_launcher" "PI_CODING_AGENT_DIR=$fixture/home/.pi/agent" "PI_OFFLINE=1" "PI_SKIP_VERSION_CHECK=1" "GIT_CONFIG_NOSYSTEM=1" "GIT_CONFIG_GLOBAL=/dev/null" "GIT_TERMINAL_PROMPT=0")
 for variable in VK_ICD_FILENAMES VK_DRIVER_FILES VK_LOADER_DEBUG;do [[ -z "${!variable:-}" ]] || app_env+=("$variable=${!variable}");done
 cd "$fixture/workspace";args=();[[ "$kind" != go ]] || args+=(--offline)
 setsid "${app_env[@]}" "$binary" "${args[@]}" > "$output/orbit.log" 2>&1 & app_pid=$!
@@ -41,7 +50,7 @@ for attempt in {1..300};do window=$(xdotool search --onlyvisible --pid "$app_pid
 wmctrl -ir "$window" -b remove,maximized_vert,maximized_horz;wmctrl -ir "$window" -b remove,fullscreen
 xdotool windowactivate --sync "$window";xdotool windowsize --sync "$window" 1470 922;xdotool windowmove "$window" 40 40
 status=0
-python3 "$repo_root/scripts/chat-native/capture.py" "$window" "$app_pid" "$output" "$repo_root/testdata/chat-native/cases.json" "$binary" "$pi_binary" || status=$?
+python3 "$repo_root/scripts/chat-native/capture.py" "$window" "$app_pid" "$output" "$repo_root/testdata/chat-native/cases.json" "$binary" "$pi_binary" "$receipt_expected" "$receipt_hash" || status=$?
 chat_cleanup;wait "$app_pid" 2>/dev/null || true
 app_pid=
 python3 "$repo_root/scripts/chat-native/materialize.py" "$fixture" --verify "$output/fixture-before.json" --manifest "$output/fixture-after.json" || status=$?
