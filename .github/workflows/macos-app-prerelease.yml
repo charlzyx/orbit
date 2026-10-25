@@ -41,7 +41,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/orbit-pi-runtime"
           cp scripts/macos-app/runtime/package{,-lock}.json "$RUNNER_TEMP/orbit-pi-runtime/"
           npm ci --prefix "$RUNNER_TEMP/orbit-pi-runtime" --ignore-scripts --omit=dev --no-audit --no-fund
-      - name: Aggregate tests and six canonical cgo-free cross-builds
+      - name: Aggregate tests and five canonical cgo-free cross-builds (macOS arm64 only)
         id: validate
         run: bash scripts/macos-app/ci-validate.sh
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -69,8 +69,6 @@ jobs:
         include:
           - arch: arm64
             runner: macos-15
-          - arch: amd64
-            runner: macos-15-intel
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 30
     steps:
@@ -131,10 +129,6 @@ jobs:
         with:
           name: macos-app-arm64-${{ github.sha }}
           path: ${{ runner.temp }}/orbit-app-inputs/arm64
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
-        with:
-          name: macos-app-amd64-${{ github.sha }}
-          path: ${{ runner.temp }}/orbit-app-inputs/amd64
       - name: Assemble only exact-source native-passed DMGs
         run: python3 scripts/macos-app/assemble-release.py --source "$GITHUB_WORKSPACE" --inputs "$RUNNER_TEMP/orbit-app-inputs" --output "$RUNNER_TEMP/orbit-app-release" --commit "$GITHUB_SHA"
       - name: Publish new prerelease by exact release ID, never replace old tag or assets

@@ -5,7 +5,7 @@ credential creation, settings changes, signing, or automatic retry is supported.
 """
 from pathlib import Path
 import argparse,hashlib,json,os,re,subprocess,tempfile,urllib.request,urllib.parse
-from package import COMMIT_RE,VERSION_RE,digest,marker,git
+from package import COMMIT_RE,VERSION_RE,digest,marker,git,ARCHITECTURES
 
 def command(*args):return subprocess.check_output(['gh',*args],text=True)
 def api(path):return json.loads(command('api',path))
@@ -61,8 +61,8 @@ def find_release(repo,tag):
 def local_assets(folder,commit,version):
  m=json.loads((folder/'release-manifest.json').read_text())
  if m.get('source_commit')!=commit or m.get('version')!=version or m.get('tag')!='macos-test-v'+version:raise ValueError('Artifact/source/version mismatch')
- expected_zips={f'Orbit-Go-Test-{version}-{commit[:12]}-ci-macos-{a}.zip' for a in ('arm64','amd64')}
- if {x['filename'] for x in m['assets']}!=expected_zips or len(m['assets'])!=2:raise ValueError('Wrong architecture asset set')
+ expected_zips={f'Orbit-Go-Test-{version}-{commit[:12]}-ci-macos-{a}.zip' for a in ARCHITECTURES}
+ if {x['filename'] for x in m['assets']}!=expected_zips or len(m['assets'])!=len(ARCHITECTURES) or {x.get('architecture') for x in m['assets']}!=set(ARCHITECTURES):raise ValueError('Wrong architecture asset set')
  for a in m['assets']:
   p=folder/a['filename']
   if p.is_symlink() or p.stat().st_size!=a['bytes'] or digest(p)!=a['sha256']:raise ValueError('ZIP mismatch')

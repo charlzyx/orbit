@@ -2,7 +2,7 @@
 """Build a native Finder .app and DMG on a matching hosted Mac; never publish."""
 from pathlib import Path
 import argparse,json,os,platform,plistlib,re,shutil,subprocess,struct
-from common import HERE,LEGACY,check_source,copy,write,run,digest,native_download,inspect
+from common import HERE,LEGACY,check_source,copy,write,run,digest,native_download,inspect,ARCHITECTURES
 APP_NAME='Orbit Go Test.app'
 SYSTEM_PATH='/usr/bin:/bin:/usr/sbin:/sbin'
 
@@ -34,7 +34,7 @@ def require_arch(path,arch):
  return a
 
 def verify_runtime(runtime,arch):
- m=json.loads((runtime/'runtime-manifest.json').read_text());pins=json.loads((HERE/'runtime/node-pins.json').read_text());selected=pins['archives']['x64' if arch=='amd64' else 'arm64']
+ m=json.loads((runtime/'runtime-manifest.json').read_text());pins=json.loads((HERE/'runtime/node-pins.json').read_text());selected=pins['archives'][arch]
  if m.get('execution_evidence')!='matching macOS Node --version and npm ci completed; application smoke still required':raise ValueError('Audit-only runtime is not a native build input')
  if m.get('node',{}).get('selected_archive')!=selected or m['node'].get('archive_sha256_verified')!=selected['sha256'] or m['node'].get('version')!='22.23.4':raise ValueError('Bundled Node provenance mismatch')
  if m.get('pi',{}).get('version')!='1.4.0' or m['pi'].get('lock_sha256')!=digest(HERE/'runtime/package-lock.json') or digest(runtime/'pi/package-lock.json')!=m['pi']['lock_sha256']:raise ValueError('Bundled Pi lock provenance mismatch')
@@ -51,11 +51,12 @@ def verify_runtime(runtime,arch):
  return m
 
 def build(root,binaries,runtime,out,commit,arch,validation):
- if platform.system()!='Darwin' or platform.machine()!= {'arm64':'arm64','amd64':'x86_64'}[arch]:raise ValueError('Matching native macOS runner required')
+ if arch not in ARCHITECTURES:raise ValueError('Future macOS app builds support arm64 only')
+ if platform.system()!='Darwin' or platform.machine()!='arm64':raise ValueError('Matching native macOS runner required')
  m,inputs=check_source(root,commit)
  runtime_evidence=verify_runtime(runtime,arch)
  v=json.loads(validation.read_text())
- if v.get('source_commit')!=commit or v.get('status')!='PASS' or set(v.get('passed_stages',[]))!={'root-race','vet','toolkit','terminal','wrapper','six-cross-builds','packaging-tests'}:raise ValueError('Exact aggregate validation required')
+ if v.get('source_commit')!=commit or v.get('status')!='PASS' or set(v.get('passed_stages',[]))!={'root-race','vet','toolkit','terminal','wrapper','five-cross-builds','packaging-tests'}:raise ValueError('Exact aggregate validation required')
  if out.exists():raise ValueError('Fresh output required; no archive overwrite')
  out.mkdir(parents=True);volume=out/'.volume';app=volume/APP_NAME;mac=app/'Contents/MacOS';res=app/'Contents/Resources';frameworks=app/'Contents/Frameworks';prov=res/'Provenance'
  binary=binaries/f'orbit-darwin-{arch}'
@@ -94,7 +95,7 @@ def build(root,binaries,runtime,out,commit,arch,validation):
  nodeversion=subprocess.check_output([str(res/'node/bin/node'),'--version'],env=env,text=True).strip()
  piversion=subprocess.check_output([str(res/'bin/pi'),'--version'],env=env,text=True,timeout=30).strip()
  if nodeversion!='v22.23.4' or piversion!='1.4.0':raise ValueError('Bundled Node/Pi version mismatch')
- selected_native=res/'pi/node_modules/@earendil-works/pi-tui/native/darwin/prebuilds'/('darwin-arm64' if arch=='arm64' else 'darwin-x64')/'darwin-platform.node'
+ selected_native=res/'pi/node_modules/@earendil-works/pi-tui/native/darwin/prebuilds'/'darwin-arm64'/'darwin-platform.node'
  addon_audit=require_arch(selected_native,arch)
  run(res/'node/bin/node','-e','require(process.argv[1]); console.log("Pi native addon loaded")',selected_native,env=env,timeout=30)
  write(prov/'pi-native-addon.json',json.dumps({'path':str(selected_native.relative_to(res)),'sha256':digest(selected_native),'audit':addon_audit,'native_load':'PASS'},indent=2)+'\n')
@@ -116,5 +117,5 @@ def build(root,binaries,runtime,out,commit,arch,validation):
 if __name__=='__main__':
  p=argparse.ArgumentParser()
  for flag in ('source','binaries','runtime','output','validation'):p.add_argument('--'+flag,type=Path,required=True)
- p.add_argument('--commit',required=True);p.add_argument('--arch',choices=('arm64','amd64'),required=True);a=p.parse_args()
+ p.add_argument('--commit',required=True);p.add_argument('--arch',choices=ARCHITECTURES,required=True);a=p.parse_args()
  build(a.source.resolve(),a.binaries.resolve(),a.runtime.resolve(),a.output.resolve(),a.commit,a.arch,a.validation.resolve())

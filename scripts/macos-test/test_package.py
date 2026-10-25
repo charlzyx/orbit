@@ -21,7 +21,7 @@ class PackagingTests(unittest.TestCase):
   for p in [HERE/'launcher.sh.in',HERE/'ci-build.sh']:subprocess.run(['bash','-n',str(p)],check=True)
  def fixture_assets(self,r):
   commit='a'*40;version='0.2.12-go-test.20261025.1';assets=[]
-  for a in ('arm64','amd64'):
+  for a in ('arm64',):
    p=r/f'Orbit-Go-Test-{version}-{commit[:12]}-ci-macos-{a}.zip';p.write_bytes(b'synthetic archive fixture '+a.encode());assets.append({'filename':p.name,'bytes':p.stat().st_size,'sha256':package.digest(p),'architecture':a})
   (r/'KNOWN-LIMITS.txt').write_text('Native Mac NOT RUN')
   (r/'RELEASE-NOTES.md').write_text('Synthetic offline test only')
@@ -30,11 +30,31 @@ class PackagingTests(unittest.TestCase):
   (r/'SHA256SUMS').write_text(''.join(f'{package.digest(p)}  {p.name}\n' for p in paths));return commit,version
  def test_local_asset_integrity_fail_closed(self):
   with tempfile.TemporaryDirectory() as d:
-   r=Path(d);commit,version=self.fixture_assets(r);good=pub.local_assets(r,commit,version);self.assertEqual(len(good),5)
+   r=Path(d);commit,version=self.fixture_assets(r);good=pub.local_assets(r,commit,version);self.assertEqual(len(good),4)
    with self.assertRaises(ValueError):pub.local_assets(r,'b'*40,version)
    with self.assertRaises(ValueError):pub.local_assets(r,commit,'0.2.12-go-test.20261025.2')
    (r/'KNOWN-LIMITS.txt').write_text('tamper')
    with self.assertRaises(ValueError):pub.local_assets(r,commit,version)
+ def test_publisher_rejects_missing_extra_and_mislabeled_architectures(self):
+  with tempfile.TemporaryDirectory() as d:
+   r=Path(d);commit,version=self.fixture_assets(r);p=r/'release-manifest.json';m=json.loads(p.read_text());arm=m['assets'][0]
+   for assets in [[],[arm,dict(arm,architecture='amd64',filename=arm['filename'].replace('arm64','amd64'))],[dict(arm,architecture='amd64')]]:
+    p.write_text(json.dumps(dict(m,assets=assets)))
+    with self.assertRaisesRegex(ValueError,'architecture asset'):pub.local_assets(r,commit,version)
+ def test_future_bundle_requires_five_cross_builds_and_selects_arm64(self):
+  self.assertEqual(package.ARCHITECTURES,('arm64',))
+  with tempfile.TemporaryDirectory() as d:
+   r=Path(d);validation=r/'validation.json';commit='a'*40
+   stages=['root-race','vet','toolkit','terminal','wrapper','packaging-tests']
+   for stage in ['six-cross-builds','five-cross-builds']:
+    validation.write_text(json.dumps({'source_commit':commit,'status':'PASS','native_macOS_execution':'NOT_RUN','passed_stages':stages+[stage]}))
+    with patch.object(package,'git',side_effect=[commit,'']),patch.object(package,'marker',return_value={'runtime_source_sha256':'b'*64}),patch.object(package,'runtime_inputs',return_value=({},'b'*64)),patch.object(package,'native_download',side_effect=RuntimeError('Stop before native download')) as native:
+     if stage=='six-cross-builds':
+      with self.assertRaisesRegex(ValueError,'Incomplete validation'):package.build(r,r,r,commit,validation)
+      native.assert_not_called()
+     else:
+      with self.assertRaisesRegex(RuntimeError,'Stop before native download'):package.build(r,r,r,commit,validation)
+      native.assert_called_once_with(r,'arm64',r/'.downloads')
  def test_remote_mismatch_requires_no_download(self):
   with patch.object(pub.subprocess,'run',side_effect=AssertionError('No commands permitted')):
    for release in [{'prerelease':False,'target_commitish':'a'*40},{'prerelease':True,'target_commitish':'b'*40},{'prerelease':True,'target_commitish':'a'*40,'draft':True}]:
@@ -60,6 +80,9 @@ class PackagingTests(unittest.TestCase):
  def test_workflow_permissions_and_trigger(self):
   text=(HERE.parents[1]/'.github/workflows/macos-test-prerelease.yml').read_text()
   self.assertEqual(text.count('contents: write'),1);self.assertIn('paths: [.github/macos-test-prerelease.json]',text);self.assertNotIn('workflow_dispatch:',text);self.assertNotIn('pull_request:',text);self.assertIn('needs: validate-and-package',text);self.assertEqual(text.count('GH_TOKEN:'),1)
+  script=(HERE/'ci-build.sh').read_text()
+  self.assertIn('for target in linux/amd64 linux/arm64 darwin/arm64 windows/amd64 windows/arm64; do',script)
+  self.assertNotIn('darwin/amd64',script);self.assertIn("'five-cross-builds'",script)
  def test_publisher_no_destructive_flags(self):
   text=(HERE/'publish-prerelease.py').read_text()
   for flag in ['--clobber','--force','--latest=true']:

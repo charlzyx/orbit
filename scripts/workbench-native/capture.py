@@ -113,6 +113,13 @@ class Capture:
         self.write_actions()
         # Event-order buffer, not the settled-state gate.
         time.sleep(.25)
+        if action.get('afterRequire'):
+            # Intermediate navigation/focus prerequisites are evidence only,
+            # not extra coverage cases. Do not dispatch the next input early.
+            run('xdotool', 'mousemove', '--window', self.window, '4', '4')
+            ready_id = f'{case_id}-action-{ordinal}-ready'
+            event['afterReadiness'] = self.settle(dict(id=ready_id, image=f'evidence/{ready_id}.png', require=action['afterRequire']))
+            self.write_actions()
 
     def write_actions(self):
         (self.out / 'actions.json').write_text(json.dumps(self.actions, indent=2) + '\n')

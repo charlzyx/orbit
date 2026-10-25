@@ -8,7 +8,8 @@ No user's Mac was accessed. No signing key or security workaround is included.
 Read KNOWN-LIMITS.txt first for concrete implementation gaps in this fixed build.
 
 QUICK START
-1. Use Apple Silicon (arm64) for M-series Macs, Intel (amd64) for Intel Macs.
+1. Use this arm64 build on Apple Silicon (M-series) Macs. Future builds are
+   arm64 only; existing Intel releases and assets remain unchanged.
    These exact binaries declare macOS 13.0 minimum; actual OS compatibility
    has not been established. Do not select an older OS or rely on Rosetta.
 2. Extract the ZIP. Keep its folder and .app contents together.
@@ -80,7 +81,7 @@ WHAT WAS VERIFIED HERE
 - The dylib links only macOS libSystem. MyGo core/editor are Go code plus
   macOS system frameworks; no separate core/editor dylib is missing.
 - Icons, fonts, locales and Orbit Pi extensions are embedded in orbit-bin.
-- Linux aggregate tests and six cross-builds are recorded in provenance.
+- Linux aggregate tests and five cross-builds (macOS arm64 only) are recorded in provenance.
   Pi 1.4.0 is a top-level npm test dependency pin, not a repository-locked
   transitive graph; its resolved package-lock hash is recorded. Pi is not bundled.
 

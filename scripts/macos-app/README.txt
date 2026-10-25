@@ -1,6 +1,7 @@
 Orbit Go Test — experimental native macOS app
 
-1. Open the DMG for your Mac: arm64 = Apple Silicon, amd64 = Intel.
+1. Open the arm64 DMG on your Apple Silicon Mac. New builds are arm64 only.
+   Existing Intel releases and assets remain unchanged.
 2. Drag Orbit Go Test.app to Applications, then eject the disk image.
 3. Open Orbit Go Test from Applications. No Launch.command or Terminal setup.
 
@@ -22,7 +23,8 @@ No signing/notarization identity is claimed. CI first-frame/Pi/Ghostty smoke on
 hosted Macs does not establish Gatekeeper acceptance of a downloaded app or full
 manual feature parity. See KNOWN-LIMITS.txt and Resources/Provenance inside app.
 
-中文：下载对应架构的 DMG，打开后把 Orbit Go Test.app 拖到 Applications，
+中文：后续仅构建 Apple Silicon（arm64）版本，已发布的 Intel 版本和资产保持不变。
+下载 arm64 DMG，打开后把 Orbit Go Test.app 拖到 Applications，
 弹出磁盘映像后直接打开应用，不需要运行 Launch.command 或自行安装 Node/Pi。
 首次启动会在独立测试目录生成可写的 Pi 运行副本，不导入你原有的账号、会话
 或项目。模型对话仍需在应用中配置提供商。测试版未进行 Developer ID 签名和

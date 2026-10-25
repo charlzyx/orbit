@@ -51,7 +51,7 @@ jobs:
         run: ORBIT_TRANSCRIPT_CAPTURE_DIR="$PWD/capture/transcript-cpu" scripts/go-native.sh test ./internal/transcriptui -run '^TestNative(TranscriptCapture|RetainedSelectionCapture)$' -count=1
       - name: No-cgo cross compilation
         run: |
-          for target in linux/amd64 linux/arm64 darwin/amd64 darwin/arm64 windows/amd64 windows/arm64; do
+          for target in linux/amd64 linux/arm64 darwin/arm64 windows/amd64 windows/arm64; do
             GOOS=${target%/*} GOARCH=${target#*/} CGO_ENABLED=0 scripts/go-native.sh build -o "/tmp/orbit-cross-${target%/*}-${target#*/}" ./cmd/orbit
           done
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

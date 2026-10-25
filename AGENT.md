@@ -31,8 +31,10 @@ never in the module cache. Both compatibility capabilities are required; unpatch
 app binaries fail startup deliberately. Do not bypass either compatibility guard. The opt-in real Pi tests use
 `ORBIT_PI_INTEGRATION_BIN`; actual disposable PTYs use `ORBIT_TERMINAL_TEST=1`.
 Use isolated homes/configuration, never a user's credentials or session store.
-Cross-build `cmd/orbit` through `scripts/go-native.sh build` with `CGO_ENABLED=0` for Linux/macOS/Windows on both
-amd64 and arm64. Distinguish compilation from actual OS execution.
+Cross-build `cmd/orbit` through `scripts/go-native.sh build` with `CGO_ENABLED=0` for Linux/Windows on both
+amd64 and arm64, and macOS on arm64 only. Future Go macOS test bundles and Finder
+installers target Apple Silicon only; preserve existing Intel releases and assets.
+Distinguish compilation from actual OS execution.
 
 Do not publish releases, signing keys, production update feeds, deployments,
 or upstream/default-branch merges. Preserve original licenses and dependency

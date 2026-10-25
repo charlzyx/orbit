@@ -68,6 +68,6 @@ fi
 kill -- -"$app_pid" 2>/dev/null || true
 wait "$app_pid" 2>/dev/null || true
 verify_status=0
-python3 "$repo_root/scripts/workbench-native/materialize.py" "$fixture" --verify "$output/fixture-before.json" --manifest "$output/fixture-after.json" || verify_status=$?
+python3 "$repo_root/scripts/workbench-native/materialize.py" "$fixture" --verify "$output/fixture-before.json" --manifest "$output/fixture-after.json" --session-evidence || verify_status=$?
 python3 "$repo_root/scripts/workbench-native/manifest.py" "$output" "$kind" "$source_root" "$binary" "$repo_root" "$source_head" "$source_dirty" "$source_sha" "$node_binary"
 [[ "$capture_status" == 0 && "$verify_status" == 0 ]]

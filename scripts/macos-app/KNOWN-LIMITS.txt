@@ -1,5 +1,7 @@
 KNOWN LIMITS / 已知限制 — experimental Finder app
 
+- Future macOS builds support Apple Silicon (arm64) only. Existing Intel
+  releases and assets remain unchanged.
 - Full 139-feature source-derived acceptance is still open. No pixel-perfect
   claim: all 16 older published-state native comparison pairs differed.
 - Review staged+edited-file duplication and hidden-window heartbeat have later

@@ -7,6 +7,8 @@ sys.path.insert(0,str(LEGACY))
 from package import runtime_inputs, native_download, COMMIT_RE, VERSION_RE
 from macho import inspect
 MARKER='.github/macos-app-prerelease.json'
+# Future supported packages are Apple Silicon only. Existing releases stay immutable.
+ARCHITECTURES=('arm64',)
 def digest(path):
  h=hashlib.sha256()
  with Path(path).open('rb') as f:

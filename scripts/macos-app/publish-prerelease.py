@@ -5,7 +5,7 @@ credential creation, settings changes, signing, or automatic retry is supported.
 """
 from pathlib import Path
 import argparse,hashlib,json,os,re,subprocess,tempfile,urllib.request,urllib.parse
-from common import COMMIT_RE,VERSION_RE,digest,marker,git
+from common import COMMIT_RE,VERSION_RE,digest,marker,git,ARCHITECTURES
 
 def command(*args):return subprocess.check_output(['gh',*args],text=True)
 def api(path):return json.loads(command('api',path))
@@ -66,13 +66,13 @@ def find_release(repo,tag):
 def local_assets(folder,commit,version):
  m=json.loads((folder/'release-manifest.json').read_text())
  if m.get('source_commit')!=commit or m.get('version')!=version or m.get('tag')!='macos-test-v'+version:raise ValueError('Artifact/source/version mismatch')
- expected_zips={f'Orbit-Go-Test-{version}-{commit[:12]}-ci-macos-{a}.dmg' for a in ('arm64','amd64')}
- if {x['filename'] for x in m['assets']}!=expected_zips or len(m['assets'])!=2:raise ValueError('Wrong architecture asset set')
- if m.get('native_macos_smoke') != {'arm64':'PASS','amd64':'PASS'}:raise ValueError('Both native macOS smoke gates must pass')
+ expected_dmgs={f'Orbit-Go-Test-{version}-{commit[:12]}-ci-macos-{a}.dmg' for a in ARCHITECTURES}
+ if {x['filename'] for x in m['assets']}!=expected_dmgs or len(m['assets'])!=len(ARCHITECTURES) or {x.get('architecture') for x in m['assets']}!=set(ARCHITECTURES):raise ValueError('Wrong architecture asset set')
+ if m.get('native_macos_smoke') != {arch:'PASS' for arch in ARCHITECTURES}:raise ValueError('arm64 native macOS smoke gate must pass')
  for a in m['assets']:
   p=folder/a['filename']
   if p.is_symlink() or not 0<p.stat().st_size<=512*1024*1024 or p.stat().st_size!=a['bytes'] or digest(p)!=a['sha256']:raise ValueError('DMG mismatch')
- expected=expected_zips|{'KNOWN-LIMITS.txt','release-manifest.json'}
+ expected=expected_dmgs|{'KNOWN-LIMITS.txt','release-manifest.json'}
  rows={}
  for line in (folder/'SHA256SUMS').read_text().splitlines():
   h,name=line.split('  ',1)

@@ -429,13 +429,11 @@ func (a *App) deleteFile(path string) {
 func (a *App) filesPage(c *ui.Context) {
 	a.initFiles()
 	s := a.files
-	ui.Row(c).Fill().Children(func() {
-		if ui.Split(c, &a.ExplorerWidth, func() { ui.Column(c).Fill().Background(a.Theme.Surface).Children(func() { a.fileTree(c) }) }, func() { ui.Column(c).Fill().MinWidth(0).Children(func() { a.fileEditor(c) }) }).Fill().Changed() {
-			a.ExplorerWidth = max(200, a.ExplorerWidth)
-			a.Layout.ExplorerWidth = float64(a.ExplorerWidth)
-			a.save(a.Options.Store.SaveLayout(a.Layout))
-		}
-	})
+	// Pinned app/view.rs places only FileViewer in the main column. The
+	// ProjectPanel stays in main's right dock, and can be hidden independently.
+	// A second tree here both diverged from that layout and mounted s.list
+	// twice, panicking as soon as a file was opened from the visible Explorer.
+	ui.Column(c).Fill().MinWidth(0).Children(func() { a.fileEditor(c) })
 	for {
 		select {
 		case <-s.editor.Changes:

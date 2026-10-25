@@ -4,7 +4,7 @@ from pathlib import Path
 import argparse,json,os,platform,plistlib,shutil,subprocess,tempfile,time,struct
 from datetime import datetime
 from common import digest,write,run
-from bundle import APP_NAME,tree_hashes,require_arch,SYSTEM_PATH
+from bundle import APP_NAME,tree_hashes,require_arch,SYSTEM_PATH,ARCHITECTURES
 
 def verify_report(report,app,home,arch,started,report_file):
  if report.get('status')!='PASS' or report.get('architecture')!=arch:raise ValueError('Native smoke did not pass on expected architecture')
@@ -34,7 +34,8 @@ def verify_report(report,app,home,arch,started,report_file):
 
 
 def smoke(folder,arch):
- if platform.system()!='Darwin' or platform.machine()!= {'arm64':'arm64','amd64':'x86_64'}[arch]:raise ValueError('Wrong native runner')
+ if arch not in ARCHITECTURES:raise ValueError('Future macOS app smoke supports arm64 only')
+ if platform.system()!='Darwin' or platform.machine()!='arm64':raise ValueError('Wrong native runner')
  package=json.loads((folder/f'package-{arch}.json').read_text());dmg=folder/package['filename']
  if digest(dmg)!=package['sha256']:raise ValueError('DMG changed before smoke')
  expected=json.loads((folder/f'expected-app-{arch}.json').read_text())
@@ -70,4 +71,4 @@ def smoke(folder,arch):
  write(folder/f'package-{arch}.json',json.dumps(package,indent=2)+'\n')
  print('PASS native Finder/DMG smoke:',arch)
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--folder',type=Path,required=True);p.add_argument('--arch',choices=('arm64','amd64'),required=True);a=p.parse_args();smoke(a.folder.resolve(),a.arch)
+ p=argparse.ArgumentParser();p.add_argument('--folder',type=Path,required=True);p.add_argument('--arch',choices=ARCHITECTURES,required=True);a=p.parse_args();smoke(a.folder.resolve(),a.arch)

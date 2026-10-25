@@ -8,7 +8,7 @@ Orbit Go + MyGo macOS 实验测试包
 先看 KNOWN-LIMITS.txt，里面列出此固定版本的具体已知问题。
 
 开始：
-1. M 系列 Mac 选择 arm64，Intel Mac 选择 amd64。二进制声明最低 macOS 13.0，实际兼容性仍需测试。
+1. 本 arm64 包仅适用于 Apple Silicon（M 系列）Mac。后续不再构建 Intel 版，已发布的 Intel 版本和资产保持不变。二进制声明最低 macOS 13.0，实际兼容性仍需测试。
 2. 解压 ZIP。可先打开 Verify.command 检查完整性，它不会启动 Orbit。
 3. 打开 Launch.command。终端会显示测试数据和日志的位置，然后启动原生窗口。
 4. 每次启动都会新建 /tmp/orbit-go-test.XXXXXXXX 临时目录，使用独立 HOME 和合成工作区，不导入现有 Pi 登录信息、会话或环境 API 密钥。

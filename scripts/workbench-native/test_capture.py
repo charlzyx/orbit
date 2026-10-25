@@ -72,7 +72,10 @@ class CaptureTests(unittest.TestCase):
         self.assertEqual(SUITE['viewport'], [1470, 922])
         self.assertEqual(SUITE['cases'][2]['actions'][0]['clickExactLabel'], 'alpha.go')
         self.assertEqual(SUITE['cases'][3]['actions'][0]['clickExactLabel'], 'bravo.go')
-        self.assertEqual(SUITE['cases'][7]['actions'], [{'key': 'ctrl+1'}, {'key': 'ctrl+j'}])
+        self.assertEqual(SUITE['cases'][7]['actions'][-1], {'key': 'ctrl+j'})
+        self.assertEqual(SUITE['cases'][7]['actions'][0]['clickExactLabel'], 'Workbench')
+        self.assertEqual(SUITE['cases'][4]['actions'][2]['clickExactLabel'], 'Workbench')
+        self.assertEqual(SUITE['cases'][6]['actions'][0]['clickExactLabel'], 'message')
         self.assertTrue(all(case['source'] and case['require'] for case in SUITE['cases']))
         self.assertFalse(any('type' in action for case in SUITE['cases'] for action in case['actions']))
 
@@ -100,6 +103,15 @@ class CaptureTests(unittest.TestCase):
                 cap.action('WB03', 1, SUITE['cases'][2]['actions'][0])
             self.assertIn(('xdotool', 'mousemove', '--window', '42', '1285', '162', 'click', '1'), events)
             self.assertEqual(cap.actions[-1]['target']['bbox'], [1250, 155, 70, 15])
+
+    def test_intermediate_readiness_is_recorded_without_an_extra_case(self):
+        with tempfile.TemporaryDirectory() as directory:
+            cap = c.Capture('42', 123, directory, SUITE)
+            with patch.object(c, 'run'), patch.object(c.time, 'sleep'), patch.object(cap, 'settle', return_value={'consecutiveReadySamples': 3}) as settle:
+                cap.action('WB05', 2, dict(key='ctrl+shift+g', afterRequire=['Staged', 'Changes']))
+            self.assertEqual(settle.call_args.args[0]['image'], 'evidence/WB05-action-2-ready.png')
+            self.assertEqual(cap.actions[-1]['afterReadiness']['consecutiveReadySamples'], 3)
+            self.assertEqual(cap.cases, [])
 
     def test_settle_resets_after_missing_sample_and_preserves_bytes(self):
         with tempfile.TemporaryDirectory() as directory:

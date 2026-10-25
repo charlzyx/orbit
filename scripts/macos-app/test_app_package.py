@@ -7,6 +7,7 @@ import bundle,smoke
 from unittest.mock import patch
 import common as package
 spec=importlib.util.spec_from_file_location('publisher',Path(__file__).with_name('publish-prerelease.py'));pub=importlib.util.module_from_spec(spec);spec.loader.exec_module(pub)
+spec=importlib.util.spec_from_file_location('assembler',Path(__file__).with_name('assemble-release.py'));assembler=importlib.util.module_from_spec(spec);spec.loader.exec_module(assembler)
 HERE=Path(__file__).resolve().parent
 class PackagingTests(unittest.TestCase):
  def test_versions_test_only(self):
@@ -23,20 +24,66 @@ class PackagingTests(unittest.TestCase):
   for p in [HERE/'ci-validate.sh']:subprocess.run(['bash','-n',str(p)],check=True)
  def fixture_assets(self,r):
   commit='a'*40;version='0.2.12-go-test.20261025.2';assets=[]
-  for a in ('arm64','amd64'):
+  for a in ('arm64',):
    p=r/f'Orbit-Go-Test-{version}-{commit[:12]}-ci-macos-{a}.dmg';p.write_bytes(b'synthetic archive fixture '+a.encode());assets.append({'filename':p.name,'bytes':p.stat().st_size,'sha256':package.digest(p),'architecture':a})
   (r/'KNOWN-LIMITS.txt').write_text('Native Mac NOT RUN')
   (r/'RELEASE-NOTES.md').write_text('Synthetic offline test only')
-  (r/'release-manifest.json').write_text(json.dumps({'version':version,'tag':'macos-test-v'+version,'source_commit':commit,'assets':assets,'native_macos_smoke':{'arm64':'PASS','amd64':'PASS'}}))
+  (r/'release-manifest.json').write_text(json.dumps({'version':version,'tag':'macos-test-v'+version,'source_commit':commit,'assets':assets,'native_macos_smoke':{'arm64':'PASS'}}))
   paths=[r/a['filename'] for a in assets]+[r/'KNOWN-LIMITS.txt',r/'release-manifest.json']
   (r/'SHA256SUMS').write_text(''.join(f'{package.digest(p)}  {p.name}\n' for p in paths));return commit,version
  def test_local_asset_integrity_fail_closed(self):
   with tempfile.TemporaryDirectory() as d:
-   r=Path(d);commit,version=self.fixture_assets(r);good=pub.local_assets(r,commit,version);self.assertEqual(len(good),5)
+   r=Path(d);commit,version=self.fixture_assets(r);good=pub.local_assets(r,commit,version);self.assertEqual(len(good),4)
    with self.assertRaises(ValueError):pub.local_assets(r,'b'*40,version)
    with self.assertRaises(ValueError):pub.local_assets(r,commit,'0.2.12-go-test.20261025.3')
    (r/'KNOWN-LIMITS.txt').write_text('tamper')
    with self.assertRaises(ValueError):pub.local_assets(r,commit,version)
+ def test_arm64_only_assembly_accepts_one_native_passed_dmg(self):
+  import contextlib,io
+  with tempfile.TemporaryDirectory() as d:
+   r=Path(d);fixture=r/'fixture';fixture.mkdir();commit,version=self.fixture_assets(fixture)
+   manifest=json.loads((fixture/'release-manifest.json').read_text());asset=manifest['assets'][0]
+   asset.update({'source_commit':commit,'version':version,'native_macos_smoke':'PASS','ci_run':'https://github.com/charlzyx/orbit/actions/runs/123'})
+   inputs=r/'inputs';arch=inputs/'arm64';arch.mkdir(parents=True)
+   (arch/asset['filename']).write_bytes((fixture/asset['filename']).read_bytes())
+   package_json=arch/'package-arm64.json';package_json.write_text(json.dumps(asset))
+   marker={'version':version,'runtime_source_sha256':'b'*64}
+   with patch.object(assembler,'check_source',return_value=(marker,{})),patch.dict(os.environ,{'GITHUB_REPOSITORY':'charlzyx/orbit','GITHUB_RUN_ID':'123'}),contextlib.redirect_stdout(io.StringIO()):
+    output=r/'release';assembler.assemble(r,inputs,output,commit)
+    self.assertEqual(len(pub.local_assets(output,commit,version)),4)
+    result=json.loads((output/'release-manifest.json').read_text())
+    self.assertEqual(result['native_macos_smoke'],{'arm64':'PASS'})
+    self.assertEqual([a['architecture'] for a in result['assets']],['arm64'])
+    self.assertEqual(len(list(output.glob('*.dmg'))),1)
+    self.assertIn('arm64 only',(output/'RELEASE-NOTES.md').read_text())
+    for key,value in [('native_macos_smoke','NOT_RUN'),('source_commit','c'*40),('ci_run','https://github.com/charlzyx/orbit/actions/runs/456')]:
+     bad=dict(asset);bad[key]=value;package_json.write_text(json.dumps(bad))
+     with self.assertRaises(ValueError):assembler.assemble(r,inputs,r/key,commit)
+    package_json.write_text(json.dumps(asset));(inputs/'amd64').mkdir()
+    with self.assertRaisesRegex(ValueError,'architecture input'):assembler.assemble(r,inputs,r/'intel',commit)
+ def test_publisher_rejects_missing_extra_and_mislabeled_architectures(self):
+  with tempfile.TemporaryDirectory() as d:
+   r=Path(d);commit,version=self.fixture_assets(r);p=r/'release-manifest.json';m=json.loads(p.read_text());arm=m['assets'][0]
+   for assets in [[],[arm,dict(arm,architecture='amd64',filename=arm['filename'].replace('arm64','amd64'))],[dict(arm,architecture='amd64')]]:
+    bad=dict(m,assets=assets);p.write_text(json.dumps(bad))
+    with self.assertRaisesRegex(ValueError,'architecture asset'):pub.local_assets(r,commit,version)
+ def test_future_build_entrypoints_reject_intel_before_work(self):
+  self.assertEqual(package.ARCHITECTURES,('arm64',))
+  with patch.object(bundle,'check_source',side_effect=AssertionError('Must not read source')):
+   with self.assertRaisesRegex(ValueError,'arm64 only'):bundle.build(None,None,None,None,None,'amd64',None)
+  with self.assertRaisesRegex(ValueError,'arm64 only'):smoke.smoke(Path('unused'),'amd64')
+  with tempfile.TemporaryDirectory() as d:
+   output=Path(d)/'output'
+   result=subprocess.run([os.sys.executable,str(HERE/'runtime/prepare-runtime.py'),'--arch','amd64','--output',str(output)],text=True,capture_output=True)
+   self.assertEqual(result.returncode,2);self.assertIn('invalid choice',result.stderr);self.assertFalse(output.exists())
+ def test_five_cross_build_validation_gate(self):
+  with tempfile.TemporaryDirectory() as d:
+   r=Path(d);validation=r/'validation.json';commit='a'*40
+   stages=['root-race','vet','toolkit','terminal','wrapper','packaging-tests']
+   with patch.object(bundle.platform,'system',return_value='Darwin'),patch.object(bundle.platform,'machine',return_value='arm64'),patch.object(bundle,'check_source',return_value=({},{})),patch.object(bundle,'verify_runtime',return_value={}):
+    for stage,error in [('six-cross-builds','Exact aggregate'),('five-cross-builds','Fresh output')]:
+     validation.write_text(json.dumps({'source_commit':commit,'status':'PASS','passed_stages':stages+[stage]}))
+     with self.assertRaisesRegex(ValueError,error):bundle.build(r,r,r,r,commit,'arm64',validation)
  def test_remote_mismatch_requires_no_download(self):
   with patch.object(pub.subprocess,'run',side_effect=AssertionError('No commands permitted')):
    for release in [{'prerelease':False,'target_commitish':'a'*40},{'prerelease':True,'target_commitish':'b'*40},{'prerelease':True,'target_commitish':'a'*40,'draft':True}]:
@@ -62,6 +109,10 @@ class PackagingTests(unittest.TestCase):
  def test_workflow_permissions_and_trigger(self):
   text=(HERE.parents[1]/'.github/workflows/macos-app-prerelease.yml').read_text()
   self.assertEqual(text.count('contents: write'),1);self.assertIn('paths: [.github/macos-app-prerelease.json]',text);self.assertNotIn('workflow_dispatch:',text);self.assertNotIn('pull_request:',text);self.assertIn('needs: [validate, native-app]',text);self.assertEqual(text.count('GH_TOKEN:'),1)
+  self.assertIn('arch: arm64',text);self.assertNotIn('arch: amd64',text);self.assertNotIn('macos-15-intel',text);self.assertNotIn('macos-app-amd64-',text)
+  script=(HERE/'ci-validate.sh').read_text()
+  self.assertIn('for target in linux/amd64 linux/arm64 darwin/arm64 windows/amd64 windows/arm64; do',script)
+  self.assertNotIn('darwin/amd64',script);self.assertIn("'five-cross-builds'",script)
  def test_publisher_no_destructive_flags(self):
   text=(HERE/'publish-prerelease.py').read_text()
   for flag in ['--clobber','--force','--latest=true']:

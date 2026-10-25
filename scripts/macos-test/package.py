@@ -4,6 +4,8 @@ from pathlib import Path
 import argparse,hashlib,json,os,plistlib,re,shutil,subprocess,urllib.request,zipfile
 from audit_macho import inspect
 HERE=Path(__file__).resolve().parent
+# Future packages are arm64 only; preserve existing Intel archives and pins.
+ARCHITECTURES=('arm64',)
 VERSION_RE=re.compile(r'^0\.2\.12-go-test\.[0-9]{8}\.[1-9][0-9]*$')
 COMMIT_RE=re.compile(r'^[0-9a-f]{40}$')
 PINS={'arm64':'6f385d3221f8c776ba40530db9baf8c71478907897959849896eeb0ddbf16b41','amd64':'421e98d2683b39555209c59395655b4a217da0382e7669c92f6dff3949832664'}
@@ -53,11 +55,12 @@ def build(root,binaries,out,commit,validation):
  if sourcehash!=m['runtime_source_sha256']:raise ValueError('Default runtime differs from fixed checkpoint')
  v=json.loads(validation.read_text())
  if v.get('source_commit')!=commit or v.get('status')!='PASS' or v.get('native_macOS_execution')!='NOT_RUN':raise ValueError('Missing/mismatched aggregate validation')
- if set(v.get('passed_stages',[]))!={'root-race','vet','toolkit','terminal','wrapper','six-cross-builds','packaging-tests'}:raise ValueError('Incomplete validation gates')
+ if set(v.get('passed_stages',[]))!={'root-race','vet','toolkit','terminal','wrapper','five-cross-builds','packaging-tests'}:raise ValueError('Incomplete validation gates')
  for rel,h in json.loads((HERE/'licenses-sha256.json').read_text()).items():
   if digest(HERE/'third-party-licenses'/rel)!=h:raise ValueError('License input drift: '+rel)
  out.mkdir(parents=True,exist_ok=True);results=[]
- for arch,label,machine in [('arm64','Apple Silicon','arm64'),('amd64','Intel','x86_64')]:
+ for arch in ARCHITECTURES:
+  label,machine='Apple Silicon','arm64'
   binary=binaries/f'orbit-darwin-{arch}';lib,native=native_download(root,arch,out/'.downloads')
   if digest(binary)!=v['binary_sha256'][binary.name]:raise ValueError('Binary differs from validated output')
   appaudit,_=inspect(binary);libaudit,exports=inspect(lib)
@@ -114,7 +117,7 @@ def build(root,binaries,out,commit,validation):
  copy(HERE/'KNOWN-LIMITS.txt',out/'KNOWN-LIMITS.txt')
  assetpaths=[out/x['filename'] for x in results]+[out/'KNOWN-LIMITS.txt',out/'release-manifest.json']
  write(out/'SHA256SUMS',''.join(f'{digest(p)}  {p.name}\n' for p in assetpaths))
- write(out/'RELEASE-NOTES.md',f'Experimental Go + MyGo macOS prerelease, not a complete replacement.\n\nSource commit: {commit}\nCI validation: {v["ci_run"]}\n\nDownload the arm64 ZIP for Apple Silicon or amd64 ZIP for Intel. macOS 13.0 minimum is declared in the binaries. Start with Launch.command for a fresh isolated HOME and synthetic workspace. Pi is separate; a missing-Pi state is expected by default.\n\nNo native macOS startup/acceptance has run. No Developer ID signing/notarization. If macOS blocks opening, stop and report the message; do not change security settings.\n\n'+(HERE/'KNOWN-LIMITS.txt').read_text())
+ write(out/'RELEASE-NOTES.md',f'Experimental Go + MyGo macOS prerelease, not a complete replacement.\n\nSource commit: {commit}\nCI validation: {v["ci_run"]}\n\nDownload the arm64 ZIP for Apple Silicon. Future builds are arm64 only; existing Intel releases and assets remain unchanged. macOS 13.0 minimum is declared in the binaries. Start with Launch.command for a fresh isolated HOME and synthetic workspace. Pi is separate; a missing-Pi state is expected by default.\n\nNo native macOS startup/acceptance has run. No Developer ID signing/notarization. If macOS blocks opening, stop and report the message; do not change security settings.\n\n'+(HERE/'KNOWN-LIMITS.txt').read_text())
  print(json.dumps({'version':m['version'],'source_commit':commit,'assets':results},indent=2))
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('--source',type=Path,required=True);p.add_argument('--binaries',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--commit',required=True);p.add_argument('--validation',type=Path,required=True);a=p.parse_args();build(a.source.resolve(),a.binaries.resolve(),a.output.resolve(),a.commit,a.validation.resolve())

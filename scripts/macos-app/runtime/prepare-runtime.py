@@ -159,20 +159,20 @@ def audit_pi(pi, licenses):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', required=True, type=pathlib.Path)
-    parser.add_argument('--arch', required=True, choices=['arm64', 'amd64'])
+    parser.add_argument('--arch', required=True, choices=['arm64'])
     parser.add_argument('--node-archive', type=pathlib.Path)
     parser.add_argument('--existing-pi-root', type=pathlib.Path,
                         help='Audit/copy an existing install without executing Node; not a macOS smoke test')
     args = parser.parse_args()
     pins = json.loads((HERE / 'node-pins.json').read_text())
-    arch = 'x64' if args.arch == 'amd64' else 'arm64'
+    arch = args.arch
     pin = pins['archives'][arch]
     out = args.output.absolute()
     if out.is_symlink() or (out.exists() and any(out.iterdir())):
         raise ValueError('Output must be new or empty, not a symlink')
     out.mkdir(parents=True, exist_ok=True)
     if not args.existing_pi_root:
-        expected_machine = 'x86_64' if arch == 'x64' else 'arm64'
+        expected_machine = 'arm64'
         if platform.system() != 'Darwin' or platform.machine() != expected_machine:
             raise ValueError('Install must run natively on the matching macOS architecture')
     with tempfile.TemporaryDirectory(prefix='.runtime-build-', dir=out) as tmp:

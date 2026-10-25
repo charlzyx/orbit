@@ -30,8 +30,9 @@ def build(out, kind, source, binary, harness, head, dirty, commit, node_binary):
         if case['proof']['image'] != recipe['viewport'] or case['proof']['client'] != recipe['viewport']:
             integrity.append('Image/client geometry mismatch: ' + case['image'])
     gaps = ['Actual selected states and loaded content require manual image review', 'Resolved glyph faces unverified', 'Clock/animation/caret phases not frozen']
-    if not after['unchanged']:
-        gaps.append('Owned fixture files, Git commits/status/diffs changed during capture')
+    fixture_accepted = after.get('integrityAccepted', after['unchanged'])
+    if not fixture_accepted:
+        gaps.append('Immutable fixture content or unvalidated runtime metadata changed during capture')
     manifest = dict(source=commit, application=kind, sourceRootGitHead=head, sourceRootDirty=dirty == 'true',
                     sourceCleanlinessRecorded='Before the original app launch, including untracked source files',
                     binarySha256=sha(binary), runtimeNode=dict(path=node_binary, version=subprocess.check_output([node_binary, '--version'], text=True).strip(), sha256=sha(Path(node_binary))), harnessGitHead=subprocess.check_output(['git', '-C', str(harness), 'rev-parse', 'HEAD'], text=True).strip(),
@@ -45,7 +46,11 @@ def build(out, kind, source, binary, harness, head, dirty, commit, node_binary):
                     bundledFontInputs={str(p.relative_to(fonts)): sha(p) for p in sorted(fonts.rglob('*')) if p.suffix.lower() in ('.ttf', '.otf')},
                     fixtureSha256=sha(out / 'fixture-before.json'), fixture=fixture,
                     fixturePreflightVerified=True, fixtureUnchangedAfterCapture=after['unchanged'],
-                    captureValidity=('BLOCKED' if result['error'] or integrity or not after['unchanged'] else 'READY_FOR_MANUAL_REVIEW'),
+                    fixtureRawByteEquality=after['unchanged'], fixtureSemanticContentPreserved=after.get('semanticFixtureContentPreserved', after['unchanged']),
+                    fixtureIntegrityAccepted=fixture_accepted, sessionIntegrity=after.get('sessionIntegrity'),
+                    expectedVolatileRuntimeMetadata=after.get('sessionIntegrity', {}).get('appendedEntries', []),
+                    sessionEvidence=after.get('sessionEvidence'),
+                    captureValidity=('BLOCKED' if result['error'] or integrity or not fixture_accepted else 'READY_FOR_MANUAL_REVIEW'),
                     captureIntegrityGaps=integrity,
                     semanticState='UNREVIEWED', pixelEquality='NOT_COMPARED', captureResult=result,
                     normalizationGaps=gaps, volatileCases={case['image']: case['volatile'] for case in recipe['cases']},

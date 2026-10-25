@@ -18,7 +18,7 @@ scripts/go-native.sh test -race -json ./... > "$WORK/logs/root-race.jsonl"
 scripts/go-native.sh test -race github.com/egoist/mygo/ui -run '^TestOrbit(Composer|Selection)' -count=1 2>&1 | tee "$WORK/logs/toolkit.log"
 scripts/go-native.sh -C third_party/mygo-terminal test -race ./... 2>&1 | tee "$WORK/logs/terminal.log"
 python3 scripts/test-go-native-overlay.py 2>&1 | tee "$WORK/logs/wrapper.log"
-for target in linux/amd64 linux/arm64 darwin/amd64 darwin/arm64 windows/amd64 windows/arm64; do
+for target in linux/amd64 linux/arm64 darwin/arm64 windows/amd64 windows/arm64; do
   GOOS=${target%/*} GOARCH=${target#*/} CGO_ENABLED=0 scripts/go-native.sh build -ldflags "-X main.version=$VERSION" -o "$WORK/binaries/orbit-${target%/*}-${target#*/}" ./cmd/orbit
  done
 export ORBIT_BUILD_WORK="$WORK"
@@ -30,7 +30,7 @@ for line in (w/'logs/root-race.jsonl').read_text().splitlines():
  x=json.loads(line)
  if x.get('Test') and x.get('Action') in counts:counts[x['Action']]+=1
 if counts['fail'] or not counts['pass']:raise SystemExit('No successful aggregate evidence')
-summary={'source_commit':os.environ['GITHUB_SHA'],'status':'PASS','passed_stages':['root-race','vet','toolkit','terminal','wrapper','six-cross-builds','packaging-tests'],'root_tests':counts,'pi_top_level_pin':'@earendil-works/pi-coding-agent@1.4.0','pi_transitives':'Not repository-locked; resolved package lock preserved in validation logs','pi_package_lock_sha256':hashlib.sha256((w/'logs/pi-package-lock.json').read_bytes()).hexdigest(),'native_macOS_execution':'NOT_RUN','successful_model_inference':'NOT_ESTABLISHED','ci_run':f'https://github.com/{os.environ["GITHUB_REPOSITORY"]}/actions/runs/{os.environ["GITHUB_RUN_ID"]}','binary_sha256':{p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted((w/'binaries').iterdir())}}
+summary={'source_commit':os.environ['GITHUB_SHA'],'status':'PASS','passed_stages':['root-race','vet','toolkit','terminal','wrapper','five-cross-builds','packaging-tests'],'root_tests':counts,'pi_top_level_pin':'@earendil-works/pi-coding-agent@1.4.0','pi_transitives':'Not repository-locked; resolved package lock preserved in validation logs','pi_package_lock_sha256':hashlib.sha256((w/'logs/pi-package-lock.json').read_bytes()).hexdigest(),'native_macOS_execution':'NOT_RUN','successful_model_inference':'NOT_ESTABLISHED','ci_run':f'https://github.com/{os.environ["GITHUB_REPOSITORY"]}/actions/runs/{os.environ["GITHUB_RUN_ID"]}','binary_sha256':{p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted((w/'binaries').iterdir())}}
 (w/'validation-summary.json').write_text(json.dumps(summary,indent=2)+'\n')
 PY
 python3 scripts/macos-test/package.py --source "$ROOT" --binaries "$WORK/binaries" --output "$WORK/assets" --commit "$GITHUB_SHA" --validation "$WORK/validation-summary.json"

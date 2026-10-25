@@ -42,7 +42,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libpango-1.0-0 libcairo2 libfontconfig1
           npm install --prefix "$RUNNER_TEMP/orbit-pi-runtime" @earendil-works/pi-coding-agent@1.4.0
-      - name: Aggregate tests, six cross-builds, static runtime audit and packaging
+      - name: Aggregate tests, five cross-builds (macOS arm64 only), static runtime audit and packaging
         id: package
         run: bash scripts/macos-test/ci-build.sh
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

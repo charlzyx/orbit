@@ -40,6 +40,19 @@ class ManifestTests(unittest.TestCase):
             self.assertIsNone(result['resolvedFontFaces'])
             self.assertEqual(len(result['actualImageSizes']), 8)
 
+    def test_valid_metadata_append_is_separate_from_raw_equality_and_visual_acceptance(self):
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory); self.inputs(base, unchanged=False)
+            (base / 'fixture-after.json').write_text(json.dumps(dict(unchanged=False, integrityAccepted=True, semanticFixtureContentPreserved=True, sessionIntegrity=dict(appendedEntries=[{'type': 'custom', 'customType': 'orbit:workflow', 'data': {'mode': 'build'}}]))))
+            result = self.build(base)
+            self.assertEqual(result['captureValidity'], 'READY_FOR_MANUAL_REVIEW')
+            self.assertFalse(result['fixtureRawByteEquality'])
+            self.assertFalse(result['fixtureUnchangedAfterCapture'])
+            self.assertTrue(result['fixtureSemanticContentPreserved'])
+            self.assertEqual(result['semanticState'], 'UNREVIEWED')
+            self.assertEqual(len(result['expectedVolatileRuntimeMetadata']), 1)
+            self.assertTrue(result['normalizationGaps'])
+
     def test_startup_failure_yields_machine_readable_blocked_manifest(self):
         with tempfile.TemporaryDirectory() as directory:
             base = Path(directory); self.inputs(base, error='STARTUP readiness failed')
