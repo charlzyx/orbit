@@ -1,0 +1,143 @@
+name: Explicit installable macOS app prerelease
+
+on:
+  push:
+    branches: [redesign/mygo-rpc]
+    paths: [.github/macos-app-prerelease.json]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: orbit-macos-app-prerelease-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    if: github.repository == 'charlzyx/orbit' && github.event_name == 'push' && github.ref == 'refs/heads/redesign/mygo-rpc'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Require explicitly advanced experimental version and exact runtime fingerprint
+        env:
+          EVENT_BEFORE: ${{ github.event.before }}
+        run: python3 scripts/macos-app/verify-marker.py
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16
+        with:
+          go-version: '1.27.3'
+          cache: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22.23.4'
+      - name: Install isolated locked Pi and Linux native-test prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libpango-1.0-0 libcairo2 libfontconfig1
+          mkdir -p "$RUNNER_TEMP/orbit-pi-runtime"
+          cp scripts/macos-app/runtime/package{,-lock}.json "$RUNNER_TEMP/orbit-pi-runtime/"
+          npm ci --prefix "$RUNNER_TEMP/orbit-pi-runtime" --ignore-scripts --omit=dev --no-audit --no-fund
+      - name: Aggregate tests and six canonical cgo-free cross-builds
+        id: validate
+        run: bash scripts/macos-app/ci-validate.sh
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: macos-app-build-${{ github.sha }}
+          path: |
+            ${{ steps.validate.outputs.binaries }}
+            ${{ steps.validate.outputs.validation }}
+          if-no-files-found: error
+          retention-days: 14
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: macos-app-linux-validation-${{ github.sha }}
+          path: ${{ runner.temp }}/orbit-macos-app-${{ github.sha }}/logs/
+          if-no-files-found: warn
+          retention-days: 14
+
+  native-app:
+    needs: validate
+    if: github.repository == 'charlzyx/orbit' && github.event_name == 'push' && github.ref == 'refs/heads/redesign/mygo-rpc' && needs.validate.result == 'success'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: arm64
+            runner: macos-15
+          - arch: amd64
+            runner: macos-15-intel
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16
+        with:
+          go-version: '1.27.3'
+          cache: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22.23.4'
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: macos-app-build-${{ github.sha }}
+          path: ${{ runner.temp }}/orbit-app-build
+      - name: Prepare verified official Node and locked Pi runtime with licenses
+        run: python3 scripts/macos-app/runtime/prepare-runtime.py --output "$RUNNER_TEMP/orbit-bundled-runtime" --arch "${{ matrix.arch }}"
+      - name: Create native Finder app and drag-install DMG
+        run: |
+          python3 scripts/macos-app/bundle.py --source "$GITHUB_WORKSPACE" --binaries "$RUNNER_TEMP/orbit-app-build/binaries" --runtime "$RUNNER_TEMP/orbit-bundled-runtime" --output "$RUNNER_TEMP/orbit-app-assets" --commit "$GITHUB_SHA" --arch "${{ matrix.arch }}" --validation "$RUNNER_TEMP/orbit-app-build/validation-summary.json"
+      - name: Mount, copy-install, eject and launch twice using default Finder bootstrap
+        run: python3 scripts/macos-app/smoke.py --folder "$RUNNER_TEMP/orbit-app-assets" --arch "${{ matrix.arch }}"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: macos-app-${{ matrix.arch }}-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/orbit-app-assets/*.dmg
+            ${{ runner.temp }}/orbit-app-assets/package-*.json
+          if-no-files-found: error
+          retention-days: 14
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: macos-app-smoke-${{ matrix.arch }}-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/orbit-app-assets/launch-*
+            ${{ runner.temp }}/orbit-app-assets/expected-app-*.json
+            ${{ runner.temp }}/orbit-bundled-runtime/runtime-manifest.json
+          if-no-files-found: warn
+          retention-days: 14
+
+  publish-requested-prerelease:
+    needs: [validate, native-app]
+    if: github.repository == 'charlzyx/orbit' && github.event_name == 'push' && github.ref == 'refs/heads/redesign/mygo-rpc' && needs.validate.result == 'success' && needs.native-app.result == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: macos-app-arm64-${{ github.sha }}
+          path: ${{ runner.temp }}/orbit-app-inputs/arm64
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: macos-app-amd64-${{ github.sha }}
+          path: ${{ runner.temp }}/orbit-app-inputs/amd64
+      - name: Assemble only exact-source native-passed DMGs
+        run: python3 scripts/macos-app/assemble-release.py --source "$GITHUB_WORKSPACE" --inputs "$RUNNER_TEMP/orbit-app-inputs" --output "$RUNNER_TEMP/orbit-app-release" --commit "$GITHUB_SHA"
+      - name: Publish new prerelease by exact release ID, never replace old tag or assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/macos-app/publish-prerelease.py --source "$GITHUB_WORKSPACE" --assets "$RUNNER_TEMP/orbit-app-release"

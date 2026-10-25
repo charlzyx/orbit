@@ -390,7 +390,7 @@ func TestMountedReviewOpenFileKeepsWholeSnapshotAndCommitFilter(t *testing.T) {
 
 func TestMountedReviewTreeKeysDoNotHijackToolbar(t *testing.T) {
 	a, tt := mountedReview(t)
-	if err := tt.Click("Review options"); err != nil {
+	if err := tt.Click("Unwrap lines"); err != nil {
 		t.Fatal(err)
 	}
 	tt.Key(0, ui.KeyEscape)

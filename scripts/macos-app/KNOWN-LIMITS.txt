@@ -1,0 +1,22 @@
+KNOWN LIMITS / 已知限制 — experimental Finder app
+
+- Full 139-feature source-derived acceptance is still open. No pixel-perfect
+  claim: all 16 older published-state native comparison pairs differed.
+- Review staged+edited-file duplication and hidden-window heartbeat have later
+  code fixes with regression tests in this version. Their native parity is NOT
+  accepted merely from those tests. Usage geometry has no fresh accepted pair.
+- Pinned stock Ghostty scrollback/reflow fidelity and font/text-layout gaps
+  remain. Experimental native-history code is not shipped.
+- Hosted macOS first-frame/Ghostty/Pi RPC smoke is a release gate, not complete
+  manual IME/clipboard/PTY/editor/provider/inference acceptance. No successful
+  live model inference or user-Mac execution is claimed.
+- No Developer ID signing or notarization; downloaded-app Gatekeeper acceptance
+  remains unestablished. Stop if blocked; no security bypass is provided.
+- Pi examples are omitted from redistributed runtime; docs/examples availability
+  differs from a complete npm installation. See runtime manifest for exact list.
+- Upstream historical Waku attribution and Pi bundled-code license provenance
+  have documented caveats. Supplied notices are preserved; packaging is not a
+  claim of exhaustive legal clearance. Read Resources/Licenses and provenance.
+
+这是便于直接安装启动的实验版，不等于全功能、像素一致或人工 Mac 验收完成。
+已包含的 Review/心跳代码修复也不代表原生交互已经逐项验收。

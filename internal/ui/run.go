@@ -15,6 +15,7 @@ import (
 
 	orbitassets "github.com/charlzyx/orbit"
 	"github.com/charlzyx/orbit/internal/agent"
+	"github.com/charlzyx/orbit/internal/appbundle"
 	"github.com/charlzyx/orbit/internal/bugreportui"
 	"github.com/charlzyx/orbit/internal/gitworkbench"
 	"github.com/charlzyx/orbit/internal/highlight"
@@ -33,6 +34,8 @@ import (
 )
 
 type RunOptions struct {
+	Bundled                            bool
+	Smoke                              *appbundle.Smoke
 	Version                            string
 	Home, Workspace, Session, PiBinary string
 	Offline, NoExtensions              bool
@@ -53,6 +56,9 @@ type Controller struct {
 	Notifier          *native.Notifier
 	Updater           *native.Updater
 	window            atomic.Pointer[mygo.Window]
+	heartbeatMu       sync.Mutex
+	openingWindow     bool
+	heartbeatDone     chan struct{}
 	close             sync.Once
 	stop              chan struct{}
 	workspace         string
@@ -109,8 +115,17 @@ func NewController(o RunOptions) (*Controller, error) {
 		}
 	}
 	executable, _ := os.Executable()
-	layout, _ := native.DiscoverInstallLayout(executable)
-	x.Updater = native.NewUpdater(native.UpdaterOptions{Version: o.Version, Layout: layout, OnChange: invalidate})
+	var layout *native.InstallLayout
+	if !o.Bundled {
+		layout, _ = native.DiscoverInstallLayout(executable)
+	}
+	updateOptions := native.UpdaterOptions{Version: o.Version, Layout: layout, OnChange: invalidate}
+	if o.Bundled {
+		// Explicit non-key/non-feed sentinels prevent release ldflags from enabling
+		// the production updater for this isolated experimental application.
+		updateOptions.PublicKey, updateOptions.FeedURL = "disabled-experimental-app", "disabled:experimental-app"
+	}
+	x.Updater = native.NewUpdater(updateOptions)
 	x.Terminal = orbiterm.NewPanel(orbiterm.Options{Workspace: o.Workspace, Height: float32(s.Layout().TerminalHeight), Font: ghostty.Font{Family: s.Fonts().CodeFamily, Size: float32(s.UI().TerminalFontSize), LineHeight: 1, Features: []string{"-calt", "-liga", "-dlig"}}, OnChange: invalidate, OnError: func(e error) { x.enqueue(func() { x.UI.Notify(e.Error(), true) }) }, OpenLink: func(url string) bool { x.enqueue(func() { x.UI.save(native.OpenURL(url)) }); return true }})
 	x.UI = New(Options{BeginRuntimeOperation: x.beginRuntimeOperation, Updater: x.Updater, Version: o.Version, Store: s, Workspace: o.Workspace, PiBinary: o.PiBinary, Terminal: x.Terminal, OnAction: x.Action, Pages: map[string]func(*ui.Context){}})
 	x.UI.Options.RefreshModels = x.refreshModelCatalog
@@ -297,14 +312,10 @@ func (x *Controller) sync() {
 	x.Worktrees.Tick()
 }
 func (x *Controller) View(c *ui.Context) {
-	x.Agent.Tick()
+	active := x.Agent.Tick()
 	x.sync()
 	x.UI.View(c)
-	interval := 90 * time.Millisecond
-	if x.UI.Model.Running {
-		interval = 16 * time.Millisecond
-	}
-	c.After(interval)
+	c.After(heartbeatDelay(active))
 }
 func (x *Controller) SetWorkspace(path string) {
 	if path == "" {
@@ -753,15 +764,23 @@ func (x *Controller) Action(a Action) {
 	}
 }
 func Run(o RunOptions) error {
+	startupError := func(err error) error {
+		if o.Smoke != nil {
+			_ = o.Smoke.Fail("Native controller initialization failed")
+		} else if o.Bundled {
+			_ = appbundle.ShowStartupError(err)
+		}
+		return err
+	}
 	if e := configureDiagnosticTextMetrics(); e != nil {
-		return e
+		return startupError(e)
 	}
 	if e := LoadAssets(); e != nil {
-		return e
+		return startupError(e)
 	}
 	x, e := NewController(o)
 	if e != nil {
-		return e
+		return startupError(e)
 	}
 	defer x.Close()
 	mygo.App.SetName("Orbit")
@@ -771,11 +790,17 @@ func Run(o RunOptions) error {
 		width, height := windowRestoreSize(display.Bounds.Width, display.Bounds.Height)
 		options := sourceWindowOptions(width, height)
 		options.Content = ui.View(x.View)
-		w := mygo.NewWindow(options)
-		x.window.Store(w)
-		x.UI.Window = w
-		x.UI.window.Store(w)
-		w.OnReadyToShow(func() { go func() { _ = native.SignalUpdateReady() }() })
+		w := x.attachWindow(func() *mygo.Window { return mygo.NewWindow(options) })
+		w.OnReadyToShow(func() {
+			if o.Smoke != nil {
+				visible := !w.IsDestroyed() && w.IsVisible()
+				o.Smoke.WindowReady(visible)
+				if visible {
+					o.Smoke.Capture(w.CapturePage)
+				}
+			}
+			go func() { _ = native.SignalUpdateReady() }()
+		})
 		return w
 	}
 	lifecycle = native.BindLifecycle(native.LifecycleOptions{Reopen: create, OpenSession: func(path string) { x.OpenSession(path) }, OpenFile: x.UI.OpenFile, Quit: x.Close, Notifier: x.Notifier})
@@ -796,7 +821,9 @@ func Run(o RunOptions) error {
 			prefs, e2 := native.LoadOpenInPrefs(filepath.Join(x.Store.RootDir, "open-in.json"))
 			return func() { x.UI.OpenApps = apps; x.UI.OpenPrefs = prefs; x.UI.save(e); x.UI.save(e2) }
 		})
-		x.Updater.StartAutomatic(context.Background(), filepath.Join(x.Store.RootDir, "updates.json"))
+		if !o.Bundled {
+			x.Updater.StartAutomatic(context.Background(), filepath.Join(x.Store.RootDir, "updates.json"))
+		}
 		x.runRetention(false)
 		if !o.Offline && o.PiBinary == "" && x.Agent.PiBinary() == "" {
 			native.CheckPiUpdateOnLaunch(x.background, native.PiLaunchUpdateOptions{Busy: func() bool { return x.maintenance.Load() || x.Agent.AnyBusy() }, BeginUpdate: func() (func(), bool) {
@@ -828,22 +855,18 @@ func Run(o RunOptions) error {
 			}})
 		}
 	})
-	// A closed macOS window still drains parked Pi sessions and timeout dialogs.
-	go func() {
-		timer := time.NewTicker(90 * time.Millisecond)
-		defer timer.Stop()
-		for {
-			select {
-			case <-x.stop:
-				return
-			case <-timer.C:
-				if w := x.window.Load(); w == nil || w.IsDestroyed() {
-					x.Terminal.SetVisible(false)
-					x.Agent.Tick()
-				}
-			}
+	// A closed macOS window still drains active/parked Pi sessions. This is
+	// deliberately only the runtime drain, not source OrbitApp.tick's full
+	// MCP/background/layout work, which still needs a UI-thread lifecycle host.
+	x.startHeartbeat()
+	o.Smoke.Start(x.background, func() appbundle.SmokeSnapshot {
+		snapshot := x.Agent.Snapshot()
+		process := x.Agent.RuntimeSnapshot().Active
+		if process == nil {
+			return appbundle.SmokeSnapshot{}
 		}
-	}()
+		return appbundle.SmokeSnapshot{Connected: snapshot.Connected && snapshot.RuntimeID == process.Key && snapshot.ActiveSession.ID == process.SessionID, Alive: process.Alive, Loading: process.Loading, PID: process.PID, SessionID: snapshot.ActiveSession.ID, RuntimeID: snapshot.RuntimeID, Launcher: process.Launcher}
+	}, mygo.App.Quit)
 	return mygo.App.Run()
 }
 

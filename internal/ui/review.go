@@ -34,6 +34,9 @@ type reviewState struct {
 	collapsed                             map[int]bool
 	dataIdentity                          string
 	refreshSpinUntil                      time.Time
+	refreshStarted                        time.Time
+	sourceMenuOpen                        bool
+	sourceMenuDismissedAt                 time.Time
 }
 
 const reviewRefreshFeedback = 650 * time.Millisecond
@@ -86,14 +89,7 @@ func (a *App) RefreshReview() {
 	req := workspace.ReviewRequest{Source: s.source, Session: a.Model.SessionID, Turn: a.reviewTurn()}
 	identity := fmt.Sprintf("%s\x00%s\x00%s\x00%d\x00%s\x00%s", root, req.Source, req.Session, req.Turn, ref, path)
 	if s.dataIdentity != identity {
-		s.data = workspace.ReviewSnapshot{}
-		s.err = ""
-		// Source clear_diff resets directory/cursor state, but keeps the
-		// filter text. A refresh of the same source retains expansions.
-		s.treeDirs, s.expandedDirs = nil, nil
-		s.treeFileKey, s.treeRows = "", nil
-		s.treeCursor = nil
-		s.treeDirty = true
+		s.clearReviewSnapshot()
 	}
 	a.Async(func() func() {
 		g := workspace.Git{Dir: root}
@@ -103,16 +99,9 @@ func (a *App) RefreshReview() {
 			d, e := g.CollectReviewAt(context.Background(), req.Source, ref, path)
 			err = e
 			result = workspace.ParseReview(d)
-		} else if req.Source == workspace.ReviewUncommitted {
-			st, e := g.CollectReview(context.Background(), workspace.ReviewRequest{Source: workspace.ReviewStaged})
-			if e != nil {
-				err = e
-			} else {
-				un, e := g.CollectReview(context.Background(), workspace.ReviewRequest{Source: workspace.ReviewUnstaged})
-				err = e
-				result = workspace.GroupReviews(workspace.ParseReview(st), workspace.ParseReview(un))
-			}
 		} else {
+			// Docked Review compares HEAD with the working tree once. Only
+			// the source embedded Git browser groups Staged/Changes sections.
 			d, e := g.CollectReview(context.Background(), req)
 			err = e
 			result = workspace.ParseReview(d)
@@ -145,58 +134,7 @@ func (a *App) review(c *ui.Context) {
 		// The source dock is an opaque rounded card with a separate left
 		// resize gutter, not a transparent overlay on the new-task backdrop.
 		ui.Column(c.Key("review-card")).Label("Review card").Fill().MinHeight(0).Background(t.Background).Border(1, t.Border).Radius(t.Px(12)).Clip().Children(func() {
-			ui.Row(c).Height(40).PaddingX(10).Gap(6).AlignItems(ui.Center).Children(func() {
-				ui.MenuButton(c, a.currentReviewLabel(), func(m *ui.Menu) {
-					for _, src := range []workspace.ReviewSource{workspace.ReviewLastTurn, workspace.ReviewUncommitted, workspace.ReviewUnstaged, workspace.ReviewStaged, workspace.ReviewCommitted, workspace.ReviewBranch} {
-						if m.Item(reviewLabel(src)).Checked(src == s.source).Disabled(src == workspace.ReviewLastTurn && a.Model.LatestTurn == 0).Chosen() {
-							s.source = src
-							s.turn = 0
-							if src == workspace.ReviewLastTurn {
-								s.turn = a.Model.LatestTurn
-							}
-							s.ref = ""
-							s.path = ""
-							s.pendingPath, s.pendingRoot = "", ""
-							a.RefreshReview()
-						}
-					}
-				})
-				ui.Spacer(c)
-				if s.refreshFeedback(time.Now()) {
-					ui.Spinner(c).Size(12, 12).Label("Refreshing review")
-				}
-				if a.iconButton(c, "Refresh review", "icons/refresh.svg").Clicked() {
-					a.refreshReviewFromButton(time.Now())
-				}
-				if a.iconButton(c, "Review options", "icons/more.svg").Menu(func(m *ui.Menu) {
-					if m.Item("Split diff").Checked(s.split).Chosen() {
-						a.toggleReviewSplit()
-					}
-					if m.Item("Wrap lines").Checked(s.wrap).Chosen() {
-						s.wrap = !s.wrap
-					}
-					if m.Item("File list").Checked(s.tree).Chosen() {
-						s.tree = !s.tree
-					}
-				}).Clicked() {
-				}
-				label, icon := "Full width review", "icons/arrow-expand.svg"
-				if s.layout.full {
-					label, icon = "Restore review width", "icons/arrow-shrink.svg"
-				}
-				if a.iconButton(c.Key("review-full-width"), label, icon).KeepFocus().Clicked() {
-					a.toggleReviewFull()
-					c.AnimationFrame()
-				}
-				if a.iconButton(c, "Close review", "icons/x.svg").Clicked() {
-					a.ReviewVisible = false
-				}
-			})
-			ui.Row(c).Padding(6, 12).Gap(8).Children(func() {
-				ui.Text(c, fmt.Sprintf("%d files", len(s.data.Files))).TextColor(t.TextMuted)
-				ui.Text(c, fmt.Sprintf("+%d", s.data.Additions)).TextColor(t.Success)
-				ui.Text(c, fmt.Sprintf("−%d", s.data.Deletions)).TextColor(t.Error)
-			})
+			a.reviewToolbar(c)
 			if s.err != "" {
 				if len(s.data.Lines) == 0 {
 					a.Empty(c, "Review unavailable", s.err)
@@ -205,7 +143,11 @@ func (a *App) review(c *ui.Context) {
 				ui.Text(c, "Refresh failed; showing the previous snapshot. "+s.err).TextColor(t.Warning).Padding(8).Selectable()
 			}
 			if len(s.data.Lines) == 0 {
-				a.Empty(c, "No changes", "No changes in this review source.")
+				if s.loading && s.dataIdentity == "" {
+					a.Empty(c, a.text("sidepane.loading_changes", "Loading changes…"), "")
+					return
+				}
+				a.Empty(c, a.text("sidepane.no_changes", "No changes"), a.reviewEmptyDescription())
 				return
 			}
 			ui.Row(c).Grow(1).MinHeight(0).Children(func() {
@@ -214,9 +156,6 @@ func (a *App) review(c *ui.Context) {
 					a.reviewTree(c)
 				}
 			})
-			if s.data.Truncated {
-				ui.Text(c, "Diff display limited to 50,000 lines.").Padding(8).TextColor(t.Warning)
-			}
 			if c.Shortcut(ui.Alt, ui.KeyDown) {
 				a.reviewFile(1)
 			}
@@ -230,7 +169,7 @@ func (a *App) review(c *ui.Context) {
 func reviewLabel(s workspace.ReviewSource) string {
 	switch s {
 	case workspace.ReviewLastTurn:
-		return "Last turn"
+		return "Last Turn"
 	case workspace.ReviewStaged:
 		return "Staged"
 	case workspace.ReviewUnstaged:
@@ -238,9 +177,9 @@ func reviewLabel(s workspace.ReviewSource) string {
 	case workspace.ReviewCommitted:
 		return "Committed"
 	case workspace.ReviewBranch:
-		return "Branch changes"
+		return "Branch"
 	default:
-		return "Uncommitted changes"
+		return "Uncommitted"
 	}
 }
 func (a *App) reviewFile(delta int) {
