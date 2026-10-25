@@ -14,6 +14,7 @@ import (
 
 	"github.com/charlzyx/orbit/internal/appbundle"
 	"github.com/charlzyx/orbit/internal/composerui"
+	"github.com/charlzyx/orbit/internal/diagnosticlog"
 	"github.com/charlzyx/orbit/internal/native"
 	"github.com/charlzyx/orbit/internal/transcriptui"
 	orbitui "github.com/charlzyx/orbit/internal/ui"
@@ -33,7 +34,7 @@ func parseArguments(args []string, output io.Writer) (arguments, error) {
 	var a arguments
 	flags := flag.NewFlagSet("Orbit", flag.ContinueOnError)
 	flags.SetOutput(output)
-	flags.StringVar(&a.options.Home, "home", "", "isolated application home (bundled app: private Application Support home)")
+	flags.StringVar(&a.options.Home, "home", "", "isolated Orbit and Pi configuration home (default: normal Pi config; bundled Orbit prefs stay private)")
 	flags.StringVar(&a.options.Workspace, "workspace", "", "workspace directory")
 	flags.StringVar(&a.options.Session, "session", "", "Pi JSONL session path to resume")
 	flags.StringVar(&a.options.PiBinary, "pi", "", "Pi executable path")
@@ -68,7 +69,16 @@ func run(args []string) int {
 		fmt.Println("Orbit", version)
 		return 0
 	}
+	started := time.Now()
+	var diagnostics *diagnosticlog.Logger
+	shutdownResult := diagnosticlog.ResultOK
+	defer func() {
+		diagnostics.Record(diagnosticlog.EventAppShutdown, shutdownResult, time.Since(started))
+		_ = diagnostics.Close()
+	}()
 	fail := func(err error) int {
+		shutdownResult = diagnosticlog.ResultError
+		diagnostics.Record(diagnosticlog.EventAppStartup, diagnosticlog.ResultError, time.Since(started))
 		fmt.Fprintln(os.Stderr, "Orbit:", err)
 		if a.options.Smoke != nil {
 			_ = a.options.Smoke.Fail("Orbit could not complete native startup; see process stderr")
@@ -88,16 +98,13 @@ func run(args []string) int {
 	o := a.options
 	o.Version = version
 	if bundled {
-		if o.Home == "" {
-			o.Home = appbundle.RelaunchHome(os.Getenv("HOME"), os.Getenv("ORBIT_BUNDLE_STATE_HOME"))
-		}
 		if o.Session != "" {
 			o.Session, err = filepath.Abs(o.Session)
 			if err != nil {
 				return fail(err)
 			}
 		}
-		// Resolve explicit CLI runtime overrides before removing ambient PATH.
+		// Resolve explicit CLI runtime overrides before prepending bundled runtimes.
 		if o.PiBinary != "" {
 			if !strings.ContainsAny(o.PiBinary, "/\\") {
 				o.PiBinary, err = exec.LookPath(o.PiBinary)
@@ -113,12 +120,20 @@ func run(args []string) int {
 		if err != nil {
 			return fail(err)
 		}
-		prepared, err := layout.Prepare(home, appbundle.Options{Home: o.Home, Workspace: o.Workspace, PiBinary: o.PiBinary}, os.Environ())
+		ambient := os.Environ()
+		if a.smokeReport != "" {
+			ambient = appbundle.SmokeEnvironment(ambient)
+			o.Offline = true
+		}
+		prepared, err := layout.Prepare(home, appbundle.Options{Home: o.Home, Workspace: o.Workspace, PiBinary: o.PiBinary}, ambient)
 		if err != nil {
 			return fail(err)
 		}
 		o.Home, o.Workspace, o.PiBinary = prepared.Home, prepared.Workspace, prepared.PiBinary
+		o.UserHome, o.PiAgentDir = prepared.UserHome, prepared.PiAgentDir
 		o.Bundled = true
+		diagnostics = openDiagnostics(o.Home)
+		o.Diagnostics = diagnostics
 		if a.smokeReport != "" {
 			o.Smoke, err = appbundle.NewSmoke(a.smokeReport, a.smokeExitAfter, layout, prepared)
 			if err != nil {
@@ -141,6 +156,14 @@ func run(args []string) int {
 	} else if a.smokeReport != "" {
 		return fail(fmt.Errorf("--smoke-report requires the native macOS app bundle"))
 	}
+	if !bundled {
+		home := o.Home
+		if home == "" {
+			home, _ = os.UserHomeDir()
+		}
+		diagnostics = openDiagnostics(home)
+		o.Diagnostics = diagnostics
+	}
 	if err := composerui.RequireCompatibility(); err != nil {
 		return fail(err)
 	}
@@ -148,6 +171,8 @@ func run(args []string) int {
 		return fail(err)
 	}
 	if err := orbitui.Run(o); err != nil {
+		shutdownResult = diagnosticlog.ResultError
+		diagnostics.Record(diagnosticlog.EventNativeRun, diagnosticlog.ResultError, time.Since(started))
 		// Run owns errors before its event loop. Never try to run MyGo twice after
 		// a native backend failure or a completed application lifecycle.
 		fmt.Fprintln(os.Stderr, "Orbit:", err)
@@ -155,4 +180,19 @@ func run(args []string) int {
 		return 1
 	}
 	return 0
+}
+
+func openDiagnostics(home string) *diagnosticlog.Logger {
+	if absolute, err := filepath.Abs(home); err == nil && home != "" {
+		home = absolute
+	}
+	logger, err := diagnosticlog.Open(home, version)
+	if err != nil {
+		// Deliberately omit error/path details; diagnostics must not expose data
+		// or prevent the user from starting the application.
+		fmt.Fprintln(os.Stderr, "Orbit: local diagnostic logging is unavailable")
+		return nil
+	}
+	logger.Record(diagnosticlog.EventAppStartup, diagnosticlog.ResultStarted, 0)
+	return logger
 }

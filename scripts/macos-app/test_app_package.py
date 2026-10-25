@@ -10,6 +10,20 @@ spec=importlib.util.spec_from_file_location('publisher',Path(__file__).with_name
 spec=importlib.util.spec_from_file_location('assembler',Path(__file__).with_name('assemble-release.py'));assembler=importlib.util.module_from_spec(spec);spec.loader.exec_module(assembler)
 HERE=Path(__file__).resolve().parent
 class PackagingTests(unittest.TestCase):
+ def test_diagnostics_require_fresh_private_allowlisted_stages(self):
+  with tempfile.TemporaryDirectory() as d:
+   p=Path(d)/'app.log';version='0.2.12-go-test.20261025.4'
+   rows=[{'timestamp':'2026-10-25T00:00:00Z','run_id':'a'*32,'version':version,'event':event,'result':result,'duration_ms':0} for event,result in [('app_startup','started'),('controller_init','ok'),('native_run','ok'),('app_shutdown','ok')]]
+   def save(data):p.write_text(''.join(json.dumps(row)+'\n' for row in data))
+   save(rows);self.assertEqual(len(smoke.verify_diagnostics(p,version,1)),4)
+   with self.assertRaises(ValueError):smoke.verify_diagnostics(p,version,2)
+   save(rows[:-1])
+   with self.assertRaises(ValueError):smoke.verify_diagnostics(p,version,1)
+   for field,value in [('private_path','/synthetic-secret'),('event','private text'),('version','wrong'),('run_id','bad')]:
+    bad=[dict(row) for row in rows];bad[0][field]=value;save(bad)
+    with self.assertRaises(ValueError):smoke.verify_diagnostics(p,version,1)
+   save(rows);link=Path(d)/'linked';link.symlink_to(p)
+   with self.assertRaises(ValueError):smoke.verify_diagnostics(link,version,1)
  def test_versions_test_only(self):
   for v in ['0.2.12-go-test.20261025.1','0.2.12-go-test.20261025.2']:self.assertTrue(package.VERSION_RE.fullmatch(v))
   for v in ['v1','0.2.12','latest','stable','0.2.12-go-test.20261025.1\nBAD=1','../../bad']:self.assertFalse(package.VERSION_RE.fullmatch(v))
@@ -187,7 +201,7 @@ class PackagingTests(unittest.TestCase):
  def test_native_smoke_report_requires_real_events_and_installed_paths(self):
   with tempfile.TemporaryDirectory() as d:
    r=Path(d);app=r/'Installed App.app';home=r/'User';private=home/'Library/Application Support/Orbit Go Test/Home'
-   report={'status':'PASS','architecture':'arm64','pid':123,'started_at':__import__('datetime').datetime.now(__import__('datetime').timezone.utc).isoformat(),'session_id':'unique','home':str(private),'workspace':str(private/'Workspace'),'pi_path':str(private/'runtime/version/pi/node_modules/.bin/pi'),'checks':{k:True for k in ['native_window_ready','first_frame','ghostty_load','pi_rpc_get_state','native_capture']}}
+   report={'status':'PASS','architecture':'arm64','pid':123,'started_at':__import__('datetime').datetime.now(__import__('datetime').timezone.utc).isoformat(),'session_id':'unique','home':str(private),'user_home':str(home),'pi_agent_dir':str(home/'.pi/agent'),'workspace':str(private/'Workspace'),'pi_path':str(private/'runtime/version/pi/node_modules/.bin/pi'),'checks':{k:True for k in ['native_window_ready','first_frame','ghostty_load','pi_rpc_get_state','native_capture']}}
    report_file=r/'report.json';capture=Path(str(report_file)+'.png');capture.write_bytes(b'\x89PNG\r\n\x1a\n'+__import__('struct').pack('>I',13)+b'IHDR'+__import__('struct').pack('>II',640,480)+bytes(9));report.update({'capture_kind':'native-content','capture_path':str(capture),'capture_width':640,'capture_height':480,'capture_sha256':package.digest(capture)})
    for k,v in {'executable':'Contents/MacOS/Orbit','ghostty_path':'Contents/Frameworks/libghostty-vt.dylib','node_path':'Contents/Resources/node/bin/node','bundled_pi_path':'Contents/Resources/bin/pi'}.items():report[k]=str(app/v)
    smoke.verify_report(report,app,home,'arm64',0,report_file)
@@ -195,6 +209,10 @@ class PackagingTests(unittest.TestCase):
     report['checks'][k]=False
     with self.assertRaises(ValueError):smoke.verify_report(report,app,home,'arm64',0,report_file)
     report['checks'][k]=True
+   for key in ['home','user_home','pi_agent_dir']:
+    old=report[key];report[key]='/tmp/wrong/config'
+    with self.assertRaises(ValueError):smoke.verify_report(report,app,home,'arm64',0,report_file)
+    report[key]=old
    report['executable']='/tmp/wrong/Orbit'
    with self.assertRaises(ValueError):smoke.verify_report(report,app,home,'arm64',0,report_file)
  def test_default_finder_launch_contract(self):

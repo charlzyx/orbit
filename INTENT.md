@@ -50,6 +50,20 @@ Current verification uses the [source-first checklist](docs/mygo-migration/accep
 
 The required composer caret/undo and opt-in retained transcript-selection compatibility additions are hash-pinned and attributed. Canonical `scripts/go-native.sh` commands verify the original module, copy it temporarily, and apply explicit source overlays. The app rejects a build missing either required capability at startup. Default toolkit selection remains unchanged outside the opted-in transcript scope. No Rust executable or runtime sidecar is part of the new application.
 
+**Pi configuration inheritance correction (Go implementation):** normal bundled
+launches preserve the actual user home and launch environment. `PI_CODING_AGENT_DIR`
+(with tilde expansion) or `~/.pi/agent` is shared by the Pi RPC process and the
+provider/model/MCP/resource views and helpers. Private Application Support state
+contains only Orbit test preferences, extension/patch support files and the
+versioned public-runtime copy. Orbit extensions receive a separate preferences
+home; Orbit never copies user credentials/configuration to that private tree.
+Stock Pi remains free to run its ordinary migrations, auth refresh and
+settings/catalog writes. Explicit `--home` remains a configuration-isolated
+fixture override; production updating remains disabled in the test app.
+Disposable offline real-Pi RPC checks cover existing provider/model/default
+inheritance and repeated launches. This is not user-Mac or live-inference
+acceptance. [Path contract and verification](docs/mygo-migration/pi-configuration-inheritance.md).
+
 ### D1 — Transport: pi CLI RPC over stdio (replaces the Node daemon + SSE)
 **Choice:** spawn `pi --mode rpc` as a child process per open session; JSONL commands on stdin,
 JSONL events on stdout. Retire `agent/` (pi-coding-agent SDK daemon) and the SSE surface.

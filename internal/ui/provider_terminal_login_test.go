@@ -14,7 +14,14 @@ func TestProviderTerminalLoginUsesExplicitUnsupportedCapabilityAndLiteralArgumen
 	x.UI.providerState.catalog = workbench.ProviderCatalog{Providers: []workbench.ProviderMetadata{{ID: "fixture-provider", Name: "Fixture", OAuth: true}, {ID: "api-only", APIKey: true}}}
 	calls := 0
 	var argv []string
-	open := func(bin string, args ...string) error { calls++; argv = append([]string{bin}, args...); return nil }
+	open := func(bin string, env map[string]string, args ...string) error {
+		calls++
+		argv = append([]string{bin}, args...)
+		if env["HOME"] != x.Store.UserHome || env["PI_CODING_AGENT_DIR"] != x.Store.PiDir || env["ORBIT_PREFERENCES_HOME"] != x.Store.Home || env["PATH"] == "" {
+			t.Fatal("terminal sign-in configuration differs from RPC")
+		}
+		return nil
+	}
 	for _, support := range []string{"", "supported"} {
 		x.UI.Model.Auth.Support = support
 		if x.loginProviderTerminal("fixture-provider", open) == nil {
@@ -36,7 +43,7 @@ func TestProviderTerminalLoginUsesExplicitUnsupportedCapabilityAndLiteralArgumen
 	if !reflect.DeepEqual(argv, []string{"pi", "/login", "fixture-provider"}) || calls != 1 {
 		t.Fatal(argv, calls)
 	}
-	if err := x.loginProviderTerminal("fixture-provider", func(string, ...string) error { return errors.New("fixture terminal unavailable") }); err == nil {
+	if err := x.loginProviderTerminal("fixture-provider", func(string, map[string]string, ...string) error { return errors.New("fixture terminal unavailable") }); err == nil {
 		t.Fatal("terminal launch failure hidden")
 	}
 }

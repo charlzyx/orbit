@@ -132,11 +132,16 @@ test("allowlist round-trips per mode and degrades on failure", () => {
 
 test("path helpers point under ~/.orbit-pi", () => {
   const prev = process.env.HOME;
+  const previousPreferencesHome = process.env.ORBIT_PREFERENCES_HOME;
+  delete process.env.ORBIT_PREFERENCES_HOME;
   process.env.HOME = "/tmp/orbit-home-test";
   try {
     assert.equal(modeFilePath(), "/tmp/orbit-home-test/.orbit-pi/access.json");
     assert.equal(allowlistPath(), "/tmp/orbit-home-test/.orbit-pi/access-allow.json");
   } finally {
-    process.env.HOME = prev;
+    if (prev === undefined) delete process.env.HOME;
+    else process.env.HOME = prev;
+    if (previousPreferencesHome === undefined) delete process.env.ORBIT_PREFERENCES_HOME;
+    else process.env.ORBIT_PREFERENCES_HOME = previousPreferencesHome;
   }
 });

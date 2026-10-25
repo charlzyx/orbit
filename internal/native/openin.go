@@ -256,6 +256,16 @@ func OpenNotificationSettings() error {
 // OpenTerminalProgram is the explicit external-terminal escape hatch for a pi
 // authentication flow; normal shell work stays in the integrated terminal.
 func OpenTerminalProgram(program string, args ...string) error {
+	return OpenTerminalProgramWithEnvironment(program, nil, args...)
+}
+
+// OpenTerminalProgramWithEnvironment carries only non-secret Pi identity paths
+// across LaunchServices. It never writes inherited credentials to a script.
+func OpenTerminalProgramWithEnvironment(program string, environment map[string]string, args ...string) error {
+	env, err := terminalPathEnvironment(environment)
+	if err != nil {
+		return err
+	}
 	if program == "" {
 		return errors.New("terminal program is empty")
 	}
@@ -271,6 +281,13 @@ func OpenTerminalProgram(program string, args ...string) error {
 		path := filepath.Join(dir, "login.command")
 		quote := func(s string) string { return "'" + strings.ReplaceAll(s, "'", "'\\''") + "'" }
 		command := quote(program)
+		if len(env) > 0 {
+			command = "/usr/bin/env"
+			for _, entry := range env {
+				command += " " + quote(entry)
+			}
+			command += " " + quote(program)
+		}
 		for _, arg := range args {
 			command += " " + quote(arg)
 		}
@@ -286,14 +303,40 @@ func OpenTerminalProgram(program string, args ...string) error {
 		return nil
 	}
 	if runtime.GOOS == "windows" {
-		return launchExternalTerminal(program, args)
+		return launchExternalTerminal(program, args, env)
 	}
 	for _, spec := range [][]string{{"x-terminal-emulator", "-e"}, {"gnome-terminal", "--"}, {"konsole", "-e"}, {"xterm", "-e"}} {
 		if exe, err := exec.LookPath(spec[0]); err == nil {
-			argv := append(append([]string(nil), spec[1:]...), program)
+			argv := append([]string(nil), spec[1:]...)
+			if len(env) > 0 {
+				argv = append(argv, "/usr/bin/env")
+				argv = append(argv, env...)
+			}
+			argv = append(argv, program)
 			argv = append(argv, args...)
 			return launch(exec.Command(exe, argv...))
 		}
 	}
 	return fmt.Errorf("no installed terminal can run %s", program)
+}
+
+// Explicit allowlist prevents a future caller accidentally persisting secrets.
+func terminalPathEnvironment(values map[string]string) ([]string, error) {
+	for key, value := range values {
+		switch key {
+		case "HOME", "USERPROFILE", "PI_CODING_AGENT_DIR", "ORBIT_PREFERENCES_HOME", "PATH":
+		default:
+			return nil, errors.New("terminal environment accepts only configuration paths")
+		}
+		if strings.ContainsRune(value, 0) {
+			return nil, errors.New("invalid terminal configuration path")
+		}
+	}
+	var env []string
+	for _, key := range []string{"HOME", "USERPROFILE", "PI_CODING_AGENT_DIR", "ORBIT_PREFERENCES_HOME", "PATH"} {
+		if value, ok := values[key]; ok {
+			env = append(env, key+"="+value)
+		}
+	}
+	return env, nil
 }

@@ -20,7 +20,9 @@ import (
 type Service struct {
 	Preferences         *preferences.Store
 	Workspace, PiBinary string
-	mu                  sync.Mutex
+	// A non-nil Environment is complete, primarily for disposable helper tests.
+	Environment []string
+	mu          sync.Mutex
 }
 
 func New(p *preferences.Store, workspace string) *Service {
@@ -104,12 +106,12 @@ func (s *Service) Command(ctx context.Context, binary string, args ...string) (s
 	cmd := exec.CommandContext(ctx, binary, args...)
 	configureResourceProcess(cmd)
 	cmd.Dir = s.Workspace
-	cmd.Env = append(os.Environ(), "HOME="+s.Preferences.Home, "PI_CODING_AGENT_DIR="+s.Preferences.PiDir, "PI_SKIP_VERSION_CHECK=1", "NO_COLOR=1", "CI=1")
+	cmd.Env = append(s.baseEnvironment(), "PI_SKIP_VERSION_CHECK=1", "NO_COLOR=1", "CI=1")
 	secrets, e := s.SecretEnv()
 	if e != nil {
 		return "", e
 	}
-	cmd.Env = append(cmd.Env, secrets...)
+	cmd.Env = s.Preferences.PiEnvironment(append(cmd.Env, secrets...))
 	cmd.WaitDelay = 2 * time.Second
 	var out, errout limitedBuffer
 	out.remaining = 16 << 20
@@ -123,6 +125,8 @@ func (s *Service) Command(ctx context.Context, binary string, args ...string) (s
 	if out.truncated {
 		return "", errors.New("command output exceeded 16 MiB limit")
 	}
+	// Successful stdout can be structured protocol data. Redact only after
+	// parsing, or at the user-facing text boundary, never inside JSON tokens.
 	return out.String(), nil
 }
 
@@ -148,4 +152,11 @@ func (s *Service) Pi(ctx context.Context, args ...string) (string, error) {
 		bin = "pi"
 	}
 	return s.Command(ctx, bin, args...)
+}
+
+func (s *Service) baseEnvironment() []string {
+	if s.Environment != nil {
+		return append([]string{}, s.Environment...)
+	}
+	return os.Environ()
 }

@@ -17,6 +17,7 @@ import (
 	"github.com/charlzyx/orbit/internal/agent"
 	"github.com/charlzyx/orbit/internal/appbundle"
 	"github.com/charlzyx/orbit/internal/bugreportui"
+	"github.com/charlzyx/orbit/internal/diagnosticlog"
 	"github.com/charlzyx/orbit/internal/gitworkbench"
 	"github.com/charlzyx/orbit/internal/highlight"
 	"github.com/charlzyx/orbit/internal/mcpui"
@@ -34,13 +35,17 @@ import (
 )
 
 type RunOptions struct {
+	Diagnostics                        *diagnosticlog.Logger
 	Bundled                            bool
 	Smoke                              *appbundle.Smoke
 	Version                            string
 	Home, Workspace, Session, PiBinary string
-	Offline, NoExtensions              bool
+	// UserHome and PiAgentDir separate Pi config from private bundled preferences.
+	UserHome, PiAgentDir  string
+	Offline, NoExtensions bool
 }
 type Controller struct {
+	diagnostics       *diagnosticlog.Logger
 	authBrowsers      authBrowserEffects
 	catalogRefreshing bool
 	UI                *App
@@ -72,15 +77,22 @@ type Controller struct {
 }
 
 func NewController(o RunOptions) (*Controller, error) {
+	o.Diagnostics.Record(diagnosticlog.EventControllerInit, diagnosticlog.ResultStarted, 0)
+	if err := preferences.ValidatePiDir(o.PiAgentDir); err != nil {
+		return nil, err
+	}
 	var s *preferences.Store
 	var e error
 	if o.Home != "" {
-		s = preferences.New(o.Home)
+		s = preferences.NewWithPi(o.Home, o.UserHome, o.PiAgentDir)
 	} else {
 		s, e = preferences.Default()
 		if e != nil {
 			return nil, e
 		}
+	}
+	if o.Home == "" && (o.UserHome != "" || o.PiAgentDir != "") {
+		s = preferences.NewWithPi(s.Home, o.UserHome, o.PiAgentDir)
 	}
 	if o.PiBinary == "" {
 		var saved struct {
@@ -99,7 +111,7 @@ func NewController(o RunOptions) (*Controller, error) {
 	if e != nil {
 		return nil, e
 	}
-	x := &Controller{Store: s, stop: make(chan struct{}), workspace: o.Workspace, pinned: map[string]bool{}, archived: map[string]bool{}}
+	x := &Controller{diagnostics: o.Diagnostics, Store: s, stop: make(chan struct{}), workspace: o.Workspace, pinned: map[string]bool{}, archived: map[string]bool{}}
 	x.background, x.cancelBackground = context.WithCancel(context.Background())
 	for _, p := range s.SessionSet(false) {
 		x.pinned[p] = true
@@ -140,7 +152,7 @@ func NewController(o RunOptions) (*Controller, error) {
 	x.Notifier.OnToast = func(kind native.ToastKind, title, body string) {
 		x.enqueue(func() { x.UI.toastStack.Push(kind, title, body) })
 	}
-	x.Agent = agent.NewManager(agent.Options{PiBinary: o.PiBinary, Home: s.Home, SessionDir: filepath.Join(s.PiDir, "sessions"), Resources: orbitassets.Extensions(), ResolveChildEnv: func(dir string) ([]string, error) { return workbench.New(s, dir).SecretEnv() }, Offline: o.Offline, DisableExtensions: o.NoExtensions, OnChange: invalidate, OnNotification: func(n agent.Notification) {
+	x.Agent = agent.NewManager(agent.Options{PiBinary: o.PiBinary, Home: s.Home, UserHome: s.UserHome, PiAgentDir: s.PiDir, SessionDir: filepath.Join(s.PiDir, "sessions"), Resources: orbitassets.Extensions(), ResolveChildEnv: func(dir string) ([]string, error) { return workbench.New(s, dir).SecretEnv() }, Offline: o.Offline, DisableExtensions: o.NoExtensions, OnChange: invalidate, OnNotification: func(n agent.Notification) {
 		x.Notifier.Deliver(native.Notification{Session: n.SessionPath, Title: n.Title, Body: n.Message, Kind: native.ToastKind(n.Kind)})
 	}})
 	x.UI.Options.Custom = orbiterm.NewCustom(orbiterm.CustomOptions{RowHeight: float32(s.UI().EditorFontSize) * 18 / 13, Font: ghostty.Font{Family: s.Fonts().CodeFamily, Size: float32(s.UI().EditorFontSize) * 12 / 13, Features: []string{"-calt", "-liga", "-dlig"}}, Theme: NewTheme(s.Appearance().LightTheme, s.UI(), s.Fonts()).Terminal(), DarkTheme: NewTheme(s.Appearance().DarkTheme, s.UI(), s.Fonts()).Terminal(), ReduceMotion: s.UI().ReduceMotion, OnChange: invalidate, OnInput: x.Agent.CustomUIInput, OnResize: x.Agent.CustomUIResize, OnError: func(e error) { x.enqueue(func() { x.UI.save(e) }) }})
@@ -159,7 +171,7 @@ func NewController(o RunOptions) (*Controller, error) {
 	}
 	x.UI.Options.Pages["git"] = func(c *ui.Context) { gitworkbench.View(c, x.Git).Fill() }
 	x.UI.Options.Pages["worktrees"] = func(c *ui.Context) { worktreeui.View(c, x.Worktrees).Fill() }
-	x.BugReport = bugreportui.New(bugreportui.Options{OnChange: invalidate, PiBinary: o.PiBinary, Version: o.Version, Home: s.Home, Window: func() *mygo.Window { return x.window.Load() }, Capture: func() ([]byte, error) {
+	x.BugReport = bugreportui.New(bugreportui.Options{OnChange: invalidate, PiBinary: o.PiBinary, Version: o.Version, Home: s.UserHome, Window: func() *mygo.Window { return x.window.Load() }, Capture: func() ([]byte, error) {
 		if w := x.window.Load(); w != nil && !w.IsDestroyed() {
 			return w.CapturePage()
 		}
@@ -174,7 +186,7 @@ func NewController(o RunOptions) (*Controller, error) {
 		if e != nil {
 			return workspace.Draft{}, e
 		}
-		cfg := workspace.GenerationConfig{Pi: pirpc.Config{Executable: x.Agent.PiBinary(), WorkspaceDir: s.Home, Environment: append(os.Environ(), env...), EnvOverrides: map[string]string{"PI_CODING_AGENT_DIR": s.PiDir}}, Provider: snap.Model.Provider, Model: snap.Model.ID}
+		cfg := workspace.GenerationConfig{Pi: pirpc.Config{Executable: x.Agent.PiBinary(), WorkspaceDir: s.Home, Environment: append(os.Environ(), env...), EnvOverrides: s.PiEnvOverrides()}, Provider: snap.Model.Provider, Model: snap.Model.ID}
 		return workspace.GenerateReportDraftRPC(ctx, cfg, string(kind), notes)
 	}, Text: x.UI.text, ModelLabel: func() string {
 		if name := x.UI.Model.CurrentModel.Name; name != "" {
@@ -240,6 +252,7 @@ func NewController(o RunOptions) (*Controller, error) {
 	x.bindGenerators(o.Workspace)
 	x.Git.Refresh()
 	x.watcher = workspace.WatchWorkspace(context.Background(), o.Workspace, 500*time.Millisecond)
+	o.Diagnostics.Record(diagnosticlog.EventControllerInit, diagnosticlog.ResultOK, 0)
 	return x, nil
 }
 func (x *Controller) enqueue(f func()) {
@@ -318,20 +331,43 @@ func (x *Controller) View(c *ui.Context) {
 	c.After(heartbeatDelay(active))
 }
 func (x *Controller) SetWorkspace(path string) {
+	started := time.Now()
+	x.diagnostics.Record(diagnosticlog.EventWorkspaceSelect, diagnosticlog.ResultStarted, 0)
 	if path == "" {
+		x.diagnostics.Record(diagnosticlog.EventWorkspaceSelect, diagnosticlog.ResultCancelled, time.Since(started))
 		return
 	}
 	if !x.sessionGate.TryRLock() {
+		x.diagnostics.Record(diagnosticlog.EventWorkspaceSelect, diagnosticlog.ResultBusy, time.Since(started))
 		x.UI.Notify("Runtime maintenance is in progress. Try again when it finishes.", false)
 		return
 	}
 	defer x.sessionGate.RUnlock()
+	x.diagnostics.Record(diagnosticlog.EventWorkspaceServices, diagnosticlog.ResultStarted, 0)
 	x.changeWorkspaceServices(path)
-	x.UI.save(x.Store.AddWorkspace(path))
-	x.UI.save(x.Store.SaveLastWorkspace(path))
+	x.diagnostics.Record(diagnosticlog.EventWorkspaceServices, diagnosticlog.ResultOK, time.Since(started))
+	x.diagnostics.Record(diagnosticlog.EventWorkspacePreferences, diagnosticlog.ResultStarted, 0)
+	addErr, lastErr := x.Store.AddWorkspace(path), x.Store.SaveLastWorkspace(path)
+	x.UI.save(addErr)
+	x.UI.save(lastErr)
 	x.UI.Workspaces = x.Store.Workspaces()
-	x.UI.save(x.Agent.NewSession(path))
+	result := diagnosticlog.ResultOK
+	if addErr != nil || lastErr != nil {
+		result = diagnosticlog.ResultError
+	}
+	x.diagnostics.Record(diagnosticlog.EventWorkspacePreferences, result, time.Since(started))
+	x.diagnostics.Record(diagnosticlog.EventWorkspaceSession, diagnosticlog.ResultStarted, 0)
+	sessionErr := x.Agent.NewSession(path)
+	x.UI.save(sessionErr)
+	sessionResult := diagnosticlog.ResultOK
+	if sessionErr != nil {
+		sessionResult, result = diagnosticlog.ResultError, diagnosticlog.ResultError
+	}
+	x.diagnostics.Record(diagnosticlog.EventWorkspaceSession, sessionResult, time.Since(started))
+	x.diagnostics.Record(diagnosticlog.EventWorkspaceFiles, diagnosticlog.ResultStarted, 0)
 	x.UI.RefreshFiles()
+	x.diagnostics.Record(diagnosticlog.EventWorkspaceFiles, diagnosticlog.ResultOK, time.Since(started))
+	x.diagnostics.Record(diagnosticlog.EventWorkspaceSelect, result, time.Since(started))
 }
 func (x *Controller) changeWorkspaceServices(path string) {
 	x.workspace = path
@@ -455,7 +491,16 @@ func (x *Controller) Action(a Action) {
 	case "SetWorkspace":
 		x.SetWorkspace(a.Value)
 	case "BrowseWorkspace":
+		started := time.Now()
+		x.diagnostics.Record(diagnosticlog.EventWorkspaceBrowse, diagnosticlog.ResultStarted, 0)
 		p, err := native.BrowseWorkspace(u.Window, x.workspace)
+		result := diagnosticlog.ResultOK
+		if err != nil {
+			result = diagnosticlog.ResultError
+		} else if p == "" {
+			result = diagnosticlog.ResultCancelled
+		}
+		x.diagnostics.Record(diagnosticlog.EventWorkspaceBrowse, result, time.Since(started))
 		e = err
 		if p != "" {
 			x.SetWorkspace(p)
@@ -558,7 +603,7 @@ func (x *Controller) Action(a Action) {
 	case "Login":
 		e = m.StartLogin(a.Value, str("method"))
 	case "LoginTerminal":
-		e = x.loginProviderTerminal(a.Value, native.OpenTerminalProgram)
+		e = x.loginProviderTerminal(a.Value, native.OpenTerminalProgramWithEnvironment)
 	case "Logout":
 		e = m.Logout(a.Value)
 	case "CancelLogin":
@@ -792,6 +837,7 @@ func Run(o RunOptions) error {
 		options.Content = ui.View(x.View)
 		w := x.attachWindow(func() *mygo.Window { return mygo.NewWindow(options) })
 		w.OnReadyToShow(func() {
+			o.Diagnostics.Record(diagnosticlog.EventNativeRun, diagnosticlog.ResultOK, 0)
 			if o.Smoke != nil {
 				visible := !w.IsDestroyed() && w.IsVisible()
 				o.Smoke.WindowReady(visible)
@@ -867,6 +913,7 @@ func Run(o RunOptions) error {
 		}
 		return appbundle.SmokeSnapshot{Connected: snapshot.Connected && snapshot.RuntimeID == process.Key && snapshot.ActiveSession.ID == process.SessionID, Alive: process.Alive, Loading: process.Loading, PID: process.PID, SessionID: snapshot.ActiveSession.ID, RuntimeID: snapshot.RuntimeID, Launcher: process.Launcher}
 	}, mygo.App.Quit)
+	o.Diagnostics.Record(diagnosticlog.EventNativeRun, diagnosticlog.ResultStarted, 0)
 	return mygo.App.Run()
 }
 
@@ -874,7 +921,7 @@ func (x *Controller) bindGenerators(dir string) {
 	config := func() (workspace.GenerationConfig, error) {
 		snap := x.Agent.Snapshot()
 		env, e := workbench.New(x.Store, dir).SecretEnv()
-		return workspace.GenerationConfig{Pi: pirpc.Config{Executable: x.Agent.PiBinary(), WorkspaceDir: dir, Environment: append(os.Environ(), env...), EnvOverrides: map[string]string{"PI_CODING_AGENT_DIR": x.Store.PiDir}}, Provider: snap.Model.Provider, Model: snap.Model.ID}, e
+		return workspace.GenerationConfig{Pi: pirpc.Config{Executable: x.Agent.PiBinary(), WorkspaceDir: dir, Environment: append(os.Environ(), env...), EnvOverrides: x.Store.PiEnvOverrides()}, Provider: snap.Model.Provider, Model: snap.Model.ID}, e
 	}
 	x.Git.Options.GenerateCommitResult = func(ctx context.Context, stagedOnly bool) (workspace.GeneratedText, error) {
 		if !x.sessionGate.TryRLock() {

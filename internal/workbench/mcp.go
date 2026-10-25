@@ -370,18 +370,35 @@ func (s *Service) SaveSecret(name, value string) error {
 }
 func (s *Service) Redact(text string) string {
 	var m map[string]string
+	var values []string
 	if s.Preferences.Read("mcp-secrets.json", &m) == nil {
-		values := make([]string, 0, len(m))
-		for _, v := range m {
-			if v != "" {
-				values = append(values, v)
+		for _, value := range m {
+			if value != "" {
+				values = append(values, value)
 			}
 		}
-		sort.Slice(values, func(i, j int) bool { return len(values[i]) > len(values[j]) })
-		for _, v := range values {
-			text = strings.ReplaceAll(text, v, "••••••••")
+	}
+	// Normal Pi launches inherit provider/cloud credentials. Helpers must not
+	// expose them if a child includes an environment value in failure output.
+	for _, entry := range s.baseEnvironment() {
+		key, value, ok := strings.Cut(entry, "=")
+		if !ok || value == "" {
+			continue
+		}
+		upper := strings.ToUpper(key)
+		for _, marker := range []string{"TOKEN", "SECRET", "PASSWORD", "PASSWD", "CREDENTIAL", "API_KEY", "APIKEY", "ACCESS_KEY", "PRIVATE_KEY", "AUTHORIZATION"} {
+			if strings.Contains(upper, marker) {
+				values = append(values, value)
+				break
+			}
 		}
 	}
+	sort.Slice(values, func(i, j int) bool { return len(values[i]) > len(values[j]) })
+	pairs := make([]string, 0, len(values)*2)
+	for _, value := range values {
+		pairs = append(pairs, value, "••••••••")
+	}
+	text = strings.NewReplacer(pairs...).Replace(text)
 	return bearer.ReplaceAllString(text, "Bearer ••••••••")
 }
 func SecretReferences(text string) []string {

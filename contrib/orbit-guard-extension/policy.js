@@ -101,13 +101,13 @@ export function decide(mode, toolName, allowlist = []) {
 
 /** The path Orbit writes the active mode to. */
 export function modeFilePath() {
-  const home = process.env.HOME || process.env.USERPROFILE || os.homedir() || ".";
+  const home = process.env.ORBIT_PREFERENCES_HOME || process.env.HOME || process.env.USERPROFILE || os.homedir() || ".";
   return path.join(home, ".orbit-pi", "access.json");
 }
 
 /** The path the "always allow" decisions live in. */
 export function allowlistPath() {
-  const home = process.env.HOME || process.env.USERPROFILE || os.homedir() || ".";
+  const home = process.env.ORBIT_PREFERENCES_HOME || process.env.HOME || process.env.USERPROFILE || os.homedir() || ".";
   return path.join(home, ".orbit-pi", "access-allow.json");
 }
 

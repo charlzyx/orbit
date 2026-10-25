@@ -14,16 +14,27 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import test, { beforeEach } from "node:test";
+import test, { beforeEach, afterEach } from "node:test";
 
 import activate, { pendingTitle } from "./index.js";
 
 let home;
+let previousEnvironment;
 
 beforeEach(() => {
+  previousEnvironment = Object.fromEntries(["HOME", "USERPROFILE", "ORBIT_PREFERENCES_HOME", "ORBIT_WORKFLOW_MODE"].map((key) => [key, process.env[key]]));
+  delete process.env.ORBIT_PREFERENCES_HOME;
   home = fs.mkdtempSync(path.join(os.tmpdir(), "orbit-title-entry-"));
   fs.mkdirSync(path.join(home, ".orbit-pi"), { recursive: true });
-  process.env.HOME = home;
+  process.env.HOME = process.env.USERPROFILE = home;
+});
+
+afterEach(() => {
+  for (const [key, value] of Object.entries(previousEnvironment)) {
+    if (value === undefined) delete process.env[key];
+    else process.env[key] = value;
+  }
+  fs.rmSync(home, { recursive: true, force: true });
 });
 
 function setConfig(config) {
@@ -278,4 +289,27 @@ test("a failed ask is retried on the next settle", async () => {
   await pi.fire("agent_settled", {}, ctx);
   await pendingTitle();
   assert.deepEqual(pi.state.set, ["Fix login redirect"]);
+});
+
+test("ORBIT_PREFERENCES_HOME overrides HOME for title settings", async () => {
+  setConfig({ enabled: true });
+  const privateHome = path.join(home, "private-orbit");
+  const preferences = path.join(privateHome, ".orbit-pi");
+  fs.mkdirSync(preferences, { recursive: true });
+  const config = path.join(preferences, "auto-title.json");
+  fs.writeFileSync(config, JSON.stringify({ enabled: false }));
+  process.env.ORBIT_PREFERENCES_HOME = privateHome;
+  const pi = fakePi();
+  activate(pi);
+  const ctx = fakeCtx();
+  await pi.fire("agent_settled", {}, ctx);
+  await pendingTitle();
+  assert.equal(ctx.calls.length, 0, "private disabled setting wins over normal HOME");
+  fs.writeFileSync(config, JSON.stringify({ enabled: true }));
+  const nextSession = fakePi();
+  activate(nextSession);
+  await nextSession.fire("agent_settled", {}, ctx);
+  await pendingTitle();
+  assert.equal(ctx.calls.length, 1, "a new session reads the updated private preference");
+  assert.deepEqual(nextSession.state.set, ["Fix login redirect"]);
 });

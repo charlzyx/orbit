@@ -65,6 +65,7 @@ type Manager struct {
 	sessionIndex       SessionIndex
 	configuredBinary   atomic.Value
 	options            Options
+	configurationErr   error
 	mu                 sync.Mutex
 	sessions           map[string]*liveSession
 	diskRows           []SessionRow
@@ -90,12 +91,7 @@ func NewManager(options Options) *Manager {
 		overrides[key] = value
 	}
 	options.EnvOverrides = overrides
-	if options.Home == "" {
-		options.Home, _ = os.UserHomeDir()
-	}
-	if options.SessionDir == "" {
-		options.SessionDir = filepath.Join(options.Home, ".pi", "agent", "sessions")
-	}
+	configurationErr := resolvePiOptions(&options)
 	if options.MaxParked <= 0 {
 		options.MaxParked = 6
 	}
@@ -106,10 +102,12 @@ func NewManager(options Options) *Manager {
 		options.CommandTimeout = 30 * time.Second
 	}
 	ctx, cancel := context.WithCancel(context.Background())
-	manager := &Manager{options: options, sessions: map[string]*liveSession{}, ctx: ctx, cancel: cancel, workflowStore: preferences.New(options.Home)}
+	manager := &Manager{options: options, configurationErr: configurationErr, sessions: map[string]*liveSession{}, ctx: ctx, cancel: cancel, workflowStore: preferences.New(options.Home)}
 	manager.patchPolicyEnabled = manager.workflowStore.RPCPatches().Enabled && !options.DisablePatches && !patchEnvironmentDisabled(options)
 	manager.configuredBinary.Store(options.PiBinary)
-	manager.ReloadSessions()
+	if configurationErr == nil {
+		manager.ReloadSessions()
+	}
 	return manager
 }
 func (m *Manager) changed() {
@@ -133,6 +131,9 @@ func (m *Manager) Open(workspace, sessionPath string) error {
 	return m.open(workspace, sessionPath, "")
 }
 func (m *Manager) open(workspace, sessionPath, pendingWorkflow string) error {
+	if m.configurationErr != nil {
+		return m.configurationErr
+	}
 	if strings.TrimSpace(workspace) == "" {
 		return errors.New("workspace is required")
 	}
@@ -216,7 +217,7 @@ func (m *Manager) start(key string, entry *liveSession, workspace, path string) 
 		m.changed()
 	}
 	extensions, status := prepareExtensions(options)
-	overrides := map[string]string{"HOME": m.options.Home, "USERPROFILE": m.options.Home}
+	overrides := m.piEnvOverrides()
 	var redactions []string
 	secretNames := map[string]bool{}
 	if m.options.ResolveChildEnv != nil {
@@ -255,9 +256,9 @@ func (m *Manager) start(key string, entry *liveSession, workspace, path string) 
 	m.mu.Lock()
 	entry.redactions = redactions
 	m.mu.Unlock()
-	// Align Pi and the UI on an explicitly chosen HOME without copying credentials.
-	if _, set := overrides["PI_CODING_AGENT_DIR"]; !set {
-		overrides["PI_CODING_AGENT_DIR"] = filepath.Join(m.options.Home, ".pi", "agent")
+	// Resolved identity paths win over raw/relative env spellings and MCP secrets.
+	for key, value := range m.piEnvOverrides() {
+		overrides[key] = value
 	}
 	config := pirpc.Config{Executable: options.PiBinary, PrefixArgs: m.options.PiPrefixArgs, WorkspaceDir: workspace, SessionDir: m.options.SessionDir, Extensions: extensions, Args: m.options.PiArgs, Environment: m.options.Environment, EnvOverrides: overrides, TrustProject: true, Offline: m.options.Offline, NoSession: m.options.NoSession}
 	if path == "" {

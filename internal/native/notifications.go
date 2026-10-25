@@ -52,7 +52,10 @@ func LoadNotificationPrefs(path string) (NotificationPrefs, error) {
 }
 func (p NotificationPrefs) Save(path string) error { return atomicJSON(path, p) }
 func PreferencePath(name string) string {
-	home, _ := os.UserHomeDir()
+	home := os.Getenv("ORBIT_PREFERENCES_HOME")
+	if home == "" {
+		home, _ = os.UserHomeDir()
+	}
 	return filepath.Join(home, ".orbit-pi", name)
 }
 func atomicJSON(path string, value any) error {

@@ -17,23 +17,23 @@ import (
 // Store is a concurrency-safe settings repository. Home and PiDir are explicit so
 // tests never borrow credentials or write to the user's actual configuration.
 type Store struct {
-	Home, RootDir, PiDir string
-	mu                   sync.Mutex
+	Home, RootDir, UserHome, PiDir string
+	mu                             sync.Mutex
 }
 
 func New(home string) *Store {
-	return &Store{Home: home, RootDir: filepath.Join(home, ".orbit-pi"), PiDir: filepath.Join(home, ".pi", "agent")}
+	return NewWithPi(home, home, "")
 }
 func Default() (*Store, error) {
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return nil, err
 	}
-	s := New(home)
-	if dir := os.Getenv("PI_CODING_AGENT_DIR"); dir != "" {
-		s.PiDir = dir
+	configured := os.Getenv("PI_CODING_AGENT_DIR")
+	if err := ValidatePiDir(configured); err != nil {
+		return nil, err
 	}
-	return s, nil
+	return NewWithPi(home, home, configured), nil
 }
 func (s *Store) path(name string) (string, error) {
 	if name == "" || filepath.Base(name) != name || name == "." || name == ".." {

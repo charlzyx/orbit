@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/charlzyx/orbit/internal/preferences"
 	"github.com/charlzyx/orbit/internal/runtimepath"
 )
 
@@ -26,6 +27,9 @@ type ModelCatalogOptions struct {
 // RefreshPiModelCatalogWithConfig runs only Pi's catalog refresh command, never
 // a shell or installer. It leaves restart/resume and the busy gate to the host.
 func RefreshPiModelCatalogWithConfig(ctx context.Context, options ModelCatalogOptions) (CommandOutput, error) {
+	if err := preferences.ValidatePiDir(options.PiDir); err != nil {
+		return CommandOutput{}, err
+	}
 	env := options.Environment
 	if env == nil {
 		env = os.Environ()
@@ -50,7 +54,7 @@ func RefreshPiModelCatalogWithConfig(ctx context.Context, options ModelCatalogOp
 		values["USERPROFILE"] = options.Home
 	}
 	if options.PiDir != "" {
-		values["PI_CODING_AGENT_DIR"] = options.PiDir
+		values["PI_CODING_AGENT_DIR"] = preferences.ResolvePiDir(values["HOME"], options.PiDir)
 	} else if options.Home != "" {
 		values["PI_CODING_AGENT_DIR"] = filepath.Join(options.Home, ".pi", "agent")
 	}

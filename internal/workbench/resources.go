@@ -29,7 +29,7 @@ type skillRoot struct{ path, scope string }
 
 func (s *Service) skillRoots() []skillRoot {
 	var roots []skillRoot
-	homeAgents := filepath.Join(s.Preferences.Home, ".agents", "skills")
+	homeAgents := filepath.Join(s.Preferences.UserHome, ".agents", "skills")
 	if s.Workspace != "" {
 		roots = append(roots, skillRoot{filepath.Join(s.Workspace, ".pi", "skills"), "project"})
 		start := s.Workspace
@@ -451,7 +451,8 @@ func (s *Service) PluginAction(ctx context.Context, action, source, scope string
 	if scope == "project" && action != "update" {
 		args = append(args, "-l", "-a")
 	}
-	return s.Pi(ctx, args...)
+	out, err := s.Pi(ctx, args...)
+	return s.Redact(out), err
 }
 
 // PluginUpdate is an observed upstream version, never an installation promise.
@@ -684,7 +685,7 @@ func newerPluginVersion(a, b string) bool {
 func (s *Service) resourceProbe(ctx context.Context, dir, binary string, args ...string) (string, error) {
 	ctx, cancel := context.WithTimeout(ctx, 12*time.Second)
 	defer cancel()
-	env := append(os.Environ(), "HOME="+s.Preferences.Home, "PI_CODING_AGENT_DIR="+s.Preferences.PiDir, "PI_SKIP_VERSION_CHECK=1", "GIT_TERMINAL_PROMPT=0", "NO_COLOR=1", "CI=1")
+	env := append(s.Preferences.PiEnvironment(s.baseEnvironment()), "PI_SKIP_VERSION_CHECK=1", "GIT_TERMINAL_PROMPT=0", "NO_COLOR=1", "CI=1")
 	preferred := ""
 	if s.PiBinary != "" && strings.ContainsAny(s.PiBinary, "/\\") {
 		preferred = filepath.Dir(s.PiBinary)

@@ -54,13 +54,20 @@ async function withHome(auth, fn) {
   const dir = fs.mkdtempSync(path.join(process.env.TMPDIR || "/tmp", "orbit-bridge-"));
   fs.mkdirSync(path.join(dir, ".pi", "agent"), { recursive: true });
   fs.writeFileSync(path.join(dir, ".pi", "agent", "auth.json"), JSON.stringify(auth));
-  const prev = process.env.HOME;
-  process.env.HOME = dir;
+  const prev = Object.fromEntries(["HOME", "USERPROFILE", "PI_CODING_AGENT_DIR"].map((key) => [key, process.env[key]]));
+  const previousFetch = globalThis.fetch;
+  process.env.HOME = process.env.USERPROFILE = dir;
+  delete process.env.PI_CODING_AGENT_DIR;
+  globalThis.fetch = () => { throw new Error("unexpected network request in bridge test"); };
   resetQuotaRuntime();
   try {
     return await fn();
   } finally {
-    process.env.HOME = prev;
+    for (const [key, value] of Object.entries(prev)) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
+    globalThis.fetch = previousFetch;
     resetQuotaRuntime();
     fs.rmSync(dir, { recursive: true, force: true });
   }

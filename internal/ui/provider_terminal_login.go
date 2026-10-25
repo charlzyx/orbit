@@ -2,13 +2,14 @@ package orbitui
 
 import (
 	"errors"
+	"github.com/charlzyx/orbit/internal/native"
 	"strings"
 )
 
 // The pinned source has a legacy pi /login escape hatch only when auth RPC is
 // unsupported. This does not start sign-in during page load or infer support
 // from a missing response. Native OpenTerminalProgram passes literal arguments.
-func (x *Controller) loginProviderTerminal(id string, open func(string, ...string) error) error {
+func (x *Controller) loginProviderTerminal(id string, open func(string, map[string]string, ...string) error) error {
 	if x.UI.Model.Auth.Support != "unsupported" {
 		return errors.New("terminal sign-in is available only when Pi authentication RPC is unsupported")
 	}
@@ -37,7 +38,9 @@ func (x *Controller) loginProviderTerminal(id string, open func(string, ...strin
 	if binary == "" {
 		binary = "pi"
 	}
-	if err := open(binary, "/login", id); err != nil {
+	env := x.Store.PiEnvOverrides()
+	env["PATH"] = native.AugmentedRuntimePath("")
+	if err := open(binary, env, "/login", id); err != nil {
 		return err
 	}
 	x.UI.Notify(strings.ReplaceAll(x.UI.Tr("settings.finish_sign_in_terminal"), "%{name}", name), false)

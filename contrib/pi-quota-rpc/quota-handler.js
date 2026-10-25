@@ -73,25 +73,45 @@ const orbitQuotaNumber = (value) => {
 
 // ── credential resolution (pi owns the secret) ─────────────────────────
 
-const orbitQuotaHome = () =>
-  process.env.HOME || process.env.USERPROFILE || "";
+// Match Pi's agent directory, independently of Orbit's preference home.
+// Imports stay dynamic because the RPC twin is injected into a function body.
+async function orbitQuotaAuthPath() {
+  const path = await import("node:path");
+  const os = await import("node:os");
+  const home = os.homedir();
+  let directory = process.env.PI_CODING_AGENT_DIR || path.join(home, ".pi", "agent");
+  if (directory === "~") {
+    directory = home;
+  } else if (directory.startsWith("~/") || (process.platform === "win32" && directory.startsWith("~\\"))) {
+    directory = path.join(home, directory.slice(2));
+  } else if (directory.startsWith("file://")) {
+    directory = (await import("node:url")).fileURLToPath(directory);
+  }
+  return path.resolve(directory, "auth.json");
+}
 
-let orbitQuotaAuthCache = null;
-let orbitQuotaAuthAt = 0;
+// A changed agent directory must never reuse another store's credentials.
+const orbitQuotaAuthCache = new Map();
 
 async function orbitQuotaReadAuth() {
+  let file;
+  try {
+    file = await orbitQuotaAuthPath();
+  } catch {
+    return {};
+  }
   const now = Date.now();
-  if (orbitQuotaAuthCache && now - orbitQuotaAuthAt < 5000) return orbitQuotaAuthCache;
+  const cached = orbitQuotaAuthCache.get(file);
+  if (cached && now - cached.at < 5000) return cached.auth;
+  let auth;
   try {
     const fs = await import("node:fs/promises");
-    const path = await import("node:path");
-    const file = path.join(orbitQuotaHome(), ".pi", "agent", "auth.json");
-    orbitQuotaAuthCache = JSON.parse(await fs.readFile(file, "utf8"));
+    auth = JSON.parse(await fs.readFile(file, "utf8"));
   } catch {
-    orbitQuotaAuthCache = {};
+    auth = {};
   }
-  orbitQuotaAuthAt = now;
-  return orbitQuotaAuthCache;
+  orbitQuotaAuthCache.set(file, { at: now, auth });
+  return auth;
 }
 
 /** Resolve the request credential plus the raw stored entry for special cases. */
@@ -1101,10 +1121,13 @@ async function orbitQuotaKimi(id) {
 }
 
 async function orbitQuotaReport(providerId) {
-  const cached = orbitQuotaCache.get(providerId);
-  if (cached && Date.now() - cached.at < ORBIT_QUOTA_TTL_MS) return cached.report;
+  // Reports also belong to an agent directory, not merely a provider name.
+  let cacheKey;
   let report;
   try {
+    cacheKey = JSON.stringify([await orbitQuotaAuthPath(), providerId]);
+    const cached = orbitQuotaCache.get(cacheKey);
+    if (cached && Date.now() - cached.at < ORBIT_QUOTA_TTL_MS) return cached.report;
     const adapter = orbitQuotaAdapters[providerId];
     if (!adapter) {
       report = {
@@ -1131,7 +1154,7 @@ async function orbitQuotaReport(providerId) {
     };
   }
   report.fetchedAt = Date.now();
-  orbitQuotaCache.set(providerId, { at: Date.now(), report });
+  if (cacheKey) orbitQuotaCache.set(cacheKey, { at: Date.now(), report });
   return report;
 }
 

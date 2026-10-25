@@ -2,13 +2,24 @@ KNOWN LIMITS / 已知限制 — experimental Finder app
 
 - Future macOS builds support Apple Silicon (arm64) only. Existing Intel
   releases and assets remain unchanged.
+- The reported workspace-selection unresponsiveness is NOT confirmed fixed.
+  This .4 build restores ordinary Pi configuration inheritance and adds bounded
+  private diagnostic logs; it is not a verified workspace-hang repair.
+- Pi now uses the launch user's normal ~/.pi/agent (or PI_CODING_AGENT_DIR).
+  Orbit does not copy credentials. Stock Pi may perform its normal configuration
+  migrations, settings writes and OAuth refresh. Orbit preferences and the
+  versioned bundled runtime stay in private Application Support app data.
+- App diagnostics contain allowlisted stages/results/timings, not conversation
+  text, prompts, credentials, environment dumps or workspace paths. They are
+  stored locally in the private app data folder and are not uploaded by the app.
 - The file-open crash found in .2 is corrected: the main editor no longer
   mounts a duplicate Explorer tree. Whole-app regressions and fresh hosted
   Linux native first-file/two-tab captures passed. This is not a claim of
   complete editor acceptance on macOS. The right Explorer resize handle and
   source toolbar/geometry alignment are still incomplete.
 - Full 139-feature source-derived acceptance is still open. No pixel-perfect
-  claim: all 16 older published-state native comparison pairs differed.
+  claim: all 25 examined native comparison pairs differed; a matching screenshot
+  is not a substitute for complete functional and native macOS acceptance.
 - Review staged+edited-file duplication and hidden-window heartbeat have later
   code fixes with regression tests in this version. Their native parity is NOT
   accepted merely from those tests. Usage geometry has no fresh accepted pair.
@@ -26,4 +37,5 @@ KNOWN LIMITS / 已知限制 — experimental Finder app
   claim of exhaustive legal clearance. Read Resources/Licenses and provenance.
 
 这是便于直接安装启动的实验版，不等于全功能、像素一致或人工 Mac 验收完成。
+工作区选择后无响应的问题尚未确认修复；本次重新打包主要恢复 Pi 配置继承并增加有大小上限的本地诊断日志。
 已包含的 Review/心跳代码修复也不代表原生交互已经逐项验收。

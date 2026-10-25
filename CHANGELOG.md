@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### In progress
 
+- Correct the experimental macOS app’s Pi configuration isolation: normal launches now use the existing user HOME and `PI_CODING_AGENT_DIR`/`~/.pi/agent`, while keeping Orbit test preferences and the copied runtime private. Align RPC/catalog/generator/MCP/resources, terminal sign-in and quota paths; retain explicit `--home` isolation and credential-free opt-in smoke instrumentation. Disposable offline Pi 1.4.0 RPC verifies existing model/default inheritance across repeated launches. Normal stock Pi writes remain enabled; no Orbit credential/config migration is added.
+
 - Native Skills/Plugins/MCP and Runtime process settings, source-correct Usage accounting/filters, procedural/photo backdrops, typed transcript/tool components, and composer autocomplete are implemented with scoped regressions. Additional interaction and visual gaps remain explicit in the source-first checklist.
 - The canonical Go build verifies a tiny attributed MyGo composer compatibility patch for live caret, Unicode range replacement and separate undo transactions. It uses a temporary dependency copy and never alters global module caches.
 - Checklist-driven regressions cover650ms Review feedback, worktree dismissal focus, failed-save retention, honest discard errors, and completed versus in-flight turn checkpoints. Deliberate safety deviations are listed separately, not passed as strict equivalence.

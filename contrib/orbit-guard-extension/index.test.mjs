@@ -13,21 +13,32 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import test, { beforeEach } from "node:test";
+import test, { beforeEach, afterEach } from "node:test";
 
 import activate from "./index.js";
 import { OPTION_ALLOW_ONCE, OPTION_ALWAYS_ALLOW, OPTION_DENY } from "./policy.js";
 
 let home;
+let previousEnvironment;
 let selectCalls;
 let selectResult;
 
 beforeEach(() => {
+  previousEnvironment = Object.fromEntries(["HOME", "USERPROFILE", "ORBIT_PREFERENCES_HOME", "ORBIT_WORKFLOW_MODE"].map((key) => [key, process.env[key]]));
+  delete process.env.ORBIT_PREFERENCES_HOME;
   home = fs.mkdtempSync(path.join(os.tmpdir(), "orbit-guard-entry-"));
   fs.mkdirSync(path.join(home, ".orbit-pi"), { recursive: true });
   selectCalls = 0;
   selectResult = OPTION_ALLOW_ONCE;
-  process.env.HOME = home;
+  process.env.HOME = process.env.USERPROFILE = home;
+});
+
+afterEach(() => {
+  for (const [key, value] of Object.entries(previousEnvironment)) {
+    if (value === undefined) delete process.env[key];
+    else process.env[key] = value;
+  }
+  fs.rmSync(home, { recursive: true, force: true });
 });
 
 function setMode(mode) {
@@ -202,4 +213,22 @@ test("parallel prompts are serialized, never stacked", async () => {
     pi.fire("tool_call", { toolName: "bash", input: { command: "b" } }, ctx),
   ]);
   assert.equal(maxActive, 1, "only one prompt in flight at a time");
+});
+
+test("ORBIT_PREFERENCES_HOME controls guard policy and allowlist independently of HOME", async () => {
+  setMode("full-access");
+  const privateHome = path.join(home, "private-orbit");
+  const preferences = path.join(privateHome, ".orbit-pi");
+  fs.mkdirSync(preferences, { recursive: true });
+  fs.writeFileSync(path.join(preferences, "access.json"), JSON.stringify({ mode: "supervised" }));
+  process.env.ORBIT_PREFERENCES_HOME = privateHome;
+  const pi = fakePi();
+  activate(pi);
+  selectResult = OPTION_ALWAYS_ALLOW;
+  await pi.fire("tool_call", { toolName: "bash", input: { command: "echo fixture" } }, fakeCtx());
+  assert.equal(selectCalls, 1, "private supervised policy overrides the normal home's full-access policy");
+  assert.ok(fs.existsSync(path.join(preferences, "access-allow.json")));
+  assert.equal(fs.existsSync(allowFile()), false, "normal HOME allowlist remains untouched");
+  await pi.fire("tool_call", { toolName: "bash", input: { command: "echo fixture again" } }, fakeCtx());
+  assert.equal(selectCalls, 1, "private allowlist is read on the next tool call");
 });

@@ -43,7 +43,7 @@ const MAX_TITLE_TOKENS = 1024;
 
 /** Config path resolved per call, so a changed `HOME` (tests) is honored. */
 function configPath() {
-  return path.join(os.homedir(), ".orbit-pi", CONFIG_FILE);
+  return path.join(process.env.ORBIT_PREFERENCES_HOME || os.homedir(), ".orbit-pi", CONFIG_FILE);
 }
 
 /** In-flight title request; Orbit's tests await it to stay deterministic. */

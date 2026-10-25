@@ -1,5 +1,5 @@
 // Package appbundle bootstraps the self-contained experimental macOS app.
-// Its private home separates app-managed state; it is not an OS sandbox.
+// Its private preference/runtime home is separate from ordinary shared Pi config.
 package appbundle
 
 import (
@@ -78,7 +78,9 @@ func (l Layout) Validate() error {
 
 type Options struct{ Home, Workspace, PiBinary string }
 type Prepared struct {
-	Home        string   `json:"home"`
+	Home        string   `json:"home"`      // private Orbit preferences/runtime
+	UserHome    string   `json:"user_home"` // actual Pi HOME
+	PiAgentDir  string   `json:"pi_agent_dir"`
 	Workspace   string   `json:"workspace"`
 	PiBinary    string   `json:"-"`
 	Environment []string `json:"-"`
@@ -117,6 +119,22 @@ func (l Layout) Prepare(realHome string, o Options, environment []string) (Prepa
 		return p, err
 	}
 	p.Home, p.PiBinary = home, o.PiBinary
+	p.UserHome = realHome
+	configuredPiDir := ""
+	for _, entry := range environment {
+		if key, value, ok := strings.Cut(entry, "="); ok && key == "PI_CODING_AGENT_DIR" {
+			configuredPiDir = value
+		}
+	}
+	if o.Home != "" {
+		// An explicit --home is an isolated configuration override, not the
+		// default private Orbit-preferences directory and not a security sandbox.
+		p.UserHome, configuredPiDir = home, ""
+	}
+	if err := preferences.ValidatePiDir(configuredPiDir); err != nil {
+		return p, err
+	}
+	p.PiAgentDir = preferences.ResolvePiDir(p.UserHome, configuredPiDir)
 	if p.PiBinary == "" {
 		settings := filepath.Join(home, ".orbit-pi", "runtime.json")
 		if err := rejectSymlinks(home, settings); err != nil {
@@ -185,14 +203,23 @@ func (l Layout) Prepare(realHome string, o Options, environment []string) (Prepa
 		}
 		return p, fmt.Errorf("Your selected workspace is unavailable: %s. Reconnect it or select another folder", workspace)
 	}
-	// Reject redirected preference/Pi trees before either subsystem can write.
-	for _, sub := range []string{".orbit-pi", ".pi", ".pi/agent", ".pi/agent/auth.json", ".pi/agent/settings.json", ".pi/agent/models.json", ".config", ".cache", ".local/share", ".local/state"} {
+	// Protect only app-owned state. Ordinary Pi configuration may legitimately
+	// use symlinks; Orbit neither copies it nor performs startup migrations.
+	privatePaths := []string{".orbit-pi"}
+	privateDirs := []string{home, filepath.Join(home, ".orbit-pi")}
+	if o.Home != "" {
+		privatePaths = append(privatePaths, ".pi", ".pi/agent", ".pi/agent/auth.json", ".pi/agent/settings.json", ".pi/agent/models.json", ".config", ".cache", ".local/share", ".local/state")
+		for _, sub := range []string{".pi/agent", ".config", ".cache", ".local/share", ".local/state"} {
+			privateDirs = append(privateDirs, filepath.Join(home, filepath.FromSlash(sub)))
+		}
+	}
+	for _, sub := range privatePaths {
 		dir := filepath.Join(home, filepath.FromSlash(sub))
 		if err := rejectSymlinks(home, dir); err != nil {
 			return p, err
 		}
 	}
-	for _, dir := range []string{home, filepath.Join(home, ".orbit-pi"), filepath.Join(home, ".pi", "agent"), filepath.Join(home, ".config"), filepath.Join(home, ".cache"), filepath.Join(home, ".local", "share"), filepath.Join(home, ".local", "state")} {
+	for _, dir := range privateDirs {
 		if err := os.MkdirAll(dir, 0700); err != nil {
 			return p, fmt.Errorf("Cannot create private app settings: %w", err)
 		}
@@ -218,10 +245,7 @@ func (l Layout) Prepare(realHome string, o Options, environment []string) (Prepa
 		}
 	}
 	p.Workspace = workspace
-	p.Environment = l.Environment(home, p.PiBinary, environment)
-	// MyGo relaunch inherits our deliberately private HOME. Keep the resolved
-	// app home explicit so relaunch cannot nest a second Application Support tree.
-	p.Environment = append(p.Environment, "ORBIT_BUNDLE_STATE_HOME="+home)
+	p.Environment = l.Environment(p, environment)
 	return p, nil
 }
 
@@ -271,27 +295,50 @@ func (l Layout) checkWritableLocation(path string) error {
 	}
 }
 
-// Environment is an allowlist, not inherited auth/configuration. It intentionally
-// does not include API keys, SSH agents, cloud profiles, proxies or Node options.
-// OS keychain access and workspace tools are not sandboxed by these variables.
-func (l Layout) Environment(home, pi string, ambient []string) []string {
-	env := []string{}
+// Environment keeps ordinary Pi credentials/configuration in their normal
+// locations and inherits the launch environment. Only bundled runtime selection
+// and private Orbit-extension preferences are overridden. Never log this slice.
+func (l Layout) Environment(p Prepared, ambient []string) []string {
+	values := map[string]string{}
 	for _, entry := range ambient {
-		key, _, ok := strings.Cut(entry, "=")
-		if ok && (key == "LANG" || key == "LC_ALL" || key == "LC_CTYPE" || key == "TZ" || key == "TMPDIR" || key == "__CF_USER_TEXT_ENCODING") {
-			env = append(env, entry)
+		if key, value, ok := strings.Cut(entry, "="); ok {
+			values[key] = value
 		}
 	}
-	for _, entry := range []string{
-		"HOME=" + home, "USERPROFILE=" + home, "PI_CODING_AGENT_DIR=" + filepath.Join(home, ".pi", "agent"),
-		"PATH=" + filepath.Dir(pi) + ":" + filepath.Dir(l.Node) + ":" + filepath.Dir(l.Pi) + ":/usr/bin:/bin:/usr/sbin:/sbin",
-		"PI_BIN=" + pi, "MYGO_GHOSTTY_VT=" + l.Ghostty, "PI_SKIP_VERSION_CHECK=1",
-		"XDG_CONFIG_HOME=" + filepath.Join(home, ".config"), "XDG_CACHE_HOME=" + filepath.Join(home, ".cache"),
-		"XDG_DATA_HOME=" + filepath.Join(home, ".local", "share"), "XDG_STATE_HOME=" + filepath.Join(home, ".local", "state"),
-		"npm_config_cache=" + filepath.Join(home, ".cache", "npm"), "npm_config_userconfig=" + filepath.Join(home, ".npmrc"),
-		"npm_config_prefix=" + filepath.Join(home, ".local"), "SHELL=/bin/zsh",
-	} {
-		env = append(env, entry)
+	store := preferences.NewWithPi(p.Home, p.UserHome, p.PiAgentDir)
+	for key, value := range store.PiEnvOverrides() {
+		values[key] = value
+	}
+	path := values["PATH"]
+	if path == "" {
+		path = "/usr/bin:/bin:/usr/sbin:/sbin"
+	}
+	// Relaunch inherits this environment; do not grow PATH on every relaunch.
+	paths := append([]string{filepath.Dir(p.PiBinary), filepath.Dir(l.Node), filepath.Dir(l.Pi)}, filepath.SplitList(path)...)
+	seen := map[string]bool{}
+	var unique []string
+	for _, directory := range paths {
+		if !seen[directory] {
+			unique = append(unique, directory)
+			seen[directory] = true
+		}
+	}
+	values["PATH"] = strings.Join(unique, string(os.PathListSeparator))
+	values["PI_BIN"], values["MYGO_GHOSTTY_VT"], values["PI_SKIP_VERSION_CHECK"] = p.PiBinary, l.Ghostty, "1"
+	if values["SHELL"] == "" {
+		values["SHELL"] = "/bin/zsh"
+	}
+	// Explicit --home keeps caches and package-manager state inside that override.
+	if p.Home == p.UserHome {
+		for key, sub := range map[string]string{"XDG_CONFIG_HOME": ".config", "XDG_CACHE_HOME": ".cache", "XDG_DATA_HOME": ".local/share", "XDG_STATE_HOME": ".local/state", "npm_config_cache": ".cache/npm", "npm_config_userconfig": ".npmrc", "npm_config_prefix": ".local"} {
+			values[key] = filepath.Join(p.Home, filepath.FromSlash(sub))
+		}
+	}
+	// An old private-HOME marker must never redirect a normal launch.
+	delete(values, "ORBIT_BUNDLE_STATE_HOME")
+	env := make([]string, 0, len(values))
+	for key, value := range values {
+		env = append(env, key+"="+value)
 	}
 	return env
 }
@@ -320,16 +367,6 @@ func FinderArguments(args []string) []string {
 		}
 	}
 	return out
-}
-
-// RelaunchHome recognizes only the private default home's marker paired with
-// the private HOME we set ourselves. An unrelated ambient variable is ignored.
-func RelaunchHome(home, marker string) string {
-	suffix := filepath.Join("Library", "Application Support", StateDirectory, "Home")
-	if marker != "" && filepath.IsAbs(marker) && filepath.Clean(marker) == filepath.Clean(home) && strings.HasSuffix(filepath.Clean(marker), string(filepath.Separator)+suffix) {
-		return marker
-	}
-	return ""
 }
 
 func (l Layout) seedWorkspace(workspace string) error {

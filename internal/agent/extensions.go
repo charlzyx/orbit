@@ -106,7 +106,7 @@ func atomicWrite(path string, data []byte) error {
 	}
 	return os.Rename(name, path)
 }
-func findPackageRoot(binary, home string) string {
+func findPackageRoot(binary, agentDir string) string {
 	path, err := exec.LookPath(binary)
 	if err == nil {
 		binary = path
@@ -131,7 +131,7 @@ func findPackageRoot(binary, home string) string {
 		}
 		directory = parent
 	}
-	install := filepath.Join(home, ".pi", "agent", "install")
+	install := filepath.Join(agentDir, "install")
 	if version, err := os.ReadFile(filepath.Join(install, "current-version")); err == nil {
 		root := filepath.Join(install, "releases", strings.TrimSpace(string(version)), "node_modules", "@earendil-works", "pi-coding-agent")
 		if _, err := os.Stat(filepath.Join(root, "package.json")); err == nil {
@@ -159,7 +159,7 @@ func applyPatches(options Options, resources fs.FS) PatchStatus {
 		root = configured
 	}
 	if root == "" {
-		root = findPackageRoot(binary, options.Home)
+		root = findPackageRoot(binary, options.PiAgentDir)
 	}
 	status.PackageRoot = root
 	if root == "" {

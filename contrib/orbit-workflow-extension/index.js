@@ -36,7 +36,7 @@ import {
 
 /** `~/.orbit-pi/workflow.json`, resolved per call so a test `HOME` is honored. */
 function storePath() {
-  return path.join(os.homedir(), ".orbit-pi", "workflow.json");
+  return path.join(process.env.ORBIT_PREFERENCES_HOME || os.homedir(), ".orbit-pi", "workflow.json");
 }
 
 /** The mode stored for `sessionId`, or `undefined` when absent/unreadable. */

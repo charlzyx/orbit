@@ -12,6 +12,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -36,6 +37,8 @@ type SmokeReport struct {
 	StartedAt     time.Time   `json:"started_at"`
 	Executable    string      `json:"executable"`
 	Home          string      `json:"home"`
+	UserHome      string      `json:"user_home"`
+	PiAgentDir    string      `json:"pi_agent_dir"`
 	Workspace     string      `json:"workspace"`
 	GhosttyPath   string      `json:"ghostty_path"`
 	PiPath        string      `json:"pi_path"`
@@ -84,7 +87,7 @@ func NewSmoke(path string, timeout time.Duration, l Layout, p Prepared) (*Smoke,
 	if _, err := os.Lstat(path + ".png"); err == nil || !errors.Is(err, os.ErrNotExist) {
 		return nil, errors.New("Smoke capture path already exists or cannot be inspected; choose a fresh path")
 	}
-	return &Smoke{path: path, timeout: timeout, report: SmokeReport{Status: "FAIL", PID: os.Getpid(), Architecture: runtime.GOARCH, StartedAt: time.Now().UTC(), Executable: l.Executable, Home: p.Home, Workspace: p.Workspace, GhosttyPath: l.Ghostty, PiPath: p.PiBinary, BundledPiPath: l.Pi, NodePath: l.Node}}, nil
+	return &Smoke{path: path, timeout: timeout, report: SmokeReport{Status: "FAIL", PID: os.Getpid(), Architecture: runtime.GOARCH, StartedAt: time.Now().UTC(), Executable: l.Executable, Home: p.Home, UserHome: p.UserHome, PiAgentDir: p.PiAgentDir, Workspace: p.Workspace, GhosttyPath: l.Ghostty, PiPath: p.PiBinary, BundledPiPath: l.Pi, NodePath: l.Node}}, nil
 }
 
 // WindowReady is called only by MyGo's OnReadyToShow after its first surface
@@ -229,4 +232,22 @@ func (s *Smoke) Capture(capture func() ([]byte, error)) {
 			s.report.Checks.NativeCapture = true
 		}()
 	})
+}
+
+// SmokeEnvironment keeps opt-in native CI instrumentation credential-free even
+// if LaunchServices supplies extra GUI-session variables. Normal user launches
+// do not use this allowlist and inherit their ordinary Pi environment.
+func SmokeEnvironment(ambient []string) []string {
+	var env []string
+	for _, entry := range ambient {
+		key, _, ok := strings.Cut(entry, "=")
+		if !ok {
+			continue
+		}
+		switch key {
+		case "HOME", "USERPROFILE", "PATH", "TMPDIR", "LANG", "LC_ALL", "LC_CTYPE", "TZ", "__CF_USER_TEXT_ENCODING", "PI_CODING_AGENT_DIR":
+			env = append(env, entry)
+		}
+	}
+	return append(env, "PI_OFFLINE=1", "PI_SKIP_VERSION_CHECK=1")
 }

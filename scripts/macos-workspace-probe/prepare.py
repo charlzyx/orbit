@@ -20,8 +20,8 @@ def prepare(output):
         ('func (x *Controller) View(c *ui.Context) {', 'func (x *Controller) View(c *ui.Context) {\n\tworkspaceProbeViewEnter()\n\tdefer workspaceProbeViewLeave()'),
         ('func (x *Controller) SetWorkspace(path string) {', 'func (x *Controller) SetWorkspace(path string) {\n\tworkspaceProbeStage("set_workspace.begin", path)\n\tdefer workspaceProbeStage("set_workspace.return", path)'),
         ('\tx.changeWorkspaceServices(path)\n', '\tworkspaceProbeStage("set_workspace.services.before", path)\n\tx.changeWorkspaceServices(path)\n\tworkspaceProbeStage("set_workspace.services.after", path)\n'),
-        ('\tx.UI.save(x.Agent.NewSession(path))', '\tworkspaceProbeStage("set_workspace.new_session.before", path)\n\tx.UI.save(x.Agent.NewSession(path))\n\tworkspaceProbeStage("set_workspace.new_session.after", path)'),
-        ('\tcase "BrowseWorkspace":\n\t\tp, err := native.BrowseWorkspace(u.Window, x.workspace)', '\tcase "BrowseWorkspace":\n\t\tworkspaceProbeStage("browse.before", x.workspace)\n\t\tp, err := native.BrowseWorkspace(u.Window, x.workspace)\n\t\tworkspaceProbeStage("browse.return", map[string]any{"path": p, "error": fmt.Sprint(err)})'),
+        ('\tsessionErr := x.Agent.NewSession(path)', '\tworkspaceProbeStage("set_workspace.new_session.before", path)\n\tsessionErr := x.Agent.NewSession(path)\n\tworkspaceProbeStage("set_workspace.new_session.after", path)'),
+        ('\t\tp, err := native.BrowseWorkspace(u.Window, x.workspace)', '\t\tworkspaceProbeStage("browse.before", x.workspace)\n\t\tp, err := native.BrowseWorkspace(u.Window, x.workspace)\n\t\tworkspaceProbeStage("browse.return", map[string]any{"path": p, "error": fmt.Sprint(err)})'),
         ('\t\tw.OnReadyToShow(func() {', '\t\tw.OnReadyToShow(func() {\n\t\t\tworkspaceProbeStart(x, w)'),
     ]
     for old, new in replacements: source = replace_once(source, old, new)

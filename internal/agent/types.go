@@ -13,7 +13,9 @@ type Options struct {
 	PiBinary           string
 	PiPrefixArgs       []string
 	PiArgs             []string
-	Home               string
+	Home               string // Orbit preferences and bundled extensions
+	UserHome           string // Pi HOME, independent of Orbit preferences
+	PiAgentDir         string // resolved PI_CODING_AGENT_DIR
 	SessionDir         string
 	Environment        []string
 	EnvOverrides       map[string]string

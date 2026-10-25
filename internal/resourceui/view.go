@@ -140,7 +140,7 @@ func (s *State) statusLine(c *ui.Context, count string) {
 }
 
 func (s *State) displayPath(path string) string {
-	home := s.service.Preferences.Home
+	home := s.service.Preferences.UserHome
 	if rel, err := filepath.Rel(home, path); err == nil && rel != ".." && !strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
 		if rel == "." {
 			return "~"

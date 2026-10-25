@@ -4,6 +4,7 @@ This fork is migrating the complete Orbit v0.2.12 workbench to Go and MyGo nativ
 
 - Run the new native app: `scripts/go-native.sh run ./cmd/orbit` (Go 1.27.3 and Python3; Pi1.4.0 must be installed separately).
 - Verify: `scripts/go-native.sh test -race ./...`; see [migration evidence and limitations](docs/mygo-migration/README.md) and the [source-first executable checklist](docs/mygo-migration/acceptance-checklist.md).
+- Pi models/auth/settings use the existing `PI_CODING_AGENT_DIR` (including `~`) or `~/.pi/agent`, including in the experimental macOS app. Only Orbit test preferences and the versioned bundled runtime copy remain private. Stock Pi can perform its normal migrations, auth refresh and settings/catalog writes; Orbit does not copy credentials or configuration into a private Pi store. `--home` remains an explicit isolated configuration override, not an environment/network sandbox. See [configuration inheritance](docs/mygo-migration/pi-configuration-inheritance.md).
 - Native UI uses MyGo directly, without a browser, webview, cgo or Rust sidecar. Desktop graphics libraries and the pinned Ghostty terminal runtime are platform dependencies.
 - No releases, production update feed, signing, upstream merges or deployments are configured by this migration.
 

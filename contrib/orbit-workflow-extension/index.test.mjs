@@ -13,17 +13,28 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import test, { beforeEach } from "node:test";
+import test, { beforeEach, afterEach } from "node:test";
 
 import activate, { resolveMode } from "./index.js";
 
 let home;
+let previousEnvironment;
 
 beforeEach(() => {
+  previousEnvironment = Object.fromEntries(["HOME", "USERPROFILE", "ORBIT_PREFERENCES_HOME", "ORBIT_WORKFLOW_MODE"].map((key) => [key, process.env[key]]));
+  delete process.env.ORBIT_PREFERENCES_HOME;
   home = fs.mkdtempSync(path.join(os.tmpdir(), "orbit-workflow-entry-"));
   fs.mkdirSync(path.join(home, ".orbit-pi"), { recursive: true });
-  process.env.HOME = home;
+  process.env.HOME = process.env.USERPROFILE = home;
   delete process.env.ORBIT_WORKFLOW_MODE;
+});
+
+afterEach(() => {
+  for (const [key, value] of Object.entries(previousEnvironment)) {
+    if (value === undefined) delete process.env[key];
+    else process.env[key] = value;
+  }
+  fs.rmSync(home, { recursive: true, force: true });
 });
 
 function writeStore(map) {
@@ -189,4 +200,23 @@ test("context keeps active guidance in Plan/Ask", async () => {
     fakeCtx(),
   );
   assert.equal(kept, undefined);
+});
+
+test("ORBIT_PREFERENCES_HOME overrides HOME and is re-read for workflow changes", async () => {
+  writeStore({ s1: "build" });
+  const privateHome = path.join(home, "private-orbit");
+  const preferences = path.join(privateHome, ".orbit-pi");
+  fs.mkdirSync(preferences, { recursive: true });
+  const store = path.join(preferences, "workflow.json");
+  fs.writeFileSync(store, JSON.stringify({ s1: "plan" }));
+  process.env.ORBIT_PREFERENCES_HOME = privateHome;
+  const pi = fakePi();
+  activate(pi);
+  await pi.fire("session_start", {}, fakeCtx());
+  assert.deepEqual(pi.state.tools, ["read", "bash", "grep"]);
+  assert.equal(resolveMode(fakeCtx()), "plan");
+  fs.writeFileSync(store, JSON.stringify({ s1: "build" }));
+  await pi.fire("before_agent_start", {}, fakeCtx());
+  assert.deepEqual(pi.state.tools, ["read", "bash", "grep", "edit", "write"]);
+  assert.equal(resolveMode(fakeCtx()), "build");
 });

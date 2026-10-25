@@ -245,7 +245,7 @@ func (m *Manager) RenameSavedSession(path, name string) error {
 		if temporary {
 			// Metadata-only process: no project resources, model calls, network refresh,
 			// tools, auto-title, quota bridge, or persistent credential changes.
-			client, err = pirpc.Start(pirpc.Config{Executable: m.PiBinary(), PrefixArgs: m.options.PiPrefixArgs, WorkspaceDir: row.Workspace, Environment: m.options.Environment, EnvOverrides: map[string]string{"HOME": m.options.Home, "USERPROFILE": m.options.Home, "PI_CODING_AGENT_DIR": filepath.Join(m.options.Home, ".pi", "agent")}, NoSession: true, Offline: true, Args: []string{"--no-extensions", "--no-skills", "--no-prompt-templates", "--no-context-files", "--no-tools"}})
+			client, err = pirpc.Start(pirpc.Config{Executable: m.PiBinary(), PrefixArgs: m.options.PiPrefixArgs, WorkspaceDir: row.Workspace, Environment: m.options.Environment, EnvOverrides: m.piEnvOverrides(), NoSession: true, Offline: true, Args: []string{"--no-extensions", "--no-skills", "--no-prompt-templates", "--no-context-files", "--no-tools"}})
 			if err != nil {
 				m.operationError(err)
 				return

@@ -15,6 +15,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/charlzyx/orbit/internal/preferences"
 	"github.com/charlzyx/orbit/internal/runtimepath"
 )
 
@@ -135,11 +136,8 @@ type PiInstallation struct {
 
 func (p PiInstallation) Installed() bool { return p.Bin != "" }
 func PiAgentDirectory() string {
-	if path := os.Getenv("PI_CODING_AGENT_DIR"); path != "" {
-		return path
-	}
 	home, _ := os.UserHomeDir()
-	return filepath.Join(home, ".pi", "agent")
+	return preferences.ResolvePiDir(home, os.Getenv("PI_CODING_AGENT_DIR"))
 }
 func ManagedPiMarkerValid(root string) bool {
 	raw, err := os.ReadFile(filepath.Join(root, "managed-install.json"))

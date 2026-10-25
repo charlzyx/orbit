@@ -14,7 +14,9 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
-import test, { beforeEach } from "node:test";
+import os from "node:os";
+import { pathToFileURL } from "node:url";
+import test, { beforeEach, afterEach } from "node:test";
 
 import {
   OllamaCloudParser,
@@ -24,10 +26,46 @@ import {
   quotaReport,
   quotaReports,
   quotaSanitize,
+  quotaStoredAuth,
   resetQuotaRuntime,
 } from "./adapters.js";
 
-beforeEach(() => resetQuotaRuntime());
+
+
+// Every case is isolated, including ones that resolve live-model auth first.
+// Never inherit a developer's alternate Pi configuration or make real requests.
+let fixtureHome;
+let previousEnvironment;
+let previousFetch;
+function restoreEnvironment(saved) {
+  for (const [key, value] of Object.entries(saved)) {
+    if (value === undefined) delete process.env[key];
+    else process.env[key] = value;
+  }
+}
+function writeAuth(directory, auth) {
+  fs.mkdirSync(directory, { recursive: true });
+  fs.writeFileSync(path.join(directory, "auth.json"), JSON.stringify(auth));
+}
+beforeEach(() => {
+  previousEnvironment = Object.fromEntries(["HOME", "USERPROFILE", "PI_CODING_AGENT_DIR", "ORBIT_PREFERENCES_HOME"].map((key) => [key, process.env[key]]));
+  previousFetch = globalThis.fetch;
+  fixtureHome = fs.mkdtempSync(path.join(os.tmpdir(), "orbit-quota-isolated-"));
+  process.env.HOME = process.env.USERPROFILE = fixtureHome;
+  delete process.env.PI_CODING_AGENT_DIR;
+  delete process.env.ORBIT_PREFERENCES_HOME;
+  writeAuth(path.join(fixtureHome, ".pi", "agent"), {});
+  globalThis.fetch = () => { throw new Error("unexpected network request in quota test"); };
+  resetQuotaRuntime();
+  configureQuotaAuth(null);
+});
+afterEach(() => {
+  resetQuotaRuntime();
+  configureQuotaAuth(null);
+  globalThis.fetch = previousFetch;
+  restoreEnvironment(previousEnvironment);
+  fs.rmSync(fixtureHome, { recursive: true, force: true });
+});
 
 /** A fetch stub returning one JSON body for any URL. */
 function jsonFetch(body, { status = 200 } = {}) {
@@ -58,13 +96,14 @@ async function withAuth(auth, fn) {
     path.join(dir, ".pi", "agent", "auth.json"),
     JSON.stringify(auth),
   );
-  const prev = process.env.HOME;
-  process.env.HOME = dir;
+  const prev = Object.fromEntries(["HOME", "USERPROFILE", "PI_CODING_AGENT_DIR"].map((key) => [key, process.env[key]]));
+  process.env.HOME = process.env.USERPROFILE = dir;
+  delete process.env.PI_CODING_AGENT_DIR;
   resetQuotaRuntime();
   try {
     return await fn();
   } finally {
-    process.env.HOME = prev;
+    restoreEnvironment(prev);
     resetQuotaRuntime();
     fs.rmSync(dir, { recursive: true, force: true });
   }
@@ -456,4 +495,68 @@ test("the local placeholder key is never sent to ollama.com", async () => {
     assert.equal(report.kind, "unsupported");
     assert.match(report.note, /API key|session cookie/);
   });
+});
+
+test("stored auth honors PI_CODING_AGENT_DIR over normal and Orbit homes", async () => {
+  const readAuth = quotaStoredAuth;
+  const custom = path.join(fixtureHome, "Custom Pi");
+  const privateHome = path.join(fixtureHome, "Orbit Private");
+  writeAuth(path.join(fixtureHome, ".pi", "agent"), { fixture: "normal-home" });
+  writeAuth(path.join(privateHome, ".pi", "agent"), { fixture: "wrong-private-home" });
+  writeAuth(custom, { fixture: "custom-pi" });
+  process.env.ORBIT_PREFERENCES_HOME = privateHome;
+  process.env.PI_CODING_AGENT_DIR = custom;
+  assert.deepEqual(await readAuth(), { fixture: "custom-pi" });
+  process.env.PI_CODING_AGENT_DIR = path.join(fixtureHome, "missing-pi");
+  assert.deepEqual(await readAuth(), {}, "a missing configured store must not fall back to another home");
+});
+
+test("stored auth expands tilde against Pi HOME, not Orbit preferences", async () => {
+  const readAuth = quotaStoredAuth;
+  writeAuth(fixtureHome, { fixture: "tilde-home" });
+  writeAuth(path.join(fixtureHome, "Agent State"), { fixture: "tilde-child" });
+  process.env.ORBIT_PREFERENCES_HOME = path.join(fixtureHome, "wrong-orbit-home");
+  process.env.PI_CODING_AGENT_DIR = "~";
+  assert.deepEqual(await readAuth(), { fixture: "tilde-home" });
+  process.env.PI_CODING_AGENT_DIR = "~/Agent State";
+  assert.deepEqual(await readAuth(), { fixture: "tilde-child" });
+  if (process.platform === "win32") {
+    process.env.PI_CODING_AGENT_DIR = "~\\Agent State";
+    assert.deepEqual(await readAuth(), { fixture: "tilde-child" });
+  }
+});
+
+test("credential and report caches stay scoped to the selected Pi directory", async () => {
+  const normal = path.join(fixtureHome, ".pi", "agent");
+  const custom = path.join(fixtureHome, "other-agent");
+  writeAuth(normal, { ollama: { type: "api_key", key: "synthetic-normal-key" } });
+  writeAuth(custom, { ollama: { type: "api_key", key: "synthetic-custom-key" } });
+  const requests = [];
+  const fetch = async (url, options) => {
+    requests.push(options.headers.Authorization);
+    return jsonFetch({ limits: { monthly: { usage: options.headers.Authorization === "Bearer synthetic-normal-key" ? 0.1 : 0.2 } } })(url);
+  };
+  globalThis.fetch = fetch;
+  const report = quotaReport;
+  assert.equal((await report("ollama")).windows[0].usedPercent, 10);
+  process.env.PI_CODING_AGENT_DIR = custom;
+  assert.equal((await report("ollama")).windows[0].usedPercent, 20);
+  process.env.PI_CODING_AGENT_DIR = path.join(fixtureHome, "missing-agent");
+  assert.equal((await report("ollama")).kind, "unsupported");
+  delete process.env.PI_CODING_AGENT_DIR;
+  assert.equal((await report("ollama")).windows[0].usedPercent, 10);
+  assert.deepEqual(requests, ["Bearer synthetic-normal-key", "Bearer synthetic-custom-key"]);
+});
+
+test("stored auth accepts a file URL agent directory without falling back on invalid URLs", async () => {
+  const readAuth = quotaStoredAuth;
+  const custom = path.join(fixtureHome, "Agent With Spaces");
+  writeAuth(custom, { fixture: "file-url" });
+  process.env.PI_CODING_AGENT_DIR = pathToFileURL(custom).href;
+  assert.deepEqual(await readAuth(), { fixture: "file-url" });
+  process.env.PI_CODING_AGENT_DIR = "file:///bad%2Fencoded-separator";
+  assert.deepEqual(await readAuth(), {});
+  const report = await quotaReport("ollama");
+  assert.equal(report.kind, "unsupported");
+  assert.equal(typeof report.error, "string", "invalid configuration is a report, not an uncaught exception");
 });

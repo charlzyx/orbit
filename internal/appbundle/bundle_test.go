@@ -89,7 +89,7 @@ func TestPreparePrivateFirstLaunchAndRepeat(t *testing.T) {
 	if err := realStore.Write("auth.json", map[string]string{"credential": "do-not-copy"}); err != nil {
 		t.Fatal(err)
 	}
-	p, err := l.Prepare(realHome, Options{}, []string{"LANG=en_US.UTF-8", "OPENAI_API_KEY=do-not-inherit", "SSH_AUTH_SOCK=/secret", "NODE_OPTIONS=--require=/secret", "HTTP_PROXY=secret", "PI_BIN=/other", "PI_CODING_AGENT_DIR=/normal"})
+	p, err := l.Prepare(realHome, Options{}, []string{"LANG=en_US.UTF-8", "OPENAI_API_KEY=synthetic-inherited-key", "SSH_AUTH_SOCK=/secret", "NODE_OPTIONS=--require=/secret", "HTTP_PROXY=secret", "PI_BIN=/other", "PI_CODING_AGENT_DIR=/normal"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -104,13 +104,16 @@ func TestPreparePrivateFirstLaunchAndRepeat(t *testing.T) {
 		t.Fatal("imported credentials")
 	}
 	env := envMap(p.Environment)
-	if env["HOME"] != want || env["MYGO_GHOSTTY_VT"] != l.Ghostty || env["PI_BIN"] != p.PiBinary || env["LANG"] != "en_US.UTF-8" {
+	if env["HOME"] != realHome || env["PI_CODING_AGENT_DIR"] != "/normal" || env["ORBIT_PREFERENCES_HOME"] != want || env["MYGO_GHOSTTY_VT"] != l.Ghostty || env["PI_BIN"] != p.PiBinary || env["LANG"] != "en_US.UTF-8" {
 		t.Fatal(env)
 	}
-	for _, k := range []string{"OPENAI_API_KEY", "SSH_AUTH_SOCK", "NODE_OPTIONS", "HTTP_PROXY", "ORBIT_NO_RPC_PATCHES"} {
-		if _, ok := env[k]; ok {
-			t.Fatal(k)
+	for _, k := range []string{"OPENAI_API_KEY", "SSH_AUTH_SOCK", "NODE_OPTIONS", "HTTP_PROXY"} {
+		if _, ok := env[k]; !ok {
+			t.Fatal("normal launch lost environment key", k)
 		}
+	}
+	if env["OPENAI_API_KEY"] != "synthetic-inherited-key" {
+		t.Fatal("provider environment not inherited")
 	}
 	if !strings.HasPrefix(env["PATH"], filepath.Dir(p.PiBinary)+":"+filepath.Dir(l.Node)+":") {
 		t.Fatal(env["PATH"])
@@ -410,16 +413,69 @@ func TestStarterFilesOnlySeedBrandNewWorkspace(t *testing.T) {
 		t.Fatal("relaunch changed starter edits")
 	}
 }
-func TestRelaunchHomeDoesNotNestStateOrTrustUnrelatedMarker(t *testing.T) {
-	home := filepath.Join("/Users/test", "Library", "Application Support", StateDirectory, "Home")
-	if got := RelaunchHome(home, home); got != home {
-		t.Fatal(got)
+func TestDefaultRelaunchKeepsUserHomeAndPrivateState(t *testing.T) {
+	l, home := fixture(t)
+	p, err := l.Prepare(home, Options{}, []string{"HOME=" + home, "PI_CODING_AGENT_DIR=~/custom-agent"})
+	if err != nil {
+		t.Fatal(err)
 	}
-	for _, pair := range [][2]string{{"/Users/test", "/Users/test"}, {"/Users/test", home}, {home, "/other"}} {
-		if got := RelaunchHome(pair[0], pair[1]); got != "" {
-			t.Fatal(got)
+	again, err := l.Prepare(envMap(p.Environment)["HOME"], Options{}, p.Environment)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if p.Home != again.Home || p.UserHome != again.UserHome || p.PiAgentDir != again.PiAgentDir || p.PiBinary != again.PiBinary {
+		t.Fatal("relaunch changed configuration identity")
+	}
+	if envMap(p.Environment)["PATH"] != envMap(again.Environment)["PATH"] {
+		t.Fatal("relaunch grew runtime PATH")
+	}
+	if p.PiAgentDir != filepath.Join(home, "custom-agent") {
+		t.Fatal("tilde override not resolved against user home")
+	}
+}
+
+func TestExplicitHomeKeepsConfigurationIsolated(t *testing.T) {
+	l, home := fixture(t)
+	isolated := t.TempDir()
+	p, err := l.Prepare(home, Options{Home: isolated}, []string{"HOME=" + home, "PI_CODING_AGENT_DIR=~/normal-agent", "XDG_CONFIG_HOME=/normal/config"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	env := envMap(p.Environment)
+	if p.Home != isolated || p.UserHome != isolated || p.PiAgentDir != filepath.Join(isolated, ".pi", "agent") || env["HOME"] != isolated || env["PI_CODING_AGENT_DIR"] != p.PiAgentDir || env["XDG_CONFIG_HOME"] != filepath.Join(isolated, ".config") {
+		t.Fatal("--home failed to isolate paths")
+	}
+}
+
+func TestPrepareDoesNotCopyOrMigrateSharedPiConfig(t *testing.T) {
+	l, home := fixture(t)
+	shared := filepath.Join(home, ".pi", "agent")
+	if err := os.MkdirAll(shared, 0700); err != nil {
+		t.Fatal(err)
+	}
+	for _, name := range []string{"models.json", "settings.json", "auth.json"} {
+		if err := os.WriteFile(filepath.Join(shared, name), []byte(`{"synthetic":"preserve-bootstrap-input"}`), 0600); err != nil {
+			t.Fatal(err)
 		}
 	}
+	p, err := l.Prepare(home, Options{}, []string{"HOME=" + home})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if p.PiAgentDir != shared {
+		t.Fatal("normal Pi root not inherited")
+	}
+	for _, name := range []string{"models.json", "settings.json", "auth.json"} {
+		raw, err := os.ReadFile(filepath.Join(shared, name))
+		if err != nil || string(raw) != `{"synthetic":"preserve-bootstrap-input"}` {
+			t.Fatal("Orbit bootstrap changed shared Pi input", name)
+		}
+		if _, err := os.Stat(filepath.Join(p.Home, ".pi", "agent", name)); !os.IsNotExist(err) {
+			t.Fatal("Orbit copied shared Pi input", name)
+		}
+	}
+	// This assertion covers bootstrap only. Launching stock Pi may perform its
+	// ordinary migrations, auth refreshes, model cache and settings writes.
 }
 
 func TestSmokeCaptureFailureCannotPass(t *testing.T) {
@@ -451,5 +507,28 @@ func TestSmokeCaptureFailureCannotPass(t *testing.T) {
 	}
 	if report.Status != "FAIL" || report.Checks.NativeCapture || report.Error == "" {
 		t.Fatalf("false capture PASS: %+v", report)
+	}
+}
+
+func TestSmokeEnvironmentDropsCredentialsWithoutChangingNormalLaunch(t *testing.T) {
+	ambient := []string{"HOME=/synthetic/home", "PATH=/synthetic/bin", "PI_CODING_AGENT_DIR=/synthetic/pi", "OPENAI_API_KEY=synthetic-secret", "SSH_AUTH_SOCK=/synthetic/agent", "NODE_OPTIONS=--require=/synthetic/injection", "AWS_PROFILE=synthetic-profile", "PI_OFFLINE=0"}
+	got := envMap(SmokeEnvironment(ambient))
+	for _, key := range []string{"OPENAI_API_KEY", "SSH_AUTH_SOCK", "NODE_OPTIONS", "AWS_PROFILE"} {
+		if _, ok := got[key]; ok {
+			t.Fatal("smoke inherited sensitive ambient key", key)
+		}
+	}
+	if got["HOME"] != "/synthetic/home" || got["PI_CODING_AGENT_DIR"] != "/synthetic/pi" || got["PI_OFFLINE"] != "1" {
+		t.Fatal("smoke identity or offline mode lost")
+	}
+}
+
+func TestInvalidSharedPiConfigFailsBeforePrivateStateCreation(t *testing.T) {
+	l, home := fixture(t)
+	if _, err := l.Prepare(home, Options{}, []string{"PI_CODING_AGENT_DIR=file:///bad%2Fpath"}); err == nil {
+		t.Fatal("invalid shared Pi path accepted")
+	}
+	if _, err := os.Stat(filepath.Join(home, "Library")); !os.IsNotExist(err) {
+		t.Fatal("invalid config created private runtime/state")
 	}
 }

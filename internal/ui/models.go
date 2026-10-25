@@ -85,7 +85,7 @@ func (x *Controller) refreshModelCatalog() error {
 	if a.Models != nil {
 		a.Models.SetRefreshState(true, "")
 	}
-	binary, home, piDir, dir := x.Agent.PiBinary(), x.Store.Home, x.Store.PiDir, x.workspace
+	binary, home, piDir, dir := x.Agent.PiBinary(), x.Store.UserHome, x.Store.PiDir, x.workspace
 	svc := workbench.New(x.Store, dir)
 	a.Async(func() func() {
 		defer release()

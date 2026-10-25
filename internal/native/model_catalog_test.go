@@ -80,3 +80,13 @@ func TestModelCatalogRedactionCannotExpandPastOutputBound(t *testing.T) {
 		t.Fatal(len(out.Stdout), err)
 	}
 }
+
+func TestTerminalConfigEnvironmentRejectsSecretSerialization(t *testing.T) {
+	env, err := terminalPathEnvironment(map[string]string{"HOME": "/synthetic/user", "PI_CODING_AGENT_DIR": "/synthetic/pi", "ORBIT_PREFERENCES_HOME": "/synthetic/private"})
+	if err != nil || len(env) != 3 {
+		t.Fatal("non-secret path configuration rejected")
+	}
+	if _, err := terminalPathEnvironment(map[string]string{"OPENAI_API_KEY": "synthetic-key"}); err == nil {
+		t.Fatal("terminal script accepted credentials")
+	}
+}
