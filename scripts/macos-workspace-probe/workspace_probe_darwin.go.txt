@@ -8,14 +8,17 @@ package orbitui
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"image/png"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"runtime/debug"
+	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -116,10 +119,43 @@ func workspaceProbeStart(x *Controller, w *mygo.Window) {
 			workspaceProbeStage("probe.complete", result)
 			data, _ := json.MarshalIndent(result, "", "  ")
 			_ = os.WriteFile(filepath.Join(p.dir, "report.json"), append(data, '\n'), 0600)
+			if err != nil {
+				p.cancelAfterFailure()
+			}
 			mygo.App.Quit()
 		}()
 	})
 }
+func (p *workspaceProbe) cancelAfterFailure() {
+	if probeMsg == 0 {
+		return
+	}
+	workspaceProbeStage("cleanup.cancel.before", nil)
+	done := make(chan struct{})
+	go func() {
+		mygo.RunOnMain(func() {
+			if panel := probePanel(p.w.NativeHandle()); panel != 0 && probeResponds(objc.ID(panel), "cancel:") {
+				probeSend(objc.ID(panel), "cancel:", 0)
+			}
+		})
+		for deadline := time.Now().Add(4 * time.Second); time.Now().Before(deadline); {
+			if p.panel() == 0 && workspaceProbeViewDepth.Load() == 0 {
+				workspaceProbeStage("cleanup.cancel.complete", nil)
+				close(done)
+				return
+			}
+			time.Sleep(50 * time.Millisecond)
+		}
+		workspaceProbeStage("cleanup.cancel.incomplete", nil)
+		close(done)
+	}()
+	select {
+	case <-done:
+	case <-time.After(5 * time.Second):
+		workspaceProbeStage("cleanup.cancel.timeout", nil)
+	}
+}
+
 func (p *workspaceProbe) run() error {
 	if !filepath.IsAbs(p.dir) {
 		return errors.New("probe dir must be absolute")
@@ -160,6 +196,33 @@ func (p *workspaceProbe) run() error {
 	}
 	if err = p.assertUnchanged("cancel", initial); err != nil {
 		return err
+	}
+	// Disk-only synthetic historical sessions seed normal recent rows. These
+	// clicks run production SetWorkspace before any acceptance-driver attempt.
+	for i, folder := range []string{p.config.Workspaces[1], p.config.Workspaces[0]} {
+		name := fmt.Sprintf("01%c-recent", 'b'+i)
+		calls := workspaceProbeBrowseCalls.Load()
+		if err = p.click("Choose workspace"); err != nil {
+			return err
+		}
+		if err = p.capture(name + "-popup"); err != nil {
+			return err
+		}
+		if err = p.click("Workspace: " + folder); err != nil {
+			return err
+		}
+		next, e := p.waitReady(folder, initial, true)
+		if e != nil {
+			return e
+		}
+		if workspaceProbeBrowseCalls.Load() != calls {
+			return errors.New("early recent row unexpectedly opened native dialog")
+		}
+		initial = next
+		p.record(name, next)
+		if err = p.capture(name + "-accepted"); err != nil {
+			return err
+		}
 	}
 	// Same-folder acceptance is an RPC new_session on a reusable process.
 	if err = p.dialog("02-accept-current", p.config.Workspaces[0], true); err != nil {
@@ -322,6 +385,7 @@ func (p *workspaceProbe) open(name string) error {
 	for time.Now().Before(deadline) {
 		if p.panel() != 0 {
 			workspaceProbeStage("panel.visible", name)
+			p.captureVisiblePanel(name)
 			return nil
 		}
 		time.Sleep(80 * time.Millisecond)
@@ -372,15 +436,83 @@ func (p *workspaceProbe) dialog(name, path string, accept bool) error {
 	if err != nil {
 		return err
 	}
-	deadline := time.Now().Add(8 * time.Second)
-	for time.Now().Before(deadline) {
+	if p.waitPanelClosed(name, 3*time.Second) {
+		return nil
+	}
+	if accept {
+		var clicked bool
+		mygo.RunOnMain(func() { clicked, err = probeClickDefaultButton(probePanel(p.w.NativeHandle())) })
+		if err != nil {
+			return err
+		}
+		if clicked && p.waitPanelClosed(name, 3*time.Second) {
+			return nil
+		}
+	}
+	return fmt.Errorf("%s: NSOpenPanel did not close after queued Ctrl-Return and available actual default-button click", name)
+}
+func (p *workspaceProbe) waitPanelClosed(name string, timeout time.Duration) bool {
+	for deadline := time.Now().Add(timeout); time.Now().Before(deadline); {
 		if p.panel() == 0 {
 			workspaceProbeStage("panel.closed", name)
-			return nil
+			return true
 		}
 		time.Sleep(80 * time.Millisecond)
 	}
-	return fmt.Errorf("%s: NSOpenPanel did not close after real action", name)
+	return false
+}
+func (p *workspaceProbe) captureVisiblePanel(name string) {
+	var allowed bool
+	var number int
+	mygo.RunOnMain(func() {
+		allowed = probeScreenPreflight != nil && probeScreenPreflight()
+		number = int(probeSend(objc.ID(probePanel(p.w.NativeHandle())), "windowNumber"))
+	})
+	if !allowed || number <= 0 {
+		workspaceProbeStage("panel.screen_capture_unavailable", map[string]any{"already_authorized": allowed, "window_number": number})
+		return
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	path := filepath.Join(p.dir, name+"-visible-panel.png")
+	out, err := exec.CommandContext(ctx, "/usr/sbin/screencapture", "-x", "-l"+strconv.Itoa(number), path).CombinedOutput()
+	if err != nil {
+		workspaceProbeStage("panel.screen_capture_unavailable", map[string]any{"error": err.Error(), "detail": string(out)})
+		return
+	}
+	data, err := os.ReadFile(path)
+	if err == nil {
+		im, e := png.Decode(bytes.NewReader(data))
+		err = e
+		if err == nil {
+			min, max := uint32(65535), uint32(0)
+			for y := im.Bounds().Min.Y; y < im.Bounds().Max.Y; y++ {
+				for x := im.Bounds().Min.X; x < im.Bounds().Max.X; x++ {
+					r, g, b, a := im.At(x, y).RGBA()
+					if a == 0 {
+						continue
+					}
+					for _, v := range []uint32{r, g, b} {
+						if v < min {
+							min = v
+						}
+						if v > max {
+							max = v
+						}
+					}
+				}
+			}
+			if max <= min {
+				err = errors.New("single-window screen capture has no visible variation")
+				_ = os.Rename(path, strings.TrimSuffix(path, ".png")+"-unavailable.png")
+			}
+		}
+	}
+	if err != nil {
+		workspaceProbeStage("panel.screen_capture_unavailable", err.Error())
+		return
+	}
+	workspaceProbeStage("panel.screen_capture", map[string]any{"path": path, "window_number": number, "kind": "native-single-window-screen-capture"})
 }
 func (p *workspaceProbe) invalid(before workspaceProbeState) error {
 	if _, err := os.Stat(p.config.Invalid); !errors.Is(err, os.ErrNotExist) {
@@ -437,6 +569,8 @@ type probeRect struct {
 	Size   probeSize
 }
 
+var probeScreenPreflight func() bool
+var probeFloatMsg func(objc.ID, objc.SEL) float64
 var probeMsg uintptr
 var probeRectMsg func(objc.ID, objc.SEL) probeRect
 var probeConvertPoint func(objc.ID, objc.SEL, probePoint) probePoint
@@ -461,6 +595,13 @@ func probeNativeLoad() error {
 	purego.RegisterFunc(&probeConvertPoint, probeMsg)
 	purego.RegisterFunc(&probeMouseEvent, probeMsg)
 	purego.RegisterFunc(&probeKeyEvent, probeMsg)
+	purego.RegisterFunc(&probeFloatMsg, probeMsg)
+	// Read-only permission preflight only. Never request screen recording access.
+	if cg, e := purego.Dlopen("/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics", purego.RTLD_NOW|purego.RTLD_GLOBAL); e == nil {
+		if address, e := purego.Dlsym(cg, "CGPreflightScreenCaptureAccess"); e == nil {
+			purego.RegisterFunc(&probeScreenPreflight, address)
+		}
+	}
 	purego.RegisterFunc(&probeBitmap, probeMsg)
 	purego.RegisterFunc(&probeCacheBitmap, probeMsg)
 	return nil
@@ -606,34 +747,63 @@ func probePanel(handle uintptr) uintptr {
 	return 0
 }
 
-// NSOpenPanel inherits ok: but modern NSSavePanel deliberately throws from it.
-// Send a real Return key through the public native window event path instead;
-// AppKit's actual default-button handling owns validation and the result code.
+// Actual native input, not an artificial positive completion. Ctrl-Return is
+// the documented NSWindow default-button shortcut even when a responder claims
+// plain Return. Queue through NSApplication so the normal dispatch path runs.
 func probeAcceptPanel(handle uintptr) (err error) {
 	if handle == 0 {
 		return errors.New("no native panel to accept")
 	}
 	probePool(func() {
 		panel := objc.ID(handle)
-		// Key-down may complete/release the sheet before the matching key-up.
-		probeSend(panel, "retain")
-		defer probeSend(panel, "release")
-		if !probeResponds(panel, "sendEvent:") || !probeResponds(panel, "makeKeyWindow") {
-			err = errors.New("native panel cannot receive key events")
+		if !probeResponds(panel, "makeKeyWindow") {
+			err = errors.New("panel cannot become key")
 			return
 		}
+		app := probeSend(objc.ID(objc.GetClass("NSApplication")), "sharedApplication")
+		probeSend(app, "activateIgnoringOtherApps:", 1)
 		probeSend(panel, "makeKeyWindow")
 		number := int(probeSend(panel, "windowNumber"))
+		workspaceProbeStage("panel.default_state", probeDefaultButtonState(handle))
+		workspaceProbeStage("panel.ctrl_return.before", map[string]any{"window_number": number, "key_window_number": int(probeSend(probeSend(app, "keyWindow"), "windowNumber")), "directory": probePanelDirectory(handle)})
 		chars := probeString("\r")
-		workspaceProbeStage("panel.return_key.before", map[string]any{"window_number": number, "directory": probePanelDirectory(handle)})
-		for _, typ := range []uint{10, 11} { // NSEventTypeKeyDown/KeyUp, kVK_Return.
-			event := probeKeyEvent(objc.ID(objc.GetClass("NSEvent")), objc.RegisterName("keyEventWithType:location:modifierFlags:timestamp:windowNumber:context:characters:charactersIgnoringModifiers:isARepeat:keyCode:"), typ, probePoint{}, 0, 0, number, 0, chars, chars, false, 36)
+		uptime := probeFloatMsg(probeSend(objc.ID(objc.GetClass("NSProcessInfo")), "processInfo"), objc.RegisterName("systemUptime"))
+		for i, typ := range []uint{10, 11} {
+			event := probeKeyEvent(objc.ID(objc.GetClass("NSEvent")), objc.RegisterName("keyEventWithType:location:modifierFlags:timestamp:windowNumber:context:characters:charactersIgnoringModifiers:isARepeat:keyCode:"), typ, probePoint{}, 1<<18, uptime+float64(i)*0.001, number, 0, chars, chars, false, 36)
 			if event == 0 {
-				err = errors.New("failed to construct native Return event")
+				err = errors.New("could not construct Ctrl-Return event")
 				return
 			}
-			probeSend(panel, "sendEvent:", uintptr(event))
+			probeSend(app, "postEvent:atStart:", uintptr(event), 0)
+			workspaceProbeStage("panel.ctrl_return.queued", map[string]any{"type": typ, "window_number": number, "control_modifier": true})
 		}
+	})
+	return
+}
+func probeDefaultButtonState(handle uintptr) map[string]any {
+	panel := objc.ID(handle)
+	cell := probeOptional(panel, "defaultButtonCell")
+	control := probeOptional(cell, "controlView")
+	return map[string]any{"panel_class": probeGoString(probeOptional(panel, "className")), "default_cell": uintptr(cell), "default_cell_class": probeGoString(probeOptional(cell, "className")), "default_cell_enabled": probeOptional(cell, "isEnabled") != 0, "control_view": uintptr(control), "control_class": probeGoString(probeOptional(control, "className")), "control_enabled": probeOptional(control, "isEnabled") != 0, "can_perform_click": probeResponds(control, "performClick:"), "title": probeGoString(probeOptional(control, "title")), "key_equivalent": probeGoString(probeOptional(control, "keyEquivalent"))}
+}
+func probeClickDefaultButton(handle uintptr) (clicked bool, err error) {
+	if handle == 0 {
+		return false, nil
+	}
+	probePool(func() {
+		workspaceProbeStage("panel.default_click.inspect", probeDefaultButtonState(handle))
+		cell := probeOptional(objc.ID(handle), "defaultButtonCell")
+		control := probeOptional(cell, "controlView")
+		if cell == 0 || control == 0 || !probeResponds(control, "performClick:") || !probeResponds(control, "isEnabled") || probeSend(control, "isEnabled") == 0 || probeSend(control, "isKindOfClass:", uintptr(objc.GetClass("NSButton"))) == 0 {
+			workspaceProbeStage("panel.default_click.unavailable", nil)
+			return
+		}
+		probeSend(control, "retain")
+		defer probeSend(control, "release")
+		workspaceProbeStage("panel.default_click.before", probeGoString(probeOptional(control, "title")))
+		probeSend(control, "performClick:", 0)
+		clicked = true
+		workspaceProbeStage("panel.default_click.return", nil)
 	})
 	return
 }

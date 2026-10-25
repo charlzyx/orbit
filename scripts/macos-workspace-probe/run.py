@@ -27,10 +27,28 @@ def run(app, output):
     home = output / 'synthetic-home'
     home.mkdir()
     (home / '.orbit-workspace-probe-synthetic-home').write_text('Synthetic CI fixture; no user data.\n')
-    workspaces = [home / name for name in ('Initial Workspace', 'Selected Workspace A', 'Selected Workspace B')]
+    workspaces = [home / name for name in ('Initial Workspace', 'Selected Workspace A', 'Selected Workspace B 中文')]
     for i, directory in enumerate(workspaces):
         directory.mkdir()
         (directory / 'fixture.txt').write_text(f'Isolated workspace fixture {i}. No private content.\n')
+    # Seed normal persisted recents, not an injected controller action. These
+    # allow real recent-row lifecycle coverage before native panel acceptance.
+    preferences = home / 'Library/Application Support/Orbit Go Test/Home/.orbit-pi'
+    preferences.mkdir(parents=True)
+    (preferences / 'workspaces.json').write_text(json.dumps({'workspaces': [{'path': str(p), 'added_at': i + 1} for i, p in enumerate(workspaces)]}, indent=2) + '\n')
+    # The recent picker derives rows from saved Pi sessions, not merely the
+    # workspace list. These are inert synthetic history records, never prompts
+    # sent to a provider. Seed both the shipped .3 private home and the corrected
+    # normal HOME fixture; each application version reads only its selected one.
+    for profile, pi_home in (('private', preferences.parent), ('normal', home)):
+        sessions = pi_home / '.pi/agent/sessions/native-regression'
+        sessions.mkdir(parents=True)
+        for i, directory in enumerate(workspaces):
+            records = [
+                {'type': 'session', 'version': 3, 'id': f'synthetic-{profile}-{i}', 'cwd': str(directory), 'timestamp': '2026-01-01T00:00:00Z'},
+                {'type': 'message', 'id': f'fixture-{i}', 'parentId': None, 'timestamp': '2026-01-01T00:00:01Z', 'message': {'role': 'user', 'content': 'Native regression fixture, never submitted to a model', 'timestamp': 1767225601000}},
+            ]
+            (sessions / f'fixture-{i}.jsonl').write_text(''.join(json.dumps(record) + '\n' for record in records))
     (output / 'config.json').write_text(json.dumps({'workspaces': [str(p) for p in workspaces], 'invalid': str(home / 'Missing Workspace')}, indent=2) + '\n')
     executable = app / 'Contents/MacOS/Orbit'
     if not executable.is_file():
@@ -61,8 +79,23 @@ def run(app, output):
                     continue
                 command = subprocess.run(['/bin/ps', '-p', str(pid), '-o', 'command='], text=True, stdout=subprocess.PIPE).stdout.strip()
                 if command == str(executable) or command.startswith(str(executable) + ' '):
+                    # Sample only this verified disposable app, never another
+                    # runner process. Sampling failure cannot hide the timeout.
+                    with (output / 'timeout-sample.log').open('w') as sample_log:
+                        try:
+                            subprocess.run(['/usr/bin/sample', str(pid), '1', '1'], stdout=sample_log, stderr=subprocess.STDOUT, timeout=8)
+                        except subprocess.TimeoutExpired:
+                            sample_log.write('\nSampling timed out.\n')
                     try: os.kill(pid, signal.SIGTERM)
                     except ProcessLookupError: pass
+                    time.sleep(2)
+                    remaining = subprocess.run(['/bin/ps', '-p', str(pid), '-o', 'command='], text=True, stdout=subprocess.PIPE).stdout.strip()
+                    if remaining == str(executable) or remaining.startswith(str(executable) + ' '):
+                        # MyGo's first SIGTERM requests graceful Quit. If a
+                        # nested modal await prevents that, stop this exact test
+                        # process rather than leaking it on the hosted runner.
+                        try: os.kill(pid, signal.SIGKILL)
+                        except ProcessLookupError: pass
                     break
             proc.terminate()
             try:
