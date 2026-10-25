@@ -48,18 +48,26 @@ jobs:
       - name: Reference renderer and isolated display dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang cmake pkg-config libfontconfig-dev libvulkan1 mesa-vulkan-drivers libwayland-dev libx11-xcb-dev libxi-dev libxtst-dev libxkbcommon-x11-dev libssl-dev xvfb openbox xdotool imagemagick
+          sudo apt-get install -y clang cmake pkg-config libfontconfig-dev libvulkan1 mesa-vulkan-drivers libwayland-dev libx11-xcb-dev libxi-dev libxtst-dev libxkbcommon-x11-dev libssl-dev libgtk-3-0 libpango-1.0-0 libcairo2 xvfb openbox xdotool x11-utils imagemagick
       - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
         with:
           toolchain: '1.94.0'
       - name: Build pinned original source (reference only)
         run: |
+          git fetch --depth=1 origin 299a32bc87fe3d4851bdb902d9c03dcf9bf99cac
           git worktree add --detach /tmp/orbit-reference 299a32bc87fe3d4851bdb902d9c03dcf9bf99cac
           cargo build --locked --manifest-path /tmp/orbit-reference/Cargo.toml -p orbit-pi
       - name: Install pinned Pi without credentials or inference
         run: npm install --prefix /tmp/orbit-pi-runtime @earendil-works/pi-coding-agent@1.4.0
       - name: Capture actual original native window
-        run: scripts/capture-native-reference.sh /tmp/orbit-reference/target/debug/orbit-pi "$PWD/capture/reference-desktop"
+        run: scripts/capture-native-reference.sh /tmp/orbit-reference/target/debug/orbit-pi "$PWD/capture/reference-desktop" reference
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16
+        with:
+          go-version: '1.27.3'
+      - name: Capture actual Go native desktop window at the same viewport
+        run: |
+          CGO_ENABLED=0 go build -o /tmp/orbit-go-native ./cmd/orbit
+          scripts/capture-native-reference.sh /tmp/orbit-go-native "$PWD/capture/go-desktop" go
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
