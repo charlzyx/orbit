@@ -1,0 +1,16 @@
+{
+  "preset": "custom",
+  "custom_start": 1790812800000,
+  "custom_end": 1791936000000,
+  "metric": "tokens",
+  "usage_mode": "simple",
+  "breakdown_tab": "models",
+  "detail_tab": "sessions",
+  "session_sort": "tokens",
+  "session_sort_desc": true,
+  "page_size": 25,
+  "latency_metric": "average",
+  "hidden_columns": [],
+  "breakdown_sort": "tokens",
+  "breakdown_sort_desc": true
+}

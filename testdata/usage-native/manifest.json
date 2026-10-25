@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "name": "usage-native-fixed-october",
+  "credentials": false,
+  "inference": false,
+  "range_utc": [
+    "2026-10-01T00:00:00Z",
+    "2026-10-15T00:00:00Z"
+  ],
+  "sessions": 4,
+  "providers": 2,
+  "provider_model_pairs": 4,
+  "totals": {
+    "requests": 33,
+    "input": 44400,
+    "output": 4960,
+    "cache_read": 4800,
+    "cache_write": 1200,
+    "total_tokens": 55360,
+    "cost_usd": 0.912,
+    "prompts": 33,
+    "tool_runs": 4,
+    "tool_errors": 1,
+    "request_errors": 1,
+    "aborted": 1,
+    "unbilled_provider_errors": 1
+  },
+  "files": {
+    ".orbit-pi/usage.json": "7231fff697db132c2b98c0cd5489a4756b7fb6992d58bac18a202fb50f4ea22e",
+    ".pi/agent/sessions/--tmp--orbit-visual-fixture--workspace--alpha--/usage-native-01.jsonl": "17c3f8798d52ace59fde4ae78fb503aa6d9428feb1289a1a8aafb05e4bb808e5",
+    ".pi/agent/sessions/--tmp--orbit-visual-fixture--workspace--alpha--/usage-native-02.jsonl": "4c3f7f3ffdb7cdb7a124c677d333100762f7a66f8c16342238753758f2dbed22",
+    ".pi/agent/sessions/--tmp--orbit-visual-fixture--workspace--beta--/usage-native-03.jsonl": "7c700cc6bf176fea0616cf25943982116cbf94e8c3f154d329e9b8be7785d9d8",
+    ".pi/agent/sessions/--tmp--orbit-visual-fixture--workspace--beta--/usage-native-04.jsonl": "bb58a6ec7f1d5541d7a299867c9900d17bcb6db3b146b88ac5f1d22cde7c195a"
+  },
+  "volatile": [
+    "scan-relative header age",
+    "activity calendar trailing-year anchor if executions occur on different UTC dates"
+  ],
+  "source_clock_frozen": false
+}

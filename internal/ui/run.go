@@ -161,7 +161,18 @@ func NewController(o RunOptions) (*Controller, error) {
 		}
 		cfg := workspace.GenerationConfig{Pi: pirpc.Config{Executable: x.Agent.PiBinary(), WorkspaceDir: s.Home, Environment: append(os.Environ(), env...), EnvOverrides: map[string]string{"PI_CODING_AGENT_DIR": s.PiDir}}, Provider: snap.Model.Provider, Model: snap.Model.ID}
 		return workspace.GenerateReportDraftRPC(ctx, cfg, string(kind), notes)
-	}, Text: x.UI.text})
+	}, Text: x.UI.text, ModelLabel: func() string {
+		if name := x.UI.Model.CurrentModel.Name; name != "" {
+			return name
+		}
+		if id := x.UI.Model.ModelID; id != "" {
+			return id
+		}
+		return "unknown"
+	}, Theme: func() bugreportui.Theme {
+		t := x.UI.Theme
+		return bugreportui.Theme{SurfaceSecondary: t.SurfaceSecondary, Elevated: t.Elevated, TextSecondary: t.TextSecondary, Action: t.Action, ActionText: t.ActionFg, ActionHover: t.ActionHover, ActionPressed: t.ActionPressed, Px: t.Px, Space: t.Space}
+	}})
 	x.MCP = mcpui.New(s, o.Workspace, mcpui.Options{OnChange: invalidate, PiBinary: o.PiBinary, Text: x.UI.text, Theme: func() mcpui.Theme {
 		return mcpui.Theme{Elevated: x.UI.Theme.Elevated, CodeFont: x.UI.Fonts.CodeFamily, Px: x.UI.Theme.Px, Space: x.UI.Theme.Space}
 	}, OnModified: func() { x.configApplyAfter = time.Now().Add(500 * time.Millisecond) }, OnApply: func() { x.configApplyAfter = time.Now() }})
@@ -438,6 +449,11 @@ func (x *Controller) Action(a Action) {
 			u.attachments = nil
 		}
 	case "AbortRun":
+		if u.page == "settings" || u.page == "worktrees" {
+			u.Navigate("chat")
+			u.composer.Focus()
+			break
+		}
 		if u.Model.Running {
 			e = m.Abort()
 		}
@@ -517,6 +533,8 @@ func (x *Controller) Action(a Action) {
 		}
 	case "Login":
 		e = m.StartLogin(a.Value, str("method"))
+	case "LoginTerminal":
+		e = x.loginProviderTerminal(a.Value, native.OpenTerminalProgram)
 	case "Logout":
 		e = m.Logout(a.Value)
 	case "CancelLogin":

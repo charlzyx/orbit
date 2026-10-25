@@ -1,0 +1,316 @@
+{
+  "schema": "go-test-named-events/v1",
+  "source_manifest_sha256": "e966af24d01fa3e641d26b645edee7bc917c78e0196e39d24a0c223fa4155b10",
+  "command": [
+    "scripts/go-native.sh",
+    "test",
+    "-json",
+    "-race",
+    "./internal/ui",
+    "./internal/workbench",
+    "-run",
+    "TestSettingsSource|TestGeneralMeasured|TestAppearanceSource|TestShortcutsSource|TestSource|TestSettingsReconstruction|TestNativeProvider|TestProviderCredential|TestNativeAgentRetry|TestNativeRuntime|TestSettingsPageScroll|TestSettingsNavigation|TestBackground|TestProviderCatalogOnly",
+    "-count=1"
+  ],
+  "events": [
+    {
+      "Time": "2026-10-25T17:02:13.978342114+09:00",
+      "Action": "run",
+      "Package": "github.com/charlzyx/orbit/internal/workbench",
+      "Test": "TestProviderCatalogOnlyFutureProviderKeepsUnknownCapabilities"
+    },
+    {
+      "Time": "2026-10-25T17:02:13.998342651+09:00",
+      "Action": "run",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestBackgroundChooseCoalesceFadeReuseFailureAndClear"
+    },
+    {
+      "Time": "2026-10-25T17:02:14.048610096+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/workbench",
+      "Test": "TestProviderCatalogOnlyFutureProviderKeepsUnknownCapabilities",
+      "Elapsed": 0.07
+    },
+    {
+      "Time": "2026-10-25T17:02:15.846285904+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestBackgroundChooseCoalesceFadeReuseFailureAndClear",
+      "Elapsed": 1.85
+    },
+    {
+      "Time": "2026-10-25T17:02:17.067466076+09:00",
+      "Action": "run",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestNativeProviderSaveFailureKeepsDraft"
+    },
+    {
+      "Time": "2026-10-25T17:02:17.074032795+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestNativeProviderSaveFailureKeepsDraft",
+      "Elapsed": 0.01
+    },
+    {
+      "Time": "2026-10-25T17:02:17.15193158+09:00",
+      "Action": "run",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestSettingsPageScrollRetained"
+    },
+    {
+      "Time": "2026-10-25T17:02:17.392611455+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestSettingsPageScrollRetained",
+      "Elapsed": 0.24
+    },
+    {
+      "Time": "2026-10-25T17:02:17.397836567+09:00",
+      "Action": "run",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestNativeRuntimeUsesRealSnapshotAndStoppedUnknowns"
+    },
+    {
+      "Time": "2026-10-25T17:02:17.484793645+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestNativeRuntimeUsesRealSnapshotAndStoppedUnknowns",
+      "Elapsed": 0.09
+    },
+    {
+      "Time": "2026-10-25T17:02:17.485128308+09:00",
+      "Action": "run",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestNativeAgentRetryIsUnknownUntilConfirmed"
+    },
+    {
+      "Time": "2026-10-25T17:02:17.541030321+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestNativeAgentRetryIsUnknownUntilConfirmed",
+      "Elapsed": 0.06
+    },
+    {
+      "Time": "2026-10-25T17:02:17.542611486+09:00",
+      "Action": "run",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestAppearanceSourceGroupsMappedChoicesAndPersistence"
+    },
+    {
+      "Time": "2026-10-25T17:02:17.864879777+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestAppearanceSourceGroupsMappedChoicesAndPersistence",
+      "Elapsed": 0.32
+    },
+    {
+      "Time": "2026-10-25T17:02:17.86512107+09:00",
+      "Action": "run",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestShortcutsSourceAdvertisedRowsAndComposerModes"
+    },
+    {
+      "Time": "2026-10-25T17:02:17.934328364+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestShortcutsSourceAdvertisedRowsAndComposerModes",
+      "Elapsed": 0.06
+    },
+    {
+      "Time": "2026-10-25T17:02:17.934608054+09:00",
+      "Action": "run",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestSourceWorktreeInlinePreferencesNavigationAndFailure"
+    },
+    {
+      "Time": "2026-10-25T17:02:18.11956254+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestSourceWorktreeInlinePreferencesNavigationAndFailure",
+      "Elapsed": 0.18
+    },
+    {
+      "Time": "2026-10-25T17:02:18.119654739+09:00",
+      "Action": "run",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestSourceRuntimePatchAndPrivacyControls"
+    },
+    {
+      "Time": "2026-10-25T17:02:18.300328687+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestSourceRuntimePatchAndPrivacyControls",
+      "Elapsed": 0.18
+    },
+    {
+      "Time": "2026-10-25T17:02:18.30060329+09:00",
+      "Action": "run",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestSourceProviderGridCapabilitiesFilteringAndAboutIdentity"
+    },
+    {
+      "Time": "2026-10-25T17:02:18.461862357+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestSourceProviderGridCapabilitiesFilteringAndAboutIdentity",
+      "Elapsed": 0.16
+    },
+    {
+      "Time": "2026-10-25T17:02:18.462085252+09:00",
+      "Action": "run",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestSettingsReconstructionMeasuredSourceCardGeometry"
+    },
+    {
+      "Time": "2026-10-25T17:02:18.548723597+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestSettingsReconstructionMeasuredSourceCardGeometry",
+      "Elapsed": 0.09
+    },
+    {
+      "Time": "2026-10-25T17:02:18.548907603+09:00",
+      "Action": "run",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestSourceSettingsPickerEmptyEscapeAndReopen"
+    },
+    {
+      "Time": "2026-10-25T17:02:18.722246356+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestSourceSettingsPickerEmptyEscapeAndReopen",
+      "Elapsed": 0.17
+    },
+    {
+      "Time": "2026-10-25T17:02:18.722509151+09:00",
+      "Action": "run",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestSourceProviderAuthenticationCardLifecycle"
+    },
+    {
+      "Time": "2026-10-25T17:02:18.935085728+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestSourceProviderAuthenticationCardLifecycle",
+      "Elapsed": 0.21
+    },
+    {
+      "Time": "2026-10-25T17:02:18.9353134+09:00",
+      "Action": "run",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestSourceRetryStatusUsesObservedState"
+    },
+    {
+      "Time": "2026-10-25T17:02:19.100254696+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestSourceRetryStatusUsesObservedState",
+      "Elapsed": 0.16
+    },
+    {
+      "Time": "2026-10-25T17:02:19.100504121+09:00",
+      "Action": "run",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestSourceProviderUnknownLiveCapabilitiesStayUnknown"
+    },
+    {
+      "Time": "2026-10-25T17:02:19.141715031+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestSourceProviderUnknownLiveCapabilitiesStayUnknown",
+      "Elapsed": 0.04
+    },
+    {
+      "Time": "2026-10-25T17:02:19.14621996+09:00",
+      "Action": "run",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestSourceProviderEditorModalChipsKeyboardAndPersistence"
+    },
+    {
+      "Time": "2026-10-25T17:02:19.353642874+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestSourceProviderEditorModalChipsKeyboardAndPersistence",
+      "Elapsed": 0.21
+    },
+    {
+      "Time": "2026-10-25T17:02:19.353805528+09:00",
+      "Action": "run",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestSourceProviderCredentialModalSecretAndAlternativeMethod"
+    },
+    {
+      "Time": "2026-10-25T17:02:19.497099057+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestSourceProviderCredentialModalSecretAndAlternativeMethod",
+      "Elapsed": 0.14
+    },
+    {
+      "Time": "2026-10-25T17:02:19.497219588+09:00",
+      "Action": "run",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestSourceBackgroundBlurGeometryPercentAndSteppedKeyboard"
+    },
+    {
+      "Time": "2026-10-25T17:02:19.549368994+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestSourceBackgroundBlurGeometryPercentAndSteppedKeyboard",
+      "Elapsed": 0.05
+    },
+    {
+      "Time": "2026-10-25T17:02:19.549780121+09:00",
+      "Action": "run",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestSourceCredentialSaveDoesNotDiscardReopenedDraft"
+    },
+    {
+      "Time": "2026-10-25T17:02:19.560931516+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestSourceCredentialSaveDoesNotDiscardReopenedDraft",
+      "Elapsed": 0.01
+    },
+    {
+      "Time": "2026-10-25T17:02:19.561128553+09:00",
+      "Action": "run",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestSourceProviderAdvertisedEmptyMethodsDoNotFallBackToStaticCapability"
+    },
+    {
+      "Time": "2026-10-25T17:02:19.588145019+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestSourceProviderAdvertisedEmptyMethodsDoNotFallBackToStaticCapability",
+      "Elapsed": 0.03
+    },
+    {
+      "Time": "2026-10-25T17:02:19.588242626+09:00",
+      "Action": "run",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestSettingsSourceSearchIndexAndSectionNavigation"
+    },
+    {
+      "Time": "2026-10-25T17:02:19.664096657+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestSettingsSourceSearchIndexAndSectionNavigation",
+      "Elapsed": 0.08
+    },
+    {
+      "Time": "2026-10-25T17:02:19.665064702+09:00",
+      "Action": "run",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestSettingsSourceHeaderAndGeneralRows"
+    },
+    {
+      "Time": "2026-10-25T17:02:19.739845501+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Test": "TestSettingsSourceHeaderAndGeneralRows",
+      "Elapsed": 0.08
+    }
+  ]
+}

@@ -406,13 +406,9 @@
       "feature_ids": [
         "C16"
       ],
-      "expected_controls": [
-        "Extension dialog timeout countdown",
-        " Source labels, icons, selected and disabled states visible",
-        " No unrelated dialog or stale response"
-      ],
+      "expected_controls": [],
       "scope": "canonical",
-      "note": "",
+      "note": "Pinned dialog.rs has no rendered timeout/countdown state. Stable ID retained as invalid; do not invent or capture this state.",
       "source": [
         {
           "path": "crates/orbit-pi/src/dialog.rs",
@@ -437,21 +433,18 @@
       "title": "Extension dialog timeout countdown",
       "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
       "source_version": "0.2.12",
-      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "source_evidence_level": "INVALID_SOURCE_STATE",
       "fixture_contract": "fixture.json",
       "fixture_setup": [
-        "Open the isolated extensions surface in fixture.json.",
-        "Configure the named source state: Extension dialog timeout countdown.",
-        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
-        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+        "No capture: this candidate is invalid against the pinned source."
       ],
-      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "fixture_readiness": "NOT_APPLICABLE_INVALID_CANDIDATE",
       "go_mapping": [
         "internal/agent",
         "internal/pirpc"
       ],
-      "status": "UNTESTED",
-      "blocker": null,
+      "status": "BLOCKED",
+      "blocker": "Pinned dialog.rs has no rendered timeout/countdown state. Stable ID retained as invalid; do not invent or capture this state.",
       "auth_gate": null,
       "rust_image": {
         "planned_path": "../probes/visual/V061/rust.png",
@@ -772,13 +765,13 @@
         " No unrelated dialog or stale response"
       ],
       "scope": "canonical",
-      "note": "",
+      "note": "Finished questionnaire is a transcript ask card, not the live composer ask_panel. Answered/declined/waiting branches require independent fixture validation.",
       "source": [
         {
-          "path": "crates/orbit-pi/src/app/view.rs",
-          "handler": "ask_panel",
-          "line": 3982,
-          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/view.rs#L3982"
+          "path": "crates/orbit-pi/src/transcript_view.rs",
+          "handler": "render_ask_card",
+          "line": 2928,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/transcript_view.rs#L2928"
         }
       ],
       "id": "V065",
@@ -1033,13 +1026,13 @@
         " No unrelated dialog or stale response"
       ],
       "scope": "canonical",
-      "note": "",
+      "note": "setStatus is independent of setWidget. Anchor status_bar and extension request setStatus handling, not apply_extension_widget.",
       "source": [
         {
-          "path": "crates/orbit-pi/src/app/dialogs.rs",
-          "handler": "apply_extension_widget",
-          "line": 76,
-          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/dialogs.rs#L76"
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "handler": "status_bar",
+          "line": 3073,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/view.rs#L3073"
         }
       ],
       "id": "V068",

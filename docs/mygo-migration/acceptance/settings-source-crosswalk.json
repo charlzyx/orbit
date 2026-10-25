@@ -1,0 +1,850 @@
+{
+  "schema": "orbit-settings-source-crosswalk/v1",
+  "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "mygo_pin": "9c69cf829ece196c5b3a3601f1c7bbe70526376f",
+  "tested_revision": {
+    "kind": "scoped dirty-source SHA256 manifest, not a commit",
+    "files": {
+      "crates/orbit-pi/src/app/settings.rs": "49869d298e1c75f70b6a406d52cb1e9b6cf4deaa1c1c1e6829d69bb94f992873",
+      "crates/orbit-pi/src/app/temp_ui.rs": "3c7884f667d0dd8a0c6355f88ebefb191f4f5f90e9bc8b6ec4054c7c91adcce3",
+      "crates/orbit-pi/src/app/worktrees.rs": "d1356c0e03fd33a79875605c0e1ef1816f6533be836d6f40ed52db279a756872",
+      "crates/orbit-pi/src/providers.rs": "dd9828b0272e7a15c1559339222cf7e9df647c09aebba154d9b0317c6a27cd0e",
+      "go.mod": "83dea25d420fb3d7bc4a83f8c3bc2cb96094324ee6729b0b4ba48d9e7cc3c86c",
+      "go.sum": "5ae86d7f224e45a162962c1505dfb7f1b644c931297b113e4e1709e4a3d1dcc9",
+      "internal/agent/auth_challenge.go": "5333791919195138ce31b030cab83e9f10ce3e8b17281f6ab5b86d6333fee766",
+      "internal/agent/auth_challenge_test.go": "69e6f5fe4186ed89fee4a4de01a6b6194014b8f147558edfbba2f8c3c76cc3bf",
+      "internal/agent/checkpoints.go": "07abda64e7b92c8f93106e1a61abc38c8d3457db4e32edb4142481491eaf2241",
+      "internal/agent/checkpoints_test.go": "75e124edb4728f4b3d58c66137dbe2ee5edda6b7bcc73cde3f3803da169a8394",
+      "internal/agent/extensions.go": "9ac294ccc4db0575344f5aa789c1b5928217dffc5b95a21732bf0f05ed7d4c97",
+      "internal/agent/live_test.go": "febc54dad6aee8b81548ba348e35416dcc52cd30c0e71275cfdaee9a28c4559c",
+      "internal/agent/manager.go": "f374fe10bf4b1fc5d61ca68c5ff6583d4f3a40343df68825d6df3fb499019a9a",
+      "internal/agent/manager_test.go": "fb3feea4354ac517bf5f74bffbf65056c07ed489f26aac0ddbfd3a8e86072ff3",
+      "internal/agent/model_defaults.go": "0288477d95cb88d7028d9e4c708067239805e0fc931993cd4b06fda6b140fa07",
+      "internal/agent/model_defaults_integration_test.go": "0bb575e6bbb82c043597df54920064c59172f59141cd2228d452fc0a71442966",
+      "internal/agent/model_defaults_test.go": "3fc89e53ff05d366bd3e73c1d22d6b7fd56ab43561d13a05f984d7fa99ae525b",
+      "internal/agent/patch_preferences.go": "9583c694da2c802af23930304af26932bf9e0a03d8045c40e43ed72ba380cde8",
+      "internal/agent/patch_preferences_test.go": "facde3f32640d4430879e96f0cfb7f0276bf32a80fc0f3ec4ff2cfa9e000857c",
+      "internal/agent/reducer.go": "10edd83002e9951d566833235a44c8ecd355aa7e52272f2ea89f80c7e3b2536b",
+      "internal/agent/reducer_test.go": "14836b56fb45973ffd298153344d5fe04991e1d50f23d35daf2c209bf5cd293d",
+      "internal/agent/runtime.go": "4695d2f5614fffb1cc83c938818d534e51c71d975556756c00a1dcb68e8966c8",
+      "internal/agent/runtime_test.go": "63d2abc73cf24aa03ee85ba5b6a35615c166572d95939be4bffa76fcd7d21367",
+      "internal/agent/saved_sessions.go": "479d33ce6cf93b433341acada59c769fbc8932dc0b811aece9fd671a05be6d16",
+      "internal/agent/sessions.go": "702504ce7efb8e3953efc2615c210571a9a12d60e33fbabc45c05abbde943a60",
+      "internal/agent/stream_clock.go": "ffcc69aec9da80a7d4fa6bc65681373c2ac73a0cdcb8b17e22f463c1073812e8",
+      "internal/agent/stream_clock_test.go": "ce1da861cb6f28c488c64b370d8452f612190a02a4cb56d32b7e347271eae41f",
+      "internal/agent/types.go": "85b3fb5c89f6e1fa14da7a0a0cbe5049915db537701976e731f27985324f7243",
+      "internal/agent/workflow.go": "29b84cdf9ea6068060e6ec5170dd97a502691758a9ef4ee20591f76a79a24030",
+      "internal/agent/workflow_test.go": "65736b311199922ec907e292f3ec776f201b45d44733ba09e5a5229ced21883b",
+      "internal/background/field.go": "7eabd6eb640cae2a1e873b807d69852ff00b7d068862dde73a8ae71ece77af05",
+      "internal/background/field_test.go": "ea1cad63e7ead9a60f1dfa13ed6ce67537ffbed152622d9f8d31a2d004868d44",
+      "internal/background/photo.go": "4aefe822f260cf01b87a5b4ea3f51e0402334fb261b69b2dcf669ae17d98da6c",
+      "internal/background/photo_test.go": "f65f1f80ed819e6d2431d62a9686db775f07b8bf821cf2cdab9149c563205a3d",
+      "internal/background/resize.go": "3e7ca667dfee37ea57e348f95d4bb0604783ec91f9c8cd89a268d4f29c37ba3e",
+      "internal/preferences/rpc_patches.go": "af4aa32643f774815c4b3ce3b4643f991019400e03dad831bc0ff094340c672f",
+      "internal/preferences/rpc_patches_test.go": "d46af43f2b660d187ec38a8db2de8ac986b41be55d45170801f87c8ab923c447",
+      "internal/preferences/store.go": "deca00b39635e801b2f82fa4c58356dc7f3f4e3bd984585af837ee3a3d36808d",
+      "internal/preferences/store_test.go": "69a380a241cdc58dee588d70bf277a192cfa6d2d88b1a912e66942ef1ca9e5b9",
+      "internal/preferences/theme_aliases.go": "85642b7cbcceba13d6ec498f8d88c0852f0c24ab33bd5082069b3a0e4f6fc51e",
+      "internal/preferences/workspaces.go": "b2d432d4dd4c1499f71d010cfab821975a59169ad05a5f3c64ac4b6fe0dd1d5c",
+      "internal/preferences/workspaces_test.go": "05e0f8ae6c7cb06de6fe1bd58670b2bf08c9e2c53658a0a4db8c55de4ba714c1",
+      "internal/ui/actions.go": "e39b7760d89491a741b8412c469936eb8b8b2d9139786f206848c96da1e08797",
+      "internal/ui/app.go": "8653d331ff96bfd02ae290732679a85b875819a8b468b491f4c29d1aa62d2926",
+      "internal/ui/attachments.go": "1c09e449189ae522085786d0c3e2ffba88f9c9e766160711622affaff842a17c",
+      "internal/ui/auth_browser.go": "9a403a6edd4601c75fc01dbd79d8e890008cad037c99e13e5f8ac33533a1f00c",
+      "internal/ui/auth_browser_test.go": "b2a89c384394dab99d9de125b631bd918ae9036801160a46d84d8c9d2fbb05d2",
+      "internal/ui/background.go": "c7d28c210e08870c9c4bb1740463d54ea28d3af235c88e51e132be2496dab930",
+      "internal/ui/background_test.go": "875493e1c59bfd5026e8486c04b2e6010802bff2837e8d3c6b4059d72aca2438",
+      "internal/ui/behavior_acceptance_test.go": "3243a90c0db372df2fa6acfb32a079e8cceb7ca9a792b96c241d3a48164f7c4d",
+      "internal/ui/chat.go": "035dd7c29822e0a71833c34011334991895f98769e4c24b3dfedeb45dde52348",
+      "internal/ui/commands.go": "02ecde12bc159abed238a373b01068c6c18bde007eaf3b8a9aaa73a11390e2e0",
+      "internal/ui/composer_geometry_test.go": "0497f89b680005804238910939bfa42906c0127eccf5b948ab7262e156691bc3",
+      "internal/ui/composer_integration_test.go": "b8e1787fd615a42cdf36873059e7f28a0ad2920c5e70a88aea78d453df5a2119",
+      "internal/ui/custom_dialog_test.go": "d2f34d0e0a6a98724772afbbdd799e1a97f34877a96441e07cfcf591c3097af6",
+      "internal/ui/dialogs.go": "9bf93ae58c0734ec998535346634cb0d3b1738703aed789c9c3fa4baf38772b5",
+      "internal/ui/files.go": "d3bb635600f6fe9c58f802101a9f2e5f50a3fb32d260abba1aa9a59314597125",
+      "internal/ui/interaction_acceptance_test.go": "18a9f46761bdba34c38854fe258928dbeb5c47abf0595d03911bca84af451634",
+      "internal/ui/locale.go": "a6171bd60876d69105ea441268670b93c64e58b24873ab67656df48210f5b6ef",
+      "internal/ui/locale_test.go": "afea2c2c5b4cf81f092b715e0eb2af3a6649994070739f413727d086a92efb4c",
+      "internal/ui/maintenance.go": "4fc4929a87234b541099966bc0024f13084e9eb97ce187b45ecbd05f62d94f24",
+      "internal/ui/maintenance_test.go": "2e090771d77bafb27269027cf4aab325ca84263ab270865ef4d76a00ba5421f1",
+      "internal/ui/markdown.go": "9e059f01861526f2a72eb64463dbeddaf106ce8a99336ed49e25c6684e8c5030",
+      "internal/ui/models.go": "df8a63c6d61eeb623c05951c452b0f9e31b2dae56979b1d1841071fdb261869c",
+      "internal/ui/models_integration_test.go": "56ed57f037b8095b350f7a29d473c994dc92264effcd1e05c17e7831f2c7c2ea",
+      "internal/ui/native_settings.go": "90fbadd7b86855006db11bff172c23b9d0e2cd555770455226488165cebe43f5",
+      "internal/ui/palettes.go": "f5589e6dadd0353e6a8e184da3263d11def3bb1d21fb0f138d386a6fefee3162",
+      "internal/ui/patch_preferences.go": "88bc381f205500f83c974888e84cf2fed3c20e3ff442b0ea4fb2fc619ec1d4b2",
+      "internal/ui/patch_preferences_test.go": "76efa27cfe0fc49e8823f383e4001e65196d0b848276857006469693d31f10a7",
+      "internal/ui/providers.go": "1287d0002974c0d7dcc44a1b4e464a314e46544f254a9be5332870b77a4c52a3",
+      "internal/ui/providers_test.go": "54cf7322f05da3a7315da4e819eed9504e123fb0dfd1ef8f61ed28222c61e995",
+      "internal/ui/review.go": "cc19ee8c17ab9bd5b9772e1409de3cb90c8d5ab768e1036fdfd64a755388d88f",
+      "internal/ui/review_layout.go": "84d8c76d17bf821aa627fb470cb1923d973aba1d0d2dafe0fcb5e35ec735dac4",
+      "internal/ui/review_layout_test.go": "5b2f5ea532541b9a67ad0e073146ab23266cc601199fc23834a4fc0081ac72bd",
+      "internal/ui/review_tree.go": "23fbfb8df87f45e3a0bcf13f0d17117499eb41fd1fa4ca4e393a531abc7432a3",
+      "internal/ui/review_tree_test.go": "a35384e2f17187ff1bfa58dc9975c412b1fd3839c761c5ff83ffe4a394e5787f",
+      "internal/ui/run.go": "3a456108180a1a8afc7be4672d46ffb64c066afc3bd260462430dadc5d8f700f",
+      "internal/ui/runtime_stats.go": "910934f95a534bd8abe9244f8e5f99a331258b34b1b3aa5bd4e909cfcee99640",
+      "internal/ui/runtime_stats_test.go": "a9d3231b355d39baa96d46ed7f6963b9464a50b377036b482b5d4878bc815a3c",
+      "internal/ui/runtime_view.go": "41552b1f3248c21118baed485eb5d34122b7e2ce8a6107366eb112c716658f2a",
+      "internal/ui/runtime_view_test.go": "4ee1817155468de385cb8a82a47919b4c42c2bcf109e32b5ca60274e5985c78d",
+      "internal/ui/settings.go": "4d791d7fb59de4f9fe90fb8743f6497de932ea50d024c3c7fa02040d219c8358",
+      "internal/ui/settings_agent.go": "0fa13ff3164cd0780a72ffa3a61f230b3f70ab191794e2283ff5cd90469d6c39",
+      "internal/ui/settings_appearance.go": "e3171c7ee3f4b36e7a060c577d005aa81da50cf23fb3639cd43f5c20b1b40de9",
+      "internal/ui/settings_backend_integration_test.go": "6e2793ade8a3a58cf34d993f486af170ca46db63a55da8607b3057a937ef4894",
+      "internal/ui/settings_controls.go": "c406d113a3a998574ef798aecf720563ca0b355084f66bbe7a041193f4e5dc63",
+      "internal/ui/settings_general.go": "82280e5b4eb717f402ed27841ae49b3a31a8b0eae6a3e1c77f3f6fd0ad514340",
+      "internal/ui/settings_misc.go": "a6d3c709e31eb54cae84d075300d369691df80c9df1990e2d4fe1e08a1d35632",
+      "internal/ui/settings_pages_test.go": "dae0cd178b963f3fa7c72dac8bf9eb6515281ae90f9095a96638ad493a278745",
+      "internal/ui/settings_projection.go": "c48cfd5d266b7ecb931bfd7f5e1ba1063bb3cbaf30ec3f23556751f36be4419c",
+      "internal/ui/settings_projection_test.go": "74c108281949d76308c92f02dfea01ba053e78f4f3f6669a9be6816b3997d2fd",
+      "internal/ui/settings_provider_dialogs.go": "5ede9ec4de66ebc5fed8b5190f3fbb84f5d44107c4be9bb219f85a53aa81f62e",
+      "internal/ui/settings_provider_dialogs_test.go": "4a24229446b54dada4290bb63409eee51552ba8af197d68f7764cd29d320a7ad",
+      "internal/ui/settings_providers.go": "29913eb3768ade881cf1749438531a82620b0d1a6b0513ca7408857624dcbc71",
+      "internal/ui/settings_search.go": "21a80e2574502c0897e9e18c0a2e8fc882c07b37bf6d34d4834629ee41ff987a",
+      "internal/ui/settings_shortcuts.go": "6500f9262d4440d0da010cfa618b1cfc548347ebda6afb99926d44767c852d20",
+      "internal/ui/settings_source_test.go": "aab2aa53688c0e36f0e2754bb8c5cb64e2cd643756ad079fe277410550e69b9a",
+      "internal/ui/snapshot_test.go": "efb001ebfce63dec476a86507a7f9068d35ce5b94a5cb22c06a6f11be244239a",
+      "internal/ui/source_gap_test.go": "ed5bda29039c9167ff18e017115c9d2ccaedd03fcd004a6174f35334bb7fbb9c",
+      "internal/ui/source_shell_test.go": "512976bc0232dc01628013591f3e7f72f3d199e6d3510f36091e6fb583700efb",
+      "internal/ui/theme.go": "a3aabd9d0590b9376d6b978e715fad1fc11425c34d13430f27e3031db5f7b90d",
+      "internal/ui/transcript.go": "dc432afe38dc77854128d009632d62f1a3ea50d55b4f9d3905c4dff9c530e0e9",
+      "internal/ui/transcript_integration_test.go": "4fed4532968279d463150f770ad4afbd27a3eb4b4c3d95415e677f0bf6020030",
+      "internal/ui/usage.go": "69cafb930894916d3a4e8b776e842046008b0ad19293d42925b7ba6218d9589f",
+      "internal/ui/usage_analytics.go": "96b2341d5513a826c16796f9d1c0db4bab2a9e6f845b850fc0608d554aaea1cf",
+      "internal/ui/usage_context.go": "9741058d9141b516267d403dfab6bd5cfb7ef9d0382b767d6a29b27293be092a",
+      "internal/ui/usage_filters.go": "a84ff60410a327da9a76b8e5e5e19714b85bdd00eb9acb324d79029eb1eff9fd",
+      "internal/ui/usage_format.go": "1dd4937b9086635f8d0454067aaf42feda82e4c994bfdac98813fc334475e02a",
+      "internal/ui/usage_interactions_test.go": "5ca4f84098f325bd9ad00ef7cecc90c24be6c6807fc2bd4ad6d1bce077038097",
+      "internal/ui/usage_menus.go": "e756d3868cbd0497843373cc743a1516fd5c89cf6ed9835f931cac6d228d0b4d",
+      "internal/ui/usage_metadata.go": "045fd1e0578d745e0df9325e0a401b57cedcc67508a465878a16c83b57c54e71",
+      "internal/ui/usage_metadata_test.go": "bd78f6a0658574f6b13a0e4eb9bba77abcf2638d3adc60f51a5bbf751811e907",
+      "internal/ui/usage_native_table.go": "7a940145e15123c33e073087cb51a868b578fbba3e9fc4b42516f3fac51f1445",
+      "internal/ui/usage_native_table_test.go": "4cee9005dc89e7b493eebefc82d3eccab7bd9c53206cfa635f1bdd74f7e7223c",
+      "internal/ui/usage_projection.go": "c7c508c42e86d56f7c3adb12ddeca4e52e6e5a7d808b57e83c06c0eba53fc7a2",
+      "internal/ui/usage_table_semantics_test.go": "1343aa6562196419662fdb1bf51cb5529ea29efe8e91a6dbf91c941927518a49",
+      "internal/ui/usage_tables.go": "b423191dbdb253049b5e7c1591a1e7929573917b7bde2a3c9a2bba2f828235d0",
+      "internal/ui/usage_test.go": "d79bffdc87d10a1ded24a2ea4b7f40d4a8bcbd0d67c7a08c881f593a542f5410",
+      "internal/ui/usage_token_test.go": "15750f08d8cae44e0e6a374faedcf11a1c25047067fbc339e5bb2cd71582856d",
+      "internal/ui/usage_visual_test.go": "c27a6aaed9d0d2a5e9ff629299136beefcc51b2b67ed76a430a3565a6b142e34",
+      "internal/ui/viewer_native_test.go": "7571872ec714df56eedf95ab27a22af353bf1b2ff747c3ea698f7af9deff8885",
+      "internal/ui/viewer_parity_test.go": "ad401b4c5d815ee1b0bf9d64ba76691b800ea4255eb9d3ee04925101574a2bae",
+      "internal/ui/workspace_picker.go": "31b2205672b7b9c62939268ff5187e86e25da1ef7eca5e5967045961e7dc1648",
+      "internal/ui/workspace_picker_test.go": "dc9eafaf9b86e370bfed4eb5f373f6d11024db7ba6275ea768151113b5f556cf",
+      "internal/ui/workspace_review_regression_test.go": "a4f1f3111c43d150b8de6d2255e26693fc9d3b7178484aff83497cc8f5a75478",
+      "internal/workbench/mcp.go": "73f4cb69b7a777a974c4f36c49725bd80712bc9ab9446b0736ac2b4f16653782",
+      "internal/workbench/mcp_parity_test.go": "4d0e167a5d782ff0a1bdf899a3d8742573f4a6123ba72d1ac52ca0e421387d8a",
+      "internal/workbench/provider_catalog_gap_test.go": "e81ca4a0204eac3cf81f4ea889dab5980e80b1cc38f9ed3fe0259c9c3c0c9d42",
+      "internal/workbench/providers.go": "cf16af38a88ef9bf2a8d5aa76055f81776813c9b08de186c5b8d41d60aecfc71",
+      "internal/workbench/providers_parity_test.go": "86975db768bccbf5e13e43d04b9e920fbe594a4ccbe6084b89ca91f5e36c1219",
+      "internal/workbench/resource_process_other.go": "be06f0e6530c3947d8612ce0fb63e7f20918bb974083857ae87985843224ae5c",
+      "internal/workbench/resource_process_unix.go": "46dd7bdd2862af7ae0846798c04434a97e9eb95aa68147e9059f1dcfd4e5136c",
+      "internal/workbench/resource_process_unix_test.go": "000635b3098689447f3b5f555dc92e50f6c23910a7b55b1414b3317b953b60ef",
+      "internal/workbench/resource_process_windows.go": "d1dfc2e1c1c9f9d5bb3a2eafd5d1b5aa9c9416a20f317c1a698ecd2fbf3172dc",
+      "internal/workbench/resources.go": "c024cdd1eb3582ace6e09fc69f12f40552e7d51bb2f8b53b7ae4ea77246e5d34",
+      "internal/workbench/resources_parity_test.go": "7cc9e20bc40310a3b6a5858479bcf211f15b348b381c3a01e60a72d2b3a33bbb",
+      "internal/workbench/retention.go": "7a41e9b1739ffd0ee4942c203f50f0d142fcf0f28b5c2e340de9b6704fb20936",
+      "internal/workbench/service.go": "56c17ee90e6da552d3a0d0c94803051ae21fd876124a2a3b27003a29513bc03e",
+      "internal/workbench/usage.go": "f226f170356fa129e6973f93ce8743b9868542b10206372037f912037ef20074",
+      "internal/workbench/usage_export.go": "c26ebfd619715dae458f12c04df61d074c18396148fd1fa3c079aeaf4e0cfe87",
+      "internal/workbench/usage_export_test.go": "e7722d7367046bcb088f24dd04d6b706021ed81c6e9f46e0f68dc968b8cc47d4",
+      "internal/workbench/usage_model_scope_test.go": "2b4aaae08df358da9eee6fd7c1f9bb817311beb57e45d43f94fa42fe0b447e1c",
+      "internal/workbench/usage_native_fixture_test.go": "b80212827fba19abce43f482f6b856470442f815ba322d0bb7403caf46a6b821",
+      "internal/workbench/usage_parity_test.go": "983015e52d15656568b15fa154a9ecea763ec24fea76c9625920772862950cc6",
+      "internal/workbench/usage_unreadable_test.go": "4c388d50dd8236b7baba791afda91d09ee12f4b9cb7904eda4e8ef6e48c35913",
+      "internal/workbench/workbench_test.go": "283f6abd2ecf2c542eb48225700df2e7984ede9aae05ca18b914e7b86b3c63bf",
+      "internal/workspace/avatars.go": "86b4e37b1a640b2d11882f9444486f3bc3ba90f27c76c4a3bcbfed846dabec48",
+      "internal/workspace/avatars_test.go": "da79970a5a2761eeb199d9483d36cecf28a1fc1101d35a8d67db65833335795c",
+      "internal/workspace/checkpoint.go": "d6ae83b461e776191b5295a03d53db3c79a618d69f739758e7366b398f1bc726",
+      "internal/workspace/checkpoint_test.go": "577fb3d125464fe6eb47547db8bb7ab947e580cb2dc32e8e867f312d98522be4",
+      "internal/workspace/editor.go": "30d4302a79fc077b78af53fd86de0b51e112e381a19dee2fadde8a736fdb4093",
+      "internal/workspace/files.go": "250117e100828f5652dc0ce27204569f3f0a42bf692a04d7de4db85b6ff272ad",
+      "internal/workspace/files_test.go": "a74d3bbbada7614a438fedde91ab18bb288a6ca607e623fd5665042b47e20e8b",
+      "internal/workspace/generation.go": "9bd2994a269da04f5995f1d5f4e6a21317db9000bec406e9f1ad01104af2a06b",
+      "internal/workspace/generation_test.go": "241d8cb0cf1eb86a71372061a93bf033e769932a20257cba9a08d7ad9a52b746",
+      "internal/workspace/git.go": "30763b0f065926558fb8ecbb8b7f63685caadda6d577f6fc03394d231354ba4f",
+      "internal/workspace/git_ops.go": "bb9b0b617efc2423087fd493608bd8343b1117d4ff6e27f8d72090a7340f93d0",
+      "internal/workspace/git_process_unix.go": "0c20187f9017fc105ff6e95a357bbc578d1634a2bed12ff2a0e95cccc69ff3ab",
+      "internal/workspace/git_process_windows.go": "22aef4c201f52c228b031385b20ad373c975864b281dcbb919a3653534bd8bc8",
+      "internal/workspace/git_test.go": "fad74d00e241a2603b7366ac92c4821eb54248cb9adf71a211c33e9f962f6429",
+      "internal/workspace/github.go": "ef32646e2cd59ab3d858397c20fed99331bb5eac5194966c622d76bed5afea67",
+      "internal/workspace/github_templates.go": "c04bdfa32859ee09f08b1f73a29e1913f28ddf8a051c16d073a30e0df21aab89",
+      "internal/workspace/github_test.go": "9999ba754fb4ace346d954885219b7fefd2dca0593aa853fee2b873f4f0d209e",
+      "internal/workspace/process_cancel_unix_test.go": "7ccbb146e84243c7249a07d4ee5f15762dbd3ba07e01bd287a6c929a023ef226",
+      "internal/workspace/report_generation.go": "7d1bc41defb7b4ad7a17b73edb02820db92a533abf613d9e98b5013c4aec1112",
+      "internal/workspace/review.go": "35765592aa3c493dfa29b4a5863dadece49e2759a2d66665659bb56278fc758d",
+      "internal/workspace/review_highlight_test.go": "5ff97828275b80efd275ac833426bd389f0c8d254706b9c7ef04ab16499e64cb",
+      "internal/workspace/review_test.go": "5ac89e037754e534e9349de9b45a81667d450029f83a6deebe936528bd52eae5",
+      "internal/workspace/safety_acceptance_test.go": "06bd67c60217714e691b08cc883185d4e8693afb9a6405d199a7f9762edebe31",
+      "internal/workspace/setup.go": "ffb6793263b0b8b8a6ac1fee458df264e78c0a8c954a8eb470b630293554db9a",
+      "internal/workspace/setup_process_other.go": "0ae1cb2423ab6f22d4d417fa02b50472e46e0fe01729556c52ba8e2fb23b28b4",
+      "internal/workspace/setup_process_unix.go": "1cf0d3b747248ffdfab56e59889edd22fe7f2ce6ea5f3fc380074aa663b0d15a",
+      "internal/workspace/tree.go": "90d74215301a92e7d632a34a84f9e55e530e9c482b074e815cd4c9474a6e97ee",
+      "internal/workspace/tree_test.go": "61a6b4e41b49bbff34e4e147c1d580b7efefe65208b41cd3eef82a6aff8111ec",
+      "internal/workspace/watch.go": "c10294d92b8108852787fc88fa478821718de473815083a2696c19b6ad3b1e46",
+      "internal/workspace/watch_test.go": "a95a60c00402bda2452311a7d515a51ac6f51545b0e85ce09419b4d3df5f4adb",
+      "internal/workspace/worktrees.go": "27da359c7ec6e9ed048c258dc89b2da91fc1bd9761475e8f2418d6f9f12423fb",
+      "internal/workspace/worktrees_test.go": "d1f60119c2d663124f22165485fb50923da5822511c2fe5160609e85360728c5",
+      "scripts/go-native-overlay.py": "18df0779e271b7fa0fc85a6543d7978a970bdedba0f7426dc369b8f70b060b78",
+      "scripts/go-native.sh": "e8141da5873e7dcd0bb9cc9712c935eff19b3703a8093269f3b2259b0ceae2b1"
+    },
+    "sha256": "e966af24d01fa3e641d26b645edee7bc917c78e0196e39d24a0c223fa4155b10",
+    "source_unchanged_during_test": true
+  },
+  "command": [
+    "scripts/go-native.sh",
+    "test",
+    "-json",
+    "-race",
+    "./internal/ui",
+    "./internal/workbench",
+    "-run",
+    "TestSettingsSource|TestGeneralMeasured|TestAppearanceSource|TestShortcutsSource|TestSource|TestSettingsReconstruction|TestNativeProvider|TestProviderCredential|TestNativeAgentRetry|TestNativeRuntime|TestSettingsPageScroll|TestSettingsNavigation|TestBackground|TestProviderCatalogOnly",
+    "-count=1"
+  ],
+  "vet": {
+    "command": "scripts/go-native.sh vet ./internal/ui ./internal/workbench",
+    "status": "PASS"
+  },
+  "full_feature_pass_count": 0,
+  "visual_status": "UNTESTED for this working implementation; original f61e00f images inspected, not modified",
+  "native_os_status": "UNTESTED for these assertion sequences; mounted MyGo CPU tests are not real display/OS execution",
+  "assertions": [
+    {
+      "acceptance_rows": [
+        "P01"
+      ],
+      "test": "TestSettingsSourceSearchIndexAndSectionNavigation",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "settings_search_hits",
+          "line": 412,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L412"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "settings_search_results",
+          "line": 766,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L766"
+        }
+      ],
+      "action": "Type pid into native Settings search; select Process ID.",
+      "expected": "The55-entry source search index keeps category navigation visible, opens Runtime and clears query.",
+      "untested": "Full search keyboard traversal and non-Latin input on native OS.",
+      "status": "PASS",
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "verified_at": "2026-10-25T17:02:19.664096657+09:00",
+      "elapsed_seconds": 0.08,
+      "limits": "Named mounted/local-fixture assertion only; no whole-feature, visual or native-OS PASS."
+    },
+    {
+      "acceptance_rows": [
+        "P01"
+      ],
+      "test": "TestSettingsPageScrollRetained",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "settings_rows",
+          "line": 932,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L932"
+        }
+      ],
+      "action": "Scroll Shortcuts, leave for eight frames, return.",
+      "expected": "Per-page scroll offset survives view eviction.",
+      "untested": "All long pages, tiny-window clipping and source-native scroll physics.",
+      "status": "PASS",
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "verified_at": "2026-10-25T17:02:17.392611455+09:00",
+      "elapsed_seconds": 0.24,
+      "limits": "Named mounted/local-fixture assertion only; no whole-feature, visual or native-OS PASS."
+    },
+    {
+      "acceptance_rows": [
+        "P01"
+      ],
+      "test": "TestSettingsSourceHeaderAndGeneralRows",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "settings_rows",
+          "line": 932,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L932"
+        }
+      ],
+      "action": "Inspect General and activate notification sound by pointer then Space.",
+      "expected": "Fixed header and source General rows; unavailable updater adds no card; pointer/Space persist the preference.",
+      "untested": "OS notification permission and sound playback, all translations.",
+      "status": "PASS",
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "verified_at": "2026-10-25T17:02:19.739845501+09:00",
+      "elapsed_seconds": 0.08,
+      "limits": "Named mounted/local-fixture assertion only; no whole-feature, visual or native-OS PASS."
+    },
+    {
+      "acceptance_rows": [
+        "P02"
+      ],
+      "test": "TestNativeRuntimeUsesRealSnapshotAndStoppedUnknowns",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "runtime_rows",
+          "line": 4931,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L4931"
+        }
+      ],
+      "action": "Mount real-shaped running then stopped process snapshots.",
+      "expected": "PID/executable/uptime/stderr come from the snapshot; stopped fields never fabricate a connected process.",
+      "untested": "Real process Start/Stop/Restart, parked-process lifecycle and native fault injection.",
+      "status": "PASS",
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "verified_at": "2026-10-25T17:02:17.484793645+09:00",
+      "elapsed_seconds": 0.09,
+      "limits": "Named mounted/local-fixture assertion only; no whole-feature, visual or native-OS PASS."
+    },
+    {
+      "acceptance_rows": [
+        "P02",
+        "U06",
+        "U07"
+      ],
+      "test": "TestSourceRuntimePatchAndPrivacyControls",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "runtime_rows",
+          "line": 4931,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L4931"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "privacy_rows",
+          "line": 5618,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L5618"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/temp_ui.rs",
+          "handler": "temporary_files_section",
+          "line": 79,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/temp_ui.rs#L79"
+        }
+      ],
+      "action": "Click RPC patches, repeat while save pending; render scoped temp entries; change retention by switch and filtered Enter.",
+      "expected": "Dispatch actual patch setter without optimistic policy mutation; pending control blocks duplicate action; real temp metadata and mapped retention values persist.",
+      "untested": "This test does not write patch config or delete files; host lifecycle/cleanup safety tests and native picker captures remain separate.",
+      "status": "PASS",
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "verified_at": "2026-10-25T17:02:18.300328687+09:00",
+      "elapsed_seconds": 0.18,
+      "limits": "Named mounted/local-fixture assertion only; no whole-feature, visual or native-OS PASS."
+    },
+    {
+      "acceptance_rows": [
+        "P04"
+      ],
+      "test": "TestNativeAgentRetryIsUnknownUntilConfirmed",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "agent_rows",
+          "line": 5196,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L5196"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "toggle_auto_retry",
+          "line": 5781,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L5781"
+        }
+      ],
+      "action": "Mount unknown retry policy, choose Enable, then inject a confirmed enabled state.",
+      "expected": "Unknown is not advertised as enabled; only setter acknowledgement establishes the enabled value.",
+      "untested": "D04 intentionally differs from Rust initial enabled assumption; real provider transient-error retries and native menu pixels.",
+      "status": "PASS",
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "verified_at": "2026-10-25T17:02:17.541030321+09:00",
+      "elapsed_seconds": 0.06,
+      "limits": "Named mounted/local-fixture assertion only; no whole-feature, visual or native-OS PASS."
+    },
+    {
+      "acceptance_rows": [
+        "P04"
+      ],
+      "test": "TestSourceRetryStatusUsesObservedState",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "agent_rows",
+          "line": 5196,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L5196"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "abort_retry",
+          "line": 5828,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L5828"
+        }
+      ],
+      "action": "Mount actual retry-in-progress and click Abort retry; then project idle.",
+      "expected": "Dispatch AbortRetry without clearing observed state optimistically; idle removes the button.",
+      "untested": "Real RPC child acknowledgement, delayed retry and source-native error sequence.",
+      "status": "PASS",
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "verified_at": "2026-10-25T17:02:19.100254696+09:00",
+      "elapsed_seconds": 0.16,
+      "limits": "Named mounted/local-fixture assertion only; no whole-feature, visual or native-OS PASS."
+    },
+    {
+      "acceptance_rows": [
+        "P18"
+      ],
+      "test": "TestAppearanceSourceGroupsMappedChoicesAndPersistence",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "appearance_rows",
+          "line": 5926,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L5926"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "type_preview",
+          "line": 6241,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L6241"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "apply_settings_select",
+          "line": 7157,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L7157"
+        }
+      ],
+      "action": "Click Light, press Right; choose mapped active Theme and filter Interface font to Inter then Enter.",
+      "expected": "Source groups/previews and human names; mode/font persist; changing active palette never overwrites inactive palette.",
+      "untested": "OS System light/dark events, actual font raster equivalence, every preset and failure/relaunch sequence.",
+      "status": "PASS",
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "verified_at": "2026-10-25T17:02:17.864879777+09:00",
+      "elapsed_seconds": 0.32,
+      "limits": "Named mounted/local-fixture assertion only; no whole-feature, visual or native-OS PASS."
+    },
+    {
+      "acceptance_rows": [
+        "P18"
+      ],
+      "test": "TestSourceSettingsPickerEmptyEscapeAndReopen",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "settings_select_popup",
+          "line": 6907,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L6907"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "settings_select_step",
+          "line": 7104,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L7104"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "settings_select_confirm",
+          "line": 7124,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L7124"
+        }
+      ],
+      "action": "Open selector, filter no matches, press Enter/Escape, immediately reopen and select a filtered option.",
+      "expected": "No-match Enter is a no-op; Escape closes; reopen clears stale filter; selected option uses original index.",
+      "untested": "Native OS focus restoration and all outside-dismiss/scroll placements.",
+      "status": "PASS",
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "verified_at": "2026-10-25T17:02:18.722246356+09:00",
+      "elapsed_seconds": 0.17,
+      "limits": "Named mounted/local-fixture assertion only; no whole-feature, visual or native-OS PASS."
+    },
+    {
+      "acceptance_rows": [
+        "P18",
+        "P20",
+        "W43"
+      ],
+      "test": "TestSettingsReconstructionMeasuredSourceCardGeometry",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "appearance_rows",
+          "line": 5926,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L5926"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "shortcut_rows",
+          "line": 4672,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L4672"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/worktrees.rs",
+          "handler": "worktree_settings_rows",
+          "line": 870,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/worktrees.rs#L870"
+        }
+      ],
+      "action": "Mount1470x922 Appearance, Shortcuts and Worktrees fixtures.",
+      "expected": "Named group bounds stay within2DIP of measured actual Rust screenshots; Composer lower edge is viewport-clipped.",
+      "untested": "Pixel equality, light theme, nondefault font/density, long scroll and matched new native captures. Geometry alone is not visual PASS.",
+      "status": "PASS",
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "verified_at": "2026-10-25T17:02:18.548723597+09:00",
+      "elapsed_seconds": 0.09,
+      "limits": "Named mounted/local-fixture assertion only; no whole-feature, visual or native-OS PASS."
+    },
+    {
+      "acceptance_rows": [
+        "P19"
+      ],
+      "test": "TestSourceBackgroundBlurGeometryPercentAndSteppedKeyboard",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "blur_slider",
+          "line": 6447,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L6447"
+        }
+      ],
+      "action": "Mount tuning with sigma3; click midpoint, Right, End while image worker is busy.",
+      "expected": "184px track/20px control and50% label; half-sigma keyboard step coalesces into pending tuning; End shows100%.",
+      "untested": "Actual native drag/cursor, background chooser OS dialog and renderer fidelity.",
+      "status": "PASS",
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "verified_at": "2026-10-25T17:02:19.549368994+09:00",
+      "elapsed_seconds": 0.05,
+      "limits": "Named mounted/local-fixture assertion only; no whole-feature, visual or native-OS PASS."
+    },
+    {
+      "acceptance_rows": [
+        "P19"
+      ],
+      "test": "TestBackgroundChooseCoalesceFadeReuseFailureAndClear",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "background_choose",
+          "line": 6569,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L6569"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "blur_slider",
+          "line": 6447,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L6447"
+        }
+      ],
+      "action": "Choose a real temporary PNG, coalesce tuning, change fade, inject failure and clear.",
+      "expected": "Existing asynchronous photo store/cache preserves image/tuning semantics and reports failures; source-only control changes do not replace renderer.",
+      "untested": "Native file picker cancellation and unsupported real user image formats, GPU rendering.",
+      "status": "PASS",
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "verified_at": "2026-10-25T17:02:15.846285904+09:00",
+      "elapsed_seconds": 1.85,
+      "limits": "Named mounted/local-fixture assertion only; no whole-feature, visual or native-OS PASS."
+    },
+    {
+      "acceptance_rows": [
+        "P20"
+      ],
+      "test": "TestShortcutsSourceAdvertisedRowsAndComposerModes",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "shortcut_rows",
+          "line": 4672,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L4672"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "shortcut_row",
+          "line": 4756,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L4756"
+        }
+      ],
+      "action": "Inspect advertised chords, compact session range and Composer section; change send mode.",
+      "expected": "Primary source chord rather than aliases/palette-only commands; Composer labels follow actual preference.",
+      "untested": "Actual OS chord dispatch from terminal/editor/modal focus and non-English help layout.",
+      "status": "PASS",
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "verified_at": "2026-10-25T17:02:17.934328364+09:00",
+      "elapsed_seconds": 0.06,
+      "limits": "Named mounted/local-fixture assertion only; no whole-feature, visual or native-OS PASS."
+    },
+    {
+      "acceptance_rows": [
+        "P05",
+        "P01"
+      ],
+      "test": "TestSourceProviderGridCapabilitiesFilteringAndAboutIdentity",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_rows",
+          "line": 2391,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L2391"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_card",
+          "line": 3148,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L3148"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "settings_rows",
+          "line": 932,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L932"
+        }
+      ],
+      "action": "Inspect four providers, click advertised login/API-key actions, filter, then visit About.",
+      "expected": "Three296px columns with12px gaps; real capability dispatch; only custom entries get Configure; About says MyGo, not GPUI.",
+      "untested": "Long catalog scroll, complete quota popup, source About difference remains intentional, new native matched pixels.",
+      "status": "PASS",
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "verified_at": "2026-10-25T17:02:18.461862357+09:00",
+      "elapsed_seconds": 0.16,
+      "limits": "Named mounted/local-fixture assertion only; no whole-feature, visual or native-OS PASS."
+    },
+    {
+      "acceptance_rows": [
+        "P05"
+      ],
+      "test": "TestSourceProviderUnknownLiveCapabilitiesStayUnknown",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_rows",
+          "line": 2391,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L2391"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_card",
+          "line": 3148,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L3148"
+        }
+      ],
+      "action": "Expose a valid provider only through live ModelCatalog.",
+      "expected": "Card remains visible without an invented API-key control.",
+      "untested": "Future Pi schema changes and true unknown providers from installed runtime.",
+      "status": "PASS",
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "verified_at": "2026-10-25T17:02:19.141715031+09:00",
+      "elapsed_seconds": 0.04,
+      "limits": "Named mounted/local-fixture assertion only; no whole-feature, visual or native-OS PASS."
+    },
+    {
+      "acceptance_rows": [
+        "P05"
+      ],
+      "test": "TestSourceProviderAdvertisedEmptyMethodsDoNotFallBackToStaticCapability",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_card",
+          "line": 3148,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L3148"
+        }
+      ],
+      "action": "Expose an explicit runtime provider with no auth methods despite static API-key/OAuth metadata.",
+      "expected": "Show source no-methods explanation; do not silently replace explicit empty capability with guessed auth action.",
+      "untested": "Runtime capability refresh races and real provider permissions.",
+      "status": "PASS",
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "verified_at": "2026-10-25T17:02:19.588145019+09:00",
+      "elapsed_seconds": 0.03,
+      "limits": "Named mounted/local-fixture assertion only; no whole-feature, visual or native-OS PASS."
+    },
+    {
+      "acceptance_rows": [
+        "P05"
+      ],
+      "test": "TestProviderCatalogOnlyFutureProviderKeepsUnknownCapabilities",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_views",
+          "line": 2604,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L2604"
+        },
+        {
+          "path": "crates/orbit-pi/src/providers.rs",
+          "handler": "read_catalog_counts",
+          "line": 587,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/providers.rs#L587"
+        }
+      ],
+      "action": "Load a fixture Pi package with valid catalog-only provider and separate manifest.",
+      "expected": "Retain valid provider/count with unknown auth capabilities; never promote.manifest to a provider (D09 source-defect correction).",
+      "untested": "Real installed future package versions; exclusion is not pixel parity.",
+      "status": "PASS",
+      "package": "github.com/charlzyx/orbit/internal/workbench",
+      "verified_at": "2026-10-25T17:02:14.048610096+09:00",
+      "elapsed_seconds": 0.07,
+      "limits": "Named mounted/local-fixture assertion only; no whole-feature, visual or native-OS PASS."
+    },
+    {
+      "acceptance_rows": [
+        "P06"
+      ],
+      "test": "TestSourceProviderEditorModalChipsKeyboardAndPersistence",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_editor_layer",
+          "line": 4145,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L4145"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_editor_confirm",
+          "line": 7998,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L7998"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_save",
+          "line": 8027,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L8027"
+        }
+      ],
+      "action": "Open Add at800x560; type ID and Enter invalid form; choose API chip, fill fixture endpoint/models/key and save.",
+      "expected": "Source header/body/footer and API chips; Enter validates instead of submitting composer; footer reachable; actual saved config has chosen API and two models; key never paints.",
+      "untested": "Same-run Rust modal screenshot, all native Tab orders,600px-height source clipping, every API family and relaunch.",
+      "status": "PASS",
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "verified_at": "2026-10-25T17:02:19.353642874+09:00",
+      "elapsed_seconds": 0.21,
+      "limits": "Named mounted/local-fixture assertion only; no whole-feature, visual or native-OS PASS."
+    },
+    {
+      "acceptance_rows": [
+        "P06"
+      ],
+      "test": "TestNativeProviderSaveFailureKeepsDraft",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_save",
+          "line": 8027,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L8027"
+        }
+      ],
+      "action": "Make Pi config parent a regular file and save a provider draft.",
+      "expected": "Write failure retains editable fields and dummy secret with inline error, not false success.",
+      "untested": "Real permission-denied OS dialog and recovery/retry comparison with Rust.",
+      "status": "PASS",
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "verified_at": "2026-10-25T17:02:17.074032795+09:00",
+      "elapsed_seconds": 0.01,
+      "limits": "Named mounted/local-fixture assertion only; no whole-feature, visual or native-OS PASS."
+    },
+    {
+      "acceptance_rows": [
+        "P06",
+        "P07"
+      ],
+      "test": "TestSourceProviderCredentialModalSecretAndAlternativeMethod",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_key_layer",
+          "line": 3926,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L3926"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_key_open",
+          "line": 7712,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L7712"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "apply_provider_action",
+          "line": 3730,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L3730"
+        }
+      ],
+      "action": "Open API key at800x560, type dummy key, switch to advertised browser login; reopen cookie input and Escape.",
+      "expected": "460px source dialog; display name/id; password masking and focus; alternative login uses actual advertised method and wipes draft; Escape wipes cookie.",
+      "untested": "Real OAuth issuer/credential transmission, device code OS clipboard, native screenshots and source terminal fallback.",
+      "status": "PASS",
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "verified_at": "2026-10-25T17:02:19.497099057+09:00",
+      "elapsed_seconds": 0.14,
+      "limits": "Named mounted/local-fixture assertion only; no whole-feature, visual or native-OS PASS."
+    },
+    {
+      "acceptance_rows": [
+        "P06"
+      ],
+      "test": "TestSourceCredentialSaveDoesNotDiscardReopenedDraft",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_key_save",
+          "line": 7772,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L7772"
+        }
+      ],
+      "action": "Save dummy key asynchronously, dismiss and reopen same provider before UI applies completion; type a new draft.",
+      "expected": "Completed persistence refreshes actual runtime configuration but cannot close or discard the later draft.",
+      "untested": "Rust synchronous save has no identical callback race; real OS crash/recovery and credential scope still separate.",
+      "status": "PASS",
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "verified_at": "2026-10-25T17:02:19.560931516+09:00",
+      "elapsed_seconds": 0.01,
+      "limits": "Named mounted/local-fixture assertion only; no whole-feature, visual or native-OS PASS."
+    },
+    {
+      "acceptance_rows": [
+        "P07"
+      ],
+      "test": "TestSourceProviderAuthenticationCardLifecycle",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_auth_section",
+          "line": 2760,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L2760"
+        }
+      ],
+      "action": "Project waiting device session; open/copy/cancel; project failure, retry/dismiss; project new succeeded session.",
+      "expected": "Status/actions stay inside matching card; current provider/method dispatch; cancel/dismiss never fabricate backend status; old dismissal cannot hide new session.",
+      "untested": "Real browser opening is host-tested separately; native clipboard, credentials, timeout timing and actual source-state screenshots remain unverified.",
+      "status": "PASS",
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "verified_at": "2026-10-25T17:02:18.935085728+09:00",
+      "elapsed_seconds": 0.21,
+      "limits": "Named mounted/local-fixture assertion only; no whole-feature, visual or native-OS PASS."
+    },
+    {
+      "acceptance_rows": [
+        "W43"
+      ],
+      "test": "TestSourceWorktreeInlinePreferencesNavigationAndFailure",
+      "source_handlers": [
+        {
+          "path": "crates/orbit-pi/src/app/worktrees.rs",
+          "handler": "worktree_settings_rows",
+          "line": 870,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/worktrees.rs#L870"
+        }
+      ],
+      "action": "Edit trimmed nonempty root, temporarily empty input, open Manage and inject config write failure through the setup-policy switch.",
+      "expected": "Persist valid preferences; empty intermediate input preserves last valid policy; failed toggle does not adopt unpersisted consent; Manage navigates.",
+      "untested": "Setup-script input is not exercised by this test. Actual subsequent creation/setup requires independent host test; per-repository overrides and native focus/scroll.",
+      "status": "PASS",
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "verified_at": "2026-10-25T17:02:18.11956254+09:00",
+      "elapsed_seconds": 0.18,
+      "limits": "Named mounted/local-fixture assertion only; no whole-feature, visual or native-OS PASS."
+    }
+  ]
+}

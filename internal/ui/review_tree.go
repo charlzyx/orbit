@@ -102,10 +102,8 @@ func (s *reviewState) toggleTreeDirectory(path string) {
 	s.syncTreeRows()
 }
 func (a *App) reviewPaneWidth() float32 {
-	if a.ReviewWidth <= 0 {
-		return 460
-	}
-	return max(300, a.ReviewWidth)
+	a.initReviewLayout()
+	return a.reviewState.layout.width
 }
 func (a *App) reviewTree(c *ui.Context) {
 	s, t := &a.reviewState, a.Theme

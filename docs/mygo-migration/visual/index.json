@@ -35,13 +35,13 @@
   },
   "status_totals": {
     "PARTIAL": 2,
-    "UNTESTED": 468,
-    "BLOCKED": 20
+    "UNTESTED": 467,
+    "BLOCKED": 21
   },
   "exhaustiveness_verdict": "AUDITED_CANDIDATES_STATE_RECIPES_UNDER_REVIEW",
   "recipe_execution_verdict": "NOT_EXECUTED",
   "source_anchor_validation": "490 pinned source paths/handlers checked; this is not actual-state validation.",
-  "existing_diagnostics": "Two prior diagnostic pairs used mismatched client sizes and count as zero valid pairs. Old30 count is not reused. CPU standalone component captures do not count as full-window pairs.",
+  "existing_diagnostics": "Latest: 15 individually indexed actual native page-state pairs at1470\u00d7922 from81a5114, all raw DIFFERENT; font/clock/caret normalization open, therefore0 valid normalized pairs and0 visualPASS. Prior mismatched-size pairs and CPU fixtures are not added to the current count.",
   "stable_id_policy": "These IDs are frozen. Append discoveries; mark superseded duplicates explicitly without renumbering.",
   "shards": [
     {
@@ -373,5 +373,22 @@
     }
   ],
   "planned_image_count_note": "980 is an arithmetic upper placeholder for490 candidates, not a finalized screenshot requirement. Invalid/unreachable candidates must not be captured as source parity; combined candidates need split review and discoveries await IDs.",
-  "additional_required_candidate_review": "../usage-visual-source-review.json contains14 missing/split candidate families; ../model-visual-source-review.json contains6 further branch families. They remain explicit discoveries while candidate count is frozen, not proven coverage."
+  "additional_required_candidate_review": "../usage-visual-source-review.json contains14 missing/split candidate families; ../model-visual-source-review.json contains6 further branch families. They remain explicit discoveries while candidate count is frozen, not proven coverage.",
+  "diagnostic_comparisons": {
+    "go_sha": "81a5114c36fc09bd9f125047d73d1a690f9e97c4",
+    "run": "https://github.com/charlzyx/orbit/actions/runs/40175045471",
+    "captured_pairs": 15,
+    "same_client_dimensions_pairs": 15,
+    "raw_compared_pairs": 15,
+    "exact_pixel_pairs": 0,
+    "normalized_pairs": 0,
+    "visual_passes": 0,
+    "report": "../probes/native-81a5114/README.md"
+  },
+  "candidate_validity": {
+    "invalid_source_state_ids": [
+      "V061"
+    ],
+    "policy": "490 stable candidate IDs retained; invalid source states are not screenshots to capture and do not prove exhaustive coverage."
+  }
 }

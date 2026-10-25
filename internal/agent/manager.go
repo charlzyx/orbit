@@ -1254,19 +1254,22 @@ func (m *Manager) Abort() error {
 	}
 	entry.state.awaiting = false
 	client := entry.client
+	hasQueue := len(entry.state.snapshot.Queue.Steering)+len(entry.state.snapshot.Queue.FollowUp) > 0
 	m.mu.Unlock()
 	if !m.launch(func() {
-		response, err := m.callClient(client, pirpc.NewCommand(pirpc.ClearQueue, nil))
-		if err == nil {
-			var dropped Queue
-			if response.DecodeData(&dropped) == nil {
-				parts := append(append([]string{}, dropped.Steering...), dropped.FollowUp...)
-				m.mu.Lock()
-				entry.state.snapshot.Queue = Queue{}
-				if len(parts) > 0 {
-					entry.state.snapshot.ComposerText = strings.Join(parts, "\n\n")
+		if hasQueue {
+			response, err := m.callClient(client, pirpc.NewCommand(pirpc.ClearQueue, nil))
+			if err == nil {
+				var dropped Queue
+				if response.DecodeData(&dropped) == nil {
+					parts := append(append([]string{}, dropped.Steering...), dropped.FollowUp...)
+					m.mu.Lock()
+					entry.state.snapshot.Queue = Queue{}
+					if len(parts) > 0 {
+						entry.state.snapshot.ComposerText = strings.Join(parts, "\n\n")
+					}
+					m.mu.Unlock()
 				}
-				m.mu.Unlock()
 			}
 		}
 		_, abortErr := m.callClient(client, pirpc.NewCommand(pirpc.Abort, nil))

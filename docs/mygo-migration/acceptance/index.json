@@ -2,9 +2,9 @@
   "schema": "orbit-acceptance-index/v1",
   "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
   "published_implementation_reference": {
-    "sha": "80580ee3cffe8eab19b9399d7813fa6be61ec6d9",
-    "url": "https://github.com/charlzyx/orbit/commit/80580ee3cffe8eab19b9399d7813fa6be61ec6d9",
-    "scope": "Reference only. Current dirty-tree evidence is NOT attributed to this commit."
+    "sha": "81a5114c36fc09bd9f125047d73d1a690f9e97c4",
+    "url": "https://github.com/charlzyx/orbit/commit/81a5114c36fc09bd9f125047d73d1a690f9e97c4",
+    "scope": "Published reference only. Subsequent working-tree and historical scoped evidence must not be attributed to this commit without its exact manifest."
   },
   "row_count": 139,
   "step_count": 973,

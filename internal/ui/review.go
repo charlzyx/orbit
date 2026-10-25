@@ -12,6 +12,7 @@ import (
 )
 
 type reviewState struct {
+	layout                                reviewLayoutState
 	turn                                  int // Zero follows latest completed turn; positive pins historical review.
 	source                                workspace.ReviewSource
 	data                                  workspace.ReviewSnapshot
@@ -179,6 +180,14 @@ func (a *App) review(c *ui.Context) {
 					}
 				}).Clicked() {
 				}
+				label, icon := "Full width review", "icons/arrow-expand.svg"
+				if s.layout.full {
+					label, icon = "Restore review width", "icons/arrow-shrink.svg"
+				}
+				if a.iconButton(c.Key("review-full-width"), label, icon).KeepFocus().Clicked() {
+					a.toggleReviewFull()
+					c.AnimationFrame()
+				}
 				if a.iconButton(c, "Close review", "icons/x.svg").Clicked() {
 					a.ReviewVisible = false
 				}
@@ -215,6 +224,7 @@ func (a *App) review(c *ui.Context) {
 				a.reviewFile(-1)
 			}
 		})
+		a.reviewResizeHandle(c)
 	})
 }
 func reviewLabel(s workspace.ReviewSource) string {

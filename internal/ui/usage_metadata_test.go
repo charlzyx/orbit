@@ -183,7 +183,7 @@ func TestUsagePaintedSessionContextRowScopeAndLifetime(t *testing.T) {
 		t.Fatal("invented source Escape handler on pointer-only context")
 	}
 	for range 2 {
-		tt.Click("Filter by provider: provider")
+		tt.Click("Filter by provider: Provider")
 		if !s.menu("context").Open {
 			t.Fatal("provider action prematurely dismissed context")
 		}
@@ -191,11 +191,11 @@ func TestUsagePaintedSessionContextRowScopeAndLifetime(t *testing.T) {
 	if len(s.filter.Providers) != 0 {
 		t.Fatal("provider toggles not reversible")
 	}
-	tt.Click("Filter by model: model")
+	tt.Click("Filter by model: model · Provider")
 	if len(s.filter.ModelRefs) != 1 || s.filter.ModelRefs[0].Provider != "provider" || s.filter.ModelRefs[0].Model != "model" || !s.menu("context").Open {
 		t.Fatal("context model loses provider identity", s.filter)
 	}
-	tt.Click("Filter by model: model")
+	tt.Click("Filter by model: model · Provider")
 	tt.Click("Scope to this session")
 	if s.menu("context").Open || s.filter.SessionPath != "/sessions/79.jsonl" {
 		t.Fatal("scope must close and use exact session path")

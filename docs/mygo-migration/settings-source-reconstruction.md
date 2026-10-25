@@ -108,3 +108,27 @@ Reconstruction source: `internal/ui/settings.go`, `background.go`,
 `internal/workbench/provider_catalog_gap_test.go` regression. Controller snapshot,
 RPC-patch persistence, auth-session reset, modal guards, worktree propagation and
 system-locale integration are owned and verified separately.
+
+## Provider dialog and blur continuation
+
+`settings_provider_dialogs.go` reconstructs source `provider_editor_layer`
+(520px width /560px cap), `provider_key_layer` (460px width), modal header/body/
+footer divisions, nine API-family chips, existing-ID display, field hints,
+password input focus and source confirmation labels. The real existing writes
+and editable save-error states are retained. Source Enter validates/submits the
+current form; Escape clears temporary credential text. A completed asynchronous
+key save cannot consume a later reopened same-provider draft.
+
+`background.go` uses a native SliderBase with source184px track,14px knob,
+half-sigma snapping and normalized percent. It keeps the existing renderer,
+worker/coalescing, cache and photo-store semantics unchanged. Provider cards also
+respect explicit empty runtime auth methods instead of falling back to guessed
+static controls; source action glyphs are restored.
+
+Canonical scoped race and vet passed at08:02UTC, with unchanged scoped source
+manifest `e966af24d01fa3e641d26b645edee7bc917c78e0196e39d24a0c223fa4155b10`.
+The [23 named assertion crosswalk](acceptance/settings-source-crosswalk.md) maps
+exact source handlers, steps, expectations and remaining native/scroll cases to
+the real P/W/U row IDs. Its [machine-readable companion](acceptance/settings-source-crosswalk.json)
+and named test events are integration inputs, not a change to feature status.
+Same-run source dialog/blur screenshots and real OS interactions remain pending.

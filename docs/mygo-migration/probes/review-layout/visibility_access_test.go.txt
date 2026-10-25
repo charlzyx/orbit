@@ -1,0 +1,45 @@
+package ui
+
+import (
+ "testing"
+ "github.com/egoist/mygo/internal/platform"
+)
+
+// Executed against an isolated copy of the exact9c69cf829ece MyGo source.
+// No production dependency source is modified by this proof.
+func TestOrbitRetainedInvisibleInputIsolation(t *testing.T) {
+ hidden := false
+ text := "original 中文"
+ keyCalls := 0
+ tt := coreNewTester(func(c *context) {
+  box := coreColumn(c).Fill()
+  if hidden { box.Invisible().Disabled(true) }
+  box.Children(func() {
+   input := coreTextAreaBase(c, &text).Label("Retained editor").OnTextKey(func(k TextKey) bool { keyCalls++; return false })
+   if !hidden { input.Focus() }
+  })
+ }, 600, 300)
+ tt.send(platform.SurfaceEvent{Kind:platform.AccessibilityOn})
+ accessNode(t, tt.h.access, platform.RoleTextField, "Retained editor")
+ tt.Key(Cmd, KeyA)
+ tt.Type("replacement 中文")
+ beforeKeys := keyCalls
+ hidden = true
+ tt.Frame()
+ for _, node := range tt.h.access.Nodes {
+  if node.Label == "Retained editor" || node.Value == text { t.Fatal("invisible editor leaked into accessibility tree", node) }
+ }
+ if tt.h.access.Focus != 0 { t.Fatal("invisible editor kept accessibility focus", tt.h.access.Focus) }
+ tt.Type("hidden typing")
+ tt.SetClipboard("hidden paste")
+ tt.Key(Cmd, KeyV)
+ tt.Key(0, KeyEnter)
+ if text != "replacement 中文" || keyCalls != beforeKeys { t.Fatal("invisible editor accepted input", text, keyCalls, beforeKeys) }
+ for range 4 { tt.Frame() }
+ if tt.FramePending() { t.Fatal("invisible input invalidates") }
+ hidden = false
+ tt.Frame()
+ accessNode(t, tt.h.access, platform.RoleTextField, "Retained editor")
+ tt.Key(Cmd, KeyZ)
+ if text != "original 中文" { t.Fatal("retained editor lost undo", text) }
+}

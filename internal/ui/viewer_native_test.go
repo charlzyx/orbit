@@ -36,6 +36,7 @@ func mountedFile(t *testing.T, text string) (*App, *ui.Tester, string) {
 	tt := ui.NewTester(func(c *ui.Context) {
 		c.SetTheme(a.Theme.Native())
 		ui.Column(c).Fill().Background(a.Theme.Background).Children(func() { a.fileEditor(c) })
+		a.prompt(c)
 	}, 1000, 700)
 	tt.Frame()
 	if err := tt.Click("File editor"); err != nil {
@@ -519,5 +520,114 @@ func TestMountedFileOpenCompletionUsesCurrentDocumentAfterReload(t *testing.T) {
 		t.Fatal("loaded document has no native buffer")
 	} else if st.Buffer.String() != "new disk" {
 		t.Fatal("old open snapshot replaced newer reloaded document", st.Buffer.String())
+	}
+}
+
+func TestMountedFileRenameSubtreeKeepsEveryBufferCaretAndUndo(t *testing.T) {
+	a, tt, other := mountedFile(t, "other original")
+	tt.Key(ui.Cmd, ui.KeyA)
+	tt.Type("other draft")
+	otherState := a.files.states[other]
+	root := filepath.Dir(other)
+	dir := filepath.Join(root, "src")
+	if err := os.Mkdir(dir, 0700); err != nil {
+		t.Fatal(err)
+	}
+	path := filepath.Join(dir, "one.txt")
+	if err := os.WriteFile(path, []byte("original"), 0600); err != nil {
+		t.Fatal(err)
+	}
+	d, err := a.files.editor.Open(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	a.syncDocument(d)
+	a.files.focusPending = path
+	tt.Frame()
+	tt.Key(ui.Cmd, ui.KeyA)
+	tt.Type("saved revision")
+	if err := a.files.editor.Save(path); err != nil {
+		t.Fatal(err)
+	}
+	state := a.files.states[path]
+	tt.Key(0, ui.KeyLeft)
+	selection := state.Selection()
+	a.renameFile(dir)
+	tt.Frame()
+	tt.Key(ui.Cmd, ui.KeyA)
+	tt.Type("renamed")
+	tt.Key(0, ui.KeyEnter)
+	drainRegressionUpdates(t, a, func() bool { return !a.files.mutating })
+	tt.Frame()
+	newPath := filepath.Join(root, "renamed", "one.txt")
+	if a.files.states[newPath] != state || a.files.states[other] != otherState {
+		t.Fatal("rename replaced native buffers, including unrelated tabs")
+	}
+	if _, ok := a.files.states[path]; ok {
+		t.Fatal("old path retained a second editor state")
+	}
+	if state.Selection() != selection {
+		t.Fatal("rename lost Unicode/byte caret", state.Selection(), selection)
+	}
+	if !tt.Focused("File editor") {
+		t.Fatal("rename did not retain active editor focus")
+	}
+	tt.Key(ui.Cmd, ui.KeyZ)
+	if state.Buffer.String() != "original" {
+		t.Fatal("renamed buffer lost undo history", state.Buffer.String())
+	}
+	a.activateFile(other)
+	tt.Frame()
+	tt.Key(ui.Cmd, ui.KeyZ)
+	if otherState.Buffer.String() != "other original" {
+		t.Fatal("unrelated buffer lost undo history", otherState.Buffer.String())
+	}
+	if b, err := os.ReadFile(newPath); err != nil || string(b) != "saved revision" {
+		t.Fatal("rename changed saved content", string(b), err)
+	}
+}
+
+func TestMountedFileRenameCancelAndFailureKeepState(t *testing.T) {
+	a, tt, path := mountedFile(t, "saved")
+	state := a.files.states[path]
+	tt.Key(0, ui.KeyRight)
+	selection := state.Selection()
+	a.renameFile(path)
+	tt.Frame()
+	if err := tt.Click("Cancel"); err != nil {
+		t.Fatal(err)
+	}
+	if a.promptOpen || a.files.states[path] != state {
+		t.Fatal("cancel mutated tab")
+	}
+	// Enter without changing the name is a successful no-op, not a reason
+	// to delete and recreate the native state under the same map key.
+	a.renameFile(path)
+	tt.Frame()
+	tt.Key(0, ui.KeyEnter)
+	drainRegressionUpdates(t, a, func() bool { return !a.files.mutating })
+	tt.Frame()
+	if a.files.states[path] != state || state.Selection() != selection {
+		t.Fatal("same-name rename reset native state")
+	}
+	target := filepath.Join(filepath.Dir(path), "existing.txt")
+	if err := os.WriteFile(target, []byte("do not overwrite"), 0600); err != nil {
+		t.Fatal(err)
+	}
+	a.renameFile(path)
+	tt.Frame()
+	tt.Key(ui.Cmd, ui.KeyA)
+	tt.Type("existing.txt")
+	tt.Key(0, ui.KeyEnter)
+	drainRegressionUpdates(t, a, func() bool { return !a.files.mutating })
+	tt.Frame()
+	if a.files.states[path] != state || state.Selection() != selection {
+		t.Fatal("failed rename replaced state/caret")
+	}
+	if b, err := os.ReadFile(target); err != nil || string(b) != "do not overwrite" {
+		t.Fatal("rename overwrote existing target", string(b), err)
+	}
+	if _, err := os.Stat(path); err != nil {
+		t.Fatal("failed rename lost original", err)
 	}
 }

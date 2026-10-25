@@ -1,0 +1,24 @@
+{
+  "renderer": "MyGo ui.NewTester CPU, not an actual OS window",
+  "viewport": [
+    1470,
+    922
+  ],
+  "referenceCommit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "theme": "orbit-azure",
+  "fontSize": 14,
+  "density": 100,
+  "scope": "source-form geometry, pointer/keyboard and retained privacy surfaces",
+  "externalEffects": "fake GitHub/URL adapters; local fixtures only; no credentials, inference, real issue creation or browser launch",
+  "status": "PARTIAL; native recapture pending",
+  "files": {
+    "bug-report-feature-cpu.png": "5dbf2ff8be09581cf0e6ba821a2a61cbdb42342916517c688ba47a4bc6b7f384",
+    "bug-report-generating-cpu.png": "3f391347d1a07fbf24daeb52bb4c94daa90bc8ee106c4ebee40ebb5d3b4dffa1",
+    "bug-report-privacy-cpu.png": "d34ba9896297fccece5d227c799e65607df54094b9216d8842c54f40648afcfe",
+    "bug-report-review-cpu.png": "f3631b325bb16a4c4015a953cce436df3ebfc7a623eb1eb546aa2386d4fff951",
+    "bug-report-screenshot-preview-cpu.png": "a8e069fe7b4d17649c155703bb1294886a2ae7d345690bca280b918ded7e4d29",
+    "bug-report-screenshots-cpu.png": "cace5e7921c481fd65961bfb47729df6e9a6551c463c5068f7cf0c53a934d019",
+    "bug-report-source-form-cpu.png": "1dab873f390c05f7849c864a1b9b950c72016254aa1e99a68853262db7769f2d",
+    "bug-report-source-geometry.json": "a0e78f739f61e5b93b58c589b6d9350c9c0b336c9f0b8a4b7b043de174d9b332"
+  }
+}

@@ -36,6 +36,11 @@ export VK_LOADER_DEBUG=error,warn
 mkdir -p "$HOME/.orbit-pi" "$PI_CODING_AGENT_DIR" "$XDG_CACHE_HOME" "$fixture/workspace"
 printf '%s\n' '{"language":"en","ui_font_size":14,"terminal_font_size":13,"editor_font_size":13,"spacing_density":100,"reduce_motion":true}' > "$HOME/.orbit-pi/ui.json"
 printf '%s\n' '{"mode":"dark","dark_theme":"orbit-azure","light_theme":"orbit-azure-light"}' > "$HOME/.orbit-pi/theme"
+# Optional synthetic input is identical for both apps; never seed a real HOME.
+if [[ "${ORBIT_CAPTURE_USAGE:-0}" == 1 ]]; then
+  python3 "$repo_root/scripts/usage-native/materialize.py" "$HOME" --manifest "$output/usage-fixture.json"
+  mkdir -p "$fixture/workspace/alpha" "$fixture/workspace/beta"
+fi
 Xvfb "$DISPLAY" -screen 0 1920x1200x24 -dpi 96 -nolisten tcp > "$output/xvfb.log" 2>&1 & display_pid=$!
 trap 'kill ${app_pid:-} ${wm_pid:-} "$display_pid" 2>/dev/null || true' EXIT
 for attempt in {1..100}; do xdpyinfo >/dev/null 2>&1 && break; sleep .1; done
@@ -93,6 +98,12 @@ mcp 532
 about 577
 report-bug 622
 SECTIONS
+if [[ "${ORBIT_CAPTURE_USAGE:-0}" == 1 ]]; then
+  # Escape leaves Settings before the source global Usage shortcut. No clicks
+  # on guessed chart/table coordinates, no session opening or model inference.
+  xdotool key Escape
+  bash "$repo_root/scripts/usage-native/capture-state.sh" simple "$window" "$output"
+fi
 SOURCE_SHA="$source_sha" CAPTURE_KIND="$kind" CAPTURE_OUTPUT="$output" CAPTURE_REPO="$source_root" CAPTURE_BINARY="$binary" CAPTURE_HARNESS="$repo_root" CAPTURE_SOURCE_HEAD="$capture_source_head" CAPTURE_SOURCE_DIRTY="$capture_source_dirty" python3 - <<'PY'
 import json, os, subprocess, pathlib, hashlib
 out = os.environ['CAPTURE_OUTPUT']
@@ -105,11 +116,17 @@ for name in sorted(p.name for p in pathlib.Path(out).glob('*.png')):
 manifest = dict(source=os.environ['SOURCE_SHA'], application=os.environ['CAPTURE_KIND'],
     display='Xvfb/Openbox Linux software graphics', requestedViewport=[1470, 922],
     actualImageSizes=images, dpi=96, uiScale=1, palette='orbit-azure', language='en', fontSize=14,
-    density=100, reduceMotion=True, state='isolated empty home, no credentials or inference',
+    density=100, reduceMotion=True, state=('isolated synthetic Usage fixture, no credentials or inference' if os.environ.get('ORBIT_CAPTURE_USAGE') == '1' else 'isolated empty home, no credentials or inference'),
     timezone='UTC', clockFrozen=False, animationPhaseFrozen=False,
     fontEvidence='Bundled source inputs only; per-renderer resolved glyph faces remain unverified',
     volatileCases={'settings-runtime-dark.png': ['process PID', 'uptime'], 'settings-about-dark.png': ['development version/build identity']},
     note='Verify selected states and client image sizes before pixel comparison; no resizing is allowed to mask layout errors.')
+usage_fixture = pathlib.Path(out) / 'usage-fixture.json'
+if usage_fixture.exists():
+    manifest['usageFixtureSha256'] = hashlib.sha256(usage_fixture.read_bytes()).hexdigest()
+    manifest['usageFixture'] = json.loads(usage_fixture.read_text())
+    manifest['usageCaptureState'] = 'Simple requested using Escape then Ctrl+U; selected state and scan completion require manual image review'
+    manifest['volatileCases']['usage-simple-dark.png'] = ['scan-relative header age', 'activity calendar trailing-year anchor']
 source_root = pathlib.Path(os.environ['CAPTURE_REPO'])
 manifest['binarySha256'] = hashlib.sha256(pathlib.Path(os.environ['CAPTURE_BINARY']).read_bytes()).hexdigest()
 manifest['sourceRootGitHead'] = os.environ['CAPTURE_SOURCE_HEAD']

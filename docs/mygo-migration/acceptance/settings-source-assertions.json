@@ -1,0 +1,142 @@
+{
+  "P01": [
+    [
+      "TestSettingsSourceSearchIndexAndSectionNavigation",
+      "The55-entry source search index keeps category navigation visible, opens Runtime and clears query."
+    ],
+    [
+      "TestSettingsPageScrollRetained",
+      "Per-page scroll offset survives view eviction."
+    ],
+    [
+      "TestSettingsSourceHeaderAndGeneralRows",
+      "Fixed header and source General rows; unavailable updater adds no card; pointer/Space persist the preference."
+    ],
+    [
+      "TestSourceProviderGridCapabilitiesFilteringAndAboutIdentity",
+      "Three296px columns with12px gaps; real capability dispatch; only custom entries get Configure; About says MyGo, not GPUI."
+    ]
+  ],
+  "P02": [
+    [
+      "TestNativeRuntimeUsesRealSnapshotAndStoppedUnknowns",
+      "PID/executable/uptime/stderr come from the snapshot; stopped fields never fabricate a connected process."
+    ],
+    [
+      "TestSourceRuntimePatchAndPrivacyControls",
+      "Dispatch actual patch setter without optimistic policy mutation; pending control blocks duplicate action; real temp metadata and mapped retention values persist."
+    ]
+  ],
+  "U06": [
+    [
+      "TestSourceRuntimePatchAndPrivacyControls",
+      "Dispatch actual patch setter without optimistic policy mutation; pending control blocks duplicate action; real temp metadata and mapped retention values persist."
+    ]
+  ],
+  "U07": [
+    [
+      "TestSourceRuntimePatchAndPrivacyControls",
+      "Dispatch actual patch setter without optimistic policy mutation; pending control blocks duplicate action; real temp metadata and mapped retention values persist."
+    ]
+  ],
+  "P04": [
+    [
+      "TestNativeAgentRetryIsUnknownUntilConfirmed",
+      "Unknown is not advertised as enabled; only setter acknowledgement establishes the enabled value."
+    ],
+    [
+      "TestSourceRetryStatusUsesObservedState",
+      "Dispatch AbortRetry without clearing observed state optimistically; idle removes the button."
+    ]
+  ],
+  "P18": [
+    [
+      "TestAppearanceSourceGroupsMappedChoicesAndPersistence",
+      "Source groups/previews and human names; mode/font persist; changing active palette never overwrites inactive palette."
+    ],
+    [
+      "TestSourceSettingsPickerEmptyEscapeAndReopen",
+      "No-match Enter is a no-op; Escape closes; reopen clears stale filter; selected option uses original index."
+    ],
+    [
+      "TestSettingsReconstructionMeasuredSourceCardGeometry",
+      "Named group bounds stay within2DIP of measured actual Rust screenshots; Composer lower edge is viewport-clipped."
+    ]
+  ],
+  "P20": [
+    [
+      "TestSettingsReconstructionMeasuredSourceCardGeometry",
+      "Named group bounds stay within2DIP of measured actual Rust screenshots; Composer lower edge is viewport-clipped."
+    ],
+    [
+      "TestShortcutsSourceAdvertisedRowsAndComposerModes",
+      "Primary source chord rather than aliases/palette-only commands; Composer labels follow actual preference."
+    ]
+  ],
+  "W43": [
+    [
+      "TestSettingsReconstructionMeasuredSourceCardGeometry",
+      "Named group bounds stay within2DIP of measured actual Rust screenshots; Composer lower edge is viewport-clipped."
+    ],
+    [
+      "TestSourceWorktreeInlinePreferencesNavigationAndFailure",
+      "Persist valid preferences; empty intermediate input preserves last valid policy; failed toggle does not adopt unpersisted consent; Manage navigates."
+    ]
+  ],
+  "P19": [
+    [
+      "TestSourceBackgroundBlurGeometryPercentAndSteppedKeyboard",
+      "184px track/20px control and50% label; half-sigma keyboard step coalesces into pending tuning; End shows100%."
+    ],
+    [
+      "TestBackgroundChooseCoalesceFadeReuseFailureAndClear",
+      "Existing asynchronous photo store/cache preserves image/tuning semantics and reports failures; source-only control changes do not replace renderer."
+    ]
+  ],
+  "P05": [
+    [
+      "TestSourceProviderGridCapabilitiesFilteringAndAboutIdentity",
+      "Three296px columns with12px gaps; real capability dispatch; only custom entries get Configure; About says MyGo, not GPUI."
+    ],
+    [
+      "TestSourceProviderUnknownLiveCapabilitiesStayUnknown",
+      "Card remains visible without an invented API-key control."
+    ],
+    [
+      "TestSourceProviderAdvertisedEmptyMethodsDoNotFallBackToStaticCapability",
+      "Show source no-methods explanation; do not silently replace explicit empty capability with guessed auth action."
+    ],
+    [
+      "TestProviderCatalogOnlyFutureProviderKeepsUnknownCapabilities",
+      "Retain valid provider/count with unknown auth capabilities; never promote.manifest to a provider (D09 source-defect correction)."
+    ]
+  ],
+  "P06": [
+    [
+      "TestSourceProviderEditorModalChipsKeyboardAndPersistence",
+      "Source header/body/footer and API chips; Enter validates instead of submitting composer; footer reachable; actual saved config has chosen API and two models; key never paints."
+    ],
+    [
+      "TestNativeProviderSaveFailureKeepsDraft",
+      "Write failure retains editable fields and dummy secret with inline error, not false success."
+    ],
+    [
+      "TestSourceProviderCredentialModalSecretAndAlternativeMethod",
+      "460px source dialog; display name/id; password masking and focus; alternative login uses actual advertised method and wipes draft; Escape wipes cookie."
+    ],
+    [
+      "TestSourceCredentialSaveDoesNotDiscardReopenedDraft",
+      "Completed persistence refreshes actual runtime configuration but cannot close or discard the later draft."
+    ]
+  ],
+  "P07": [
+    [
+      "TestSourceProviderCredentialModalSecretAndAlternativeMethod",
+      "460px source dialog; display name/id; password masking and focus; alternative login uses actual advertised method and wipes draft; Escape wipes cookie."
+    ],
+    [
+      "TestSourceProviderAuthenticationCardLifecycle",
+      "Status/actions stay inside matching card; current provider/method dispatch; cancel/dismiss never fabricate backend status; old dismissal cannot hide new session."
+    ]
+  ]
+}

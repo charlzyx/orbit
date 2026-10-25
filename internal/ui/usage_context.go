@@ -52,7 +52,7 @@ func (a *App) usageSessionContextPopup(c *ui.Context, anchor ui.Element, row usa
 	}
 	fresh := s.contextFresh
 	ui.Overlay(c.Key("usage-session-context-overlay"), func() {
-		panel := ui.Column(c).AttachTo(anchor, ui.AnchorTopStart, ui.AnchorTopStart).Margin(-(40-anchor.Bounds().H)/2, 0, 0, -12.5).Padding(a.Theme.Space(4), 0).Gap(a.Theme.Space(1)).Background(a.Theme.Elevated).Border(1, a.Theme.BorderStrong()).Radius(a.Theme.Px(12)).Label("Usage session context menu")
+		panel := ui.Column(c).AttachTo(anchor, ui.AnchorTopStart, ui.AnchorTopStart).Margin(0).Padding(a.Theme.Space(4), 0).Gap(a.Theme.Space(1)).Background(a.Theme.Elevated).Border(1, a.Theme.BorderStrong()).Radius(a.Theme.Px(12)).Label("Usage session context menu")
 		a.usagePopupShadow(panel)
 		// Plain pointer rows match the source: they do not create keyboard picker
 		// semantics or move focus away from the underlying native table.
@@ -85,9 +85,9 @@ func (a *App) usageSessionContextPopup(c *ui.Context, anchor ui.Element, row usa
 			ui.Box(c).Height(1).AlignSelf(ui.Stretch).Margin(a.Theme.Space(6), 0).Background(a.Theme.Border)
 			item("usage.ctx_copy_session_id", "Copy session ID", nil, true, func() { a.Dispatch(Action{Kind: "CopyText", Value: row.ID}) })
 			ui.Box(c).Height(1).AlignSelf(ui.Stretch).Margin(a.Theme.Space(6), 0).Background(a.Theme.Border)
-			item("usage.ctx_filter_by_provider", "Filter by provider: %{name}", map[string]string{"name": row.Provider}, true, func() { s.toggleFilter("providers", usageFilterOption{Key: row.Provider}) })
+			item("usage.ctx_filter_by_provider", "Filter by provider: %{name}", map[string]string{"name": usageProviderLabel(row.Provider)}, true, func() { s.toggleFilter("providers", usageFilterOption{Key: row.Provider}) })
 			if row.Model != "" {
-				item("usage.ctx_filter_by_model", "Filter by model: %{name}", map[string]string{"name": row.Model}, true, func() {
+				item("usage.ctx_filter_by_model", "Filter by model: %{name}", map[string]string{"name": usageModelPair(row.Provider, row.Model)}, true, func() {
 					s.toggleFilter("models", usageFilterOption{Model: workbench.UsageModelRef{Provider: row.Provider, Model: row.Model}})
 				})
 			}

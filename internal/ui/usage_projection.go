@@ -3,7 +3,6 @@ package orbitui
 import (
 	"fmt"
 	"math"
-	"path/filepath"
 	"sort"
 	"time"
 
@@ -11,7 +10,7 @@ import (
 )
 
 type usageAggregate struct {
-	Key, ID, Name, Path, Provider, Model, Workspace                  string
+	Key, ID, Name, Sub, Path, Provider, Model, Workspace             string
 	Requests, Errors, Aborted, Timed, Priced, ToolFailures, ToolRuns int
 	Tokens                                                           workbench.Tokens
 	Cost                                                             float64
@@ -225,10 +224,15 @@ func buildUsageProjection(index workbench.UsageIndex, filter workbench.UsageFilt
 					}
 				}
 				if i == 1 {
-					g.Name = r.Model + " · " + r.Provider
+					g.Name = usageModelLabel(r.Model)
+					g.Sub = usageProviderLabel(r.Provider)
+				}
+				if i == 2 {
+					g.Name = usageProviderLabel(r.Provider)
 				}
 				if i == 3 {
-					g.Name = filepath.Base(r.Workspace)
+					g.Name = usageWorkspaceLabel(r.Workspace)
+					g.Sub = usageParentHint(r.Workspace)
 				}
 				groups[i][key] = g
 			}

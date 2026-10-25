@@ -2,7 +2,6 @@ package orbitui
 
 import (
 	"fmt"
-	"path/filepath"
 	"slices"
 	"strings"
 	"time"
@@ -57,15 +56,15 @@ func (s *usageState) filterOptions(kind string, search string) []usageFilterOpti
 	switch kind {
 	case "models":
 		for _, ref := range s.projection.ModelRefOptions {
-			all = append(all, usageFilterOption{Key: ref.Provider + "\x00" + ref.Model, Label: ref.Model, Sub: ref.Provider, Model: ref})
+			all = append(all, usageFilterOption{Key: ref.Provider + "\x00" + ref.Model, Label: usageModelLabel(ref.Model), Sub: usageProviderLabel(ref.Provider), Model: ref})
 		}
 	case "providers":
 		for _, v := range s.projection.ProviderOptions {
-			all = append(all, usageFilterOption{Key: v, Label: v, Sub: usageCount(uint64(counts[v]))})
+			all = append(all, usageFilterOption{Key: v, Label: usageProviderLabel(v), Sub: usageCount(uint64(counts[v]))})
 		}
 	case "workspaces":
 		for _, v := range s.projection.WorkspaceOptions {
-			all = append(all, usageFilterOption{Key: v, Label: filepath.Base(v), Sub: v})
+			all = append(all, usageFilterOption{Key: v, Label: usageWorkspaceLabel(v), Sub: v})
 		}
 	}
 	slices.SortStableFunc(all, func(a, b usageFilterOption) int {
@@ -213,38 +212,52 @@ func (a *App) usageDimensionFilter(c *ui.Context, kind string) {
 			s.filterMenu = ""
 		}
 		root.Children(func() {
-			search := ui.TextInput(c, &v.Search).Label("Filter " + kind).Placeholder(a.text("usage.search", "Search…")).AlignSelf(ui.Stretch)
-			if v.FocusSearch {
-				search.Focus()
-				v.FocusSearch = false
-			}
-			if search.Submitted() {
-				v.Open = false
-				s.filterMenu = ""
-			}
+			ui.Row(c).Height(a.Theme.Px(36)).Shrink(0).Padding(0, a.Theme.Px(10)).Gap(a.Theme.Space(8)).AlignItems(ui.Center).BorderWidth(0, 0, 1, 0).BorderColor(a.Theme.Border).Clip().Label("Usage filter search head").Children(func() {
+				a.icon(c, "icons/search.svg", a.Theme.Px(14), a.Theme.TextMuted)
+				search := ui.TextInputBase(c, &v.Search).Label("Filter " + kind).Placeholder(a.text("usage.search", "Search…")).Grow(1).MinWidth(0).FontSize(a.Theme.Px(14)).FocusRing(false)
+				if v.FocusSearch {
+					search.Focus()
+					v.FocusSearch = false
+				}
+				if search.Changed() {
+					v.Selected = 0
+				}
+				if search.Submitted() {
+					v.Open = false
+					s.filterMenu = ""
+				}
+			})
 			options := s.filterOptions(kind, v.Search)
-			ui.Scroll(c.Key("usage-filter-options:" + kind)).Height(float32(min(8, len(options)+1)) * 32).Children(func() {
+			ui.Scroll(c.Key("usage-filter-options:"+kind)).Label("Usage filter options list").Height(min(float32(260), float32(len(options)+1)*(a.Theme.Px(23)+2*a.Theme.Space(4))+2*a.Theme.Space(4))).Padding(a.Theme.Space(4), 0).Children(func() {
 				ui.Column(c).WidthPercent(100).Children(func() {
-					if a.usagePickerRow(c.Key("all"), a.text("usage.all", "All"), "", len(selected) == 0).Clicked() {
+					allRow := a.usagePickerRow(c.Key("all"), a.text("usage.all", "All"), "", len(selected) == 0, v.Selected == 0)
+					if allRow.Hovered() {
+						v.Selected = 0
+					}
+					if allRow.Clicked() {
 						s.clearDimension(kind)
 					}
-					for _, o := range options {
-						if a.usagePickerRow(c.Key(o.Key), o.Label, o.Sub, s.filterChecked(kind, o)).Clicked() {
+					for i, o := range options {
+						row := a.usagePickerRow(c.Key(o.Key), o.Label, o.Sub, s.filterChecked(kind, o), v.Selected == i+1)
+						if row.Hovered() {
+							v.Selected = i + 1
+						}
+						if row.Clicked() {
 							s.toggleFilter(kind, o)
 						}
 					}
 				})
 			})
 			if len(options) == 0 && strings.TrimSpace(v.Search) != "" {
-				ui.Text(c, a.usageText("usage.no_query_match", "No match for “%{query}”", map[string]string{"query": strings.TrimSpace(v.Search)})).FontSize(12).TextColor(a.Theme.TextMuted)
+				ui.Row(c).Height(a.Theme.Px(23)+2*a.Theme.Space(4)).Shrink(0).Padding(a.Theme.Space(4), a.Theme.Space(6)).Margin(0, a.Theme.Space(4)).AlignItems(ui.Center).Children(func() {
+					ui.Text(c, a.usageText("usage.no_query_match", "No match for “%{query}”", map[string]string{"query": strings.TrimSpace(v.Search)})).MinWidth(0).SingleLine().FontSize(a.Theme.Px(14)).TextColor(a.Theme.TextMuted)
+				})
 			}
-			a.line(c)
-			ui.Row(c).Gap(8).Children(func() {
-				if a.button(c, a.text("usage.select_all", "Select all"), "", false).Clicked() {
+			a.usageMenuFooter(c, func() {
+				if a.usageFooterButton(c, a.text("usage.select_all", "Select all")).Clicked() {
 					s.selectFilterOptions(kind, all)
 				}
-				ui.Spacer(c)
-				if a.button(c, a.text("usage.clear", "Clear"), "", false).Clicked() {
+				if a.usageFooterButton(c, a.text("usage.clear", "Clear")).Clicked() {
 					s.clearDimension(kind)
 				}
 			})
@@ -254,13 +267,14 @@ func (a *App) usageDimensionFilter(c *ui.Context, kind string) {
 		s.filterMenu = ""
 	}
 }
-func (a *App) usagePickerRow(c *ui.Context, label, sub string, selected bool) ui.Element {
+func (a *App) usagePickerRow(c *ui.Context, label, sub string, selected bool, highlight ...bool) ui.Element {
+	highlighted := len(highlight) > 0 && highlight[0]
 	identity := label
 	if sub != "" {
 		identity += " · " + sub
 	}
 	b := ui.ButtonBase(c).Height(a.Theme.Px(23)+2*a.Theme.Space(4)).AlignSelf(ui.Stretch).Padding(a.Theme.Space(4), a.Theme.Space(6)).Margin(0, a.Theme.Space(4)).Radius(a.Theme.Px(6)).Clip().Gap(a.Theme.Px(6)).Label(identity).Justify(ui.Start).AlignItems(ui.Center)
-	if selected {
+	if selected || highlighted {
 		b.Background(a.Theme.Selection)
 	} else if b.Hovered() {
 		b.Background(a.Theme.Hover)
@@ -273,7 +287,10 @@ func (a *App) usagePickerRow(c *ui.Context, label, sub string, selected bool) ui
 		}
 		text := ui.Text(c, label).FontSize(a.Theme.Px(14)).Grow(1).MinWidth(0).SingleLine().TextColor(a.Theme.TextSecondary)
 		if selected {
-			text.FontWeight(500).TextColor(a.Theme.Text)
+			text.FontWeight(500)
+		}
+		if selected || highlighted {
+			text.TextColor(a.Theme.Text)
 		}
 		if sub != "" {
 			ui.Text(c, sub).FontSize(a.Theme.Px(12)).MaxWidth(120).Margin(0, 0, 0, a.Theme.Px(10)).TextColor(a.Theme.TextMuted).SingleLine()

@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"path/filepath"
-	"sort"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -177,7 +176,7 @@ type App struct {
 	searchLastCount                                                 int
 	sessionList, transcript, paletteList                            ui.ListState
 	sessionCursor                                                   int
-	expanded                                                        map[string]bool
+	sidebarState                                                    sidebarState
 	collapsedMessages                                               map[string]bool
 	md                                                              markdown.Options
 	access, workflow                                                string
@@ -224,7 +223,7 @@ func New(o Options) *App {
 	if o.Store == nil {
 		o.Store = preferences.New("")
 	}
-	a := &App{Options: o, Prefs: o.Store.UI(), Workspaces: o.Store.Workspaces(), Fonts: o.Store.Fonts(), Appearance: o.Store.Appearance(), Layout: o.Store.Layout(), SidebarVisible: true, settingsPage: "general", page: "chat", sessionCursor: -1, expanded: map[string]bool{}, collapsedMessages: map[string]bool{}, history: []string{"chat"}, updates: make(chan func(), 64), drafts: map[string]draftState{}, messageImages: map[string]ui.ImageSource{}, imageLoading: map[string]bool{}, imageErrors: map[string]string{}, selectedSkill: -1}
+	a := &App{Options: o, Prefs: o.Store.UI(), Workspaces: o.Store.Workspaces(), Fonts: o.Store.Fonts(), Appearance: o.Store.Appearance(), Layout: o.Store.Layout(), SidebarVisible: true, settingsPage: "general", page: "chat", sessionCursor: -1, collapsedMessages: map[string]bool{}, history: []string{"chat"}, updates: make(chan func(), 64), drafts: map[string]draftState{}, messageImages: map[string]ui.ImageSource{}, imageLoading: map[string]bool{}, imageErrors: map[string]string{}, selectedSkill: -1}
 	a.SidebarWidth = float32(a.Layout.SidebarWidth)
 	if a.SidebarWidth < SidebarMinWidth {
 		a.SidebarWidth = 248
@@ -408,6 +407,7 @@ drained:
 	if a.Prefs.ReduceMotion {
 		c.DisableAnimations()
 	}
+	a.syncReviewLayout(c)
 	root := ui.Row(c.Key("root")).Fill().Background(a.Theme.Background).Font(a.Fonts.UIFamily).TextColor(a.Theme.Text).Children(func() {
 		if a.page == "settings" {
 			a.settings(c)
@@ -430,7 +430,7 @@ drained:
 		a.AddPaths(paths)
 	}
 	if a.Options.Terminal != nil {
-		a.Options.Terminal.SetVisible(a.page == "chat")
+		a.Options.Terminal.SetVisible(a.page == "chat" && !a.reviewFull())
 	}
 	a.shortcuts(c)
 	modalNow := a.modalOpen()
@@ -574,7 +574,7 @@ func (a *App) sidebar(c *ui.Context) {
 			if r.group {
 				b := a.button(c, r.label, "icons/folder.svg", false).AlignSelf(ui.Stretch).MarginX(8)
 				if b.Clicked() {
-					a.expanded[r.path] = !a.expanded[r.path]
+					a.activateSidebarRow(r)
 				}
 				b.ContextMenu(func(m *ui.Menu) {
 					if m.Item("New task here").Chosen() {
@@ -590,9 +590,13 @@ func (a *App) sidebar(c *ui.Context) {
 				})
 				return
 			}
+			if r.more > 0 || r.less {
+				a.sidebarOverflowRow(c, r)
+				return
+			}
 			s := r.session
 			b := ui.ButtonBase(c).AlignSelf(ui.Stretch).Margin(1, 8).Padding(t.Space(6), t.Space(12)).Radius(t.Px(4)).Label(s.Name)
-			if s.ID == a.Model.SessionID {
+			if a.sidebarSessionActive(s) {
 				b.Background(t.Active)
 			} else if b.Hovered() {
 				b.Background(t.Hover)
@@ -607,8 +611,7 @@ func (a *App) sidebar(c *ui.Context) {
 				}
 			})
 			if b.Clicked() {
-				a.Dispatch(Action{Kind: "SwitchSession", Value: s.Path})
-				a.Navigate("chat")
+				a.activateSidebarRow(r)
 			}
 			b.ContextMenu(func(m *ui.Menu) {
 				for _, cmd := range []struct{ id, label string }{{"RenameSession", "Rename…"}, {"PinSession", "Pin / Unpin"}, {"CloneSession", "Clone"}, {"ArchiveSession", "Archive"}, {"CopySessionId", "Copy session ID"}, {"DeleteSession", "Delete…"}} {
@@ -622,13 +625,7 @@ func (a *App) sidebar(c *ui.Context) {
 			list.Grow(0).Height(0)
 		}
 		if list.Submitted() && a.sessionCursor >= 0 && a.sessionCursor < len(rows) {
-			r := rows[a.sessionCursor]
-			if r.group {
-				a.expanded[r.path] = !a.expanded[r.path]
-			} else {
-				a.Dispatch(Action{Kind: "SwitchSession", Value: r.session.Path})
-				a.Navigate("chat")
-			}
+			a.activateSidebarRow(rows[a.sessionCursor])
 		}
 		a.line(c)
 		ui.Row(c).Height(HeaderHeight).PaddingX(12).AlignItems(ui.Center).Children(func() {
@@ -654,101 +651,9 @@ func (a *App) sidebar(c *ui.Context) {
 	})
 }
 
-type sidebarRow struct {
-	key, label, path string
-	group            bool
-	session          SessionRow
-}
-
-func (a *App) sidebarRows() []sidebarRow {
-	groups := map[string][]SessionRow{}
-	for _, s := range a.Model.Sessions {
-		if (a.Workspaces.ArchivedFilter == "hide" && s.Archived) || (a.Workspaces.ArchivedFilter == "only" && !s.Archived) {
-			continue
-		}
-		key := s.Workspace
-		if a.Workspaces.GroupBy == "one_list" {
-			key = ""
-		}
-		groups[key] = append(groups[key], s)
-	}
-	for _, w := range a.Workspaces.Workspaces {
-		if a.Workspaces.GroupBy != "one_list" && groups[w.Path] == nil {
-			groups[w.Path] = []SessionRow{}
-		}
-	}
-	keys := make([]string, 0, len(groups))
-	for k := range groups {
-		keys = append(keys, k)
-	}
-	sort.SliceStable(keys, func(i, j int) bool {
-		left, right := keys[i], keys[j]
-		switch a.Workspaces.Sort {
-		case "alphabetical":
-			return strings.ToLower(filepath.Base(left)) < strings.ToLower(filepath.Base(right))
-		case "alphabetical_desc":
-			return strings.ToLower(filepath.Base(left)) > strings.ToLower(filepath.Base(right))
-		case "session_count":
-			return len(groups[left]) > len(groups[right])
-		case "last_updated":
-			var a, b time.Time
-			for _, s := range groups[left] {
-				if s.Updated.After(a) {
-					a = s.Updated
-				}
-			}
-			for _, s := range groups[right] {
-				if s.Updated.After(b) {
-					b = s.Updated
-				}
-			}
-			return a.After(b)
-		case "manual", "date_added":
-			li, rj := len(a.Workspaces.Workspaces), len(a.Workspaces.Workspaces)
-			for k, w := range a.Workspaces.Workspaces {
-				if w.Path == left {
-					li = k
-				}
-				if w.Path == right {
-					rj = k
-				}
-			}
-			if a.Workspaces.Sort == "date_added" {
-				return li > rj
-			}
-			return li < rj
-		}
-		return left < right
-	})
-	var rows []sidebarRow
-	for _, k := range keys {
-		label := filepath.Base(k)
-		if k == "" {
-			label = "Other sessions"
-		}
-		rows = append(rows, sidebarRow{key: "workspace:" + k, label: label, path: k, group: true})
-		if a.expanded[k] {
-			continue
-		}
-		sort.SliceStable(groups[k], func(i, j int) bool {
-			l, r := groups[k][i], groups[k][j]
-			if l.Pinned != r.Pinned {
-				return l.Pinned
-			}
-			return l.Updated.After(r.Updated)
-		})
-		for _, s := range groups[k] {
-			if s.Name == "" {
-				s.Name = "Untitled task"
-			}
-			rows = append(rows, sidebarRow{key: "session:" + s.ID, session: s})
-		}
-	}
-	return rows
-}
 func (a *App) main(c *ui.Context) {
 	main := ui.Column(c.Key("main")).Fill().MinWidth(0)
-	if a.page == "chat" && len(a.Model.Messages) == 0 {
+	if a.page == "chat" && !a.reviewFull() && len(a.Model.Messages) == 0 {
 		// Absolute children paint above flow siblings in MyGo. Paint on the parent
 		// before children so the background never overlays the composer/buttons.
 		main.Draw(func(p *ui.Painter, r ui.Rect) {
@@ -758,7 +663,7 @@ func (a *App) main(c *ui.Context) {
 		})
 	}
 	main.Children(func() {
-		if a.page == "chat" && len(a.Model.Messages) == 0 {
+		if a.page == "chat" && !a.reviewFull() && len(a.Model.Messages) == 0 {
 			ui.Box(c.Key("new-task-backdrop")).Label("New task backdrop").PassThrough().Absolute().Top(HeaderHeight).Left(0).Right(0).Bottom(0)
 		}
 		a.header(c)
@@ -770,16 +675,26 @@ func (a *App) main(c *ui.Context) {
 				}
 			})
 		}
-		if a.page != "chat" {
-			if render := a.Options.Pages[a.page]; render != nil {
-				render(c)
-			} else {
-				a.featurePage(c)
-			}
+		// Usage owns the whole workspace area. Other feature pages share the
+		// same content row with the Review dock, as pinned view.rs does.
+		if a.page == "usage" {
+			a.renderFeaturePage(c)
 			return
 		}
-		ui.Row(c).Grow(1).MinHeight(0).AlignSelf(ui.Stretch).AlignItems(ui.Stretch).Children(func() {
-			ui.Column(c).Grow(1).MinWidth(0).FillHeight().Children(func() {
+		ui.Row(c.Key("workspace-content")).Grow(1).MinHeight(0).AlignSelf(ui.Stretch).AlignItems(ui.Stretch).Children(func() {
+			content := ui.Column(c.Key("chat-content")).Bind(&a.reviewState.layout.content).Grow(1).MinWidth(0).FillHeight()
+			if a.reviewFull() {
+				// Retain native editor/scroll state without taking layout room,
+				// drawing, accessibility, pointer or keyboard input. Unmounting
+				// the composer would discard MyGo's private undo/redo history.
+				r := a.reviewState.layout.content.Bounds(c)
+				content.Absolute().Left(0).Top(0).Width(max(r.W, 300)).Height(max(r.H, 1)).Grow(0).Invisible().Disabled(true)
+			}
+			content.Children(func() {
+				if a.page != "chat" {
+					a.renderFeaturePage(c)
+					return
+				}
 				if a.searchOpen {
 					a.findBar(c)
 				}
@@ -789,10 +704,11 @@ func (a *App) main(c *ui.Context) {
 					a.messages(c)
 				}
 				a.composerView(c)
-				if a.Options.Terminal != nil && a.Options.Terminal.IsOpen() {
+				if a.Options.Terminal != nil && a.Options.Terminal.IsOpen() && !a.reviewFull() {
 					a.terminal(c)
 				}
 			})
+			a.trackReviewFileFocus(c)
 			if a.ReviewVisible {
 				a.review(c)
 			} else if a.ExplorerVisible {
@@ -801,6 +717,14 @@ func (a *App) main(c *ui.Context) {
 		})
 	})
 }
+func (a *App) renderFeaturePage(c *ui.Context) {
+	if render := a.Options.Pages[a.page]; render != nil {
+		render(c)
+	} else {
+		a.featurePage(c)
+	}
+}
+
 func (a *App) header(c *ui.Context) {
 	t := a.Theme
 	// Pinned view.rs main_top_bar uses a fixed20px leading inset.

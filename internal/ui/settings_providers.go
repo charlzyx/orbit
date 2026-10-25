@@ -113,7 +113,7 @@ func (a *App) providerToolbar(c *ui.Context) {
 	ui.Column(c).AlignSelf(ui.Stretch).Gap(t.Space(12)).Children(func() {
 		ui.Row(c).Height(t.Px(36)).PaddingX(t.Space(10)).Gap(t.Space(8)).AlignItems(ui.Center).BorderWidth(0, 0, 1, 0).BorderColor(t.Border).Children(func() {
 			a.icon(c, "icons/search.svg", 16, t.TextMuted)
-			ui.TextInputBase(c, &a.providerState.query).Label("Search providers").Placeholder(a.Tr("settings.providers_search")).Grow(1)
+			ui.TextInputBase(c, &a.providerState.query).Label("Search providers").Placeholder(a.Tr("app.search_providers")).Grow(1)
 		})
 		ui.Row(c).AlignSelf(ui.Stretch).Gap(t.Space(8)).AlignItems(ui.Center).Children(func() {
 			text := strings.NewReplacer("%{all}", fmt.Sprint(len(all)), "%{active}", fmt.Sprint(active), "%{connected}", fmt.Sprint(connected)).Replace(a.Tr("settings.providers_active_connected"))
@@ -316,7 +316,7 @@ func (a *App) sourceProviderActions(c *ui.Context, v sourceProviderView) {
 				a.Dispatch(Action{Kind: "Login", Value: id, Data: map[string]any{"method": method.ID}})
 			}
 		}
-		if api || v.meta.APIKey || v.custom {
+		if api || v.auth.ID == "" && (v.meta.APIKey || v.custom) {
 			label := a.Tr("settings.add_api_key")
 			if v.credential.Kind == "api_key" || v.config.HasAPIKey {
 				label = a.Tr("settings.update_key")
@@ -325,11 +325,23 @@ func (a *App) sourceProviderActions(c *ui.Context, v sourceProviderView) {
 				a.openProviderSecret(id, false)
 			}
 		}
-		if v.meta.OAuth && len(v.auth.Methods) == 0 {
-			ui.Text(c, "Connect pi to discover available sign-in methods.").FontSize(a.Theme.Px(12)).TextColor(a.Theme.TextMuted)
+		if v.auth.ID != "" && len(v.auth.Methods) == 0 {
+			ui.Text(c, a.Tr("settings.no_sign_in_methods_available")).FontSize(a.Theme.Px(12)).TextColor(a.Theme.TextMuted)
+		} else if v.meta.OAuth && v.auth.ID == "" {
+			if a.Model.Auth.Support == "unsupported" {
+				label := a.Tr("settings.sign_in")
+				if v.connected {
+					label = a.Tr("settings.reconnect")
+				}
+				if a.sourceProviderButton(c, "Sign in terminal "+id, label, "icons/lock.svg", true).Clicked() {
+					a.Dispatch(Action{Kind: "LoginTerminal", Value: id})
+				}
+			} else {
+				ui.Text(c, "Connect pi to discover available sign-in methods.").FontSize(a.Theme.Px(12)).TextColor(a.Theme.TextMuted)
+			}
 		}
 		if id == "ollama" || id == "ollama-cloud" {
-			if a.sourceProviderButton(c, "Ollama session "+id, a.Tr("settings.usage_session"), "", false).Clicked() {
+			if a.sourceProviderButton(c, "Ollama session "+id, a.Tr("settings.usage_session"), "icons/clock.svg", false).Clicked() {
 				a.openProviderSecret(id, true)
 			}
 		}
@@ -342,7 +354,7 @@ func (a *App) sourceProviderActions(c *ui.Context, v sourceProviderView) {
 				}
 			}
 			if v.auth.Authenticated || v.credential.Configured {
-				if a.sourceProviderButton(c, "Disconnect "+id, a.Tr("settings.disconnect"), "", false).Clicked() {
+				if a.sourceProviderButton(c, "Disconnect "+id, a.Tr("settings.disconnect"), "icons/stop.svg", false).Clicked() {
 					a.confirmProviderDisconnect(v)
 				}
 			}
@@ -352,7 +364,7 @@ func (a *App) sourceProviderActions(c *ui.Context, v sourceProviderView) {
 				}
 			}
 			if a.providerHasUsage(id) {
-				if a.sourceProviderButton(c, "Usage "+id, a.Tr("session.usage"), "", false).Clicked() {
+				if a.sourceProviderButton(c, "Usage "+id, a.Tr("session.usage"), "icons/usage-total.svg", false).Clicked() {
 					a.providerState.usageProvider = id
 				}
 			}
@@ -456,14 +468,14 @@ func (a *App) sourceProviderAuth(c *ui.Context, v sourceProviderView) bool {
 		ui.Row(c).Wrap().Gap(t.Space(8)).Children(func() {
 			if pending {
 				if auth.UserCode != "" {
-					if a.sourceProviderButton(c, "Open authentication page "+v.meta.ID, a.Tr("auth.open_page"), "", true).Disabled(auth.VerificationURI == "").Clicked() {
+					if a.sourceProviderButton(c, "Open authentication page "+v.meta.ID, a.Tr("auth.open_page"), "icons/arrow-up-right.svg", true).Disabled(auth.VerificationURI == "").Clicked() {
 						a.Dispatch(Action{Kind: "OpenLink", Value: auth.VerificationURI})
 					}
-					if a.sourceProviderButton(c, "Copy authentication code "+v.meta.ID, a.Tr("auth.copy_code"), "", false).Clicked() {
+					if a.sourceProviderButton(c, "Copy authentication code "+v.meta.ID, a.Tr("auth.copy_code"), "icons/copy.svg", false).Clicked() {
 						a.Dispatch(Action{Kind: "CopyText", Value: auth.UserCode})
 					}
 				}
-				if a.sourceProviderButton(c, "Cancel sign in "+v.meta.ID, a.Tr("git_panel.cancel"), "", false).Clicked() {
+				if a.sourceProviderButton(c, "Cancel sign in "+v.meta.ID, a.Tr("git_panel.cancel"), "icons/x.svg", false).Clicked() {
 					a.Dispatch(Action{Kind: "CancelLogin"})
 				}
 				return
@@ -473,7 +485,7 @@ func (a *App) sourceProviderAuth(c *ui.Context, v sourceProviderView) bool {
 				for _, method := range v.auth.Methods {
 					available = available || method.ID == auth.Method
 				}
-				if a.sourceProviderButton(c, "Retry sign in "+v.meta.ID, a.Tr("view.try_again"), "", true).Disabled(!a.Model.Connected || !available).Clicked() {
+				if a.sourceProviderButton(c, "Retry sign in "+v.meta.ID, a.Tr("view.try_again"), "icons/lock.svg", true).Disabled(!a.Model.Connected || !available).Clicked() {
 					a.providerState.dismissedAuthSession = ""
 					a.Dispatch(Action{Kind: "Login", Value: auth.Provider, Data: map[string]any{"method": auth.Method}})
 				}
@@ -482,7 +494,7 @@ func (a *App) sourceProviderAuth(c *ui.Context, v sourceProviderView) bool {
 			if auth.Status == "succeeded" {
 				label = a.Tr("common.done")
 			}
-			if a.sourceProviderButton(c, "Dismiss authentication "+v.meta.ID, label, "", auth.Status == "succeeded").Clicked() {
+			if a.sourceProviderButton(c, "Dismiss authentication "+v.meta.ID, label, "icons/check.svg", auth.Status == "succeeded").Clicked() {
 				a.providerState.dismissedAuthSession = auth.SessionID
 			}
 		})

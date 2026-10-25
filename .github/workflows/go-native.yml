@@ -3,9 +3,9 @@ name: Go native migration
 on:
   push:
     branches: ["redesign/mygo-rpc"]
-    paths: ["**/*.go", "**/*.go.txt", "**/go.mod", "**/go.sum", "scripts/go-native*", "scripts/capture-native-reference.sh", "third_party/mygo-composer/**", "third_party/mygo-selection/**", "assets/**", ".github/workflows/go-native.yml"]
+    paths: ["**/*.go", "**/*.go.txt", "**/go.mod", "**/go.sum", "scripts/go-native*", "scripts/capture-native-reference.sh", "scripts/usage-native/**", "testdata/usage-native/**", "third_party/mygo-composer/**", "third_party/mygo-selection/**", "assets/**", ".github/workflows/go-native.yml"]
   pull_request:
-    paths: ["**/*.go", "**/*.go.txt", "**/go.mod", "**/go.sum", "scripts/go-native*", "scripts/capture-native-reference.sh", "third_party/mygo-composer/**", "third_party/mygo-selection/**", "assets/**", ".github/workflows/go-native.yml"]
+    paths: ["**/*.go", "**/*.go.txt", "**/go.mod", "**/go.sum", "scripts/go-native*", "scripts/capture-native-reference.sh", "scripts/usage-native/**", "testdata/usage-native/**", "third_party/mygo-composer/**", "third_party/mygo-selection/**", "assets/**", ".github/workflows/go-native.yml"]
   workflow_dispatch:
 
 permissions:
@@ -81,7 +81,7 @@ jobs:
       - name: Install pinned Pi without credentials or inference
         run: npm install --prefix /tmp/orbit-pi-runtime @earendil-works/pi-coding-agent@1.4.0
       - name: Capture actual original native window
-        run: scripts/capture-native-reference.sh /tmp/orbit-reference/target/debug/orbit-pi "$PWD/capture/reference-desktop" reference /tmp/orbit-reference
+        run: ORBIT_CAPTURE_USAGE=1 scripts/capture-native-reference.sh /tmp/orbit-reference/target/debug/orbit-pi "$PWD/capture/reference-desktop" reference /tmp/orbit-reference
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
@@ -105,7 +105,7 @@ jobs:
           CGO_ENABLED=0 scripts/go-native.sh build -o /tmp/orbit-go-native ./cmd/orbit
           npm install --prefix /tmp/orbit-pi-runtime @earendil-works/pi-coding-agent@1.4.0
       - name: Capture real Go native desktop window
-        run: scripts/capture-native-reference.sh /tmp/orbit-go-native "$PWD/capture/go-desktop" go
+        run: ORBIT_CAPTURE_USAGE=1 scripts/capture-native-reference.sh /tmp/orbit-go-native "$PWD/capture/go-desktop" go
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

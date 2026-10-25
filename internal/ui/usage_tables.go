@@ -23,8 +23,9 @@ type usageTableState struct {
 }
 type usageTableRow struct {
 	usageAggregate
-	Failure *workbench.UsageError
-	Point   *usagePoint
+	Failure                   *workbench.UsageError
+	Point                     *usagePoint
+	Label, Stamp, Granularity string
 }
 type usageTableResult struct {
 	Rows               []usageTableRow
@@ -86,19 +87,39 @@ func (t *usageTableState) toggleColumn(id, required string) {
 		t.Hidden = append(t.Hidden, id)
 	}
 }
-func usageRowText(r usageTableRow, kind string) string {
+func usageRowFields(r usageTableRow, kind string) []string {
 	if r.Failure != nil {
 		e := r.Failure
-		return e.At.Local().Format("Jan 2, 15:04") + " " + e.Kind + " " + e.Model + " " + e.SessionTitle + " " + e.Message
+		return []string{e.At.Local().Format("Jan 2, 15:04"), e.Kind, usageModelLabel(e.Model), e.SessionTitle, e.Message}
 	}
 	if r.Point != nil {
-		return r.Point.At.Local().Format("Jan 2 2006 January Monday 15:04") + " " + r.Name
+		return []string{r.Label, r.Stamp}
+	}
+	if kind == "breakdown:tools" {
+		return []string{r.Name, workbench.UsageToolClass(r.Name)}
+	}
+	if strings.HasPrefix(kind, "breakdown:") {
+		return []string{r.Name, r.Sub}
 	}
 	status := "ok"
 	if r.Errors+r.ToolFailures > 0 {
 		status = "error failed"
 	}
-	return r.Name + " " + r.ID + " " + r.Workspace + " " + r.Provider + " " + r.Model + " " + status
+	return []string{r.Name, r.ID, usageWorkspaceLabel(r.Workspace), r.Workspace, usageProviderLabel(r.Provider), usageModelPair(r.Provider, r.Model), status}
+}
+func usageRowText(r usageTableRow, kind string) string {
+	return strings.Join(usageRowFields(r, kind), " ")
+}
+func usageRowMatches(r usageTableRow, kind, needle string) bool {
+	if needle == "" {
+		return true
+	}
+	for _, field := range usageRowFields(r, kind) {
+		if strings.Contains(strings.ToLower(field), needle) {
+			return true
+		}
+	}
+	return false
 }
 func usageRowField(r usageTableRow, id, metric, latency string) (string, float64, bool) {
 	if r.Failure != nil {
@@ -109,7 +130,7 @@ func usageRowField(r usageTableRow, id, metric, latency string) (string, float64
 		case "kind":
 			return e.Kind, 0, true
 		case "model":
-			return e.Model, 0, true
+			return usageModelLabel(e.Model), 0, true
 		case "session":
 			return e.SessionTitle, 0, true
 		case "message":
@@ -120,11 +141,11 @@ func usageRowField(r usageTableRow, id, metric, latency string) (string, float64
 	case "title", "name", "tool":
 		return r.Name, 0, true
 	case "workspace":
-		return r.Workspace, 0, true
+		return usageWorkspaceLabel(r.Workspace), 0, true
 	case "provider":
-		return r.Provider, 0, true
+		return usageProviderLabel(r.Provider), 0, true
 	case "model":
-		return r.Model, 0, true
+		return usageModelPair(r.Provider, r.Model), 0, true
 	case "started":
 		return "", float64(r.Ended.UnixMilli()), false
 	case "date", "time", "latest":
@@ -160,7 +181,7 @@ func usageRowField(r usageTableRow, id, metric, latency string) (string, float64
 		}
 		return "", r.Duration.Seconds() / float64(r.Timed), false
 	case "max":
-		if r.Timed == 0 {
+		if r.Timed == 0 || r.MaxDuration == 0 {
 			return "", -1, false
 		}
 		return "", r.MaxDuration.Seconds(), false
@@ -184,7 +205,7 @@ func queryUsageTable(rows []usageTableRow, t *usageTableState, kind, metric, lat
 	needle := strings.ToLower(strings.TrimSpace(t.Search))
 	out := make([]usageTableRow, 0, len(rows))
 	for _, r := range rows {
-		if needle == "" || strings.Contains(strings.ToLower(usageRowText(r, kind)), needle) {
+		if usageRowMatches(r, kind, needle) {
 			out = append(out, r)
 		}
 	}
@@ -287,7 +308,7 @@ func usageTableColumns(kind, metric string) []ui.TableColumn {
 		if slices.Contains([]string{"title", "name", "tool", "workspace", "provider", "model", "when", "date", "time", "started", "kind", "session", "message"}, id) {
 			align = ui.Start
 		}
-		cols = append(cols, ui.TableColumn{ID: id, Title: title, Width: w, MinWidth: 48, Align: align, Sortable: id != "share" && id != "message" && kind != "breakdown:tools"})
+		cols = append(cols, ui.TableColumn{ID: id, Title: title, Width: w, MinWidth: 48, Align: align, Fixed: id == "share", Sortable: id != "share" && id != "message" && kind != "breakdown:tools"})
 	}
 	return cols
 }
@@ -303,13 +324,21 @@ func (a *App) usageTableRows(kind string) []usageTableRow {
 		if kind == "daily" {
 			points = p.Daily
 		}
+		granularity := p.Granularity
+		if kind == "daily" && granularity == "hour" {
+			granularity = "day"
+		}
 		for i := range points {
 			v := points[i]
 			g := v.usageAggregate
 			g.Key = v.At.Format(time.RFC3339)
-			g.Name = v.At.Local().Format("Jan 2, 2006 15:04")
+			label, stamp := usageBucketLabel(v.At, granularity, a.usageState.now()), a.usageStamp(v.At, granularity)
+			g.Name = stamp
+			if kind == "daily" {
+				g.Name = label
+			}
 			g.At = v.At
-			out = append(out, usageTableRow{usageAggregate: g, Point: &v})
+			out = append(out, usageTableRow{usageAggregate: g, Point: &v, Label: label, Stamp: stamp, Granularity: granularity})
 		}
 	case "failures":
 		for i := range p.Errors[:min(400, len(p.Errors))] {
@@ -340,7 +369,7 @@ func (a *App) usageCell(r usageTableRow, id, kind string) string {
 		case "kind":
 			return a.text("usage.error_kind_"+e.Kind, titleCase(e.Kind))
 		case "model":
-			return e.Model
+			return usageModelLabel(e.Model)
 		case "session":
 			return e.SessionTitle
 		case "message":
@@ -351,12 +380,12 @@ func (a *App) usageCell(r usageTableRow, id, kind string) string {
 	case "title", "name", "tool":
 		return r.Name
 	case "workspace":
-		return r.Workspace
+		return usageWorkspaceLabel(r.Workspace)
 	case "provider":
-		return r.Provider
+		return usageProviderLabel(r.Provider)
 	case "model":
 		if kind == "sessions" && r.Model != "" {
-			return r.Model + " · " + r.Provider
+			return usageModelPair(r.Provider, r.Model)
 		}
 		return r.Model
 	case "time", "date":
@@ -404,7 +433,7 @@ func (a *App) usageCell(r usageTableRow, id, kind string) string {
 		}
 		return usageDuration(r.Duration.Seconds() / float64(r.Timed))
 	case "max":
-		if r.Timed == 0 {
+		if r.Timed == 0 || r.MaxDuration == 0 {
 			return "—"
 		}
 		return usageDuration(r.MaxDuration.Seconds())
@@ -424,35 +453,6 @@ func (a *App) usageTable(c *ui.Context, kind string) {
 	t := s.table(kind)
 	all := usageTableColumns(kind, s.metric)
 	required := all[0].ID
-	// Native MyGo sorts are two-state; normalize a descending-to-ascending third
-	// click into the frozen source's default ordering, before querying the rows.
-	if t.Sort != t.observedSort {
-		if t.Sort.Column == t.observedSort.Column && t.sortPhase == 2 {
-			t.Sort = usageDefaultSort(kind)
-			t.sortPhase = 0
-		} else if t.Sort.Column == t.observedSort.Column && t.sortPhase == 1 {
-			t.sortPhase = 2
-		} else {
-			t.sortPhase = 1
-		}
-		t.observedSort = t.Sort
-		t.Page = 1
-		t.Selected = -1
-		if kind == "sessions" {
-			s.sort, s.descending = t.Sort.Column, t.Sort.Descending
-			a.saveUsagePrefs()
-		}
-		if strings.HasPrefix(kind, "breakdown:") && kind != "breakdown:tools" {
-			s.breakdownSort, s.breakdownDescending = t.Sort.Column, t.Sort.Descending
-			for key, other := range s.tables {
-				if strings.HasPrefix(key, "breakdown:") && key != "breakdown:tools" {
-					other.Sort = t.Sort
-					other.observedSort = t.Sort
-				}
-			}
-			a.saveUsagePrefs()
-		}
-	}
 	ui.Row(c.Key("usage-toolbar:" + kind)).Wrap().Gap(8).Children(func() {
 		if ui.TextInput(c, &t.Search).Label("Search " + kind).Placeholder("Search…").Width(200).Changed() {
 			t.Page = 1
@@ -509,58 +509,16 @@ func (a *App) usageTable(c *ui.Context, kind string) {
 	t.List.Label = func(i int) string { return usageRowText(result.Rows[i], kind) }
 	t.List.CellMenu = nil
 
-	baseTheme := c.Theme()
-	tableTheme := *baseTheme
-	tableTheme.Spacing = 5 // frozen Usage HEADER_H and ROW_H are 40 DIPs
-	c.SetTheme(&tableTheme)
-	rowBounds := make(map[int]*ui.Handle)
-	if t.rowHandles == nil {
-		t.rowHandles = map[int]*ui.Handle{}
-	}
-	frameRows := len(result.Rows)
-	if frameRows == 0 {
-		frameRows = 3
-	}
-	table := ui.Table(c.Key("usage-table:"+kind), &t.List, cols, len(result.Rows), func(row, col int) {
-		r := result.Rows[row]
-		if cols[col].ID == "open" {
-			if a.iconButton(c, "Open "+r.Name, "icons/arrow-right.svg").Size(12, 20).Disabled(r.Path == "").Clicked() {
-				a.openUsageSession(r)
-			}
-			return
-		}
-		text := a.usageCell(r, cols[col].ID, kind)
-		cell := ui.Text(c, text).SingleLine().Tooltip(text)
-		if cols[col].Align == ui.End {
-			cell.Font(a.Fonts.CodeFamily)
-		}
-		if col == 0 {
-			handle := t.rowHandles[row]
-			if handle == nil {
-				handle = &ui.Handle{}
-				t.rowHandles[row] = handle
-			}
-			cell.Bind(handle)
-			rowBounds[row] = handle
-			if kind == "sessions" && s.menu("context").Open && s.contextRow == row {
-				a.usageSessionContextPopup(c, cell, r)
-			}
-		}
-	}).Height(float32(frameRows*40+42)).Border(1, a.Theme.Border).Radius(a.Theme.Px(12)).AlignSelf(ui.Stretch).Label("Usage " + kind + " table")
-	c.SetTheme(baseTheme)
-	if kind == "sessions" {
-		table.Bind(&t.contextHandle)
-		a.usageSessionContext(c, table, &t.contextHandle, result.Rows, rowBounds)
-	}
+	table, body := a.usageNativeTable(c, kind, cols, result)
 	if t.Selected >= 0 && t.Selected < len(result.Rows) {
 		r := result.Rows[t.Selected]
-		if table.Submitted() {
+		if body.Submitted() {
 			if kind == "sessions" {
 				a.openUsageSession(r)
 			} else {
 				a.activateUsageRow(kind, r)
 			}
-		} else if table.Changed() || (table.Clicked() && t.Sort == t.observedSort) {
+		} else if body.Changed() || body.Clicked() {
 			switch kind {
 			case "sessions":
 				s.menu("context").Open = false
@@ -580,7 +538,7 @@ func (a *App) usageTable(c *ui.Context, kind string) {
 	if result.Total == 0 {
 		table.Children(func() {
 			ui.Box(c).Absolute().Top(40).Bottom(0).Left(0).Right(0).Center().Children(func() {
-				ui.Text(c, a.usageTableEmpty(kind, false)).FontSize(a.Theme.Px(12)).TextColor(a.Theme.TextMuted)
+				ui.Text(c, a.usageTableEmpty(kind, false)).FontSize(a.Theme.Px(14)).TextColor(a.Theme.TextMuted)
 			})
 		})
 	}
@@ -676,7 +634,7 @@ func usageSessionColumns(columns []ui.TableColumn, resized map[string]float32, a
 		col.Width = width(col.ID, fallback)
 		out = append(out, col)
 	}
-	return append(out, ui.TableColumn{ID: "open", Width: 38, MinWidth: 38, Align: ui.Center, Sortable: false})
+	return append(out, ui.TableColumn{ID: "open", Width: 38, MinWidth: 38, Align: ui.Center, Sortable: false, Fixed: true})
 }
 
 // Non-session plans follow the frozen source's per-table reading registers.

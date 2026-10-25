@@ -3,7 +3,6 @@ package orbitui
 import (
 	"context"
 	"github.com/charlzyx/orbit/internal/workbench"
-	"github.com/egoist/mygo/ui"
 	"strings"
 )
 
@@ -14,13 +13,14 @@ type providerState struct {
 	editor                    *providerDraft
 	secretBusy, secretCookie  bool
 	secretError               string
+	secretGeneration          uint64
 	authTarget, usageProvider string
 	dismissedAuthSession      string
 }
 type providerDraft struct {
 	edit                           workbench.ProviderEdit
 	originalID, models, key, error string
-	busy, inCatalog                bool
+	busy, inCatalog, hadAPIKey     bool
 }
 
 func (a *App) refreshProviders() {
@@ -55,76 +55,13 @@ func (a *App) isCatalogProvider(id string) bool {
 }
 func (a *App) editProvider(p workbench.Provider) {
 	inCatalog := a.isCatalogProvider(p.ID)
-	a.providerState.editor = &providerDraft{edit: workbench.ProviderEditDefaults(p, inCatalog), originalID: p.ID, models: strings.Join(p.ModelIDs, "\n"), inCatalog: inCatalog}
+	a.providerState.editor = &providerDraft{edit: workbench.ProviderEditDefaults(p, inCatalog), originalID: p.ID, models: strings.Join(p.ModelIDs, "\n"), inCatalog: inCatalog, hadAPIKey: p.HasAPIKey}
 }
 
-var providerAPIs = []string{"", "openai-completions", "openai-responses", "anthropic-messages", "google-generative-ai", "mistral-conversations", "amazon-bedrock", "azure-openai-responses", "openai-codex-responses", "google-vertex"}
+var providerAPIs = []string{"openai-completions", "openai-responses", "anthropic-messages", "google-generative-ai", "mistral-conversations", "amazon-bedrock", "azure-openai-responses", "openai-codex-responses", "google-vertex"}
 
 func providerModels(s string) []string {
 	return strings.FieldsFunc(s, func(r rune) bool { return r == '\n' || r == '\r' || r == ',' })
-}
-func (a *App) providerDialog(c *ui.Context) {
-	d := a.providerState.editor
-	if d == nil {
-		return
-	}
-	open := true
-	a.modal(c.Key("provider-editor:"+d.originalID), &open, 520, func() {
-		title := "Add provider"
-		if d.originalID != "" {
-			title = "Edit provider"
-		}
-		ui.Text(c, title).FontSize(18).FontWeight(500)
-		_, height := c.Size()
-		ui.Scroll(c).MaxHeight(max(200, height-190)).AlignSelf(ui.Stretch).Gap(8).Children(func() {
-			field := func(label string, value *string, placeholder string, readonly, password bool) {
-				ui.Text(c, label).TextColor(a.Theme.TextMuted).FontSize(12)
-				e := ui.TextInput(c, value).Label(label).Placeholder(placeholder).AlignSelf(ui.Stretch).Disabled(readonly || d.busy)
-				if password {
-					e.Password()
-				}
-			}
-			field("Provider ID", &d.edit.ID, "my-provider", d.originalID != "", false)
-			field("Display name", &d.edit.Name, "Optional display name", false, false)
-			field("Base URL", &d.edit.BaseURL, "https://api.example.com/v1", false, false)
-			ui.Text(c, "API format").FontSize(12).TextColor(a.Theme.TextMuted)
-			label := d.edit.API
-			if label == "" {
-				label = "Inherit catalog default"
-			}
-			ui.MenuButton(c, label, func(m *ui.Menu) {
-				for _, api := range providerAPIs {
-					label := api
-					if label == "" {
-						label = "Inherit catalog default"
-					}
-					if m.Item(label).Checked(d.edit.API == api).Chosen() {
-						d.edit.API = api
-					}
-				}
-			}).Disabled(d.busy)
-			field("API key", &d.key, "Leave blank to keep the existing key", false, true)
-			ui.Text(c, "Saving a key stores it locally for future requests to this provider. Existing keys are never shown.").TextColor(a.Theme.TextMuted).FontSize(11)
-			ui.Text(c, "Model IDs (one per line)").FontSize(12).TextColor(a.Theme.TextMuted)
-			ui.TextArea(c, &d.models).Label("Model IDs").Placeholder("model-id").Height(100).AlignSelf(ui.Stretch).Disabled(d.busy)
-			ui.Text(c, "Catalog providers may omit models to keep the built-in catalog. Custom providers need at least one model.").FontSize(11).TextColor(a.Theme.TextMuted)
-		})
-		if d.error != "" {
-			ui.Text(c, d.error).TextColor(a.Theme.Error)
-		}
-		ui.Row(c).Gap(8).Justify(ui.End).Children(func() {
-			if a.button(c, "Cancel", "", false).Disabled(d.busy).Clicked() {
-				open = false
-			}
-			if a.button(c, "Save provider", "", true).Disabled(d.busy).Clicked() {
-				a.saveProviderDraft(d)
-			}
-		})
-	})
-	if !open {
-		d.key = ""
-		a.providerState.editor = nil
-	}
 }
 func (a *App) saveProviderDraft(d *providerDraft) {
 	edit := d.edit
@@ -161,65 +98,50 @@ func (a *App) saveProviderDraft(d *providerDraft) {
 	})
 }
 func (a *App) openProviderSecret(id string, cookie bool) {
+	a.providerState.secretGeneration++
 	a.secretProvider = id
 	a.secretValue = ""
 	a.secretOpen = true
 	a.providerState.secretCookie = cookie
 	a.providerState.secretError = ""
 }
-func (a *App) secretDialog(c *ui.Context) {
-	if !a.secretOpen {
+func (a *App) saveProviderSecret() {
+	s := &a.providerState
+	if s.secretBusy || strings.TrimSpace(a.secretValue) == "" {
 		return
 	}
-	s := &a.providerState
-	a.modal(c.Key("secret-input:"+a.secretProvider), &a.secretOpen, 480, func() {
-		title := "API key for " + a.secretProvider
-		label := "API key"
-		if s.secretCookie {
-			title = "Ollama web session"
-			label = "Cookie header"
+	svc := a.Service()
+	id, key, cookie := a.secretProvider, a.secretValue, s.secretCookie
+	generation := s.secretGeneration
+	s.secretBusy = true
+	s.secretError = ""
+	a.Async(func() func() {
+		var err error
+		if cookie {
+			err = svc.SaveOllamaSession(key)
+		} else {
+			err = svc.SaveAPIKey(id, key)
 		}
-		ui.Text(c, title).FontSize(18).Bold()
-		ui.Text(c, "Stored in pi's local auth.json for ongoing requests to this provider. This value is never displayed in diagnostics.").TextColor(a.Theme.TextMuted)
-		ui.TextInput(c, &a.secretValue).Password().Label(label).Placeholder(label).Disabled(s.secretBusy).AlignSelf(ui.Stretch)
-		if s.secretError != "" {
-			ui.Text(c, s.secretError).TextColor(a.Theme.Error)
+		return func() {
+			s.secretBusy = false
+			// The save already ran even if its modal was dismissed. Refresh the
+			// real runtime state, but never consume a subsequently reopened draft.
+			if err == nil {
+				a.Dispatch(Action{Kind: "RuntimeConfigChanged"})
+				a.refreshProviders()
+			}
+			if !a.secretOpen || id != a.secretProvider || generation != s.secretGeneration {
+				if err != nil {
+					a.save(err)
+				}
+				return
+			}
+			if err != nil {
+				s.secretError = err.Error()
+				return
+			}
+			a.secretValue = ""
+			a.secretOpen = false
 		}
-		ui.Row(c).Gap(8).Justify(ui.End).Children(func() {
-			if a.button(c, "Cancel", "", false).Disabled(s.secretBusy).Clicked() {
-				a.secretOpen = false
-				a.secretValue = ""
-			}
-			if a.button(c, "Save credential", "", true).Disabled(s.secretBusy || strings.TrimSpace(a.secretValue) == "").Clicked() {
-				svc := a.Service()
-				id, key, cookie := a.secretProvider, a.secretValue, s.secretCookie
-				s.secretBusy = true
-				a.Async(func() func() {
-					var e error
-					if cookie {
-						e = svc.SaveOllamaSession(key)
-					} else {
-						e = svc.SaveAPIKey(id, key)
-					}
-					return func() {
-						s.secretBusy = false
-						if !a.secretOpen || id != a.secretProvider {
-							return
-						}
-						if e != nil {
-							s.secretError = e.Error()
-							return
-						}
-						a.secretValue = ""
-						a.secretOpen = false
-						a.Dispatch(Action{Kind: "RuntimeConfigChanged"})
-						a.refreshProviders()
-					}
-				})
-			}
-		})
 	})
-	if !a.secretOpen {
-		a.secretValue = ""
-	}
 }

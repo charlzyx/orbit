@@ -1,0 +1,664 @@
+{
+  "reference_source": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "implementation_source": "81a5114c36fc09bd9f125047d73d1a690f9e97c4",
+  "metadata_mismatches": {},
+  "normalized_fixture_gate": "BLOCKED",
+  "normalization_gaps": [
+    {
+      "application": 0,
+      "unverified": "resolvedFontFaces"
+    },
+    {
+      "application": 0,
+      "unverified": "clockFrozen"
+    },
+    {
+      "application": 0,
+      "unverified": "animationPhaseFrozen"
+    },
+    {
+      "application": 0,
+      "unverified": "focusAndCaretPhaseVerified"
+    },
+    {
+      "application": 1,
+      "unverified": "resolvedFontFaces"
+    },
+    {
+      "application": 1,
+      "unverified": "clockFrozen"
+    },
+    {
+      "application": 1,
+      "unverified": "animationPhaseFrozen"
+    },
+    {
+      "application": 1,
+      "unverified": "focusAndCaretPhaseVerified"
+    }
+  ],
+  "criteria": "Exact pixel equality: changed_pixels == 0. No tolerance, resizing, crop alignment or masking is applied. Manual semantic review remains independent.",
+  "cases": [
+    {
+      "name": "new-task-dark.png",
+      "reference": "reference/new-task-dark.png",
+      "implementation": "implementation/new-task-dark.png",
+      "manual_semantic_review": "REVIEWED_DIFFERENCES",
+      "sha256": [
+        "4bd88eaab2f73fe2e56263e27a6598a1b0beebc63e862eaf8a7019679c67b783",
+        "f79a329c3a87c9e0504a25c99abc9dd5e40846c0688d2698f7b83cd92c1e6b3f"
+      ],
+      "dimensions": [
+        [
+          1470,
+          922
+        ],
+        [
+          1470,
+          922
+        ]
+      ],
+      "status": "DIFFERENT",
+      "changed_pixels": 62449,
+      "changed_percent": 4.607626130712589,
+      "mae": 0.5155315271444804,
+      "normalized_rmse": 0.02305534247777974,
+      "max_channel_delta": 210,
+      "difference_bbox": [
+        0,
+        8,
+        1460,
+        922
+      ],
+      "candidate_id": "V001",
+      "manual_notes": "Empty task with connected offline Pi; shell/background preserved. Hero text, glyphs and composer height still differ; caret phase is unverified.",
+      "visual_acceptance": "NOT_PASS",
+      "previous_go_commit": "f61e00fdeea806d58fc692c35675401bd095a130",
+      "previous_changed_percent": 4.729145454277155,
+      "review_reuses_identical_decoded_pixels_from_f61e00f": {
+        "reference": true,
+        "implementation": false
+      }
+    },
+    {
+      "name": "settings-about-dark.png",
+      "reference": "reference/settings-about-dark.png",
+      "implementation": "implementation/settings-about-dark.png",
+      "manual_semantic_review": "REVIEWED_DIFFERENCES",
+      "sha256": [
+        "ae440daf20c520adf868aaba6d3e64268826978ac9a7498d2537f2c2bf6dfa0b",
+        "d09f543680be8b1697f9e018b9e954acda1b6f1ddb5cba4087ced7be810141c0"
+      ],
+      "dimensions": [
+        [
+          1470,
+          922
+        ],
+        [
+          1470,
+          922
+        ]
+      ],
+      "status": "DIFFERENT",
+      "changed_pixels": 23773,
+      "changed_percent": 1.7540248203402835,
+      "mae": 0.5935693257780336,
+      "normalized_rmse": 0.027823393020295233,
+      "max_channel_delta": 205,
+      "difference_bbox": [
+        0,
+        24,
+        1311,
+        907
+      ],
+      "candidate_id": "V078",
+      "manual_notes": "Source icon/banner/version-board structure restored. MyGo/Go/dev-version identity deliberately remains truthful. Remaining text/glyph/control differences.",
+      "visual_acceptance": "NOT_PASS",
+      "previous_go_commit": "f61e00fdeea806d58fc692c35675401bd095a130",
+      "previous_changed_percent": 26.189738368232327,
+      "review_reuses_identical_decoded_pixels_from_f61e00f": {
+        "reference": true,
+        "implementation": false
+      }
+    },
+    {
+      "name": "settings-agent-dark.png",
+      "reference": "reference/settings-agent-dark.png",
+      "implementation": "implementation/settings-agent-dark.png",
+      "manual_semantic_review": "REVIEWED_DIFFERENCES",
+      "sha256": [
+        "6c291c63877817ec3b36d6e80bdf90ce64c0c96e59bb2f38f24e072dbd3b8b46",
+        "c73d4295f9b1fcbb1c9750ab3a229c13dafc8ba792cf839744d71e7c2504eeac"
+      ],
+      "dimensions": [
+        [
+          1470,
+          922
+        ],
+        [
+          1470,
+          922
+        ]
+      ],
+      "status": "DIFFERENT",
+      "changed_pixels": 262712,
+      "changed_percent": 19.383475733026398,
+      "mae": 3.290419378163413,
+      "normalized_rmse": 0.05722659350436634,
+      "max_channel_delta": 216,
+      "difference_bbox": [
+        0,
+        25,
+        1311,
+        907
+      ],
+      "candidate_id": "V075",
+      "manual_notes": "Behavior/Titles/Defaults structure restored. Unknown auto-retry uses explicit policy selection rather than inventing source enabled state (D04), which increases this row height. Remaining control/text geometry.",
+      "visual_acceptance": "NOT_PASS",
+      "previous_go_commit": "f61e00fdeea806d58fc692c35675401bd095a130",
+      "previous_changed_percent": 49.54535393333038,
+      "review_reuses_identical_decoded_pixels_from_f61e00f": {
+        "reference": true,
+        "implementation": false
+      }
+    },
+    {
+      "name": "settings-appearance-dark.png",
+      "reference": "reference/settings-appearance-dark.png",
+      "implementation": "implementation/settings-appearance-dark.png",
+      "manual_semantic_review": "REVIEWED_DIFFERENCES",
+      "sha256": [
+        "6c52edc473c876570f18260f6c340f429733cb0472b7f3c89b6792be0430c437",
+        "cb23a6b6d62c0fc299a01b346ad7457d19baa5aae87b68df9fb4f612b51da0d5"
+      ],
+      "dimensions": [
+        [
+          1470,
+          922
+        ],
+        [
+          1470,
+          922
+        ]
+      ],
+      "status": "DIFFERENT",
+      "changed_pixels": 68029,
+      "changed_percent": 5.019330942789264,
+      "mae": 1.0318318650670681,
+      "normalized_rmse": 0.03517309739712547,
+      "max_channel_delta": 208,
+      "difference_bbox": [
+        0,
+        25,
+        1311,
+        907
+      ],
+      "candidate_id": "V071",
+      "manual_notes": "Source appearance segments/active-theme/language/preview and font groups restored. Interface preview is still shorter and vertically centered against terminal preview instead of equal height. Text metrics and chip widths differ.",
+      "visual_acceptance": "NOT_PASS",
+      "previous_go_commit": "f61e00fdeea806d58fc692c35675401bd095a130",
+      "previous_changed_percent": 52.97357120722476,
+      "review_reuses_identical_decoded_pixels_from_f61e00f": {
+        "reference": true,
+        "implementation": false
+      }
+    },
+    {
+      "name": "settings-general-dark.png",
+      "reference": "reference/settings-general-dark.png",
+      "implementation": "implementation/settings-general-dark.png",
+      "manual_semantic_review": "REVIEWED_DIFFERENCES",
+      "sha256": [
+        "97b2186bf23698998f9eb66c6fd67762e7720acfb347a2c87485265f9a0fee70",
+        "fcd9307ebcece937dbed27c3174668b7ab86ab9f25d9ec7067e2803c5ee96f54"
+      ],
+      "dimensions": [
+        [
+          1470,
+          922
+        ],
+        [
+          1470,
+          922
+        ]
+      ],
+      "status": "DIFFERENT",
+      "changed_pixels": 28686,
+      "changed_percent": 2.1165168887511623,
+      "mae": 0.7444263063142827,
+      "normalized_rmse": 0.03045399467269625,
+      "max_channel_delta": 205,
+      "difference_bbox": [
+        0,
+        24,
+        1311,
+        907
+      ],
+      "candidate_id": "V070",
+      "manual_notes": "Decoded pixels identical to previously inspected f61e00f Go page. Correct page groups remain; baseline/row/glyph differences persist.",
+      "visual_acceptance": "NOT_PASS",
+      "previous_go_commit": "f61e00fdeea806d58fc692c35675401bd095a130",
+      "previous_changed_percent": 2.1165168887511623,
+      "review_reuses_identical_decoded_pixels_from_f61e00f": {
+        "reference": true,
+        "implementation": true
+      }
+    },
+    {
+      "name": "settings-mcp-dark.png",
+      "reference": "reference/settings-mcp-dark.png",
+      "implementation": "implementation/settings-mcp-dark.png",
+      "manual_semantic_review": "REVIEWED_DIFFERENCES",
+      "sha256": [
+        "ca7f3cfb8a5caad6ccdbca057a5d5ae1de3918eb199a49a8094ed67cce581cf9",
+        "b4483297349f0090267db05cee8ecaae4ebf74c332ba970b48a36f0db4c306df"
+      ],
+      "dimensions": [
+        [
+          1470,
+          922
+        ],
+        [
+          1470,
+          922
+        ]
+      ],
+      "status": "DIFFERENT",
+      "changed_pixels": 57678,
+      "changed_percent": 4.255611138164594,
+      "mae": 1.3432029970339545,
+      "normalized_rmse": 0.049185548631001365,
+      "max_channel_delta": 231,
+      "difference_bbox": [
+        0,
+        25,
+        1312,
+        907
+      ],
+      "candidate_id": "V235",
+      "manual_notes": "Empty MCP state, not populated V234. Unchanged bordered empty card instead of source unboxed icon state; checked time is volatile and header/path formatting differs.",
+      "visual_acceptance": "NOT_PASS",
+      "previous_go_commit": "f61e00fdeea806d58fc692c35675401bd095a130",
+      "previous_changed_percent": 4.255094662593888,
+      "review_reuses_identical_decoded_pixels_from_f61e00f": {
+        "reference": true,
+        "implementation": false
+      }
+    },
+    {
+      "name": "settings-models-dark.png",
+      "reference": "reference/settings-models-dark.png",
+      "implementation": "implementation/settings-models-dark.png",
+      "manual_semantic_review": "REVIEWED_DIFFERENCES",
+      "sha256": [
+        "deb2b6a623a431c130e407a401681727e1825e1c4d4c65d3fbcc0f21a2115218",
+        "96b2b3413d058dc28036800c232a692726a911388ba2b62e294bffcc3eeb86fb"
+      ],
+      "dimensions": [
+        [
+          1470,
+          922
+        ],
+        [
+          1470,
+          922
+        ]
+      ],
+      "status": "DIFFERENT",
+      "changed_pixels": 234810,
+      "changed_percent": 17.324804108194254,
+      "mae": 1.8604862986409314,
+      "normalized_rmse": 0.03370666494031036,
+      "max_channel_delta": 205,
+      "difference_bbox": [
+        0,
+        24,
+        1312,
+        907
+      ],
+      "candidate_id": "V125",
+      "manual_notes": "Empty catalog, not populated V124. Decoded Go pixels unchanged: source centered glyph/large panel still replaced by compact notice; toolbar is displaced.",
+      "visual_acceptance": "NOT_PASS",
+      "previous_go_commit": "f61e00fdeea806d58fc692c35675401bd095a130",
+      "previous_changed_percent": 17.324804108194254,
+      "review_reuses_identical_decoded_pixels_from_f61e00f": {
+        "reference": true,
+        "implementation": true
+      }
+    },
+    {
+      "name": "settings-plugins-dark.png",
+      "reference": "reference/settings-plugins-dark.png",
+      "implementation": "implementation/settings-plugins-dark.png",
+      "manual_semantic_review": "REVIEWED_DIFFERENCES",
+      "sha256": [
+        "50e2582ad77738cea1dca2808c39be8586f7d3751a4c41584e0e26ce7801b8d6",
+        "d85fb607ee31befa648e775a7418e65562eaef43745e118634218a47fd3ea0e5"
+      ],
+      "dimensions": [
+        [
+          1470,
+          922
+        ],
+        [
+          1470,
+          922
+        ]
+      ],
+      "status": "DIFFERENT",
+      "changed_pixels": 246543,
+      "changed_percent": 18.190490946921066,
+      "mae": 2.231937373647941,
+      "normalized_rmse": 0.0368577043686021,
+      "max_channel_delta": 223,
+      "difference_bbox": [
+        0,
+        24,
+        1312,
+        907
+      ],
+      "candidate_id": "V225",
+      "manual_notes": "Empty plugins, not populated V222. Decoded Go pixels unchanged: empty icon tile, filled card, search icon and toolbar still differ.",
+      "visual_acceptance": "NOT_PASS",
+      "previous_go_commit": "f61e00fdeea806d58fc692c35675401bd095a130",
+      "previous_changed_percent": 18.190490946921066,
+      "review_reuses_identical_decoded_pixels_from_f61e00f": {
+        "reference": true,
+        "implementation": true
+      }
+    },
+    {
+      "name": "settings-privacy-dark.png",
+      "reference": "reference/settings-privacy-dark.png",
+      "implementation": "implementation/settings-privacy-dark.png",
+      "manual_semantic_review": "REVIEWED_DIFFERENCES",
+      "sha256": [
+        "fbd9372aee33d37362e2dd66b1132b6da63bea35ce1d0347931faaf4c579e507",
+        "2a2a60816507ebf030670e929417d76c781b65dc6cebe8b51e9cbf819697dacf"
+      ],
+      "dimensions": [
+        [
+          1470,
+          922
+        ],
+        [
+          1470,
+          922
+        ]
+      ],
+      "status": "DIFFERENT",
+      "changed_pixels": 60103,
+      "changed_percent": 4.434533032301858,
+      "mae": 1.3342849395723582,
+      "normalized_rmse": 0.04116004050061807,
+      "max_channel_delta": 205,
+      "difference_bbox": [
+        0,
+        24,
+        1311,
+        918
+      ],
+      "candidate_id": "V073",
+      "manual_notes": "Source retention boards and actual temporary-file list restored. Temporary file names/sizes/counts are different job outputs, not a normalized fixture; remaining row/text differences.",
+      "visual_acceptance": "NOT_PASS",
+      "previous_go_commit": "f61e00fdeea806d58fc692c35675401bd095a130",
+      "previous_changed_percent": 50.05821417504095,
+      "review_reuses_identical_decoded_pixels_from_f61e00f": {
+        "reference": true,
+        "implementation": false
+      }
+    },
+    {
+      "name": "settings-providers-dark.png",
+      "reference": "reference/settings-providers-dark.png",
+      "implementation": "implementation/settings-providers-dark.png",
+      "manual_semantic_review": "REVIEWED_DIFFERENCES",
+      "sha256": [
+        "ef317eda1adc1e37633d463b0f3eb7eab19b244f62900570300c1509d6dfce87",
+        "554746e6b48eae19e07c4a95b09462b42ce726c3c6de690fcd2b0a3e05181f87"
+      ],
+      "dimensions": [
+        [
+          1470,
+          922
+        ],
+        [
+          1470,
+          922
+        ]
+      ],
+      "status": "DIFFERENT",
+      "changed_pixels": 223671,
+      "changed_percent": 16.50294391075302,
+      "mae": 4.439175040949134,
+      "normalized_rmse": 0.08386329999625713,
+      "max_channel_delta": 255,
+      "difference_bbox": [
+        0,
+        24,
+        1312,
+        922
+      ],
+      "candidate_id": "V077",
+      "manual_notes": "Source three-column branded provider grid and actual auth controls restored. Rust falsely includes .manifest; Go excludes it (D09), shifting ordering/row heights. Go search placeholder leaks settings.providers_search in this capture; corrected only in subsequent working code. Header starts4px lower.",
+      "visual_acceptance": "NOT_PASS",
+      "previous_go_commit": "f61e00fdeea806d58fc692c35675401bd095a130",
+      "previous_changed_percent": 54.49702657635722,
+      "review_reuses_identical_decoded_pixels_from_f61e00f": {
+        "reference": true,
+        "implementation": false
+      }
+    },
+    {
+      "name": "settings-report-bug-dark.png",
+      "reference": "reference/settings-report-bug-dark.png",
+      "implementation": "implementation/settings-report-bug-dark.png",
+      "manual_semantic_review": "REVIEWED_DIFFERENCES",
+      "sha256": [
+        "e6c8469e5d4f2393cc808b05a2937ffe49bce35eccf8fa5e0187da5509553397",
+        "1115e7065016cde090f45a419719cdfd7ddf6e9cec6f940cbcdcece9ae031017"
+      ],
+      "dimensions": [
+        [
+          1470,
+          922
+        ],
+        [
+          1470,
+          922
+        ]
+      ],
+      "status": "DIFFERENT",
+      "changed_pixels": 659900,
+      "changed_percent": 48.68888987265188,
+      "mae": 5.5859671742883705,
+      "normalized_rmse": 0.06967016808162252,
+      "max_channel_delta": 231,
+      "difference_bbox": [
+        0,
+        24,
+        1312,
+        912
+      ],
+      "candidate_id": "V253",
+      "manual_notes": "Decoded Go pixels unchanged. Wrong width/grouping/Issue-type/Generate/footer and extra privacy controls remain. A source form reconstruction is in progress, not included in81a5114.",
+      "visual_acceptance": "NOT_PASS",
+      "previous_go_commit": "f61e00fdeea806d58fc692c35675401bd095a130",
+      "previous_changed_percent": 48.68888987265188,
+      "review_reuses_identical_decoded_pixels_from_f61e00f": {
+        "reference": true,
+        "implementation": true
+      }
+    },
+    {
+      "name": "settings-runtime-dark.png",
+      "reference": "reference/settings-runtime-dark.png",
+      "implementation": "implementation/settings-runtime-dark.png",
+      "manual_semantic_review": "REVIEWED_DIFFERENCES",
+      "sha256": [
+        "b50628e256a86e57245fc7b853368d6d75aa7f5b66fea403940b64c153384da7",
+        "19c7f3290dbd4981fe3ddd41114156f9d0cda17c8448f353ceb2558ef53652eb"
+      ],
+      "dimensions": [
+        [
+          1470,
+          922
+        ],
+        [
+          1470,
+          922
+        ]
+      ],
+      "status": "DIFFERENT",
+      "changed_pixels": 28738,
+      "changed_percent": 2.12035356441926,
+      "mae": 0.7126807664497469,
+      "normalized_rmse": 0.030775235081452648,
+      "max_channel_delta": 205,
+      "difference_bbox": [
+        0,
+        24,
+        1311,
+        907
+      ],
+      "candidate_id": "V074",
+      "manual_notes": "Source process/patch/transport/stderr structure restored. Actual PID differs, uptime happened to be10s on both. Text/control metrics differ; runtime behavior not inferred from pixels.",
+      "visual_acceptance": "NOT_PASS",
+      "previous_go_commit": "f61e00fdeea806d58fc692c35675401bd095a130",
+      "previous_changed_percent": 46.89214514439181,
+      "review_reuses_identical_decoded_pixels_from_f61e00f": {
+        "reference": false,
+        "implementation": false
+      }
+    },
+    {
+      "name": "settings-shortcuts-dark.png",
+      "reference": "reference/settings-shortcuts-dark.png",
+      "implementation": "implementation/settings-shortcuts-dark.png",
+      "manual_semantic_review": "REVIEWED_DIFFERENCES",
+      "sha256": [
+        "d1a38fcd98bcafb3ed16d9f27f9ea86d0ebf15d107149275aa37e616194cd95f",
+        "a845d5ecd626730a04b510a758986f17dced08d367ede9df9813eddc1d7a4149"
+      ],
+      "dimensions": [
+        [
+          1470,
+          922
+        ],
+        [
+          1470,
+          922
+        ]
+      ],
+      "status": "DIFFERENT",
+      "changed_pixels": 28849,
+      "changed_percent": 2.1285433913261618,
+      "mae": 0.763931928519781,
+      "normalized_rmse": 0.033225853553436116,
+      "max_channel_delta": 205,
+      "difference_bbox": [
+        0,
+        24,
+        1311,
+        922
+      ],
+      "candidate_id": "V072",
+      "manual_notes": "Source short reference rows, range chord and separate Composer board restored. Remaining glyph/text/chip geometry. Below-fold groups not captured.",
+      "visual_acceptance": "NOT_PASS",
+      "previous_go_commit": "f61e00fdeea806d58fc692c35675401bd095a130",
+      "previous_changed_percent": 52.61580120117461,
+      "review_reuses_identical_decoded_pixels_from_f61e00f": {
+        "reference": true,
+        "implementation": false
+      }
+    },
+    {
+      "name": "settings-skills-dark.png",
+      "reference": "reference/settings-skills-dark.png",
+      "implementation": "implementation/settings-skills-dark.png",
+      "manual_semantic_review": "REVIEWED_DIFFERENCES",
+      "sha256": [
+        "fd90987079d18a850670d535f6f2f6bafd94370c764575e3a03597a2b32c1d5a",
+        "27783a12f6219c53894af4cd5ad0956b86448f854ef32b98288e4d068ea63d44"
+      ],
+      "dimensions": [
+        [
+          1470,
+          922
+        ],
+        [
+          1470,
+          922
+        ]
+      ],
+      "status": "DIFFERENT",
+      "changed_pixels": 17960,
+      "changed_percent": 1.3251287499815545,
+      "mae": 0.3665369944073074,
+      "normalized_rmse": 0.02082863942534492,
+      "max_channel_delta": 205,
+      "difference_bbox": [
+        0,
+        21,
+        1158,
+        912
+      ],
+      "candidate_id": "V216",
+      "manual_notes": "Empty skills, not populated V213. Decoded Go pixels unchanged: search icon and vertical offsets still differ.",
+      "visual_acceptance": "NOT_PASS",
+      "previous_go_commit": "f61e00fdeea806d58fc692c35675401bd095a130",
+      "previous_changed_percent": 1.3251287499815545,
+      "review_reuses_identical_decoded_pixels_from_f61e00f": {
+        "reference": true,
+        "implementation": true
+      }
+    },
+    {
+      "name": "settings-worktrees-dark.png",
+      "reference": "reference/settings-worktrees-dark.png",
+      "implementation": "implementation/settings-worktrees-dark.png",
+      "manual_semantic_review": "REVIEWED_DIFFERENCES",
+      "sha256": [
+        "f01559d14a8e1b32335f3acc3766d6b83a6ae0d2452b38822a6fd0ddffd4dc3e",
+        "d2605e25af281c61a7c242e1060fcce658ae764b506316d17bd16a4f71ce9b82"
+      ],
+      "dimensions": [
+        [
+          1470,
+          922
+        ],
+        [
+          1470,
+          922
+        ]
+      ],
+      "status": "DIFFERENT",
+      "changed_pixels": 37668,
+      "changed_percent": 2.7792288281907123,
+      "mae": 0.9085257204834212,
+      "normalized_rmse": 0.03430245996799653,
+      "max_channel_delta": 205,
+      "difference_bbox": [
+        0,
+        24,
+        1311,
+        907
+      ],
+      "candidate_id": "V076",
+      "manual_notes": "Source Manage/Location/Creation boards and inline fields restored. Field backgrounds/padding, labels and glyph geometry still differ. Saving/create behavior has separate tests.",
+      "visual_acceptance": "NOT_PASS",
+      "previous_go_commit": "f61e00fdeea806d58fc692c35675401bd095a130",
+      "previous_changed_percent": 28.01370873729101,
+      "review_reuses_identical_decoded_pixels_from_f61e00f": {
+        "reference": true,
+        "implementation": false
+      }
+    }
+  ],
+  "counts": {
+    "MISSING": 0,
+    "RESHOOT": 0,
+    "DIFFERENT": 15,
+    "EXACT_PIXELS": 0
+  }
+}

@@ -168,7 +168,7 @@ func (a *App) composerView(c *ui.Context) {
 			var input ui.Element
 			anchor.Children(func() {
 				a.attachmentRow(c)
-				input = ui.TextAreaBase(c.Key("draft"), &a.Draft).Bind(&a.composer).AutoFocus().Label("Message").Placeholder(a.text("composer.placeholder", "Describe the task…")).Lines(1, 8).AlignSelf(ui.Stretch).OnTextKey(func(k ui.TextKey) bool {
+				input = ui.TextAreaBase(c.Key(struct{ Field, Session, Workspace string }{"draft", a.Model.SessionID, a.Model.Workspace}), &a.Draft).Bind(&a.composer).Label("Message").Placeholder(a.text("composer.placeholder", "Describe the task…")).Lines(1, 8).AlignSelf(ui.Stretch).OnTextKey(func(k ui.TextKey) bool {
 					if a.autocomplete.HandleKey(k) {
 						return true
 					}
@@ -199,9 +199,13 @@ func (a *App) composerView(c *ui.Context) {
 					return false
 				})
 
+				if a.reviewComposerAutoFocus(c) {
+					input.AutoFocus()
+				}
 				if a.autocomplete.SyncInput(input, &a.Draft) {
 					c.AnimationFrame()
 				}
+				a.retainReviewComposer(c, input)
 				composerui.PaintMentions(input, a.Draft, style)
 				ui.Row(c).AlignSelf(ui.Stretch).AlignItems(ui.Center).Gap(8).Children(func() {
 					a.composerChip(c, "Add attachment", "", "icons/plus.svg", false, 0).Menu(func(m *ui.Menu) {

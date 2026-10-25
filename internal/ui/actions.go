@@ -2,7 +2,6 @@ package orbitui
 
 import (
 	"runtime"
-	"strconv"
 	"strings"
 
 	"github.com/egoist/mygo/ui"
@@ -50,6 +49,9 @@ func shortcutLabel(chord string) string {
 }
 func (a *App) shortcuts(c *ui.Context) {
 	if a.modalOpen() {
+		return
+	}
+	if a.sidebarShortcut(c) {
 		return
 	}
 
@@ -126,6 +128,14 @@ func (a *App) command(id, value string) {
 		return
 	}
 	switch id {
+	case "AbortRun":
+		// Pinned session.rs::on_abort closes feature pages before touching Pi.
+		if a.page == "settings" || a.page == "worktrees" {
+			a.Navigate("chat")
+			a.composer.Focus()
+			return
+		}
+		a.Dispatch(Action{Kind: id, Value: value})
 	case "NewSession":
 		a.drafts[a.Model.SessionID] = draftState{a.Draft, append([]attachment(nil), a.attachments...)}
 		a.Draft = ""
@@ -140,8 +150,7 @@ func (a *App) command(id, value string) {
 	case "ToggleSidebar":
 		a.SidebarVisible = !a.SidebarVisible
 	case "FocusSessions":
-		a.SidebarVisible = true
-		a.sessionList.Handle.Focus()
+		a.focusSidebarSessions()
 	case "FocusComposer":
 		a.Navigate("chat")
 		a.composer.Focus()
@@ -247,27 +256,11 @@ func (a *App) command(id, value string) {
 			}
 		}
 	case "OpenSessionSlot":
-		n, e := strconv.Atoi(value)
-		if e == nil && n > 0 && n <= len(a.Model.Sessions) {
-			a.Dispatch(Action{Kind: "SwitchSession", Value: a.Model.Sessions[n-1].Path})
-		}
-	case "NextSession", "PrevSession":
-		if len(a.Model.Sessions) == 0 {
-			return
-		}
-		i := 0
-		for ix, s := range a.Model.Sessions {
-			if s.ID == a.Model.SessionID {
-				i = ix
-				break
-			}
-		}
-		delta := 1
-		if id == "PrevSession" {
-			delta = -1
-		}
-		i = (i + delta + len(a.Model.Sessions)) % len(a.Model.Sessions)
-		a.Dispatch(Action{Kind: "SwitchSession", Value: a.Model.Sessions[i].Path})
+		a.openSidebarSessionSlot(value)
+	case "NextSession":
+		a.cycleSidebarSession(1)
+	case "PrevSession":
+		a.cycleSidebarSession(-1)
 	case "PrevTurn", "NextTurn":
 		delta := 1
 		if id == "PrevTurn" {

@@ -125,7 +125,7 @@ func (a *App) appearanceSettings(c *ui.Context) {
 }
 func (a *App) sourceTypePreview(c *ui.Context) {
 	t := a.Theme
-	ui.Row(c).AlignSelf(ui.Stretch).Padding(t.Space(12), t.Space(16)).Gap(t.Space(16)).Children(func() {
+	ui.Row(c).AlignSelf(ui.Stretch).AlignItems(ui.Stretch).Padding(t.Space(12), t.Space(16)).Gap(t.Space(16)).Children(func() {
 		for _, terminal := range []bool{false, true} {
 			title := a.Tr("settings.interface_preview")
 			if terminal {
@@ -134,14 +134,14 @@ func (a *App) sourceTypePreview(c *ui.Context) {
 			ui.Column(c).Grow(1).Basis(0).MinWidth(0).Gap(t.Space(6)).Children(func() {
 				ui.Text(c, strings.ToUpper(title)).FontSize(t.Px(10)).Height(sourceTextHeight(t.Px(10), sourceDefaultLineHeight)).FontWeight(500).TextColor(t.TextMuted)
 				if !terminal {
-					ui.Column(c).AlignSelf(ui.Stretch).Grow(1).Padding(t.Space(12)).Gap(t.Space(6)).Radius(t.Px(12)).Background(t.Background).Justify(ui.Center).Children(func() {
+					ui.Column(c).Label("Interface typography preview").AlignSelf(ui.Stretch).Grow(1).Padding(t.Space(12)).Gap(t.Space(6)).Radius(t.Px(12)).Background(t.Background).Justify(ui.Center).Children(func() {
 						ui.Text(c, a.Tr("settings.new_task")).FontSize(t.Px(16)).FontWeight(500)
 						ui.Text(c, a.Tr("settings.the_quick_brown_fox_jumps_over_the_lazy_dog")).FontSize(t.Px(12)).TextColor(t.TextSecondary)
 					})
 					return
 				}
 				termScale := float32(a.Prefs.TerminalFontSize) / 13
-				ui.Column(c).AlignSelf(ui.Stretch).Border(1, t.Border).Radius(t.Px(12)).Background(t.CodeBg).Clip().Children(func() {
+				ui.Column(c).Label("Terminal typography preview").AlignSelf(ui.Stretch).Border(1, t.Border).Radius(t.Px(12)).Background(t.CodeBg).Clip().Children(func() {
 					ui.Row(c).AlignSelf(ui.Stretch).Height(26).PaddingX(t.Space(8)).Gap(t.Space(6)).Background(t.Surface).BorderWidth(0, 0, 1, 0).BorderColor(t.Border).AlignItems(ui.Center).Children(func() {
 						for _, color := range []ui.Color{t.Error, t.Warning, t.Success} {
 							ui.Box(c).Size(7, 7).Radius(3.5).Background(color)

@@ -171,12 +171,28 @@ func (a *App) backgroundSettings(c *ui.Context) {
 			tuning = *s.pending
 		}
 		a.sourceSettingsRow(c, a.Tr("settings.blur"), a.Tr("settings.softens_the_picture_before_the_dither_pass_so_a_"), "", func() {
-			blur := float64(tuning.Blur)
-			if ui.StepSlider(c, &blur, 0, float64(background.BlurMax), float64(background.BlurStep)).Width(160).Label("Background blur").Changed() {
-				tuning.Blur = float32(blur)
-				a.setBackgroundTuning(tuning)
-			}
-			ui.Text(c, fmt.Sprintf("%.1f", blur)).Width(28)
+			ui.Row(c).Gap(a.Theme.Space(8)).AlignItems(ui.Center).Children(func() {
+				blur := float64(tuning.Blur)
+				slider := ui.SliderBase(c, &blur, 0, float64(background.BlurMax)).Step(float64(background.BlurStep)).Width(184).Height(a.Theme.Space(20)).PaddingX(7).Label("Background blur")
+				if slider.Changed() {
+					tuning.Blur = float32(blur)
+					a.setBackgroundTuning(tuning)
+				}
+				norm := float32(blur) / background.BlurMax
+				slider.Draw(func(p *ui.Painter, r ui.Rect) {
+					center := r.X + 7 + (r.W-14)*norm
+					track := ui.Rect{X: r.X, Y: r.Y + (r.H-4)/2, W: r.W, H: 4}
+					p.Fill(track, a.Theme.Border, 2)
+					p.Fill(ui.Rect{X: r.X, Y: track.Y, W: center - r.X, H: 4}, a.Theme.Accent, 2)
+					p.Fill(ui.Rect{X: center - 7, Y: r.Y + (r.H-14)/2, W: 14, H: 14}, a.Theme.BorderStrong(), 7)
+					knob := ui.RGB(255, 255, 255)
+					if a.Theme.Dark {
+						knob = a.Theme.Text
+					}
+					p.Fill(ui.Rect{X: center - 6, Y: r.Y + (r.H-12)/2, W: 12, H: 12}, knob, 6)
+				})
+				ui.Text(c, fmt.Sprintf("%.0f%%", norm*100)).Width(40).FontSize(a.Theme.Px(12)).TextColor(a.Theme.TextSecondary)
+			})
 		})
 		a.sourceSettingsDivider(c)
 		a.sourceSettingsRow(c, a.Tr("settings.pixel_size"), a.Tr("settings.the_dither_cell_edge_fine_cells_read_as_halftone"), "", func() {

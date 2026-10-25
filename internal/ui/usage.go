@@ -717,36 +717,7 @@ func (a *App) usageDetails(c *ui.Context) {
 				}
 			}
 		})
-		rows := s.projection.Models
-		switch s.breakdown {
-		case "workspaces":
-			rows = s.projection.Workspaces
-		case "providers":
-			rows = s.projection.Providers
-		case "tools":
-			rows = s.projection.ToolGroups
-		}
-		for _, r := range rows[:min(8, len(rows))] {
-			r := r
-			ui.Row(c).Gap(10).AlignItems(ui.Center).Children(func() {
-				if a.button(c, r.Name, "", false).Width(200).Clicked() {
-					a.activateUsageRow("breakdown:"+s.breakdown, usageTableRow{usageAggregate: r})
-				}
-				value, maximum := float64(r.Tokens.Total), float64(rows[0].Tokens.Total)
-				if s.breakdown == "tools" {
-					value, maximum = float64(r.Requests), float64(rows[0].Requests)
-				}
-				ui.Box(c).Grow(1).Height(8).Background(a.Theme.Background).Radius(4).Children(func() {
-					if maximum > 0 {
-						ui.Box(c).Height(8).WidthPercent(float32(value / maximum * 100)).Background(a.Theme.Accent).Radius(4)
-					}
-				})
-				ui.Text(c, compactCount(uint64(value))).Font(a.Fonts.CodeFamily).Width(85)
-			})
-		}
-		if s.breakdown == "tools" {
-			a.usageLatencyLine(c, s.projection.ToolLatency, a.text("usage.tool_response_time", "Tool response time"))
-		}
+		a.usageBreakdownChart(c, "breakdown:"+s.breakdown)
 		a.usageTable(c, "breakdown:"+s.breakdown)
 	})
 	a.usageCard(c, a.text("usage.records", "Records"), a.usageTableMeta(s.detail), func() {

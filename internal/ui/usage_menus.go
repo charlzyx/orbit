@@ -106,7 +106,7 @@ func (a *App) usageColumnControl(c *ui.Context, kind string, all []ui.TableColum
 		}
 	}
 	a.usagePopover(c, "columns:"+kind, a.text("usage.columns", "Columns"), "", true, 0, func(closeMenu func()) {
-		ui.Text(c, a.text("usage.columns", "Columns")).FontSize(11).TextColor(a.Theme.TextMuted).Padding(6, 8)
+		a.usageMenuTitle(c, a.text("usage.columns", "Columns"))
 		for _, col := range all {
 			if col.ID == required || col.ID == "open" || (kind == "sessions" && col.ID == "tools") {
 				continue
@@ -116,18 +116,19 @@ func (a *App) usageColumnControl(c *ui.Context, kind string, all []ui.TableColum
 				persist()
 			}
 		}
-		a.line(c)
-		if a.button(c, a.text("usage.show_all", "Show all"), "", false).Clicked() {
-			t.Hidden = nil
-			persist()
-		}
+		a.usageMenuFooter(c, func() {
+			if a.usageFooterButton(c, a.text("usage.show_all", "Show all")).Clicked() {
+				t.Hidden = nil
+				persist()
+			}
+		})
 	})
 }
 func (a *App) usagePageSizeControl(c *ui.Context, kind string) {
 	s := &a.usageState
 	t := s.table(kind)
 	a.usagePopover(c, "page-size:"+kind, fmt.Sprint(t.Size), "", true, 0, func(closeMenu func()) {
-		ui.Text(c, a.text("usage.rows_per_page", "Rows per page")).FontSize(11).TextColor(a.Theme.TextMuted).Padding(6, 8)
+		a.usageMenuTitle(c, a.text("usage.rows_per_page", "Rows per page"))
 		for _, size := range []int{10, 25, 50, 100} {
 			if a.usagePickerRow(c.Key(size), fmt.Sprint(size), "", t.Size == size).Label(fmt.Sprintf("Rows per page %d", size)).Clicked() && t.Size != size {
 				t.setPageSize(size)
@@ -139,4 +140,23 @@ func (a *App) usagePageSizeControl(c *ui.Context, kind string) {
 			}
 		}
 	})
+}
+
+func (a *App) usageMenuTitle(c *ui.Context, label string) {
+	ui.Column(c).AlignSelf(ui.Stretch).Padding(0, a.Theme.Space(2), a.Theme.Space(4)).Children(func() {
+		ui.Row(c).Height(a.Theme.Px(20)).Padding(0, a.Theme.Px(8)).AlignItems(ui.Center).Children(func() { ui.Text(c, label).SingleLine().FontSize(a.Theme.Px(12)).TextColor(a.Theme.TextMuted) })
+	})
+}
+func (a *App) usageMenuFooter(c *ui.Context, body func()) {
+	ui.Row(c).AlignSelf(ui.Stretch).Padding(a.Theme.Space(4)).Gap(a.Theme.Space(4)).AlignItems(ui.Center).BorderWidth(1, 0, 0, 0).BorderColor(a.Theme.Border).Children(body)
+}
+func (a *App) usageFooterButton(c *ui.Context, label string) ui.Element {
+	button := ui.ButtonBase(c).Height(a.Theme.Px(28)).Grow(1).Basis(0).Padding(0, a.Theme.Space(8)).Radius(a.Theme.Px(8)).Center().Label(label)
+	color := a.Theme.TextMuted
+	if button.Hovered() {
+		button.Background(a.Theme.Hover)
+		color = a.Theme.TextSecondary
+	}
+	button.Children(func() { ui.Text(c, label).SingleLine().FontSize(a.Theme.Px(14)).TextColor(color) })
+	return button
 }

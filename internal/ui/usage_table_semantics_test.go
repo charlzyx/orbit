@@ -27,7 +27,7 @@ func TestUsageSourceTableCacheAndEndedDateRegisters(t *testing.T) {
 		if got := a.usageCell(r, "cache", "sessions"); got != wants[r.ID] {
 			t.Fatalf("%s cache %q want %q", r.ID, got, wants[r.ID])
 		}
-		if a.usageCell(r, "model", "sessions") != "model · provider" {
+		if a.usageCell(r, "model", "sessions") != "model · Provider" {
 			t.Fatal("provider-scoped model display lost")
 		}
 		if got := a.usageCell(r, "started", "sessions"); got != r.Ended.Format("Jan 2") {

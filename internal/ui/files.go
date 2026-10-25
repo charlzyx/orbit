@@ -343,13 +343,59 @@ func (a *App) renameFilePrompt(path string) {
 				a.files.mutating = false
 				a.save(e)
 				if e == nil {
-					a.files.states = map[string]*editor.State{}
+					a.reconcileFileRename(path, p)
 					a.RefreshFiles()
 				}
 			}
 		})
 	})
 }
+
+// Source FileViewer::reconcile_rename rewrites paths on existing editor
+// entities. Preserve native buffers, selections, undo/redo and scroll state,
+// including every unrelated tab; a successful rename is not a reload.
+func (a *App) reconcileFileRename(old, renamed string) {
+	if filepath.Clean(old) == filepath.Clean(renamed) {
+		return
+	}
+	s := a.files
+	remap := func(path string) (string, bool) {
+		rel, err := filepath.Rel(old, path)
+		if path == "" || err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+			return path, false
+		}
+		return filepath.Join(renamed, rel), true
+	}
+	for path, state := range s.states {
+		if next, changed := remap(path); changed {
+			s.states[next] = state
+			delete(s.states, path)
+			if d, ok := s.editor.Active(); ok && d.Content.Path == next {
+				s.focusPending = next
+			}
+		}
+	}
+	for path, version := range s.versions {
+		if next, changed := remap(path); changed {
+			s.versions[next] = version
+			delete(s.versions, path)
+		}
+	}
+	for path, image := range s.images {
+		if next, changed := remap(path); changed {
+			s.images[next] = image
+			delete(s.images, path)
+		}
+	}
+	if next, changed := remap(s.desired); changed {
+		s.desired = next
+		s.openGeneration++ // Invalidate a queued open of the old path.
+	}
+	if next, changed := remap(s.focusPending); changed {
+		s.focusPending = next
+	}
+}
+
 func (a *App) deleteFile(path string) {
 	if a.files.editor.HasDirtyUnder(path) {
 		a.Notify(a.text("explorer.err_unsaved", "Save unsaved edits before renaming or deleting this path."), true)

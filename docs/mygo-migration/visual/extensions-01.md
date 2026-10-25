@@ -38,14 +38,10 @@ Initial source-state register. Recipes are not yet executed; no matched pair is 
 - Planned pair: `../probes/visual/V060/rust.png` ↔ `../probes/visual/V060/go.png`. Neither image exists in this register.
 - Metrics: not measured. Manual review: not reviewed. Last verified Go SHA: none.
 
-## V061 · Extension dialog timeout countdown
-- Features: C16. Lane: `canonical`. Visual: **UNTESTED**. Native OS: **UNTESTED**.
-- Rust: [crates/orbit-pi/src/dialog.rs::render:L319](https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/dialog.rs#L319); [crates/orbit-pi/src/dialog.rs::render_options:L461](https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/dialog.rs#L461); [crates/orbit-pi/src/dialog.rs::render_confirm:L549](https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/dialog.rs#L549)
-- Expected: Extension dialog timeout countdown;  Source labels, icons, selected and disabled states visible;  No unrelated dialog or stale response.
-- Setup: Open the isolated extensions surface in fixture.json. Configure the named source state: Extension dialog timeout countdown. Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size. Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls.
-- Go mapping: `internal/agent`, `internal/pirpc`
-- Planned pair: `../probes/visual/V061/rust.png` ↔ `../probes/visual/V061/go.png`. Neither image exists in this register.
-- Metrics: not measured. Manual review: not reviewed. Last verified Go SHA: none.
+## V061 · INVALID candidate: extension dialog timeout countdown
+- Source-state audit: the pinned dialog request/model/render has no visible countdown state.
+- Status: **BLOCKED / INVALID_SOURCE_STATE**. No screenshot is required for this invented state.
+- Stable ID retained to make the correction reviewable; this is not an implemented feature or an omitted screenshot.
 
 ## V062 · Permission approval inline choice bar
 - Features: C17. Lane: `canonical`. Visual: **UNTESTED**. Native OS: **UNTESTED**.
@@ -74,6 +70,7 @@ Initial source-state register. Recipes are not yet executed; no matched pair is 
 - Planned pair: `../probes/visual/V064/rust.png` ↔ `../probes/visual/V064/go.png`. Neither image exists in this register.
 - Metrics: not measured. Manual review: not reviewed. Last verified Go SHA: none.
 
+<!-- V065 source correction: transcript_view.rs::render_ask_card:L2928, not the live composer ask_panel. See JSON for canonical anchor. -->
 ## V065 · Questionnaire completed readonly answer record
 - Features: C19. Lane: `canonical`. Visual: **UNTESTED**. Native OS: **UNTESTED**.
 - Rust: [crates/orbit-pi/src/app/view.rs::ask_panel:L3982](https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/view.rs#L3982)
@@ -101,6 +98,7 @@ Initial source-state register. Recipes are not yet executed; no matched pair is 
 - Planned pair: `../probes/visual/V067/rust.png` ↔ `../probes/visual/V067/go.png`. Neither image exists in this register.
 - Metrics: not measured. Manual review: not reviewed. Last verified Go SHA: none.
 
+<!-- V068 source correction: app/view.rs::status_bar:L3073 and setStatus, not apply_extension_widget. See JSON for canonical anchor. -->
 ## V068 · Extension status line widget
 - Features: C20. Lane: `canonical`. Visual: **UNTESTED**. Native OS: **UNTESTED**.
 - Rust: [crates/orbit-pi/src/app/dialogs.rs::apply_extension_widget:L76](https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/dialogs.rs#L76)
