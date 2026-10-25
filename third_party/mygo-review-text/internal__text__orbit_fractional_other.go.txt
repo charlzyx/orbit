@@ -1,0 +1,7 @@
+//go:build !linux || (!amd64 && !arm64)
+
+package text
+
+// OrbitFractionalGlyphPositionsAvailable reports false on other native stacks.
+// The layout policy is deliberately inert there; their defaults do not change.
+func (s *System) OrbitFractionalGlyphPositionsAvailable() bool { return false }

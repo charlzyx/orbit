@@ -178,6 +178,7 @@ func NewController(o RunOptions) (*Controller, error) {
 			return nil
 		}))
 	}, OnChange: invalidate, OpenWorkspace: x.SetWorkspace, OpenTerminal: func(path string) { x.Terminal.SetWorkspace(path); x.UI.save(x.Terminal.NewTab()) }, RevealPath: native.RevealPath, ConfigPath: filepath.Join(s.RootDir, "worktrees.json")})
+	x.UI.Options.SessionPinned = func(path string) bool { return x.pinned[path] }
 	x.UI.Options.CaptureSessionRenameTarget = func(runtimeID, sessionID, path string) (agent.SessionRenameTarget, error) {
 		return x.Agent.CaptureSessionRenameTarget(runtimeID, sessionID, path)
 	}
@@ -361,6 +362,11 @@ func (x *Controller) SetWorkspace(path string) {
 	}
 	defer x.sessionGate.RUnlock()
 	x.diagnostics.Record(diagnosticlog.EventWorkspaceServices, diagnosticlog.ResultStarted, 0)
+	// A deliberate same-workspace selection still supersedes an older sheet.
+	// A plain same-workspace service refresh below does not change ownership.
+	if path == x.workspace && path == x.UI.Model.Workspace {
+		x.workspaceBrowse.epoch++
+	}
 	x.changeWorkspaceServices(path)
 	x.diagnostics.Record(diagnosticlog.EventWorkspaceServices, diagnosticlog.ResultOK, time.Since(started))
 	x.diagnostics.Record(diagnosticlog.EventWorkspacePreferences, diagnosticlog.ResultStarted, 0)
@@ -388,11 +394,11 @@ func (x *Controller) SetWorkspace(path string) {
 }
 func (x *Controller) changeWorkspaceServices(path string) {
 	if path != x.workspace || path != x.UI.Model.Workspace {
+		x.workspaceBrowse.epoch++
 		x.UI.resetMarkdownImageOwner()
 		x.UI.cancelPaletteDelete()
 		x.UI.cancelPaletteRename()
 	}
-	x.workspaceBrowse.epoch++
 	x.workspace = path
 	x.UI.invalidateWorkspaceMenu(path)
 	x.UI.Model.Workspace = path

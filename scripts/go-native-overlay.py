@@ -209,6 +209,19 @@ def verify_diagnostic(module_dir: Path, mode: str | None) -> dict[str, Path]:
     return mapping
 
 
+def verify_review_text(module_dir: Path, expected: dict, mode: str | None, assets: Path | None = None) -> dict[str, Path]:
+    if mode:
+        fail("Global text-metrics diagnostics conflict with local Review text policy")
+    assets = assets or ROOT / "third_party/mygo-review-text"
+    if sha(assets / "baseline.json") != "9b8d49dcb3f95af6aef6e2e2d34fe7e6afcb3f2f16e8b8353cc1cef39dadd86c":
+        fail("Review text manifest differs from reviewed hash")
+    verifier = import_verifier(ROOT / "third_party/mygo-review-text/prepare.py")
+    manifest, mappings = verifier.verify(module_dir, assets)
+    if any(manifest[key] != expected[key] for key in SELECTION_IDENTITIES):
+        fail("Review text compatibility identity differs from pinned MyGo")
+    return mappings
+
+
 def main() -> int:
     if len(sys.argv) < 2:
         fail("Usage: scripts/go-native.sh <run|build|test|vet|other-go-command> [arguments...]")
@@ -277,7 +290,8 @@ def main() -> int:
     if sha(source) != manifest["added_sha256"]:
         fail("Composer compatibility source hash mismatch; review/update the manifest")
     selection_overlays = verify_selection(module_dir, SELECTION, manifest)
-    diagnostic_overlays = verify_diagnostic(module_dir, mode)
+    review_overlays = verify_review_text(module_dir, manifest, mode)
+    diagnostic_overlays = {}
     overlay: dict[str, str] = {}
     if previous_overlay:
         prior = json.loads((effective_cwd / previous_overlay).read_text())
@@ -302,7 +316,7 @@ def main() -> int:
     reviewed_overlays = merge_reviewed([
         selection_overlays, {manifest["added_file"]: source},
         {"ui/orbit_composer_test.go": test_source} if test_source.exists() else {},
-        diagnostic_overlays,
+        review_overlays, diagnostic_overlays,
     ])
     with tempfile.TemporaryDirectory(prefix="orbit-mygo-overlay-") as tmp:
         temp_root = Path(tmp)
@@ -332,7 +346,7 @@ def main() -> int:
         path = temp_root / "overlay.json"
         path.write_text(json.dumps({"Replace": overlay}, indent=2) + "\n")
         env["GOFLAGS"] = " ".join(quote_flag(f) for f in flags + [f"-modfile={temp_mod}", f"-overlay={path}"])
-        print(f"go-native: verified {manifest['version']}; temporary source copy + composer range-edit and selection-retention overlays", file=sys.stderr)
+        print(f"go-native: verified {manifest['version']}; temporary source copy + composer range-edit, selection-retention and local Review text overlays", file=sys.stderr)
         if mode:
             print(f"go-native: DIAGNOSTIC ONLY {mode}; startup fractional metrics enabled; not a parity claim", file=sys.stderr)
         process = subprocess.Popen([go, *args], env=env)

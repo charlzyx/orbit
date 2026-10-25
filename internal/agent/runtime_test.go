@@ -23,7 +23,8 @@ func waitRuntime(t *testing.T, m *Manager, condition func(RuntimeSnapshot) bool)
 		}
 		time.Sleep(5 * time.Millisecond)
 	}
-	t.Fatalf("runtime condition timed out: %+v", m.RuntimeSnapshot())
+	final := m.RuntimeSnapshot()
+	t.Fatalf("runtime condition timed out: active=%+v snapshot=%+v", final.Active, final)
 	return RuntimeSnapshot{}
 }
 func TestRuntimeSnapshotLifecycleParkSwitchReuseAndRestart(t *testing.T) {

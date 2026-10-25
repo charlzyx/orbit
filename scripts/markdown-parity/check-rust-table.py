@@ -12,6 +12,7 @@ source = Path(sys.argv[1]) / 'crates/orbit-pi/src/transcript_view.rs'
 raw = source.read_bytes()
 assert hashlib.sha256(raw).hexdigest() == 'cf06a57001b3fddcdf4d6eaca5f13814b4262a070c2b093fa0469e56a10f7abc', 'pinned Rust source changed'
 text = raw.decode()
+assert 'let code = lines.join("\\n");' in text, 'pinned renderer copy contract changed'
 fixture = Path(__file__).with_name('rust-table-parser.rs').read_text()
 for start, end in [
  ('#[derive(Clone)]\nenum Block {', 'impl TableAlign {'),

@@ -32,6 +32,7 @@ func (a *App) reviewDiff(c *ui.Context) {
 // width from the currently mounted rows (which would jump while scrolling).
 // Native text measurement accounts for the actual code font and wide glyphs.
 type reviewWidthCache struct {
+	fractional  bool
 	first       *workspace.ReviewLine
 	count       int
 	generation  uint64
@@ -45,15 +46,16 @@ func (a *App) reviewUnwrappedWidth(c *ui.Context) float32 {
 	if len(s.data.Lines) > 0 {
 		first = &s.data.Lines[0]
 	}
+	policy := a.reviewTextPolicy()
 	cache := &s.widthCache
-	if cache.first != first || cache.count != len(s.data.Lines) || cache.generation != s.generation || cache.font != a.Fonts.CodeFamily || cache.size != a.reviewCodeFontSize() {
-		*cache = reviewWidthCache{first: first, count: len(s.data.Lines), generation: s.generation, font: a.Fonts.CodeFamily, size: a.reviewCodeFontSize()}
+	if cache.fractional != policy.enabled || cache.first != first || cache.count != len(s.data.Lines) || cache.generation != s.generation || cache.font != a.Fonts.CodeFamily || cache.size != a.reviewCodeFontSize() {
+		*cache = reviewWidthCache{fractional: policy.enabled, first: first, count: len(s.data.Lines), generation: s.generation, font: a.Fonts.CodeFamily, size: a.reviewCodeFontSize()}
 		measure := func(line workspace.ReviewLine) {
 			size := a.Theme.CodeSize
 			if line.Kind == "context" || line.Kind == "addition" || line.Kind == "deletion" {
 				size = a.reviewCodeFontSize()
 			}
-			w, _ := c.MeasureText(0, ui.Span{Text: line.Content, Font: a.Fonts.CodeFamily, Size: size})
+			w, _ := policy.measure(c, line.Kind, ui.Span{Text: line.Content, Font: a.Fonts.CodeFamily, Size: size})
 			cache.width = max(cache.width, w)
 		}
 		for _, line := range s.data.Lines {

@@ -1,0 +1,12 @@
+//go:build linux && (amd64 || arm64)
+
+package text
+
+// OrbitFractionalGlyphPositionsAvailable is a side-effect-free policy check:
+// it may initialize the engine, but does not shape text or change its defaults.
+func (s *System) OrbitFractionalGlyphPositionsAvailable() bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	_, ok := s.engine().(*pangoEngine)
+	return ok && pangoLib.contextSetRoundPositions != nil
+}

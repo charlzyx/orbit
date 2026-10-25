@@ -1,0 +1,37 @@
+package ui
+
+import "github.com/egoist/mygo/internal/text"
+
+// OrbitFractionalGlyphPositions selects fractional advances for this element
+// and its descendants on Linux only. The default and other platforms are
+// unchanged. It does not disable hint metrics, change fonts or scale painting.
+// An explicit false overrides an inherited true. Pango <1.44 fails closed.
+func (e Element) OrbitFractionalGlyphPositions(enabled bool) Element {
+	n := e.node()
+	if n == nil {
+		return Element{}
+	}
+	n.ts.orbitFractional = enabled
+	n.ts.set |= setOrbitFractional
+	return e
+}
+
+// MeasureTextOrbitFractional measures the same per-layout policy used by
+// OrbitFractionalGlyphPositions(true); unlike a Span property this applies to
+// the whole layout including all rich-text runs. Other platforms are unchanged.
+func (c *Context) MeasureTextOrbitFractional(width float32, spans ...Span) (float32, float32) {
+	ctx := c.build()
+	if ctx == nil {
+		return 0, 0
+	}
+	p := ctx.rt.richParams(width, spans)
+	p.Style.OrbitFractionalGlyphPositions = true
+	l := ctx.rt.text.Layout(p)
+	return l.Width, l.Height
+}
+
+// OrbitFractionalGlyphPositionsAvailable lets an app check the pinned native
+// capability before opting any layout in. It does not enable a global policy.
+func OrbitFractionalGlyphPositionsAvailable() bool {
+	return text.Shared().OrbitFractionalGlyphPositionsAvailable()
+}

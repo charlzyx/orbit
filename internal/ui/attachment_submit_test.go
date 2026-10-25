@@ -197,7 +197,7 @@ func TestAttachmentPendingFailureAllowsRetryWithoutChangingExistingError(t *test
 	a := x.UI
 	a.Draft = "text survives image read error"
 	a.Notify("existing diagnostic", true)
-	a.addPaths([]string{"synthetic.png"}, func(string) ([]byte, string, error) { return nil, "", errors.New("fixture read failed") })
+	a.addPathsOrigin([]string{"synthetic.png"}, attachmentImagePicker, func(string) ([]byte, string, error) { return nil, "", errors.New("fixture read failed") })
 	if a.submit(a.Draft, "") {
 		t.Fatal("pending failed-read completion allowed early send")
 	}

@@ -9,7 +9,6 @@ import (
 	"github.com/charlzyx/orbit/internal/modelui"
 	"github.com/charlzyx/orbit/internal/transcriptui"
 	"github.com/egoist/mygo/ui"
-	"github.com/egoist/mygo/ui/markdown"
 )
 
 func (a *App) messages(c *ui.Context) {
@@ -89,11 +88,7 @@ func (a *App) messageTranscript(c *ui.Context) ui.Element {
 							}
 						}
 						if m.Text != "" {
-							if m.Streaming {
-								markdown.Stream(c, m.Text, &a.md)
-							} else {
-								markdown.View(c, m.Text, &a.md)
-							}
+							a.chatMarkdown(c, m.Text, m.Streaming)
 						}
 						if m.Streaming {
 							ui.Spinner(c).Size(12, 12)

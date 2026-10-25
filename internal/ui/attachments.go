@@ -5,12 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/charlzyx/orbit/internal/agent"
-	"github.com/charlzyx/orbit/internal/attachments"
 	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
 )
@@ -43,85 +41,11 @@ func (a *App) attachmentOwner() attachmentOwner {
 func (a *App) ownsAttachment(owner attachmentOwner) bool {
 	return owner.live && owner == a.attachmentOwner() && (owner.window == nil || !owner.window.IsDestroyed())
 }
-func (a *App) AddImage(data []byte, mime, name string) {
-	a.addImageFor(a.attachmentOwner(), data, mime, name)
-}
-func (a *App) addImageFor(owner attachmentOwner, data []byte, mime, name string) {
-	if !a.ownsAttachment(owner) {
-		return
-	}
-	if len(a.attachments) >= 8 {
-		a.Notify("Maximum 8 attachments per message", true)
-		return
-	}
-	token := a.beginAttachmentImage(owner)
-	a.Async(func() func() {
-		im := attachments.Prepare(data, mime)
-		var preview ui.ImageSource
-		if im.MIME == "image/svg+xml" {
-			preview, _ = ui.ParseSVG(im.Bytes)
-		} else {
-			preview, _ = ui.DecodeBitmap(im.Bytes)
-		}
-		return func() {
-			if token.done {
-				return
-			}
-			defer a.finishAttachmentImage(token)
-			if token.batch.cancelled || !a.ownsAttachment(owner) {
-				return
-			}
-			if len(a.attachments) >= 8 {
-				a.Notify("Maximum 8 attachments per message", true)
-				return
-			}
-			a.nextAttachment++
-			a.attachments = append(a.attachments, attachment{ID: fmt.Sprint(a.nextAttachment), Name: name, Image: agent.Image{Type: "image", Data: im.Base64(), MIMEType: im.MIME}, Preview: preview})
-		}
-	})
-}
-func (a *App) AddPaths(paths []string) { a.addPaths(paths, readAttachmentPath) }
-func (a *App) addPaths(paths []string, read func(string) ([]byte, string, error)) {
-	owner := a.attachmentOwner()
-	if !a.ownsAttachment(owner) {
-		return
-	}
-	for _, p := range paths {
-		if !imagePickerPathSupported(p) {
-			a.queueAttachmentPath(owner, p+" ")
-			continue
-		}
-		token := a.beginAttachmentImage(owner)
-		a.Async(func() func() {
-			raw, mime, err := read(p)
-			return func() {
-				if token.done {
-					return
-				}
-				defer a.finishAttachmentImage(token)
-				// Check the owner captured BEFORE reading, not the task active when the
-				// read finishes. Otherwise AddImage would silently adopt a newer task.
-				if token.batch.cancelled || !a.ownsAttachment(owner) {
-					return
-				}
-				if err != nil {
-					a.save(err)
-					return
-				}
-				a.addImageFor(owner, raw, mime, filepath.Base(p))
-			}
-		})
-	}
-}
 func readAttachmentPath(p string) ([]byte, string, error) {
-	st, err := os.Stat(p)
-	if err != nil {
-		return nil, "", err
-	}
-	if st.Size() > 64<<20 {
+	raw, err := readAttachmentFile(p, attachmentFileByteLimit)
+	if errors.Is(err, errAttachmentReadLimit) {
 		return nil, "", fmt.Errorf("Image exceeds 64 MiB: %s", filepath.Base(p))
 	}
-	raw, err := os.ReadFile(p)
 	if err != nil {
 		return nil, "", err
 	}

@@ -15,7 +15,9 @@ type attachmentImageToken struct {
 func (a *App) beginAttachmentImage(owner attachmentOwner) *attachmentImageToken {
 	batch := a.pendingAttachmentImages
 	if batch == nil || batch.owner != owner {
-		a.cancelAttachmentImages()
+		if batch != nil {
+			a.cancelAttachmentImages()
+		}
 		batch = &attachmentImageBatch{owner: owner}
 		a.pendingAttachmentImages = batch
 	}
@@ -36,6 +38,7 @@ func (a *App) finishAttachmentImage(token *attachmentImageToken) {
 	}
 }
 func (a *App) cancelAttachmentImages() {
+	a.cancelAttachmentIngress()
 	if batch := a.pendingAttachmentImages; batch != nil {
 		batch.cancelled = true
 		batch.count = 0

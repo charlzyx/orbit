@@ -86,7 +86,9 @@ func (x *Controller) browseAttachmentsDialog() {
 			x.UI.save(err)
 			return
 		}
-		x.UI.AddPaths(paths)
+		if len(paths) != 0 {
+			x.UI.addPathsOrigin(paths[:1], attachmentFilePicker, readAttachmentPath)
+		}
 	})
 }
 
@@ -128,7 +130,7 @@ func (x *Controller) browseImageDialog() {
 			x.UI.save(errors.New("Unsupported image format"))
 			return
 		}
-		x.UI.AddPaths(paths[:1])
+		x.UI.addPathsOrigin(paths[:1], attachmentImagePicker, readAttachmentPath)
 	})
 }
 func (x *Controller) saveDialog(target nativeDialogTarget, title, path string, filters []mygo.FileFilter, apply func(string, error)) {

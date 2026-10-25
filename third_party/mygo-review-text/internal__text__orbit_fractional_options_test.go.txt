@@ -1,0 +1,46 @@
+//go:build linux && (amd64 || arm64)
+
+package text
+
+import (
+	"github.com/ebitengine/purego"
+	"testing"
+)
+
+func TestOrbitFractionalDefaultContextAndHintMetrics(t *testing.T) {
+	var round func(uintptr) int32
+	var opts func(uintptr) uintptr
+	var hint func(uintptr) int32
+	bind := func(lib, name string, target any) {
+		h, e := purego.Dlopen(lib, purego.RTLD_NOW|purego.RTLD_GLOBAL)
+		if e != nil {
+			t.Fatal(e)
+		}
+		sym, e := purego.Dlsym(h, name)
+		if e != nil {
+			t.Fatal(e)
+		}
+		purego.RegisterFunc(target, sym)
+	}
+	bind("libpango-1.0.so.0", "pango_context_get_round_glyph_positions", &round)
+	bind("libpangocairo-1.0.so.0", "pango_cairo_context_get_font_options", &opts)
+	bind("libcairo.so.2", "cairo_font_options_get_hint_metrics", &hint)
+	s := orbitFractionalSystem(t)
+	e := s.eng.(*pangoEngine)
+	for _, setting := range []string{"none", "full", "slight"} {
+		s.SetFontRendering("gray", setting, "rgb")
+		for _, on := range []bool{false, true, false, true} {
+			s.Shape(Params{Text: "12345", Style: Style{Family: "Orbit Mono", Size: 12.5, OrbitFractionalGlyphPositions: on}})
+			if round(e.context) != int32(gTrue) || hint(opts(e.context)) != cairoHintMetricsOn {
+				t.Fatal("shared context changed")
+			}
+		}
+	}
+	// A separately owned context carries only the narrower rounding choice.
+	c := pangoLib.fontMapCreateContext(e.fontMap)
+	defer pangoLib.gObjectUnref(c)
+	e.orbitApplyOptions(c, false)
+	if round(c) != int32(gFalse) || hint(opts(c)) != cairoHintMetricsOn {
+		t.Fatal("opt-in altered hint metrics or failed fractional setting")
+	}
+}

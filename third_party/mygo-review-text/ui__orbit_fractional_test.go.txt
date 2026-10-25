@@ -1,0 +1,110 @@
+//go:build linux && (amd64 || arm64)
+
+package ui
+
+import (
+	"golang.org/x/image/font/gofont/gomono"
+	"testing"
+)
+
+func TestOrbitFractionalPublicMeasureInheritanceAndCache(t *testing.T) {
+	if err := RegisterFont(gomono.TTF, "Orbit UI Mono"); err != nil {
+		t.Fatal(err)
+	}
+	on := true
+	var plain, fraction float32
+	view := func(c *Context) {
+		sp := Span{Text: "Untracked fixture note.", Font: "Orbit UI Mono", Size: 12.5}
+		plain, _ = c.MeasureText(0, sp)
+		fraction, _ = c.MeasureTextOrbitFractional(0, sp)
+		Column(c).Width(178).Font("Orbit UI Mono").FontSize(12.5).Children(func() {
+			RichText(c, sp).Label("normal").FillWidth()
+			Column(c).OrbitFractionalGlyphPositions(on).FillWidth().Children(func() {
+				RichText(c, sp).Label("inherit").FillWidth()
+				RichText(c, sp).Label("override").FillWidth().OrbitFractionalGlyphPositions(false)
+			})
+		})
+	}
+	a := NewTester(view, 400, 300)
+	b := NewTester(view, 400, 300)
+	for i := 0; i < 6; i++ {
+		on = i%2 == 0
+		a.Frame()
+		b.Frame()
+		normal, _ := a.Find("normal")
+		inherited, _ := a.Find("inherit")
+		override, _ := a.Find("override")
+		if plain <= fraction {
+			t.Fatal("measurement not fractional")
+		}
+		if normal.H != override.H {
+			t.Fatal("inherited policy leaked into explicit false")
+		}
+		if on && inherited.H >= normal.H {
+			t.Fatal("enabled row should fit", inherited, normal)
+		}
+		if !on && inherited.H != normal.H {
+			t.Fatal("cache failed policy toggle")
+		}
+		other, _ := b.Find("inherit")
+		if other.H != inherited.H {
+			t.Fatal("two-window mismatch")
+		}
+	}
+}
+
+func TestOrbitFractionalSelectionAndLongLineResize(t *testing.T) {
+	if err := RegisterFont(gomono.TTF, "Orbit Select Mono"); err != nil {
+		t.Fatal(err)
+	}
+	text := "Latin fi é 中文🙂 العربية tail"
+	width := float32(178)
+	tt := NewTester(func(c *Context) {
+		Column(c).Width(width).OrbitFractionalGlyphPositions(true).Font("Orbit Select Mono").FontSize(12.5).Selectable().Children(func() {
+			RichText(c, Span{Text: text[:8]}, Span{Text: text[8:], Color: RGB(200, 50, 60)}).Label("mixed").FillWidth()
+		})
+	}, 400, 300)
+	for _, w := range []float32{178, 90, 320, 178} {
+		width = w
+		tt.Frame()
+		selectBetween(t, tt, text, 0, text, len([]rune(text)))
+		tt.Key(Cmd, KeyC)
+		if tt.Clipboard() != text {
+			t.Fatalf("copy at width %g lost content %q", w, tt.Clipboard())
+		}
+		if _, ok := tt.Find("mixed"); !ok {
+			t.Fatal("missing text")
+		}
+		tt.Image()
+	}
+}
+
+func TestOrbitFractionalEditableCaretAndDefaultNeighbor(t *testing.T) {
+	if err := RegisterFont(gomono.TTF, "Orbit Edit Mono"); err != nil {
+		t.Fatal(err)
+	}
+	value := "0123456789"
+	other := "unchanged"
+	tt := NewTester(func(c *Context) {
+		Column(c).Children(func() {
+			TextInput(c, &value).Label("fraction-input").Font("Orbit Edit Mono").FontSize(12.5).OrbitFractionalGlyphPositions(true).AutoFocus()
+			TextInput(c, &other).Label("default-input").Font("Orbit Edit Mono").FontSize(12.5)
+		})
+	}, 400, 160)
+	tt.Key(Cmd, KeyA)
+	tt.Key(Cmd, KeyC)
+	if tt.Clipboard() != value {
+		t.Fatal("opt-in input select/copy")
+	}
+	tt.Type("中文🙂")
+	tt.Key(0, KeyLeft)
+	tt.Type("X")
+	if value != "中文X🙂" || other != "unchanged" {
+		t.Fatalf("caret/edit mismatch %q %q", value, other)
+	}
+	tt.Key(Cmd, KeyA)
+	tt.Key(Cmd, KeyC)
+	if tt.Clipboard() != value {
+		t.Fatal("mixed opt-in copy")
+	}
+}

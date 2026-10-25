@@ -12,6 +12,7 @@ import (
 )
 
 type reviewState struct {
+	textPolicy                            *reviewTextPolicy
 	layout                                reviewLayoutState
 	turn                                  int // Zero follows latest completed turn; positive pins historical review.
 	source                                workspace.ReviewSource

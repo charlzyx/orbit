@@ -80,7 +80,7 @@ func (a *App) commandPalette(c *ui.Context) {
 			if cmd.ID == "OpenSessionSlot" || cmd.Category == "Review" {
 				continue
 			}
-			title := a.Tr(cmd.TitleKey)
+			title := a.paletteCommandTitle(cmd)
 			if q == "" || strings.Contains(strings.ToLower(title+" "+cmd.Keywords), q) {
 				results = append(results, result{title, cmd.Icon, cmd.ID, ""})
 			}

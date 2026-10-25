@@ -8,7 +8,6 @@ import (
 	"github.com/charlzyx/orbit/internal/highlight"
 	"github.com/charlzyx/orbit/internal/transcriptui"
 	"github.com/egoist/mygo/ui"
-	"github.com/egoist/mygo/ui/markdown"
 )
 
 func (a *App) projectTranscript(s *Snapshot) {
@@ -60,11 +59,7 @@ func (a *App) transcriptOptions(c *ui.Context) transcriptui.Options {
 	return transcriptui.Options{Colors: colors, Font: t.Font, CodeFont: t.CodeFont, FontSize: t.FontSize, CodeSize: t.CodeSize, Text: a.text, Workspace: a.Model.Workspace,
 		Icon: func(c *ui.Context, path string, size float32, color ui.Color) { a.icon(c, path, size, color) },
 		Markdown: func(c *ui.Context, text string, streaming bool) {
-			if streaming {
-				markdown.Stream(c, text, &a.md)
-			} else {
-				markdown.View(c, text, &a.md)
-			}
+			a.chatMarkdown(c, text, streaming)
 		},
 		Copy: func(text string) { c.Services().WriteClipboard(text) }, Review: func() { a.OpenTurnReview(latest) },
 	}

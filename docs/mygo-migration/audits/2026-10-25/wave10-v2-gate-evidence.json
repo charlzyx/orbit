@@ -1,0 +1,114 @@
+{
+  "commit": "102e6a849b7f5b6f184f49fbd31f1a210494a3e7",
+  "source_hash_count": 1593,
+  "source_hash_recheck": "PASS",
+  "vet": "PASS",
+  "race": "PASS",
+  "race_package_count": 25,
+  "ui_seconds": 488.659,
+  "agent_seconds": 155.127,
+  "darwin_arm64": "PASS",
+  "prior_gate": "FAIL3 retained; MCP cause not proven",
+  "logs": {
+    "/workspace/shared/orbit-toolchains-continued/wave10-v2-race-2220.jsonl": "a2f939aba337c536e70089173301b0f7534307f8013796caa3f1c08215cda0fb",
+    "/workspace/shared/orbit-toolchains-continued/wave10-v2-vet-2220.log": "9da2d27b7ee72dd6c6d7e2ae1b7563cfb188c722afb006b10f70efacf395b90a",
+    "/workspace/shared/orbit-toolchains-continued/wave10-v2-arm64-2220.log": "9da2d27b7ee72dd6c6d7e2ae1b7563cfb188c722afb006b10f70efacf395b90a"
+  },
+  "skips": [
+    {
+      "package": "github.com/charlzyx/orbit/internal/agent",
+      "test": "TestDeleteSessionCaseVariantProtectsLiveFileWhereSupported",
+      "output": "=== RUN   TestDeleteSessionCaseVariantProtectsLiveFileWhereSupported\n    session_delete_guard_test.go:403: filesystem is case-sensitive; Darwin case-insensitive CI must run this case\n--- SKIP: TestDeleteSessionCaseVariantProtectsLiveFileWhereSupported (0.00s)\n"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/mcpui",
+      "test": "TestNativeCaptureMCP",
+      "output": "=== RUN   TestNativeCaptureMCP\n    state_test.go:220: set ORBIT_MCP_CAPTURE_DIR for explicit native CPU fixture screenshots\n--- SKIP: TestNativeCaptureMCP (0.00s)\n"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/modelui",
+      "test": "TestNativeModelUICaptures",
+      "output": "=== RUN   TestNativeModelUICaptures\n    view_test.go:266: set ORBIT_MODELUI_CAPTURE_DIR for explicit native CPU fixture captures\n--- SKIP: TestNativeModelUICaptures (0.00s)\n"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/preferences",
+      "test": "TestWorkspaceRevisionCaseAliasWhenSupported",
+      "output": "=== RUN   TestWorkspaceRevisionCaseAliasWhenSupported\n    workspace_marks_test.go:124: case-sensitive filesystem; native Mac coverage pending\n--- SKIP: TestWorkspaceRevisionCaseAliasWhenSupported (0.00s)\n"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/resourceui",
+      "test": "TestNativeCaptureResources",
+      "output": "=== RUN   TestNativeCaptureResources\n    state_test.go:494: set ORBIT_RESOURCE_CAPTURE_DIR for explicit native CPU fixture captures\n--- SKIP: TestNativeCaptureResources (0.00s)\n"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/resourceui",
+      "test": "TestNativeCaptureFullResourceSlots",
+      "output": "=== RUN   TestNativeCaptureFullResourceSlots\n    view_test.go:221: explicit screenshot fixture opt-in\n--- SKIP: TestNativeCaptureFullResourceSlots (0.00s)\n"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/transcriptui",
+      "test": "TestNativeTranscriptCapture",
+      "output": "=== RUN   TestNativeTranscriptCapture\n    view_test.go:205: set ORBIT_TRANSCRIPT_CAPTURE_DIR for explicit fixture native CPU review images\n--- SKIP: TestNativeTranscriptCapture (0.00s)\n"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/transcriptui",
+      "test": "TestNativeRetainedSelectionCapture",
+      "output": "=== RUN   TestNativeRetainedSelectionCapture\n    view_test.go:455: set ORBIT_TRANSCRIPT_CAPTURE_DIR for explicit retained-selection native CPU review image\n--- SKIP: TestNativeRetainedSelectionCapture (0.00s)\n"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestNativeModelAndWorkspaceHostCaptures",
+      "output": "=== RUN   TestNativeModelAndWorkspaceHostCaptures\n    models_integration_test.go:258: explicit native CPU fixtures only\n--- SKIP: TestNativeModelAndWorkspaceHostCaptures (0.00s)\n"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestNavigationRailCapture",
+      "output": "=== RUN   TestNavigationRailCapture\n    navigation_rail_test.go:321: capture path not requested\n--- SKIP: TestNavigationRailCapture (0.00s)\n"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestOnboardingCapture",
+      "output": "=== RUN   TestOnboardingCapture\n    onboarding_test.go:90: optional native CPU setup capture\n--- SKIP: TestOnboardingCapture (0.00s)\n"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestReviewToolbarCPUEvidence",
+      "output": "=== RUN   TestReviewToolbarCPUEvidence\n    review_toolbar_test.go:326: set ORBIT_REVIEW_CPU_CAPTURE_DIR for CPU-only review fixtures\n--- SKIP: TestReviewToolbarCPUEvidence (0.00s)\n"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestSetupMigrationCapture",
+      "output": "=== RUN   TestSetupMigrationCapture\n    setup_migration_test.go:312: optional CPU-only npm setup capture\n--- SKIP: TestSetupMigrationCapture (0.00s)\n"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestNativeCapture",
+      "output": "=== RUN   TestNativeCapture\n    snapshot_test.go:49: set ORBIT_CAPTURE_DIR to write reproducible native CPU screenshots\n--- SKIP: TestNativeCapture (0.00s)\n"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestNativeUsageShellCapture",
+      "output": "=== RUN   TestNativeUsageShellCapture\n    usage_shell_test.go:110: set ORBIT_CAPTURE_DIR for explicit CPU fixture\n--- SKIP: TestNativeUsageShellCapture (0.00s)\n"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestNativeUsageCapture",
+      "output": "=== RUN   TestNativeUsageCapture\n    usage_test.go:154: set ORBIT_CAPTURE_DIR for explicitly labelled fixture screenshots\n--- SKIP: TestNativeUsageCapture (0.00s)\n"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestNativeUsageComponentCaptures",
+      "output": "=== RUN   TestNativeUsageComponentCaptures\n    usage_visual_test.go:186: set ORBIT_CAPTURE_DIR for labelled CPU fixtures\n--- SKIP: TestNativeUsageComponentCaptures (0.00s)\n"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestNativeViewerCapture",
+      "output": "=== RUN   TestNativeViewerCapture\n    viewer_native_test.go:452: set ORBIT_VIEWER_CAPTURE_DIR to capture native viewer fixtures\n--- SKIP: TestNativeViewerCapture (0.00s)\n"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/workbench",
+      "test": "TestLivePiProviderMetadataWithoutInference",
+      "output": "=== RUN   TestLivePiProviderMetadataWithoutInference\n    providers_parity_test.go:141: set ORBIT_PI_METADATA_TEST_BIN for credential-free installed Pi metadata probe\n--- SKIP: TestLivePiProviderMetadataWithoutInference (0.00s)\n"
+    }
+  ]
+}

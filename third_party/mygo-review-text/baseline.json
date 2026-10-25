@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "upstream_commit": "9c69cf829ece196c5b3a3601f1c7bbe70526376f",
+  "module": "github.com/egoist/mygo",
+  "version": "v0.6.4-0.20261025001514-9c69cf829ece",
+  "module_sum": "h1:zKaW0m3ftywWzdR18dv/b+MKgS+iKTu7HF5twRZtSvs=",
+  "go_mod_sum": "h1:dVav53PwF2xEotjf4oA5lTY2Jp2exgzyjLhbSXhbMwE=",
+  "pristine_tree_sha256": "96dae6d68d612b648267f72fdf90f2211698612d29f3c89ca923a314c23af110",
+  "baseline_sha256": {
+    "internal/text/layout.go": "20e816df47d2c66f862bdb4eef1aba52f296a45778086c52d16c7c350254e0e7",
+    "internal/text/pango_linux.go": "2f260729c9321875c121f05b42a15116696d1cddc8a10dd0f79efd4ce8d57275",
+    "ui/element.go": "10897b0bdb014b3bf643b4ff1e74742c07b039cf388c2e83bc276b8c42be2758",
+    "ui/layout.go": "859f78af29e4fb81f80b0c3a0fb06faab0b4e1d622bbb499c3a7d9eb42df958b",
+    "ui/layoutcache.go": "dfba52533db87903824cc7bd1e1c555df223fc57a425e354df49877d582c35b8"
+  },
+  "overlays": {
+    "internal/text/layout.go": {
+      "source": "internal__text__layout.go.txt",
+      "sha256": "f10ee9fc487cc8524665307e0c6740c077684d47899730139c248c28b289c230"
+    },
+    "internal/text/pango_linux.go": {
+      "source": "internal__text__pango_linux.go.txt",
+      "sha256": "01da63ce6bb740c87346bf02622fa18ecfd086511bceabaccb7de7625c9e5020"
+    },
+    "ui/element.go": {
+      "source": "ui__element.go.txt",
+      "sha256": "b5bf775bdb4d09c15a43e1d7d02483f64cb8f2aecaa65e9d54699237663f36c8"
+    },
+    "ui/layout.go": {
+      "source": "ui__layout.go.txt",
+      "sha256": "3a20c6d67836a0ede37b6dd5acb4be63298c2bc2ca7181e9202f546a78e46304"
+    },
+    "ui/layoutcache.go": {
+      "source": "ui__layoutcache.go.txt",
+      "sha256": "9d177df019c5d5ab88670105f447d63f155cac141bae79ff2f9af09c60162c89"
+    },
+    "internal/text/orbit_fractional_linux.go": {
+      "source": "internal__text__orbit_fractional_linux.go.txt",
+      "sha256": "dc201d130509b8a9cb5be8a55c40421dd5967e607179a7d08182335cfe193346"
+    },
+    "internal/text/orbit_fractional_other.go": {
+      "source": "internal__text__orbit_fractional_other.go.txt",
+      "sha256": "24038774d377b3068958b5b6e02161bcc2f9a558e492920ec84e07b93a06c058"
+    },
+    "ui/orbit_fractional.go": {
+      "source": "ui__orbit_fractional.go.txt",
+      "sha256": "c5e8931f92daa4c580464655b5f1744347f12816363cf4c7b8b1c9a590a02238"
+    },
+    "ui/orbit_fractional_test.go": {
+      "source": "ui__orbit_fractional_test.go.txt",
+      "sha256": "64ef5fac07b62dd47ec07c88cd16f7734ba10cee555a9a03172bc16ea2420a26"
+    },
+    "internal/text/orbit_fractional_test.go": {
+      "source": "internal__text__orbit_fractional_test.go.txt",
+      "sha256": "5cae1395a008e10e024e58163238a55064f35de7cff6daf9fc383ec3932ec208"
+    },
+    "internal/text/orbit_fractional_options_test.go": {
+      "source": "internal__text__orbit_fractional_options_test.go.txt",
+      "sha256": "8a4cd76fd09c8fbf43fe77af6e6aaa5269d81f55798a0df7dfa2d189f0fc0494"
+    }
+  },
+  "patch_sha256": "d9d2f0547a8b08a6144d43065fadba5ffac20db45791215f6fb7c43573ecde79",
+  "license_sha256": "f0b56f4ab53beb6e18c5e155219c2e2b6000b5475c0ae3ddb3af3894fd9349b4"
+}

@@ -29,7 +29,7 @@ func (a *App) reviewCodeRow(c *ui.Context, l workspace.ReviewLine, number int, s
 		}
 		bodyBG, gutterBG, numberColor = edge.Alpha(bodyWash), edge.Alpha(gutterWash), edge
 	}
-	row := ui.Row(c).FillWidth().MinWidth(0).MinHeight(19).AlignItems(ui.Stretch)
+	row := a.reviewTextPolicy().apply(ui.Row(c)).FillWidth().MinWidth(0).MinHeight(19).AlignItems(ui.Stretch)
 	if changed && !split {
 		row.BorderWidth(0, 0, 0, 2).BorderColor(edge)
 	}

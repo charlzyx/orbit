@@ -450,6 +450,7 @@ fn parse_blocks(text: &str) -> Vec<Block> {
 
 
 fn main() {
+ code_copy_contract();
  let input = "| A | B |\n| --- | --- |\n| one | two | [lost](https://example.invalid/extra) |\n";
  let blocks = parse_blocks(input);
  match &blocks[0] {
@@ -459,4 +460,27 @@ fn main() {
    println!("header={:?}; rows={:?}; retained cells={}",header,rows,header.len()+rows[0].len());
   }, _ => panic!("not a table")
  }
+}
+
+// Same input/expected bytes as the Go mounted copy fixtures. This exercises
+// the pinned parser plus the render_code_block join expression, not GPUI.
+fn code_copy_contract() {
+ let cases = [
+  ("closed", "```sh\nprintf x\n```", "printf x"),
+  ("final blank", "```sh\nprintf x\n\n```", "printf x\n"),
+  ("empty", "```sh\n```", ""),
+  ("open", "```sh\nprintf x", "printf x"),
+  ("CRLF", "```sh\r\nprintf x\r\n```", "printf x"),
+  ("multiple blanks", "```sh\nprintf x\n\n\n```", "printf x\n\n"),
+  ("tabs unicode", "```text\n\t用户 α  \n```", "\t用户 α  "),
+  ("spaces", "```text\n  spaced  \n\n```", "  spaced  \n"),
+ ];
+ for (name, input, expected) in cases {
+  let blocks = parse_blocks(input);
+  match &blocks[0] {
+   Block::Code(_, lines) => assert_eq!(lines.join("\n"), expected, "{}", name),
+   _ => panic!("{} not parsed as code", name),
+  }
+ }
+ println!("code copy parser/join contract: 8 cases passed");
 }

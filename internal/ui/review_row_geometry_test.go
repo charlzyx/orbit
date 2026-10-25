@@ -16,7 +16,7 @@ func TestMountedReviewCodeRowSourceGeometry(t *testing.T) {
 			var sourceWidth, oldWidth float32
 			tt := ui.NewTester(func(c *ui.Context) {
 				c.SetTheme(a.Theme.Native())
-				sourceWidth, _ = c.MeasureText(0, ui.Span{Text: line.Content, Font: a.Fonts.CodeFamily, Size: 12.5 * a.Theme.CodeSize / 13})
+				sourceWidth, _ = a.reviewTextPolicy().measure(c, kind, ui.Span{Text: line.Content, Font: a.Fonts.CodeFamily, Size: 12.5 * a.Theme.CodeSize / 13})
 				oldWidth, _ = c.MeasureText(0, ui.Span{Text: line.Content, Font: a.Fonts.CodeFamily, Size: a.Theme.CodeSize})
 				ui.Column(c).Width(254).Height(200).Children(func() {
 					a.reviewLineContent(c, line, 0)

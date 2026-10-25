@@ -1,0 +1,556 @@
+diff --git a/internal/text/layout.go b/internal/text/layout.go
+index be91234..f8aabeb 100644
+--- a/internal/text/layout.go
++++ b/internal/text/layout.go
+@@ -18,7 +18,10 @@ import (
+ type Style struct {
+ 	// Family is a comma-separated list of font families, where "system-ui"
+ 	// and "monospace" are the system's own; "" is the system UI font.
+-	Family string
++	// OrbitFractionalGlyphPositions opts this layout into fractional Linux glyph advances.
++	// It leaves hint metrics and all other platforms unchanged.
++	OrbitFractionalGlyphPositions bool
++	Family                        string
+ 	// Size in DIPs; 0 is 14.
+ 	Size float32
+ 	// Weight from 100 (thin) to 900 (black); 0 is 400.
+diff --git a/internal/text/orbit_fractional_linux.go b/internal/text/orbit_fractional_linux.go
+new file mode 100644
+index 0000000..19b938f
+--- /dev/null
++++ b/internal/text/orbit_fractional_linux.go
+@@ -0,0 +1,12 @@
++//go:build linux && (amd64 || arm64)
++
++package text
++
++// OrbitFractionalGlyphPositionsAvailable is a side-effect-free policy check:
++// it may initialize the engine, but does not shape text or change its defaults.
++func (s *System) OrbitFractionalGlyphPositionsAvailable() bool {
++	s.mu.Lock()
++	defer s.mu.Unlock()
++	_, ok := s.engine().(*pangoEngine)
++	return ok && pangoLib.contextSetRoundPositions != nil
++}
+diff --git a/internal/text/orbit_fractional_options_test.go b/internal/text/orbit_fractional_options_test.go
+new file mode 100644
+index 0000000..fa912ac
+--- /dev/null
++++ b/internal/text/orbit_fractional_options_test.go
+@@ -0,0 +1,46 @@
++//go:build linux && (amd64 || arm64)
++
++package text
++
++import (
++	"github.com/ebitengine/purego"
++	"testing"
++)
++
++func TestOrbitFractionalDefaultContextAndHintMetrics(t *testing.T) {
++	var round func(uintptr) int32
++	var opts func(uintptr) uintptr
++	var hint func(uintptr) int32
++	bind := func(lib, name string, target any) {
++		h, e := purego.Dlopen(lib, purego.RTLD_NOW|purego.RTLD_GLOBAL)
++		if e != nil {
++			t.Fatal(e)
++		}
++		sym, e := purego.Dlsym(h, name)
++		if e != nil {
++			t.Fatal(e)
++		}
++		purego.RegisterFunc(target, sym)
++	}
++	bind("libpango-1.0.so.0", "pango_context_get_round_glyph_positions", &round)
++	bind("libpangocairo-1.0.so.0", "pango_cairo_context_get_font_options", &opts)
++	bind("libcairo.so.2", "cairo_font_options_get_hint_metrics", &hint)
++	s := orbitFractionalSystem(t)
++	e := s.eng.(*pangoEngine)
++	for _, setting := range []string{"none", "full", "slight"} {
++		s.SetFontRendering("gray", setting, "rgb")
++		for _, on := range []bool{false, true, false, true} {
++			s.Shape(Params{Text: "12345", Style: Style{Family: "Orbit Mono", Size: 12.5, OrbitFractionalGlyphPositions: on}})
++			if round(e.context) != int32(gTrue) || hint(opts(e.context)) != cairoHintMetricsOn {
++				t.Fatal("shared context changed")
++			}
++		}
++	}
++	// A separately owned context carries only the narrower rounding choice.
++	c := pangoLib.fontMapCreateContext(e.fontMap)
++	defer pangoLib.gObjectUnref(c)
++	e.orbitApplyOptions(c, false)
++	if round(c) != int32(gFalse) || hint(opts(c)) != cairoHintMetricsOn {
++		t.Fatal("opt-in altered hint metrics or failed fractional setting")
++	}
++}
+diff --git a/internal/text/orbit_fractional_other.go b/internal/text/orbit_fractional_other.go
+new file mode 100644
+index 0000000..59b5511
+--- /dev/null
++++ b/internal/text/orbit_fractional_other.go
+@@ -0,0 +1,7 @@
++//go:build !linux || (!amd64 && !arm64)
++
++package text
++
++// OrbitFractionalGlyphPositionsAvailable reports false on other native stacks.
++// The layout policy is deliberately inert there; their defaults do not change.
++func (s *System) OrbitFractionalGlyphPositionsAvailable() bool { return false }
+diff --git a/internal/text/orbit_fractional_test.go b/internal/text/orbit_fractional_test.go
+new file mode 100644
+index 0000000..57a1966
+--- /dev/null
++++ b/internal/text/orbit_fractional_test.go
+@@ -0,0 +1,133 @@
++//go:build linux && (amd64 || arm64)
++
++package text
++
++import (
++	"golang.org/x/image/font/gofont/gomono"
++	"math"
++	"strings"
++	"testing"
++)
++
++func orbitFractionalSystem(t *testing.T) *System {
++	t.Helper()
++	s := newSystem()
++	e, err := newPango()
++	if err != nil {
++		t.Fatal(err)
++	}
++	s.eng = e
++	if err = e.register(gomono.TTF, "Orbit Mono"); err != nil {
++		t.Fatal(err)
++	}
++	return s
++}
++func TestOrbitFractionalLayoutLocal(t *testing.T) {
++	s := orbitFractionalSystem(t)
++	p := Params{Text: "Untracked fixture note.", Style: Style{Family: "Orbit Mono", Size: 12.5}}
++	normal := s.Shape(p)
++	p.Style.OrbitFractionalGlyphPositions = true
++	fraction := s.Shape(p)
++	if fraction.Width >= normal.Width || fraction.Height != normal.Height {
++		t.Fatalf("width/metrics normal=%gx%g fractional=%gx%g", normal.Width, normal.Height, fraction.Width, fraction.Height)
++	}
++	for i := 0; i < 20; i++ {
++		p.Style.OrbitFractionalGlyphPositions = i%2 == 0
++		l := s.Shape(p)
++		want := normal.Width
++		if p.Style.OrbitFractionalGlyphPositions {
++			want = fraction.Width
++		}
++		if l.Width != want {
++			t.Fatal("policy/cache contamination", i, l.Width, want)
++		}
++	}
++	p.Width = (normal.Width + fraction.Width) / 2
++	p.Style.OrbitFractionalGlyphPositions = false
++	if len(s.Shape(p).Lines) != 2 {
++		t.Fatal("default should wrap")
++	}
++	p.Style.OrbitFractionalGlyphPositions = true
++	if len(s.Shape(p).Lines) != 1 {
++		t.Fatal("fraction should fit")
++	}
++	t.Logf("normal=%gx%g fractional=%gx%g", normal.Width, normal.Height, fraction.Width, fraction.Height)
++}
++func TestOrbitFractionalFontOptionsAndMixedCaret(t *testing.T) {
++	s := orbitFractionalSystem(t)
++	for _, setting := range []string{"none", "slight", "full"} {
++		s.SetFontRendering("gray", setting, "rgb")
++		for _, v := range []string{"plain \t spaces  ", "AV fi é 中文🙂 العربية", strings.Repeat("longword ", 80)} {
++			for _, on := range []bool{false, true} {
++				p := Params{Text: v, Width: 178, Style: Style{Family: "Orbit Mono", Size: 12.5, OrbitFractionalGlyphPositions: on}}
++				l := s.Shape(p)
++				if len(l.Lines) == 0 || math.IsNaN(float64(l.Width)) {
++					t.Fatal("invalid layout")
++				}
++				for i := 0; i <= len([]rune(v)); i++ {
++					x, y, h := l.CaretAt(CaretPosition{Index: i})
++					q := l.PositionAt(x, y+h/2)
++					if q.Index < 0 || q.Index > len([]rune(v)) {
++						t.Fatal("invalid hit", q)
++					}
++				}
++				for _, r := range l.SelectionRanges(CaretPosition{}, CaretPosition{Index: len([]rune(v))}) {
++					if r.End < r.Start || r.Start < 0 || r.End > len([]rune(v)) {
++						t.Fatal("negative selection")
++					}
++				}
++			}
++		}
++		p := Params{Text: "123456789", Style: Style{Family: "Orbit Mono", Size: 12.5}}
++		a := s.Shape(p)
++		p.Style.OrbitFractionalGlyphPositions = true
++		b := s.Shape(p)
++		p.Style.OrbitFractionalGlyphPositions = false
++		c := s.Shape(p)
++		if a.Width != c.Width || a.Height != b.Height {
++			t.Fatal("options update changed default or metrics")
++		}
++	}
++}
++
++func TestOrbitFractionalBoundedContextsAndLatinCaret(t *testing.T) {
++	s := orbitFractionalSystem(t)
++	e := s.eng.(*pangoEngine)
++	p := Params{Text: "0123456789 ABC xyz", Style: Style{Family: "Orbit Mono", Size: 12.5, OrbitFractionalGlyphPositions: true}}
++	l := s.Shape(p)
++	count := len(e.fonts)
++	for i := 0; i <= len(p.Text); i++ {
++		x, y, h := l.CaretAt(CaretPosition{Index: i})
++		q := l.PositionAt(x, y+h/2)
++		if q.Index != i {
++			t.Fatalf("caret roundtrip at%d ->%v", i, q)
++		}
++	}
++	for i := 0; i < 300; i++ {
++		p.Width = float32(100 + i%100)
++		s.Shape(p)
++	}
++	if len(e.fonts) > count+1 {
++		t.Fatalf("owned contexts created unbounded fonts %d->%d", count, len(e.fonts))
++	}
++}
++
++func TestOrbitFractionalMissingNativeAPIFailsClosed(t *testing.T) {
++	s := orbitFractionalSystem(t)
++	e := s.eng.(*pangoEngine)
++	if !s.OrbitFractionalGlyphPositionsAvailable() {
++		t.Fatal("expected pinned capability")
++	}
++	old := pangoLib.contextSetRoundPositions
++	pangoLib.contextSetRoundPositions = nil
++	if s.OrbitFractionalGlyphPositionsAvailable() {
++		t.Fatal("missing API reported available")
++	}
++	defer func() {
++		pangoLib.contextSetRoundPositions = old
++		if recover() == nil {
++			t.Fatal("opt-in silently accepted missing Pango API")
++		}
++	}()
++	e.shape([]rune("text"), Style{OrbitFractionalGlyphPositions: true}, nil, 0, false, false)
++}
+diff --git a/internal/text/pango_linux.go b/internal/text/pango_linux.go
+index a1e9eef..a9a66a9 100644
+--- a/internal/text/pango_linux.go
++++ b/internal/text/pango_linux.go
+@@ -407,16 +407,26 @@ func (e *pangoEngine) setFontRendering(antialias, hinting, subpixels string) {
+ // desktop's antialiasing, hint style and subpixel order, metrics hinted
+ // to whole pixels, and glyphs on whole pixels.
+ func (e *pangoEngine) applyOptions() {
++	e.orbitApplyOptions(e.context, true)
++}
++
++// orbitApplyOptions configures an owned context without changing another layout.
++// Fractional positions deliberately retain the platform hint-metrics policy.
++func (e *pangoEngine) orbitApplyOptions(context uintptr, rounded bool) {
+ 	l := &pangoLib
+ 	opts := l.cairoFontOptionsCreate()
+ 	l.cairoFontOptionsAntialias(opts, e.antialias)
+ 	l.cairoFontOptionsHintStyle(opts, e.hintStyle)
+ 	l.cairoFontOptionsSubpixel(opts, e.subpixels)
+ 	l.cairoFontOptionsHintMets(opts, cairoHintMetricsOn)
+-	l.contextSetFontOptions(e.context, opts)
++	l.contextSetFontOptions(context, opts)
+ 	l.cairoFontOptionsDestroy(opts)
+ 	if l.contextSetRoundPositions != nil {
+-		l.contextSetRoundPositions(e.context, int32(gTrue))
++		round := int32(gFalse)
++		if rounded {
++			round = int32(gTrue)
++		}
++		l.contextSetRoundPositions(context, round)
+ 	}
+ }
+ 
+@@ -648,8 +658,20 @@ func (e *pangoEngine) shape(text []rune, style Style, spans []Span, width float3
+ 	if rtl {
+ 		dir = pangoDirRTL
+ 	}
+-	l.contextSetBaseDir(e.context, dir)
+-	layout := l.layoutNew(e.context)
++	context := e.context
++	if style.OrbitFractionalGlyphPositions {
++		if l.contextSetRoundPositions == nil {
++			panic("Orbit fractional glyph positions require Pango 1.44")
++		}
++		context = l.fontMapCreateContext(e.fontMap)
++		if context == 0 {
++			panic("Orbit fractional glyph context unavailable")
++		}
++		defer l.gObjectUnref(context)
++		e.orbitApplyOptions(context, false)
++	}
++	l.contextSetBaseDir(context, dir)
++	layout := l.layoutNew(context)
+ 	if layout == 0 {
+ 		return nil
+ 	}
+diff --git a/ui/element.go b/ui/element.go
+index 721c8bc..b0669f3 100644
+--- a/ui/element.go
++++ b/ui/element.go
+@@ -159,14 +159,15 @@ type textStyle struct {
+ 	italic bool
+ 	color  Color
+ 	// lineHeight is a multiple of the font size, or DIPs when fixedLine.
+-	lineHeight float32
+-	fixedLine  bool
+-	align      Align
+-	underline  bool
+-	wavy       bool
+-	strike     bool
+-	spacing    float32 // letter spacing
+-	features   string
++	lineHeight      float32
++	fixedLine       bool
++	align           Align
++	underline       bool
++	wavy            bool
++	strike          bool
++	orbitFractional bool
++	spacing         float32 // letter spacing
++	features        string
+ 	// lang is the language of the text, a BCP 47 tag (Lang).
+ 	lang string
+ 	// decoColor and decoThick are those of underlines and strikethroughs;
+@@ -195,9 +196,10 @@ const (
+ 	setBackground
+ 	setSelection
+ 	setLang
++	setOrbitFractional
+ 
+ 	// setAll has every bit of textStyle.set.
+-	setAll = setLang<<1 - 1
++	setAll = setOrbitFractional<<1 - 1
+ )
+ 
+ // layoutStyle is what lays an element out, of what the view sets on it:
+diff --git a/ui/layout.go b/ui/layout.go
+index e6d05fa..23fd5f1 100644
+--- a/ui/layout.go
++++ b/ui/layout.go
+@@ -188,6 +188,7 @@ func (e *node) textParams(width float32) text.Params {
+ 	style := text.Style{
+ 		Family: ts.family, Size: ts.size, Weight: ts.weight, Italic: ts.italic, LineHeight: ts.lineHeight,
+ 		LetterSpacing: ts.spacing, Features: ts.features, Lang: ts.lang,
++		OrbitFractionalGlyphPositions: ts.orbitFractional,
+ 	}
+ 	if ts.fixedLine && ts.lineHeight > 0 {
+ 		style.LineHeight = ts.lineHeight / style.FontSize()
+@@ -250,6 +251,9 @@ func (e *node) resolvedText() textStyle {
+ 		if take&setFeatures != 0 {
+ 			out.features = t.features
+ 		}
++		if take&setOrbitFractional != 0 {
++			out.orbitFractional = t.orbitFractional
++		}
+ 		if take&setLang != 0 {
+ 			out.lang = t.lang
+ 		}
+diff --git a/ui/layoutcache.go b/ui/layoutcache.go
+index 2aa8701..011ad16 100644
+--- a/ui/layoutcache.go
++++ b/ui/layoutcache.go
+@@ -63,7 +63,7 @@ const layoutFlags = flagScrollX | flagScrollY | flagClipX | flagClipY | flagAbso
+ 
+ // textLayoutSet are the text styles that lay text out (textParams) and
+ // size icons, which elements inherit.
+-const textLayoutSet = setFamily | setSize | setWeight | setItalic | setLineHeight | setAlign | setSpacing | setFeatures | setLang
++const textLayoutSet = setFamily | setSize | setWeight | setItalic | setLineHeight | setAlign | setSpacing | setFeatures | setLang | setOrbitFractional
+ 
+ // layoutRecord is what an element's state keeps of its last layout.
+ type layoutRecord struct {
+@@ -211,6 +211,7 @@ type textLayout struct {
+ 	size, lineHeight, spacing float32
+ 	weight                    int
+ 	italic, fixedLine         bool
++	orbitFractional           bool
+ 	align                     Align
+ }
+ 
+@@ -231,7 +232,8 @@ func (l *textLayout) same(t *textStyle) bool {
+ 		(set&setAlign == 0 || l.align == t.align) &&
+ 		(set&setSpacing == 0 || l.spacing == t.spacing) &&
+ 		(set&setFeatures == 0 || l.features == t.features) &&
+-		(set&setLang == 0 || l.lang == t.lang)
++		(set&setLang == 0 || l.lang == t.lang) &&
++		(set&setOrbitFractional == 0 || l.orbitFractional == t.orbitFractional)
+ }
+ 
+ // layoutOfText returns what of t lays text out.
+@@ -265,6 +267,9 @@ func layoutOfText(t *textStyle) textLayout {
+ 	if set&setFeatures != 0 {
+ 		l.features = t.features
+ 	}
++	if set&setOrbitFractional != 0 {
++		l.orbitFractional = t.orbitFractional
++	}
+ 	if set&setLang != 0 {
+ 		l.lang = t.lang
+ 	}
+diff --git a/ui/orbit_fractional.go b/ui/orbit_fractional.go
+new file mode 100644
+index 0000000..c8236e7
+--- /dev/null
++++ b/ui/orbit_fractional.go
+@@ -0,0 +1,37 @@
++package ui
++
++import "github.com/egoist/mygo/internal/text"
++
++// OrbitFractionalGlyphPositions selects fractional advances for this element
++// and its descendants on Linux only. The default and other platforms are
++// unchanged. It does not disable hint metrics, change fonts or scale painting.
++// An explicit false overrides an inherited true. Pango <1.44 fails closed.
++func (e Element) OrbitFractionalGlyphPositions(enabled bool) Element {
++	n := e.node()
++	if n == nil {
++		return Element{}
++	}
++	n.ts.orbitFractional = enabled
++	n.ts.set |= setOrbitFractional
++	return e
++}
++
++// MeasureTextOrbitFractional measures the same per-layout policy used by
++// OrbitFractionalGlyphPositions(true); unlike a Span property this applies to
++// the whole layout including all rich-text runs. Other platforms are unchanged.
++func (c *Context) MeasureTextOrbitFractional(width float32, spans ...Span) (float32, float32) {
++	ctx := c.build()
++	if ctx == nil {
++		return 0, 0
++	}
++	p := ctx.rt.richParams(width, spans)
++	p.Style.OrbitFractionalGlyphPositions = true
++	l := ctx.rt.text.Layout(p)
++	return l.Width, l.Height
++}
++
++// OrbitFractionalGlyphPositionsAvailable lets an app check the pinned native
++// capability before opting any layout in. It does not enable a global policy.
++func OrbitFractionalGlyphPositionsAvailable() bool {
++	return text.Shared().OrbitFractionalGlyphPositionsAvailable()
++}
+diff --git a/ui/orbit_fractional_test.go b/ui/orbit_fractional_test.go
+new file mode 100644
+index 0000000..f67acd9
+--- /dev/null
++++ b/ui/orbit_fractional_test.go
+@@ -0,0 +1,110 @@
++//go:build linux && (amd64 || arm64)
++
++package ui
++
++import (
++	"golang.org/x/image/font/gofont/gomono"
++	"testing"
++)
++
++func TestOrbitFractionalPublicMeasureInheritanceAndCache(t *testing.T) {
++	if err := RegisterFont(gomono.TTF, "Orbit UI Mono"); err != nil {
++		t.Fatal(err)
++	}
++	on := true
++	var plain, fraction float32
++	view := func(c *Context) {
++		sp := Span{Text: "Untracked fixture note.", Font: "Orbit UI Mono", Size: 12.5}
++		plain, _ = c.MeasureText(0, sp)
++		fraction, _ = c.MeasureTextOrbitFractional(0, sp)
++		Column(c).Width(178).Font("Orbit UI Mono").FontSize(12.5).Children(func() {
++			RichText(c, sp).Label("normal").FillWidth()
++			Column(c).OrbitFractionalGlyphPositions(on).FillWidth().Children(func() {
++				RichText(c, sp).Label("inherit").FillWidth()
++				RichText(c, sp).Label("override").FillWidth().OrbitFractionalGlyphPositions(false)
++			})
++		})
++	}
++	a := NewTester(view, 400, 300)
++	b := NewTester(view, 400, 300)
++	for i := 0; i < 6; i++ {
++		on = i%2 == 0
++		a.Frame()
++		b.Frame()
++		normal, _ := a.Find("normal")
++		inherited, _ := a.Find("inherit")
++		override, _ := a.Find("override")
++		if plain <= fraction {
++			t.Fatal("measurement not fractional")
++		}
++		if normal.H != override.H {
++			t.Fatal("inherited policy leaked into explicit false")
++		}
++		if on && inherited.H >= normal.H {
++			t.Fatal("enabled row should fit", inherited, normal)
++		}
++		if !on && inherited.H != normal.H {
++			t.Fatal("cache failed policy toggle")
++		}
++		other, _ := b.Find("inherit")
++		if other.H != inherited.H {
++			t.Fatal("two-window mismatch")
++		}
++	}
++}
++
++func TestOrbitFractionalSelectionAndLongLineResize(t *testing.T) {
++	if err := RegisterFont(gomono.TTF, "Orbit Select Mono"); err != nil {
++		t.Fatal(err)
++	}
++	text := "Latin fi é 中文🙂 العربية tail"
++	width := float32(178)
++	tt := NewTester(func(c *Context) {
++		Column(c).Width(width).OrbitFractionalGlyphPositions(true).Font("Orbit Select Mono").FontSize(12.5).Selectable().Children(func() {
++			RichText(c, Span{Text: text[:8]}, Span{Text: text[8:], Color: RGB(200, 50, 60)}).Label("mixed").FillWidth()
++		})
++	}, 400, 300)
++	for _, w := range []float32{178, 90, 320, 178} {
++		width = w
++		tt.Frame()
++		selectBetween(t, tt, text, 0, text, len([]rune(text)))
++		tt.Key(Cmd, KeyC)
++		if tt.Clipboard() != text {
++			t.Fatalf("copy at width %g lost content %q", w, tt.Clipboard())
++		}
++		if _, ok := tt.Find("mixed"); !ok {
++			t.Fatal("missing text")
++		}
++		tt.Image()
++	}
++}
++
++func TestOrbitFractionalEditableCaretAndDefaultNeighbor(t *testing.T) {
++	if err := RegisterFont(gomono.TTF, "Orbit Edit Mono"); err != nil {
++		t.Fatal(err)
++	}
++	value := "0123456789"
++	other := "unchanged"
++	tt := NewTester(func(c *Context) {
++		Column(c).Children(func() {
++			TextInput(c, &value).Label("fraction-input").Font("Orbit Edit Mono").FontSize(12.5).OrbitFractionalGlyphPositions(true).AutoFocus()
++			TextInput(c, &other).Label("default-input").Font("Orbit Edit Mono").FontSize(12.5)
++		})
++	}, 400, 160)
++	tt.Key(Cmd, KeyA)
++	tt.Key(Cmd, KeyC)
++	if tt.Clipboard() != value {
++		t.Fatal("opt-in input select/copy")
++	}
++	tt.Type("中文🙂")
++	tt.Key(0, KeyLeft)
++	tt.Type("X")
++	if value != "中文X🙂" || other != "unchanged" {
++		t.Fatalf("caret/edit mismatch %q %q", value, other)
++	}
++	tt.Key(Cmd, KeyA)
++	tt.Key(Cmd, KeyC)
++	if tt.Clipboard() != value {
++		t.Fatal("mixed opt-in copy")
++	}
++}

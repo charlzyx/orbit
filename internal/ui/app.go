@@ -105,6 +105,8 @@ type Action struct {
 	Data                   map[string]any
 }
 type Options struct {
+	// Owner-thread cache lookup; never performs filesystem work during palette paint.
+	SessionPinned              func(string) bool
 	CaptureSessionRenameTarget func(runtimeID, sessionID, sessionPath string) (agent.SessionRenameTarget, error)
 	// UI-owned task identity and intent generation for delayed attachment work.
 	AttachmentContext func() (agent.WorkflowTarget, uint64, bool)
@@ -191,6 +193,7 @@ type App struct {
 	Draft, Search, paletteQuery, modelQuery                         string
 	attachments                                                     []attachment
 	pendingAttachmentImages                                         *attachmentImageBatch
+	attachmentIngress                                               attachmentIngressState
 	inlineImages                                                    inlineImageState
 	messageImages                                                   map[string]ui.ImageSource
 	imageLoading                                                    map[string]bool
