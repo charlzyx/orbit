@@ -105,11 +105,12 @@ if [[ "${ORBIT_CAPTURE_USAGE:-0}" == 1 ]]; then
   # Escape leaves Settings before the source global Usage shortcut. No clicks
   # on guessed chart/table coordinates, no session opening or model inference.
   xdotool key Escape
+  export ORBIT_CAPTURE_APP_PID="$app_pid"
   bash "$repo_root/scripts/usage-native/capture-state.sh" simple "$window" "$output"
   # Resolve Details from THIS run's full native client image. An older
   # screenshot's coordinates are not authority for a new pointer action.
   # Verification sends no input; the existing helper sends exactly one click.
-  details_target=$(python3 "$repo_root/scripts/workbench-native/verify-target.py" "$window" "$app_pid" "$output/usage-evidence" Details 1000 70 1470 160)
+  details_target=$(python3 "$repo_root/scripts/workbench-native/verify-target.py" "$window" "$app_pid" "$output/usage-evidence" Details 1000 70 1470 160 --require-ready Summary "Usage over time" requests tokens sessions)
   read -r details_x details_y <<< "$details_target"
   bash "$repo_root/scripts/usage-native/capture-state.sh" details "$window" "$output" "$details_x" "$details_y"
   printf '%s\n' 'Details target evidence: usage-evidence/details-target.json; selected state remains unreviewed' >> "$output/usage-actions.log"
@@ -135,7 +136,8 @@ usage_fixture = pathlib.Path(out) / 'usage-fixture.json'
 if usage_fixture.exists():
     manifest['usageFixtureSha256'] = hashlib.sha256(usage_fixture.read_bytes()).hexdigest()
     manifest['usageFixture'] = json.loads(usage_fixture.read_text())
-    manifest['usageCaptureState'] = 'Simple requested using Escape then Ctrl+U, then Details at a unique exact-label OCR target in a fresh current-run native client image; Models is fixture-selected. Selected states and scan completion require manual image review'
+    manifest['usageCaptureState'] = 'Simple and Details each passed three consecutive complete-body OCR readiness observations without recognized loading/error. Details also required completed Simple body anchors and a unique exact-label OCR target on one fresh frame. No guessed target. Semantic states and pixels still require manual review'
+    manifest['usageReadiness'] = {phase: json.loads((pathlib.Path(out) / 'usage-readiness' / (phase + '-ready.json')).read_text()) for phase in ('simple', 'details')}
     manifest['usageDetailsTargetEvidence'] = json.loads((pathlib.Path(out) / 'usage-evidence/details-target.json').read_text())
     manifest['volatileCases']['usage-simple-dark.png'] = ['scan-relative header age', 'activity calendar trailing-year anchor']
     manifest['volatileCases']['usage-details-dark.png'] = ['scan-relative header age']

@@ -1,0 +1,75 @@
+{
+  "run": "https://github.com/charlzyx/orbit/actions/runs/40201277104",
+  "ocr": "local Tesseract 5.5.0 PSM11, whole original image",
+  "imageTransformations": [],
+  "artifacts": {
+    "go": {
+      "id": 12601098875,
+      "zipSha256": "5e755ad082609a118ca4d6bb86cc885aa085fd9a8c803eb7f0c67b3e318f1b50",
+      "source": "32083a3cfe5f6dd76b760bd4a12c831251bfa6c3"
+    },
+    "rust": {
+      "id": 12602355698,
+      "zipSha256": "1651866912451973acd6e1c7e9afe1978148ad28b3d723a04b2da9c80d387fd5",
+      "source": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac"
+    }
+  },
+  "frames": [
+    {
+      "renderer": "go",
+      "phase": "simple",
+      "imageSha256": "14e5843422b7bd8350ec72522b15a52116b84fc4850062bdce718419fc49e2c5",
+      "tsv": "completed-go-simple.tsv",
+      "tsvSha256": "fa84f0713dd62c68b4d39d155de385e40a4631ce31dceb70a1c750f3ec24ff9b",
+      "required": [
+        "Summary",
+        "Usage over time",
+        "requests",
+        "tokens",
+        "sessions"
+      ]
+    },
+    {
+      "renderer": "go",
+      "phase": "details",
+      "imageSha256": "6b6b8bfec869634c989c82e6e6dacc70d19fbe67e05a16310568c9d65a556e10",
+      "tsv": "completed-go-details.tsv",
+      "tsvSha256": "8482e5cb6aafd50302e89803799fb69faadd08f0f59b6ba6e8bfaae5e7c4eb3e",
+      "required": [
+        "Breakdown",
+        "Records",
+        "Models",
+        "Sessions",
+        "Tokens"
+      ]
+    },
+    {
+      "renderer": "rust",
+      "phase": "simple",
+      "imageSha256": "0bd5d458b31ca55ae5f6e84a3858d6e37f8ca9f9310cc2785fd2979293d1a85a",
+      "tsv": "completed-rust-simple.tsv",
+      "tsvSha256": "65840a15ea843916feb68b7e2d50c4777fca8925cccd36c4e187da069cb22f1e",
+      "required": [
+        "Summary",
+        "Usage over time",
+        "requests",
+        "tokens",
+        "sessions"
+      ]
+    },
+    {
+      "renderer": "rust",
+      "phase": "details",
+      "imageSha256": "f7f41b1b2049ed7619be4c4c0dc1993d2d75deb4ba3dc1f28d2d3012d70d2508",
+      "tsv": "completed-rust-details.tsv",
+      "tsvSha256": "3cd7d34bbf0d43c7846c3637bbc66a6863b9e7adf5a66255e4c2c1bfe8ede395",
+      "required": [
+        "Breakdown",
+        "Records",
+        "Models",
+        "Sessions",
+        "Tokens"
+      ]
+    }
+  ]
+}

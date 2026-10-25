@@ -15,9 +15,9 @@ Data oracle: 33 requests, 33 prompts, 4 sessions, 2 providers, 4 provider/model 
 
 ## Actual UI capture sequence
 
-After the main harness sizes the actual client to 1470×922, use its native window ID and display. Do not use CPU fixture captures here.
+After the main harness sizes the actual client to 1470×922, use its native window ID and display, and export `ORBIT_CAPTURE_APP_PID` to its actual process ID (the main harness does this). Do not use CPU fixture captures here.
 
-1. `bash scripts/usage-native/capture-state.sh simple "$window" "$output"` sends Ctrl+U, the pinned global ToggleUsage command (`platform.rs:762`, `commands.rs:894`, Go commands.go). Inspect usage-simple-dark.png: selected Simple, custom Oct 1–14 chip, populated Summary, Usage over time and real data. Confirm scan is complete, not skeleton. If still loading, wait and capture the same window again without another Ctrl+U toggle.
+1. `bash scripts/usage-native/capture-state.sh simple "$window" "$output"` sends Ctrl+U, the pinned global ToggleUsage command (`platform.rs:762`, `commands.rs:894`, Go commands.go). Inspect usage-simple-dark.png: selected Simple, custom Oct 1–14 chip, populated Summary, Usage over time and real data. Confirm scan is complete, not skeleton. The readiness gate now blocks on loading; see the observer-only diagnostic retry below.
 2. From that actual renderer's inspected image, find the Details segment in the filter bar. `bash scripts/usage-native/capture-state.sh details "$window" "$output" X Y` clicks that verified point. Inspect selected Details and the Breakdown/Records cards. Do not assume Go and Rust coordinates match before measuring them. A wrong click is a failed state setup, never a valid pair.
 3. From the inspected Details image, locate All models. `bash scripts/usage-native/capture-state.sh models "$window" "$output" X Y` opens the real model menu. Inspect Search, All, Select all and the four provider-scoped model options. Do not select an option; the intended state is the unfiltered menu-open view. Escape closes it after capture.
 
@@ -26,3 +26,50 @@ Each script invocation records its pointer setup and checks actual image size, b
 ## Clock and other open gates
 
 Process clock is NOT frozen. The scan-relative header age is volatile; collect both within the same stated interval and report any age difference rather than masking it. The activity heatmap ends at the scan's calendar day, so same fixture data alone does not make captures from different UTC dates comparable. The fixture manifest lists these exceptions. Per-renderer resolved fonts, hover/focus phase, native execution and actual matched pixel comparison still need their own evidence. This script/fixture preparation is not an executed native Usage pair.
+
+## Completed-state readiness gate (ce4 follow-up)
+
+The main harness exports its actual `ORBIT_CAPTURE_APP_PID`. `capture-state.sh`
+now waits for three consecutive completed-body observations instead of treating a
+one-second sleep as readiness. Sampling has a 45-second deadline; individual
+native capture/OCR commands have a 15-second timeout. Every sample's unchanged
+whole-window PNG, raw TSV, hashes and readiness decision remains under
+`usage-readiness/`. Timeout/error records `BLOCKED`, publishes no final Usage PNG
+and, under the main harness's `set -e`, prevents the subsequent Details target or
+click. Previous evidence is rejected before new input.
+
+Required visible body anchors:
+- Simple: Summary, Usage over time, requests, tokens, sessions.
+- Details: Breakdown, Records, Models, Sessions, Tokens. Sessions is present in
+  the Records header's count; the below-fold Records tabs are not a prerequisite.
+
+These phrases were checked in both pinned Rust source and Go source, then against
+all four original completed Usage PNGs from run40201277104 (artifact IDs12601098875
+and12602355698). ZIP hashes match the earlier native-image audit. Whole-frame
+local Tesseract5.5.0 PSM11/3 recognized all required anchors in those four images.
+Committed raw PSM11 TSVs and image/artifact hashes are under `testdata/`; this is
+OCR regression evidence, not newly executed desktop integration. The ce4 failed
+frame remains correctly blocked: its primary OCR says `Loading local usage.`;
+PSM3 also lacks every completed Simple anchor. The saved pixels visibly show a
+skeleton even though Details itself is visible.
+
+Readiness fallback remains same-engine alternate segmentation on the unchanged
+whole frame, never a merge of partial observations; a primary recognized error or
+loading marker cannot be overridden. After readiness, `verify-target.py` captures
+another fresh frame and requires both the completed Simple anchors and the exact
+unique Details target at confidence>=60 in the existing filter-bar region. This
+fresh-target path deliberately has no OCR fallback: if PSM11 omits a required
+anchor or Details, the run stays blocked. No crop, rescale, image edits, lowered
+threshold or previous coordinates are substituted.
+
+Recognized loading/refresh/error/empty phrases are rejected. OCR can omit text;
+this gate is not a guarantee of every possible error string, selected-state
+semantics, dynamic UI stability or pixel parity. Raw frames still need manual
+review. In particular, the ce4 `idle_add_full: function != NULL` runtime diagnostic
+is not fixed by this gate; startup/runtime correction is a separate change. A
+single saved loading frame cannot establish whether a scan is merely pending or
+permanently stranded.
+
+If a diagnostic retry only needs observation, do not send Ctrl+U again (it would
+toggle Usage closed). Use `wait-ready.py simple WINDOW PID FRESH_OUTPUT` on the
+already-open native window; it sends no input and never reuses failed evidence.

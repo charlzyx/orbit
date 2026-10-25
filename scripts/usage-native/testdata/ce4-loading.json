@@ -1,0 +1,45 @@
+{
+  "source": "ce4d49a",
+  "fixture": "isolated synthetic Usage, no credentials",
+  "imageSha256": "a462eab15fb7b48c523f438a0b04c08c2929ed5bafd7d002f3e1046e60806269",
+  "primaryTesseract": "CI artifact PSM11; version not recorded in failed-run artifacts",
+  "localAlternateTesseract": "tesseract 5.5.0",
+  "imageTransformations": [],
+  "requiredPhrases": [
+    "Summary",
+    "Usage over time",
+    "requests",
+    "tokens",
+    "sessions"
+  ],
+  "passes": [
+    {
+      "psm": 11,
+      "ready": false,
+      "tsvSha256": "32b814b0fecc6f2bf1a6701ba64edbde519243ca28825cb887a349b165a942d7",
+      "missing": [
+        "Summary",
+        "Usage over time",
+        "requests",
+        "tokens",
+        "sessions"
+      ],
+      "blocked": [
+        "loading local usage"
+      ]
+    },
+    {
+      "psm": 3,
+      "ready": false,
+      "tsvSha256": "d96d3aa1b40d47eab93e8b702959f76165467fe5579fb02adbb7b57f0864193c",
+      "missing": [
+        "Summary",
+        "Usage over time",
+        "requests",
+        "tokens",
+        "sessions"
+      ],
+      "blocked": []
+    }
+  ]
+}

@@ -827,7 +827,7 @@ func Run(o RunOptions) error {
 			x.UI.nativeCommand(command)
 		}}))
 	}
-	mygo.App.WhenReady(func() {
+	registerNativeHostReady(mygo.App.WhenReady, func() {
 		x.rebuildMenu()
 		lifecycle.SetWindow(create())
 		x.UI.Async(func() func() {
@@ -868,10 +868,7 @@ func Run(o RunOptions) error {
 				})
 			}})
 		}
-	})
-	// The retained host continues non-rendering maintenance while windowless,
-	// dispatched on MyGo's owner thread, never on the timer goroutine.
-	x.startHeartbeat()
+	}, x.startHeartbeat)
 	o.Smoke.Start(x.background, func() appbundle.SmokeSnapshot {
 		snapshot := x.Agent.Snapshot()
 		process := x.Agent.RuntimeSnapshot().Active

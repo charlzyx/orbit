@@ -38,8 +38,10 @@ jobs:
         run: scripts/go-native.sh test -race github.com/egoist/mygo/ui -run "^TestOrbit(Composer|Selection)" -count=1
       - name: Verify canonical wrapper manifest boundaries
         run: python3 scripts/test-go-native-overlay.py
-      - name: Source workbench fixture and capture safety regressions
-        run: python3 -m unittest discover -s scripts/workbench-native -p 'test_*.py'
+      - name: Source workbench and Usage fixture/capture safety regressions
+        run: |
+          python3 -m unittest discover -s scripts/workbench-native -p 'test_*.py'
+          python3 -m unittest discover -s scripts/usage-native -p 'test_*.py'
       - name: Terminal compatibility module regressions
         run: |
           if [ -f third_party/mygo-terminal/go.mod ]; then

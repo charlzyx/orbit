@@ -13,7 +13,7 @@ import time
 
 
 def run(*args):
-    return subprocess.check_output(list(args), text=True, stderr=subprocess.PIPE).strip()
+    return subprocess.check_output(list(args), text=True, stderr=subprocess.PIPE, timeout=15).strip()
 
 
 def sha(path):
@@ -43,7 +43,7 @@ def exact_target(rows, label, region):
 def ready(rows, required):
     text = plain(rows)
     absent = [phrase for phrase in required if phrase.casefold() not in text]
-    blocked = [phrase for phrase in ('loading...', 'loading…', 'failed to load', 'could not load', 'runtime unavailable', 'runtime not found', 'workspace unavailable') if phrase in text]
+    blocked = [phrase for phrase in ('loading...', 'loading…', 'failed to load', 'could not load', 'runtime unavailable', 'runtime not found', 'workspace unavailable', 'loading local usage', 'unable to load usage data', 'unable to read usage data', 'no usage data yet', 'no usage matches these filters', 'refreshing', 'permission denied', 'no such file or directory', 'not a directory', 'operation not permitted', 'input/output error', 'failed to scan') if phrase in text]
     return not absent and not blocked, dict(missing=absent, blocked=blocked)
 
 

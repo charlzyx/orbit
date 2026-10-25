@@ -1,6 +1,7 @@
 package orbitui
 
 import (
+	"sync"
 	"time"
 
 	"github.com/egoist/mygo"
@@ -99,4 +100,13 @@ func (x *Controller) attachWindow(create func() *mygo.Window) *mygo.Window {
 	x.UI.Window = w
 	x.UI.window.Store(w)
 	return w
+}
+
+// Register before App.Run, but never dispatch owner-thread work before the
+// native backend has initialized its callback pointers. On Linux Signal can
+// otherwise set its signaled latch while its GLib callback is still nil.
+// The one host lifetime starts after the initial window setup, not on reopen.
+func registerNativeHostReady(register func(func()), initialize, start func()) {
+	var once sync.Once
+	register(func() { once.Do(func() { initialize(); start() }) })
 }

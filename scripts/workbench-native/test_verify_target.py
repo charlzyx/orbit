@@ -38,6 +38,15 @@ class TargetTests(unittest.TestCase):
                     run.assert_not_called()
                 self.assertEqual(json.loads((Path(directory) / 'details-target.json').read_text())['status'], 'BLOCKED')
 
+    def test_fresh_target_frame_must_still_have_completed_usage_body(self):
+        with tempfile.TemporaryDirectory() as directory:
+            loading = [row(), dict(text='Loading local usage…')]
+            with patch.object(v.capture.Capture, 'capture', return_value=(loading, {})), patch.object(v.capture, 'run') as run:
+                with self.assertRaisesRegex(ValueError, 'not ready'):
+                    v.verify('42', 123, directory, 'Details', [1000, 70, 1470, 160], required=['Summary'])
+                run.assert_not_called()
+            self.assertEqual(json.loads((Path(directory) / 'details-target.json').read_text())['action'], 'NO_INPUT_SENT')
+
     def test_previous_evidence_cannot_authorize_new_pointer_action(self):
         with tempfile.TemporaryDirectory() as directory:
             out = Path(directory); (out / 'details-before.png').write_bytes(b'old')
