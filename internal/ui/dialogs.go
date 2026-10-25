@@ -304,9 +304,17 @@ func (a *App) extensionDialog(c *ui.Context) {
 
 func (a *App) prompt(c *ui.Context) {
 	if !a.promptOpen {
+		a.cancelPaletteRename()
 		return
 	}
-	a.modal(c.Key("text-prompt"), &a.promptOpen, 460, func() {
+	var key any = "text-prompt"
+	if a.paletteRename != nil {
+		key = struct {
+			kind   string
+			intent *paletteRenameIntent
+		}{"palette-rename-prompt", a.paletteRename}
+	}
+	a.modal(c.Key(key), &a.promptOpen, 460, func() {
 		ui.Text(c, a.promptTitle).FontSize(18).FontWeight(600)
 		in := ui.TextInput(c, &a.promptValue).Label(a.promptTitle).AutoFocus().AlignSelf(ui.Stretch)
 		submit := in.Submitted()
@@ -326,8 +334,12 @@ func (a *App) prompt(c *ui.Context) {
 			}
 		}
 	})
+	if !a.promptOpen {
+		a.cancelPaletteRename()
+	}
 }
 func (a *App) Prompt(title, value string, commit func(string)) {
+	a.paletteRename = nil // A replacement prompt revokes the previous rename intent.
 	a.promptTitle = title
 	a.promptValue = value
 	a.promptCommit = commit

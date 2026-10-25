@@ -47,6 +47,7 @@ type RunOptions struct {
 type Controller struct {
 	setupInstall      setupInstallState
 	setupProbe        setupProbeState
+	piUpdateDone      <-chan struct{}
 	workspaceBrowse   workspaceBrowseState
 	fileDialogs       nativeFileDialogState
 	diagnostics       *diagnosticlog.Logger
@@ -177,6 +178,9 @@ func NewController(o RunOptions) (*Controller, error) {
 			return nil
 		}))
 	}, OnChange: invalidate, OpenWorkspace: x.SetWorkspace, OpenTerminal: func(path string) { x.Terminal.SetWorkspace(path); x.UI.save(x.Terminal.NewTab()) }, RevealPath: native.RevealPath, ConfigPath: filepath.Join(s.RootDir, "worktrees.json")})
+	x.UI.Options.CaptureSessionRenameTarget = func(runtimeID, sessionID, path string) (agent.SessionRenameTarget, error) {
+		return x.Agent.CaptureSessionRenameTarget(runtimeID, sessionID, path)
+	}
 	x.UI.Options.AttachmentContext = func() (agent.WorkflowTarget, uint64, bool) {
 		select {
 		case <-x.stop:
@@ -386,6 +390,7 @@ func (x *Controller) changeWorkspaceServices(path string) {
 	if path != x.workspace || path != x.UI.Model.Workspace {
 		x.UI.resetMarkdownImageOwner()
 		x.UI.cancelPaletteDelete()
+		x.UI.cancelPaletteRename()
 	}
 	x.workspaceBrowse.epoch++
 	x.workspace = path
@@ -415,7 +420,7 @@ func (x *Controller) Close() {
 		x.hostMailboxMu.Unlock()
 		close(x.stop)
 		x.cancelBackground()
-		x.waitSetupInstallRunner(3 * time.Second)
+		x.waitRuntimeRunners(3 * time.Second)
 		if x.watcher != nil {
 			x.watcher.Close()
 		}
@@ -425,6 +430,7 @@ func (x *Controller) Close() {
 		x.Resources.Close()
 		x.UI.autocomplete.Close()
 		x.UI.Models.Close()
+		x.UI.cancelAttachmentImages()
 		x.UI.closeBackground()
 		x.UI.closeInlineImages()
 		x.UI.markdownImages.Close()
@@ -525,6 +531,10 @@ func (x *Controller) Action(a Action) {
 	case "BrowseWorkspace":
 		x.browseWorkspace()
 	case "Submit":
+		if u.hasPendingAttachmentImages() {
+			u.submitAccepted = false
+			return
+		}
 		images := make([]agent.Image, 0, len(u.attachments))
 		for _, im := range u.attachments {
 			images = append(images, im.Image)
@@ -571,14 +581,11 @@ func (x *Controller) Action(a Action) {
 			}
 		})
 	case "RenameSession":
-		path := str("path")
-		if path == "" {
-			path = u.Model.SessionPath
-		}
-		if path == u.Model.SessionPath {
-			e = m.RenameSession(a.Value)
+		if a.sessionRenameTarget != nil {
+			e = m.RenameSessionFor(*a.sessionRenameTarget, a.Value)
 		} else {
-			e = m.RenameSavedSession(path, a.Value)
+			// Cold saved rows use file ownership; never infer a current task.
+			e = m.RenameSavedSession(str("path"), a.Value)
 		}
 	case "CloneSession":
 		path := a.Value

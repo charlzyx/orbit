@@ -1,0 +1,137 @@
+{
+  "source_base": "99866d8611aac61fcef9267e6d7cfc534c050944",
+  "expected_publication_parent": "bfc1579f63d84a5b2385bf5b17e5594b29d35d02",
+  "source_freeze": "607 Go/module hashes unchanged after final gates",
+  "patches": [
+    {
+      "path": "/workspace/shared/orbit-palette-rename-safe-full-2044.patch",
+      "sha256": "01e4686c53504f35b1113fc2ee3f30f8d2a2b936ffb22c07e1f89d903e37ce3c"
+    },
+    {
+      "path": "/tmp/orbit-pi-update-settlement-candidate.patch",
+      "sha256": "f152b55351b51a6f2f80e4286ab8f665621e915d264902dc7e383e1f06ea4f79"
+    },
+    {
+      "path": "/tmp/orbit-pi-update-deferral-candidate.patch",
+      "sha256": "1650212319bd7869755a4c517011f1f976d3e1c1a53580942276971218351d9d"
+    },
+    {
+      "path": "/tmp/orbit-attachment-submit-candidate.patch",
+      "sha256": "820571961150fdb19fca2396c5c4f0563f9fd200e3ac32cc667a73e8c4d5f30a"
+    }
+  ],
+  "gate": "vet; test -race -p 1 -timeout 20m -json ./...; Darwin arm64 canonical build",
+  "result": "PASS",
+  "packages": [
+    {
+      "package": "github.com/charlzyx/orbit",
+      "seconds": 1.9140000000000001
+    },
+    {
+      "package": "github.com/charlzyx/orbit/cmd/orbit",
+      "seconds": 1.03
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/agent",
+      "seconds": 0.004
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/appbundle",
+      "seconds": 4.112
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/attachments",
+      "seconds": 0
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/background",
+      "seconds": 1.7890000000000001
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/bugreportui",
+      "seconds": 12.022
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/composerui",
+      "seconds": 3.797
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/diagnosticlog",
+      "seconds": 0.001
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/gitworkbench",
+      "seconds": 21.494
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/highlight",
+      "seconds": 0.014
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/markdownimage",
+      "seconds": 2.425
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/mcpui",
+      "seconds": 3.35
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/modelui",
+      "seconds": 4.299
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/native",
+      "seconds": 56.196
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/pirpc",
+      "seconds": 0.001
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/preferences",
+      "seconds": 0
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/resourceui",
+      "seconds": 3.739
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/runtimepath",
+      "seconds": 0
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/terminal",
+      "seconds": 1.4889999999999999
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/transcriptui",
+      "seconds": 1.4689999999999999
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "seconds": 558.443
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/workbench",
+      "seconds": 0.002
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/workspace",
+      "seconds": 0.001
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/worktreeui",
+      "seconds": 3.128
+    }
+  ],
+  "prior_full_failure": {
+    "test": "TestModalTransitionRestoresComposerFocus",
+    "ui_seconds": 498.406,
+    "focused_reproduction_seconds": 3.445,
+    "production_changed": false
+  },
+  "focused_corrected_ui_seconds": 58.582,
+  "release": "unchanged .4",
+  "native_acceptance": "new four runtime changes not yet captured; old picker hang unconfirmed",
+  "chat_capture": "one-shot condition removed, manual-only restored"
+}

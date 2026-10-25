@@ -31,7 +31,7 @@ func TestPiUpdateTargetMismatchDoesNotStartAutomaticCheck(t *testing.T) {
 				t.Setenv("PI_CODING_AGENT_DIR", t.TempDir())
 			}
 			calls := 0
-			x.startPiLaunchUpdate(func(context.Context, native.PiLaunchUpdateOptions) { calls++ })
+			x.startPiLaunchUpdate(func(context.Context, native.PiLaunchUpdateOptions) <-chan struct{} { calls++; return nil })
 			if calls != 0 || x.maintenance.Load() {
 				t.Fatal("automatic check started for a different native target", calls)
 			}
@@ -42,7 +42,11 @@ func TestPiUpdateTargetRecheckedBeforeWriterAdmission(t *testing.T) {
 	x := piUpdateTargetFixture(t)
 	var options native.PiLaunchUpdateOptions
 	calls := 0
-	x.startPiLaunchUpdate(func(_ context.Context, o native.PiLaunchUpdateOptions) { calls++; options = o })
+	x.startPiLaunchUpdate(func(_ context.Context, o native.PiLaunchUpdateOptions) <-chan struct{} {
+		calls++
+		options = o
+		return nil
+	})
 	if calls != 1 || options.BeginUpdate == nil || options.OnEvent == nil || options.Busy == nil {
 		t.Fatal("matching default target was not wired")
 	}
@@ -70,7 +74,7 @@ func TestPiUpdateTargetRetainsClosedCustomAndBusyRejection(t *testing.T) {
 		t.Run(reason, func(t *testing.T) {
 			x := piUpdateTargetFixture(t)
 			var options native.PiLaunchUpdateOptions
-			x.startPiLaunchUpdate(func(_ context.Context, o native.PiLaunchUpdateOptions) { options = o })
+			x.startPiLaunchUpdate(func(_ context.Context, o native.PiLaunchUpdateOptions) <-chan struct{} { options = o; return nil })
 			switch reason {
 			case "closed":
 				x.Close()
@@ -104,12 +108,13 @@ func TestPiUpdateTargetDefaultDirectoryAndOwnerDelivery(t *testing.T) {
 		t.Fatal("fixture does not use the default Pi directory")
 	}
 	calls := 0
-	x.startPiLaunchUpdate(func(_ context.Context, o native.PiLaunchUpdateOptions) {
+	x.startPiLaunchUpdate(func(_ context.Context, o native.PiLaunchUpdateOptions) <-chan struct{} {
 		calls++
 		o.OnEvent(native.PiUpdateEvent{State: "available", Latest: "0.60.2"})
 		if len(x.UI.toastStack.Items()) != 0 {
 			t.Fatal("worker callback applied UI off-owner")
 		}
+		return nil
 	})
 	if calls != 1 {
 		t.Fatal("default native target was disabled")
@@ -119,5 +124,8 @@ func TestPiUpdateTargetDefaultDirectoryAndOwnerDelivery(t *testing.T) {
 		t.Fatal("matching target lost queued event delivery")
 	}
 	x.Close()
-	x.startPiLaunchUpdate(func(context.Context, native.PiLaunchUpdateOptions) { t.Fatal("closed host started checker") })
+	x.startPiLaunchUpdate(func(context.Context, native.PiLaunchUpdateOptions) <-chan struct{} {
+		t.Fatal("closed host started checker")
+		return nil
+	})
 }

@@ -3,6 +3,7 @@ package orbitui
 import (
 	"fmt"
 	"math"
+	"path/filepath"
 	"testing"
 
 	"github.com/egoist/mygo/ui"
@@ -129,6 +130,8 @@ func TestMinimumWindowModalsKeepActionsReachable(t *testing.T) {
 
 func TestModalTransitionRestoresComposerFocus(t *testing.T) {
 	a := fixture(t)
+	// Rename requires an explicit displayed target; this test exercises focus, not pathless admission.
+	a.Model.SessionPath = filepath.Join(t.TempDir(), "focus-session.jsonl")
 	tt := ui.NewTester(a.View, 1200, 800)
 	if e := tt.Click("Message"); e != nil {
 		t.Fatal(e)

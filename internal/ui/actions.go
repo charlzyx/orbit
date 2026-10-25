@@ -282,7 +282,7 @@ func (a *App) command(id, value string) {
 			a.Dispatch(Action{Kind: id, Value: a.Model.SessionPath, SessionID: a.Model.SessionID})
 		}
 	case "RenameSession":
-		a.Prompt("Rename task", a.Model.SessionName, func(v string) { a.Dispatch(Action{Kind: id, Value: v}) })
+		a.promptPaletteRename()
 	case "DeleteSession":
 		a.confirmPaletteDelete()
 	case "CopySessionId":

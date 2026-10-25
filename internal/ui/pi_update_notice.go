@@ -6,10 +6,15 @@ import (
 )
 
 // notifyPiUpdateStatus maps only source-equivalent informational events. A Go
-// deferred event has several causes, so it cannot truthfully imply a busy run.
+// deferred event implies a busy run only with the explicit busy-timeout reason.
 func (a *App) notifyPiUpdateStatus(event native.PiUpdateEvent) {
 	var key string
 	switch event.State {
+	case "deferred":
+		if event.Deferral != native.PiUpdateDeferralBusyTimeout {
+			return
+		}
+		key = "pi_update.available_next_launch"
 	case "available":
 		key = "pi_update.available_background"
 	case string(native.PiUnsupportedManager):

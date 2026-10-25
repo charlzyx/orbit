@@ -131,6 +131,7 @@ func installPi(ctx context.Context, allowNPMMigration bool, client *http.Client)
 
 type PiUpdateEvent struct {
 	State, Latest, Before, Detail string
+	Deferral                      PiUpdateDeferralReason
 	Installation                  PiInstallation
 	Dependencies                  []Dependency
 }
@@ -151,11 +152,13 @@ type PiLaunchUpdateOptions struct {
 // defer initial traffic 3s, skip offline/custom PI_BIN, require an installed
 // managed runtime, wait up to 120s for idle, and re-probe actual results.
 // NPM migration is offered only; it is never silently performed.
-func CheckPiUpdateOnLaunch(ctx context.Context, opts PiLaunchUpdateOptions) {
+func CheckPiUpdateOnLaunch(ctx context.Context, opts PiLaunchUpdateOptions) <-chan struct{} {
 	if os.Getenv("PI_BIN") != "" || os.Getenv("PI_OFFLINE") != "" {
-		return
+		done := make(chan struct{})
+		close(done)
+		return done
 	}
-	go func() {
+	return startPiUpdateWorker(func() {
 		if !waitRuntime(ctx, 3*time.Second) {
 			return
 		}
@@ -174,6 +177,11 @@ func CheckPiUpdateOnLaunch(ctx context.Context, opts PiLaunchUpdateOptions) {
 				opts.OnEvent(PiUpdateEvent{State: state, Latest: latest, Before: before, Detail: detail, Installation: installed})
 			}
 		}
+		emitDeferred := func(reason PiUpdateDeferralReason, detail string) {
+			if opts.OnEvent != nil {
+				opts.OnEvent(piUpdateDeferredEvent(reason, latest, before, detail, installed))
+			}
+		}
 		switch plan {
 		case PiUpToDate:
 			return
@@ -186,7 +194,7 @@ func CheckPiUpdateOnLaunch(ctx context.Context, opts PiLaunchUpdateOptions) {
 		}
 		emit("available", "")
 		if opts.Busy == nil {
-			emit("deferred", "Waiting for a verified idle session state.")
+			emitDeferred(PiUpdateDeferralNoIdleVerifier, "Waiting for a verified idle session state.")
 			return
 		}
 		deadline := time.NewTimer(120 * time.Second)
@@ -198,7 +206,7 @@ func CheckPiUpdateOnLaunch(ctx context.Context, opts PiLaunchUpdateOptions) {
 			case <-ctx.Done():
 				return
 			case <-deadline.C:
-				emit("deferred", "The agent is still busy; the update is deferred to the next launch.")
+				emitDeferred(PiUpdateDeferralBusyTimeout, "The agent is still busy; the update is deferred to the next launch.")
 				return
 			case <-tick.C:
 			}
@@ -231,7 +239,7 @@ func CheckPiUpdateOnLaunch(ctx context.Context, opts PiLaunchUpdateOptions) {
 		})
 		if !acquired {
 			if ctx.Err() == nil {
-				emit("deferred", "The runtime maintenance guard was not acquired; no update was started.")
+				emitDeferred(PiUpdateDeferralAdmissionRejected, "The runtime maintenance guard was not acquired; no update was started.")
 			}
 			return
 		}
@@ -239,7 +247,15 @@ func CheckPiUpdateOnLaunch(ctx context.Context, opts PiLaunchUpdateOptions) {
 		if opts.OnEvent != nil {
 			opts.OnEvent(event)
 		}
-	}()
+	})
+}
+
+// Completion means the worker and all its synchronous IO have returned, not
+// that an owner notification has been rendered or cancellation was requested.
+func startPiUpdateWorker(work func()) <-chan struct{} {
+	done := make(chan struct{})
+	go func() { defer close(done); work() }()
+	return done
 }
 func waitRuntime(ctx context.Context, d time.Duration) bool {
 	timer := time.NewTimer(d)

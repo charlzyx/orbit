@@ -36,6 +36,9 @@ func TestSessionExportProcess(t *testing.T) {
 			data["held"] = held != nil
 		case pirpc.GetState:
 			data = map[string]any{"sessionId": id, "isStreaming": false, "thinkingLevel": "off"}
+			if path := os.Getenv("ORBIT_SESSION_FILE"); path != "" {
+				data["sessionFile"] = path
+			}
 		case pirpc.NewSession, pirpc.Fork, pirpc.Clone, pirpc.SwitchSession:
 			if os.Getenv("ORBIT_SESSION_CANCEL") == "1" {
 				data["cancelled"] = true

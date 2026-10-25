@@ -43,7 +43,7 @@ func (x *Controller) applyPiUpdateEvent(owner piUpdateOwner, event native.PiUpda
 		x.UI.Notify("Pi update failed: "+event.Detail, true)
 	case "migration_required":
 		x.UI.notifyPiMigrationRequired(event.Latest)
-	case "available", string(native.PiUnsupportedManager), string(native.PiUnknownVersion):
+	case "available", "deferred", string(native.PiUnsupportedManager), string(native.PiUnknownVersion):
 		x.UI.notifyPiUpdateStatus(event)
 	}
 }

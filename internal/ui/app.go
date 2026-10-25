@@ -99,11 +99,13 @@ type Snapshot struct {
 	QuotaSupport                                                                                            string
 }
 type Action struct {
+	sessionRenameTarget    *agent.SessionRenameTarget
 	newTaskAdmission       *newTaskAdmission
 	Kind, Value, SessionID string
 	Data                   map[string]any
 }
 type Options struct {
+	CaptureSessionRenameTarget func(runtimeID, sessionID, sessionPath string) (agent.SessionRenameTarget, error)
 	// UI-owned task identity and intent generation for delayed attachment work.
 	AttachmentContext func() (agent.WorkflowTarget, uint64, bool)
 	RefreshModels     func() error
@@ -188,6 +190,7 @@ type App struct {
 	SidebarWidth, ExplorerWidth, ReviewWidth                        float32
 	Draft, Search, paletteQuery, modelQuery                         string
 	attachments                                                     []attachment
+	pendingAttachmentImages                                         *attachmentImageBatch
 	inlineImages                                                    inlineImageState
 	messageImages                                                   map[string]ui.ImageSource
 	imageLoading                                                    map[string]bool
@@ -221,6 +224,7 @@ type App struct {
 	promptCommit                                                    func(string)
 	confirmOpen                                                     bool
 	paletteDelete                                                   *paletteDeleteIntent
+	paletteRename                                                   *paletteRenameIntent
 	confirmTitle, confirmMessage                                    string
 	confirmCommit                                                   func()
 	toastStack                                                      native.ToastStack
@@ -316,6 +320,7 @@ func (a *App) text(key, fallback string) string {
 }
 func (a *App) SetSnapshot(s Snapshot) {
 	a.invalidatePaletteDelete(s)
+	a.invalidatePaletteRename(s)
 	if s.RuntimeID != a.Model.RuntimeID || s.SessionID != a.Model.SessionID || s.SessionPath != a.Model.SessionPath || s.Workspace != a.Model.Workspace {
 		a.resetMarkdownImageOwner()
 	}
@@ -359,6 +364,7 @@ func (a *App) SetSnapshot(s Snapshot) {
 	a.syncInlineImageOwner()
 	a.syncInlineImageContents(s.Messages)
 	a.pruneAttachmentPaths()
+	a.pruneAttachmentImages()
 	a.syncExtensionUI(s)
 	a.syncModelCatalog()
 	if a.reviewState.source == workspace.ReviewLastTurn {
@@ -448,6 +454,7 @@ func (a *App) View(c *ui.Context) {
 	a.workspaceActions.rendered = false
 	a.drainUpdates()
 	a.pruneAttachmentPaths()
+	a.pruneAttachmentImages()
 	if target := a.workspaceActions.target; a.workspaceActions.open && (target == nil || a.workspaceEntry(target.Path) != target) {
 		a.workspaceActions.open = false
 	}

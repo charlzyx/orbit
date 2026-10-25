@@ -52,6 +52,7 @@ const (
 	EventWorkspaceWatcher
 	EventWorkspaceSettings
 	EventRuntimeInstallShutdown
+	EventRuntimeAutoUpdateShutdown
 )
 
 var eventNames = [...]string{
@@ -60,7 +61,7 @@ var eventNames = [...]string{
 	"workspace_preferences", "workspace_session", "workspace_files",
 	"workspace_terminal", "workspace_git", "workspace_generators",
 	"workspace_worktrees", "workspace_mcp", "workspace_resources",
-	"workspace_watcher", "workspace_settings", "runtime_install_shutdown",
+	"workspace_watcher", "workspace_settings", "runtime_install_shutdown", "runtime_auto_update_shutdown",
 }
 
 // Result describes a stage without including its error or application data.

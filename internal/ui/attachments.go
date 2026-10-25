@@ -54,6 +54,7 @@ func (a *App) addImageFor(owner attachmentOwner, data []byte, mime, name string)
 		a.Notify("Maximum 8 attachments per message", true)
 		return
 	}
+	token := a.beginAttachmentImage(owner)
 	a.Async(func() func() {
 		im := attachments.Prepare(data, mime)
 		var preview ui.ImageSource
@@ -63,7 +64,11 @@ func (a *App) addImageFor(owner attachmentOwner, data []byte, mime, name string)
 			preview, _ = ui.DecodeBitmap(im.Bytes)
 		}
 		return func() {
-			if !a.ownsAttachment(owner) {
+			if token.done {
+				return
+			}
+			defer a.finishAttachmentImage(token)
+			if token.batch.cancelled || !a.ownsAttachment(owner) {
 				return
 			}
 			if len(a.attachments) >= 8 {
@@ -86,12 +91,17 @@ func (a *App) addPaths(paths []string, read func(string) ([]byte, string, error)
 			a.queueAttachmentPath(owner, p+" ")
 			continue
 		}
+		token := a.beginAttachmentImage(owner)
 		a.Async(func() func() {
 			raw, mime, err := read(p)
 			return func() {
+				if token.done {
+					return
+				}
+				defer a.finishAttachmentImage(token)
 				// Check the owner captured BEFORE reading, not the task active when the
 				// read finishes. Otherwise AddImage would silently adopt a newer task.
-				if !a.ownsAttachment(owner) {
+				if token.batch.cancelled || !a.ownsAttachment(owner) {
 					return
 				}
 				if err != nil {

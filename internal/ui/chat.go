@@ -386,8 +386,8 @@ func titleCase(s string) string {
 	return strings.ToUpper(s[:1]) + s[1:]
 }
 func (a *App) submit(text, mode string) bool {
-	// Never send a pre-insertion draft while a queued native edit waits for IME.
-	if len(a.pendingAttachmentPaths) != 0 {
+	// Never send before pending native text edits or image owner callbacks land.
+	if len(a.pendingAttachmentPaths) != 0 || a.hasPendingAttachmentImages() {
 		return false
 	}
 	text = strings.TrimSpace(text)
