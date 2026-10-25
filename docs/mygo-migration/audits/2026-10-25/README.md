@@ -18,7 +18,7 @@
 | MCP 应用状态 | 宿主请求重启，但没有调用完成确认，pending 状态不能可靠闭环 | 正在补充精确 runtime/session/revision 完成验证；未进入 .4 |
 | 终端退出后的恢复 | domain 有 Restart，终端宿主没有退出/错误提示和重启入口 | 已确认缺少 UI 接线，非用户操作错误 |
 | Review 长行/上下文 | 无横向滚动与固定标题，上下文只有双边展开按钮 | 长行尾部可能不可达；不能只按“diff 能显示”判通过 |
-| Chat 状态/上下文 | 缺重试/压缩状态条、重试详情、上下文详情弹层和快捷 Compact | 基础停止、Settings 压缩等路径存在，不等于原版呈现完整 |
+| Chat 状态/上下文 | 缺重试/压缩状态条、重试详情、上下文详情弹层和快捷 Compact | 基础停止存在；早期核对误把 Settings 当作手动压缩入口，后续源码复核未找到该入口，仍需补齐 |
 | 文件/侧栏操作 | 文件创建/重命名为弹窗而非行内；Explorer 和 workspace/session 菜单缺部分原版动作 | 不要把已有 domain helper 当作 UI 已接通 |
 | 手动清理 | 自动清理关闭时，手动入口也被错误限制 | 修复已在隔离批次通过局部回归，未进入 .4；不建议用真实会话做删除验收 |
 | 图片/导航/额度 | Markdown HTTPS/data 图片被拒绝；缺消息导航轨道/预览；额度弹层缺 MCP tab/隐藏供应商分组 | 已确认源码差异，详见分报告 |
@@ -67,3 +67,15 @@ Pi 正常读取 `~/.pi/agent` 或指定的 `PI_CODING_AGENT_DIR`；原生 Pi 可
 - [S/P/U 共 48 项：Shell / Settings / Usage / Lifecycle](settings-lifecycle.md)
 
 各报告中的测试名是定位线索，除明确注明已执行的独立证据外，不代表本轮运行通过。旧清单也已发现反向过时：问卷/内联审批/组件、Usage 过滤与数据表、Runtime RPC patches 开关等在 .4 已有实现，不再列作“完全未实现”。
+
+### 持续源码补齐（16:49 UTC，尚待整合门禁）
+
+第一波正在整合 [MCP parked 配置失效检测](../../mcp-parked-fingerprint.md)、[工作区异步对话框](workspace-dialog-async.md)、[重试/压缩状态条](chat-status-strip.md)、[Explorer 菜单动作](explorer-menu-actions.md) 和 [Review 长行导航](review-long-lines.md)。各独立补丁的 focused 回归不等于整合通过；Review sticky 标题导航回归已修正，最终同树 aggregate 正在运行，尚未发布或完成 native 验证。详见[持续迁移第一波证据](continued-wave1.md)。
+
+工作区改动来自 Rust 避免嵌套事件循环的明确源码设计，不是已复现用户无响应的根因证明。原生确认仍未验收。C14 的取消呈现和错误本地化仍有剩余差异；上下文详情/快捷 Compact、后台无窗口维护、附件/导出异步和行内文件操作另在独立批次进行。`.4` 不受这些源码工作影响。
+
+- [持续迁移第二波：独立整合与仍有差异](continued-wave2.md)。源码和专项验证继续推进，未新增 release。
+
+### 17:25 UTC：已审第一、第二波最终源码门禁
+
+MCP闲置重开校验、工作区异步等待、Review长行/上下文/固定标题、重试/压缩/Context UI、Explorer行内与菜单、后台无窗口维护、附件/Usage/背景对话框已在同树通过全 vet、aggregate race 与arm64跨编译。[完整范围及源hash](continued-wave12-evidence.json)。这是开发分支源码，不是新安装包；同提交CI/native对照待完成。Session HTML安全序列化、会话文件身份保护、embedded Git diff、quota/MCP pane及进一步消息导航仍在独立后续批次，不计入这里的通过范围。

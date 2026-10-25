@@ -156,6 +156,7 @@ func (a *App) composerView(c *ui.Context) {
 	style := composerui.Style{FontSize: t.FontSize, Density: t.Density, Font: t.Font, Dark: t.Dark, Surface: t.Elevated, Border: t.Text.Alpha(borderAlpha), Selection: t.Selection, Hover: t.Hover, Text: t.Text, Secondary: t.TextSecondary, Muted: t.TextMuted, Badge: t.Text.Alpha(badgeAlpha), CommandColor: t.AccentText, FileColor: composerui.MentionFileColor(t.AccentText), TextFor: a.text, Icon: func(c *ui.Context, path string, size float32, color ui.Color) { a.icon(c, path, size, color) }}
 	ui.Column(c.Key("composer-wrap")).AlignSelf(ui.Stretch).AlignItems(ui.Center).Padding(0, 16, 16).LineHeight(sourceDefaultLineHeight).Children(func() {
 		ui.Column(c).WidthPercent(100).MaxWidth(ContentMaxWidth).Gap(0).Children(func() {
+			a.runStatusStrip(c)
 			a.inlineExtensionPanels(c)
 			a.queueBar(c)
 			a.extensionWidgets(c, "aboveEditor")
@@ -324,17 +325,7 @@ func (a *App) composerView(c *ui.Context) {
 				}
 				ui.Spacer(c)
 				a.extensionStatus(c)
-				if a.Model.Usage.ContextAvailable {
-					usage := a.Model.Usage
-					detail := fmt.Sprintf("Context: %d / %d tokens", usage.ContextTokens, usage.ContextWindow)
-					if usage.TokensAvailable {
-						detail += fmt.Sprintf("\nSession: %d input · %d output · %d cache read · %d cache write", usage.Input, usage.Output, usage.CacheRead, usage.CacheWrite)
-					}
-					if usage.CostAvailable {
-						detail += fmt.Sprintf("\nSession cost: $%.4f", usage.Cost)
-					}
-					ui.Text(c, contextPercentLabel(usage)).Tooltip(detail).TextColor(t.TextMuted).FontSize(t.Px(12))
-				}
+				a.contextControl(c)
 				if a.Model.Running {
 					primary, alternate := a.text("composer.queue", "Queue"), a.text("composer.steer", "Steer")
 					if a.Prefs.ComposerSendMode == "steer" {

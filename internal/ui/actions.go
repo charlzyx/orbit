@@ -48,6 +48,12 @@ func shortcutLabel(chord string) string {
 	return r.Replace(chord)
 }
 func (a *App) shortcuts(c *ui.Context) {
+	if a.files != nil && a.files.entry != nil && a.files.entry.input.FocusWithin(c) {
+		if c.Shortcut(0, ui.KeyEscape) {
+			a.cancelExplorerEntry()
+		}
+		return
+	}
 	if a.modalOpen() {
 		return
 	}

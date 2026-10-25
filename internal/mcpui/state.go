@@ -89,6 +89,7 @@ type State struct {
 	cancel                                                     context.CancelFunc
 	generation                                                 uint64
 	applyRevision                                              uint64
+	hostVisibilityKnown, hostVisible                           bool
 	closed, loaded, pendingProbe, externalChange, applyPending bool
 	activity, authTarget                                       string
 	fingerprint                                                string
@@ -223,6 +224,17 @@ func (s *State) start(activity string, job func(context.Context) (func(*State), 
 	}()
 }
 
+// SetHostVisible supplies retained navigation intent, independent of whether a
+// native frame was recently rendered. The application owner sets this before
+// Tick; standalone embedded views retain their recent-View fallback.
+func (s *State) SetHostVisible(visible bool) { s.hostVisibilityKnown, s.hostVisible = true, visible }
+func (s *State) pollVisible() bool {
+	if s.hostVisibilityKnown {
+		return s.hostVisible
+	}
+	return time.Since(s.lastViewed) < 2*time.Second
+}
+
 // Tick drains worker results on the main thread. It never reads files or runs Pi.
 func (s *State) Tick() bool {
 	changed := false
@@ -250,7 +262,7 @@ func (s *State) Tick() bool {
 					s.pendingProbe = false
 					s.Probe()
 					changed = true
-				} else if s.loaded && !s.nextPoll.IsZero() && time.Now().After(s.nextPoll) && time.Since(s.lastViewed) < 2*time.Second {
+				} else if s.loaded && !s.nextPoll.IsZero() && !time.Now().Before(s.nextPoll) && s.pollVisible() {
 					s.refresh(false, true)
 					changed = true
 				}

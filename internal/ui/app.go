@@ -50,12 +50,14 @@ type DialogRequest struct {
 	Options                                          []string
 }
 type Usage struct {
-	Input, Output, CacheRead, CacheWrite             int64
-	Cost                                             float64
-	ContextPercent                                   float64
-	Available                                        bool
-	TokensAvailable, CostAvailable, ContextAvailable bool
-	ContextTokens, ContextWindow                     int64
+	Input, Output, CacheRead, CacheWrite, Total                                              int64
+	Cost                                                                                     float64
+	ContextPercent                                                                           float64
+	Available                                                                                bool
+	TokensAvailable, CostAvailable, ContextAvailable                                         bool
+	ContextTokens, ContextWindow                                                             int64
+	ContextTokensAvailable, SessionAvailable                                                 bool
+	InputAvailable, OutputAvailable, CacheReadAvailable, CacheWriteAvailable, TotalAvailable bool
 }
 type Snapshot struct {
 	ExtensionStatusText                                                                                     string
@@ -67,7 +69,8 @@ type Snapshot struct {
 	ExtensionWidgets                                                                                        []agent.ExtensionWidget
 	ExtensionNotices                                                                                        []agent.ExtensionNotice
 	Auth                                                                                                    agent.AuthState
-	Retrying                                                                                                bool
+	Retrying, Compacting                                                                                    bool
+	RetryDetail                                                                                             agent.RetryDetail
 	ModelCatalog                                                                                            []agent.ModelChoice
 	CurrentModel                                                                                            agent.ModelChoice
 	LatestTurn                                                                                              int
@@ -98,6 +101,8 @@ type Action struct {
 	Data                   map[string]any
 }
 type Options struct {
+	// UI-owned task identity and intent generation for delayed attachment work.
+	AttachmentContext     func() (agent.WorkflowTarget, uint64, bool)
 	RefreshModels         func() error
 	QueryModelCatalog     func()
 	BeginRuntimeOperation func() (func(), error)
@@ -133,6 +138,9 @@ type Notice struct {
 	Until time.Time
 }
 type App struct {
+	retryCancellation                                               retryCancellation
+	contextOpen                                                     bool
+	contextDismissed                                                time.Time
 	extensionUI                                                     extensionUIState
 	rpcPatchSaving                                                  bool
 	Models                                                          *modelui.State
@@ -286,6 +294,10 @@ func (a *App) SetSnapshot(s Snapshot) {
 	oldID, oldLatest := a.Model.SessionID, a.Model.LatestTurn
 	a.transcriptUI.Session(s.SessionID)
 	a.projectTranscript(&s)
+	if s.SessionID != a.Model.SessionID || s.RuntimeID != a.Model.RuntimeID {
+		a.contextOpen = false
+		a.retryCancellation = retryCancellation{}
+	}
 	if s.SessionID != a.Model.SessionID {
 		a.messageImages = map[string]ui.ImageSource{}
 		a.imageLoading = map[string]bool{}
@@ -327,6 +339,9 @@ func (a *App) SetSnapshot(s Snapshot) {
 	}
 }
 func (a *App) Dispatch(action Action) {
+	if action.Kind == "AbortRetry" && (action.SessionID == "" || action.SessionID == a.Model.SessionID) {
+		a.cancelRetryPresentation()
+	}
 	if action.SessionID == "" {
 		action.SessionID = a.Model.SessionID
 	}
@@ -387,15 +402,7 @@ func (a *App) flushFilesOnLeave(next string) {
 	}
 }
 func (a *App) View(c *ui.Context) {
-	for {
-		select {
-		case apply := <-a.updates:
-			apply()
-		default:
-			goto drained
-		}
-	}
-drained:
+	a.drainUpdates()
 	systemDark := c.Theme().Dark
 	id := a.Appearance.DarkTheme
 	if a.Appearance.Mode == "light" || (a.Appearance.Mode == "system" && !systemDark) {

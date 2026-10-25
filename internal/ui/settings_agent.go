@@ -8,7 +8,7 @@ import (
 )
 
 func (a *App) agentSettings(c *ui.Context) {
-	if a.Model.Retrying {
+	if a.retryPresentationActive() {
 		a.sourceSettingsSection(c, a.Tr("settings.status"), "", func() {
 			a.sourceSettingsRow(c, a.Tr("settings.retrying"), a.Tr("settings.pi_is_waiting_out_a_transient_provider_error_bef"), "", func() {
 				if a.sourceSettingsButton(c, a.Tr("settings.abort_retry")).Disabled(!a.Model.Connected).Clicked() {

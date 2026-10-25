@@ -72,17 +72,13 @@ Existing saved-session catalog reload and runtime park/restart regressions are
 also exercised. Aggregate tests and native acceptance must be rerun on the final
 combined source, not inferred from this focused suite.
 
-## Known remaining gap: lazy parked configuration invalidation
+## Follow-on correction: lazy parked configuration invalidation
 
 Rust `crates/orbit-pi/src/app/session.rs:792–805` fingerprints the **target**
 workspace and reuses a parked client only if it is busy or its loaded MCP stamp
 matches. A stale idle client cold-starts on reopen; a busy one is never killed.
-Go `Manager.open` still reuses a matching alive/loading client without a loaded
-configuration stamp. This patch does not fix that separate lifecycle gap.
-
-A safe follow-on needs asynchronous target-workspace fingerprint validation,
-loaded-stamp tracking, and race-safe lazy idle replacement. Do not insert disk
-reads on the UI open path or eagerly restart parked/busy processes. Required
-cases include unchanged cross-workspace reuse, project-local versus global
-edits, stale idle reopen, busy stale preservation and a newer session switch
-while validation is in flight. No full MCP parity claim is warranted meanwhile.
+The initial acknowledgment patch did not implement this separate lifecycle gap.
+The later unreleased correction and its source-derived regression evidence are
+recorded in [mcp-parked-fingerprint.md](mcp-parked-fingerprint.md). It validates
+idle reopen asynchronously, preserves busy clients, and guards stale completion
+against newer session selections. This is not a full MCP parity claim.

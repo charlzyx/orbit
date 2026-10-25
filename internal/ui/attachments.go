@@ -12,6 +12,7 @@ import (
 	"github.com/charlzyx/orbit/internal/agent"
 	"github.com/charlzyx/orbit/internal/attachments"
 	"github.com/charlzyx/orbit/internal/workspace"
+	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
 )
 
@@ -21,12 +22,39 @@ type attachment struct {
 	Preview  ui.ImageSource
 }
 
+type attachmentOwner struct {
+	runtime, session, path, workspace string
+	generation                        uint64
+	window                            *mygo.Window
+	target                            agent.WorkflowTarget
+	managed, live                     bool
+}
+
+func (a *App) attachmentOwner() attachmentOwner {
+	owner := attachmentOwner{runtime: a.Model.RuntimeID, session: a.Model.SessionID, path: a.Model.SessionPath, workspace: a.Model.Workspace, window: a.Window, live: true}
+	if a.Options.AttachmentContext != nil {
+		owner.target, owner.generation, owner.live = a.Options.AttachmentContext()
+		owner.managed = true
+		// The opaque runtime key/task generation survives normal session ID/path
+		// hydration but changes for another draft, even while its ID is empty.
+		owner.runtime, owner.session, owner.path = "", "", ""
+	}
+	return owner
+}
+func (a *App) ownsAttachment(owner attachmentOwner) bool {
+	return owner.live && owner == a.attachmentOwner() && (owner.window == nil || !owner.window.IsDestroyed())
+}
 func (a *App) AddImage(data []byte, mime, name string) {
+	a.addImageFor(a.attachmentOwner(), data, mime, name)
+}
+func (a *App) addImageFor(owner attachmentOwner, data []byte, mime, name string) {
+	if !a.ownsAttachment(owner) {
+		return
+	}
 	if len(a.attachments) >= 8 {
 		a.Notify("Maximum 8 attachments per message", true)
 		return
 	}
-	session := a.Model.SessionID
 	a.Async(func() func() {
 		im := attachments.Prepare(data, mime)
 		var preview ui.ImageSource
@@ -36,12 +64,11 @@ func (a *App) AddImage(data []byte, mime, name string) {
 			preview, _ = ui.DecodeBitmap(im.Bytes)
 		}
 		return func() {
-			if len(a.attachments) >= 8 {
-				a.Notify("Maximum 8 attachments per message", true)
+			if !a.ownsAttachment(owner) {
 				return
 			}
-			if session != a.Model.SessionID {
-				a.Notify("The attachment finished after switching tasks; add it again in the intended task.", true)
+			if len(a.attachments) >= 8 {
+				a.Notify("Maximum 8 attachments per message", true)
 				return
 			}
 			a.nextAttachment++
@@ -49,37 +76,56 @@ func (a *App) AddImage(data []byte, mime, name string) {
 		}
 	})
 }
-func (a *App) AddPaths(paths []string) {
+func (a *App) AddPaths(paths []string) { a.addPaths(paths, readAttachmentPath) }
+func (a *App) addPaths(paths []string, read func(string) ([]byte, string, error)) {
+	owner := a.attachmentOwner()
+	if !a.ownsAttachment(owner) {
+		return
+	}
 	for _, p := range paths {
-		p := p
 		if !workspace.IsImage(p) {
 			a.Draft += p + " "
 			continue
 		}
 		a.Async(func() func() {
-			st, e := os.Stat(p)
-			if e != nil {
-				return func() { a.save(e) }
+			raw, mime, err := read(p)
+			return func() {
+				// Check the owner captured BEFORE reading, not the task active when the
+				// read finishes. Otherwise AddImage would silently adopt a newer task.
+				if !a.ownsAttachment(owner) {
+					return
+				}
+				if err != nil {
+					a.save(err)
+					return
+				}
+				a.addImageFor(owner, raw, mime, filepath.Base(p))
 			}
-			if st.Size() > 64<<20 {
-				return func() { a.Notify("Image exceeds 64 MiB: "+filepath.Base(p), true) }
-			}
-			raw, e := os.ReadFile(p)
-			if e != nil {
-				return func() { a.save(e) }
-			}
-			mime := http.DetectContentType(raw)
-			switch strings.ToLower(filepath.Ext(p)) {
-			case ".svg":
-				mime = "image/svg+xml"
-			case ".webp":
-				mime = "image/webp"
-			case ".tiff", ".tif":
-				mime = "image/tiff"
-			}
-			return func() { a.AddImage(raw, mime, filepath.Base(p)) }
 		})
 	}
+}
+func readAttachmentPath(p string) ([]byte, string, error) {
+	st, err := os.Stat(p)
+	if err != nil {
+		return nil, "", err
+	}
+	if st.Size() > 64<<20 {
+		return nil, "", fmt.Errorf("Image exceeds 64 MiB: %s", filepath.Base(p))
+	}
+	raw, err := os.ReadFile(p)
+	if err != nil {
+		return nil, "", err
+	}
+	mime := http.DetectContentType(raw)
+	switch strings.ToLower(filepath.Ext(p)) {
+	case ".svg":
+		mime = "image/svg+xml"
+	case ".webp":
+		mime = "image/webp"
+	case ".tiff", ".tif":
+		mime = "image/tiff"
+	}
+	return raw, mime, nil
 }
 func (a *App) attachmentRow(c *ui.Context) {
 	if len(a.attachments) == 0 {

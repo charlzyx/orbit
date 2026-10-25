@@ -29,6 +29,10 @@ type filesState struct {
 	active, treeWorkspace string
 	resizeDirty           bool
 	generation            uint64
+	menuEpoch             uint64
+	entrySerial           uint64
+	entry                 *explorerEntry
+	treeHandle            ui.Handle
 	desired               string
 	openGeneration        uint64
 	mutating              bool
@@ -53,6 +57,8 @@ func (a *App) RefreshFiles() {
 	a.initFiles()
 	s := a.files
 	if s.treeWorkspace != a.Model.Workspace {
+		s.entry = nil
+		s.menuEpoch++ // A -> B -> A must not revive an old native menu choice.
 		s.treeWorkspace = a.Model.Workspace
 		s.tree = workspace.TreeSnapshot{Root: a.Model.Workspace}
 		s.expanded = map[string]bool{}
@@ -246,10 +252,10 @@ func (a *App) fileTree(c *ui.Context) {
 		}
 		ui.Text(c, title).Grow(1).MinWidth(0).MaxLines(1).FontSize(t.Px(12)).FontWeight(500)
 		if a.explorerIcon(c, "New file", "icons/file-plus.svg", false).Clicked() {
-			a.createFile(a.explorerCreateParent(), false)
+			a.beginExplorerEntry(a.explorerCreateParent(), "", false)
 		}
 		if a.explorerIcon(c, "New folder", "icons/folder-plus.svg", false).Clicked() {
-			a.createFile(a.explorerCreateParent(), true)
+			a.beginExplorerEntry(a.explorerCreateParent(), "", true)
 		}
 		if a.explorerIcon(c, "Refresh files", "icons/refresh.svg", s.loading).Clicked() {
 			a.RefreshFiles()
@@ -279,6 +285,7 @@ func (a *App) fileTree(c *ui.Context) {
 			s.query = ""
 		}
 	})
+	a.explorerEntryTop(c)
 	if s.err != "" {
 		ui.Text(c, s.err).Padding(10).TextColor(t.Error)
 	}
@@ -296,6 +303,18 @@ func (a *App) fileTree(c *ui.Context) {
 		}
 	}
 	rows := workspace.TreeRows(s.tree, s.expanded, s.query, s.badges)
+	if e := s.entry; e != nil && e.target != "" {
+		found := false
+		for _, r := range rows {
+			if r.Path == e.relative {
+				found = true
+				break
+			}
+		}
+		if !found && !s.loading {
+			a.cancelExplorerEntry()
+		}
+	}
 	if s.selected >= len(rows) {
 		s.selected = -1
 	}
@@ -307,13 +326,13 @@ func (a *App) fileTree(c *ui.Context) {
 			}
 		}
 	}
-	tree := ui.Column(c.Key("explorer-tree")).Label("Explorer files").Focusable().Grow(1).MinHeight(0)
+	tree := ui.Column(c.Key("explorer-tree")).Bind(&s.treeHandle).Label("Explorer files").Focusable().Grow(1).MinHeight(0)
 	// Source cursor navigation does not select the active file. In particular,
 	// an unopened tree starts with no cursor, and Left never jumps to a parent.
-	if tree.Shortcut(0, ui.KeyEscape) {
+	if s.entry == nil && tree.Shortcut(0, ui.KeyEscape) {
 		s.query = ""
 	}
-	if len(rows) > 0 {
+	if len(rows) > 0 && s.entry == nil {
 		for _, k := range []struct {
 			key ui.Key
 			row int
@@ -354,10 +373,21 @@ func (a *App) fileTree(c *ui.Context) {
 		// activation semantics. Keep virtualization, but paint/route the source
 		// cursor and active file separately on our sole tree.
 		s.list.Selected = nil
-		ui.List(c.Key("file-tree"), &s.list, len(rows), func(i int) {
+		ui.List(c.Key(fmt.Sprintf("file-tree:%d:%s", s.menuEpoch, s.tree.Root)), &s.list, len(rows), func(i int) {
 			r := rows[i]
 			path := filepath.Join(s.tree.Root, filepath.FromSlash(r.Path))
 			ui.Row(c).FillWidth().PaddingX(t.Space(4)).Children(func() {
+				if e := s.entry; e != nil && e.relative == r.Path && e.target != "" {
+					ui.Row(c).Label("Explorer rename row " + r.Path).Height(28).Grow(1).MinWidth(0).PaddingX(8).Gap(6).AlignItems(ui.Center).Background(t.Surface).Children(func() {
+						if r.Directory {
+							a.icon(c, "icons/folder.svg", t.Px(14), t.TextMuted)
+						} else {
+							a.explorerFileBadge(c, r.Path)
+						}
+						a.explorerEntryInput(c, e)
+					})
+					return
+				}
 				indent := float32(23 + r.Depth*14)
 				if r.Directory {
 					indent = float32(7 + r.Depth*14)
@@ -396,46 +426,23 @@ func (a *App) fileTree(c *ui.Context) {
 					}
 				})
 				if b.Clicked() {
+					if s.entry != nil {
+						a.cancelExplorerEntry()
+						return
+					}
 					s.selected = i
 					tree.Focus()
 					a.activateExplorerRow(r)
 					c.AnimationFrame()
 				}
 				if b.RightClicked() {
+					if s.entry != nil {
+						a.cancelExplorerEntry()
+					}
 					s.selected = i
 					tree.Focus()
 				}
-				b.ContextMenu(func(m *ui.Menu) {
-					if r.Directory {
-						if m.Item("New file…").Chosen() {
-							a.createFile(path, false)
-						}
-						if m.Item("New folder…").Chosen() {
-							a.createFile(path, true)
-						}
-					} else {
-						if m.Item("Open").Chosen() {
-							a.OpenFile(path)
-						}
-					}
-					if m.Item("Reveal in file manager").Chosen() {
-						a.Dispatch(Action{Kind: "RevealPath", Value: path})
-					}
-					if m.Item("Copy path").Chosen() {
-						c.Services().WriteClipboard(path)
-					}
-					if m.Item("Copy relative path").Chosen() {
-						if relative, e := filepath.Rel(a.Model.Workspace, path); e == nil {
-							c.Services().WriteClipboard(filepath.ToSlash(relative))
-						}
-					}
-					if m.Item("Rename…").Chosen() {
-						a.renameFile(path)
-					}
-					if m.Item("Delete…").Chosen() {
-						a.deleteFile(path)
-					}
-				})
+				b.ContextMenu(func(m *ui.Menu) { a.explorerRowMenu(c, m, r, path) })
 			})
 		}).Grow(1).MinHeight(0).PaddingY(t.Space(4))
 	})

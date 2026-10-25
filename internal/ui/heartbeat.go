@@ -36,30 +36,41 @@ func runHeartbeat(stop <-chan struct{}, tick func() bool) {
 	}
 }
 
-func (x *Controller) startHeartbeat() {
+func (x *Controller) startHeartbeat() { x.startHeartbeatOnOwner(mygo.RunOnMain) }
+
+// owner is synchronous: production uses MyGo's actual UI-thread dispatcher.
+func (x *Controller) startHeartbeatOnOwner(owner func(func())) {
 	x.heartbeatDone = make(chan struct{})
 	go func() {
 		defer close(x.heartbeatDone)
-		runHeartbeat(x.stop, x.tickWindowless)
+		runHeartbeat(x.stop, func() bool { return x.tickWindowlessOnOwner(owner) })
 	}()
 }
 
-func (x *Controller) tickWindowless() bool {
-	if !x.parkWindowlessTerminal() {
+// The runtime drain stays on the timer worker: native notification delivery
+// may wait for the UI loop or invoke the unpackaged macOS notification helper.
+// Only thread-safe Manager state is touched there. All host/UI maintenance is
+// dispatched on the owner, with ownership rechecked after any slow runtime work.
+func (x *Controller) tickWindowlessOnOwner(owner func(func())) bool {
+	allowed := false
+	owner(func() { allowed = x.parkWindowlessTerminal() })
+	if !allowed {
 		return false
 	}
-	// Manager serializes its own state. Do not hold the view handoff lock
-	// across Tick: native notification callbacks can wait on the UI thread.
-	return x.Agent.Tick()
+	active := x.Agent.Tick()
+	owner(func() {
+		if x.parkWindowlessTerminal() {
+			x.maintainHost(time.Now())
+		}
+	})
+	return active
 }
 
 func (x *Controller) parkWindowlessTerminal() bool {
 	x.heartbeatMu.Lock()
 	defer x.heartbeatMu.Unlock()
-	select {
-	case <-x.stop:
+	if x.hostStopped() {
 		return false
-	default:
 	}
 	if x.openingWindow {
 		return false

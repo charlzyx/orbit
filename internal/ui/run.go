@@ -45,6 +45,8 @@ type RunOptions struct {
 	Offline, NoExtensions bool
 }
 type Controller struct {
+	workspaceBrowse   workspaceBrowseState
+	fileDialogs       nativeFileDialogState
 	diagnostics       *diagnosticlog.Logger
 	authBrowsers      authBrowserEffects
 	catalogRefreshing bool
@@ -64,6 +66,9 @@ type Controller struct {
 	heartbeatMu       sync.Mutex
 	openingWindow     bool
 	heartbeatDone     chan struct{}
+	hostMailboxMu     sync.Mutex
+	hostMailbox       []func()
+	hostMailboxClosed bool
 	close             sync.Once
 	stop              chan struct{}
 	workspace         string
@@ -170,6 +175,14 @@ func NewController(o RunOptions) (*Controller, error) {
 			return nil
 		}))
 	}, OnChange: invalidate, OpenWorkspace: x.SetWorkspace, OpenTerminal: func(path string) { x.Terminal.SetWorkspace(path); x.UI.save(x.Terminal.NewTab()) }, RevealPath: native.RevealPath, ConfigPath: filepath.Join(s.RootDir, "worktrees.json")})
+	x.UI.Options.AttachmentContext = func() (agent.WorkflowTarget, uint64, bool) {
+		select {
+		case <-x.stop:
+			return agent.WorkflowTarget{}, 0, false
+		default:
+		}
+		return x.Agent.CaptureWorkflowTarget(), x.workspaceBrowse.epoch, true
+	}
 	x.UI.Options.Escape = x.Git.CloseTransient
 	x.UI.Options.WorkIn = func(c *ui.Context) {
 		worktreeui.WorkInPicker(c, x.Worktrees, func() { x.UI.Navigate("worktrees") }).Height(22)
@@ -260,17 +273,8 @@ func NewController(o RunOptions) (*Controller, error) {
 	o.Diagnostics.Record(diagnosticlog.EventControllerInit, diagnosticlog.ResultOK, 0)
 	return x, nil
 }
-func (x *Controller) enqueue(f func()) {
-	select {
-	case x.UI.updates <- f:
-	case <-x.stop:
-		return
-	}
-	if w := x.window.Load(); w != nil && !w.IsDestroyed() {
-		w.Invalidate()
-	}
-}
-func (x *Controller) sync() {
+func (x *Controller) sync() { x.syncAt(time.Now()) }
+func (x *Controller) syncAt(now time.Time) {
 	s := x.Agent.Snapshot()
 	x.UI.Runtime = x.Agent.RuntimeSnapshot()
 	x.UI.SetSnapshot(adaptSnapshot(s, x.workspace, x.pinned, x.archived))
@@ -313,17 +317,20 @@ func (x *Controller) sync() {
 		default:
 		}
 	}
+	x.MCP.SetHostVisible(x.UI.page == "settings" && x.UI.settingsPage == "mcp")
 	x.MCP.Tick()
 	x.Resources.Tick()
-	x.tickConfigApply(time.Now())
+	x.tickConfigApply(now)
 	x.BugReport.Tick()
 	x.Git.Tick()
 	x.UI.Model.Branch = x.Git.Data.Branch
 	x.Worktrees.Tick()
 }
 func (x *Controller) View(c *ui.Context) {
-	active := x.Agent.Tick()
-	x.sync()
+	active := x.tickHost(time.Now())
+	if x.hostStopped() {
+		return
+	}
 	x.UI.View(c)
 	c.After(heartbeatDelay(active))
 }
@@ -367,6 +374,7 @@ func (x *Controller) SetWorkspace(path string) {
 	x.diagnostics.Record(diagnosticlog.EventWorkspaceSelect, result, time.Since(started))
 }
 func (x *Controller) changeWorkspaceServices(path string) {
+	x.workspaceBrowse.epoch++
 	x.workspace = path
 	x.UI.Model.Workspace = path
 	x.Terminal.SetWorkspace(path)
@@ -387,6 +395,10 @@ func (x *Controller) changeWorkspaceServices(path string) {
 }
 func (x *Controller) Close() {
 	x.close.Do(func() {
+		x.hostMailboxMu.Lock()
+		x.hostMailboxClosed = true
+		x.hostMailbox = nil
+		x.hostMailboxMu.Unlock()
 		close(x.stop)
 		x.cancelBackground()
 		if x.watcher != nil {
@@ -412,6 +424,7 @@ func (x *Controller) Close() {
 func adaptSnapshot(s agent.Snapshot, workspacePath string, pinned, archived map[string]bool) Snapshot {
 	v := Snapshot{ModelCatalog: s.Models, CurrentModel: s.Model, LatestTurn: s.LatestTurn, CommandsRaw: s.Commands, RawMessages: s.Messages, Turn: s.Turn, Connected: s.Connected, Running: s.Running, Error: s.ConnectionError, Status: s.Status, SessionID: s.ActiveSession.ID, SessionPath: s.ActiveSession.Path, SessionName: s.ActiveSession.Name, Workspace: workspacePath, ModelID: s.Model.ID, ModelProvider: s.Model.Provider, Thinking: s.ThinkingLevel, ThinkingLevels: s.ThinkingLevels, AuthProviders: s.Auth.Providers, AuthURL: s.Auth.URL, AuthStatus: s.Auth.Status, AuthCode: s.Auth.UserCode}
 	v.Auth, v.Retrying = s.Auth, s.Retrying
+	v.Compacting, v.RetryDetail = s.Compacting, s.RetryDetail
 	v.Approval, v.Ask = s.Approval, s.Ask
 	v.ComposerText, v.ComposerRevision, v.RuntimeID = s.ComposerText, s.ComposerRevision, s.RuntimeID
 	v.ExtensionWidgets, v.ExtensionNotices = s.ExtensionWidgets, s.ExtensionNotices
@@ -482,26 +495,14 @@ func (x *Controller) Action(a Action) {
 	flag := func(k string) bool { v, _ := a.Data[k].(bool); return v }
 	switch a.Kind {
 	case "NewSession":
+		x.workspaceBrowse.epoch++
 		e = m.NewSession(x.workspace)
 	case "SwitchSession":
 		x.OpenSession(a.Value)
 	case "SetWorkspace":
 		x.SetWorkspace(a.Value)
 	case "BrowseWorkspace":
-		started := time.Now()
-		x.diagnostics.Record(diagnosticlog.EventWorkspaceBrowse, diagnosticlog.ResultStarted, 0)
-		p, err := native.BrowseWorkspace(u.Window, x.workspace)
-		result := diagnosticlog.ResultOK
-		if err != nil {
-			result = diagnosticlog.ResultError
-		} else if p == "" {
-			result = diagnosticlog.ResultCancelled
-		}
-		x.diagnostics.Record(diagnosticlog.EventWorkspaceBrowse, result, time.Since(started))
-		e = err
-		if p != "" {
-			x.SetWorkspace(p)
-		}
+		x.browseWorkspace()
 	case "Submit":
 		images := make([]agent.Image, 0, len(u.attachments))
 		for _, im := range u.attachments {
@@ -617,6 +618,10 @@ func (x *Controller) Action(a Action) {
 		e = m.Stop()
 	case "WorktreePreferencesChanged":
 		x.reloadWorktreePreferences()
+	case "RefreshContextStats":
+		e = m.Send(pirpc.GetSessionStats, nil)
+	case "CompactContext":
+		e = m.Compact()
 	case "AbortRetry":
 		e = m.Send(pirpc.AbortRetry, nil)
 	case "SetAutoRetry":
@@ -677,6 +682,8 @@ func (x *Controller) Action(a Action) {
 		} else {
 			e = errors.New("Unsupported link scheme")
 		}
+	case "OpenDefaultPath":
+		u.openPathDefault(a.Value, native.OpenPath)
 	case "RevealPath":
 		native.RevealPath(a.Value)
 	case "OpenInApp":
@@ -710,46 +717,11 @@ func (x *Controller) Action(a Action) {
 			e = m.Send(pirpc.ExportHTML, map[string]any{"outputPath": p})
 		}
 	case "ExportUsage":
-		format := a.Value
-		if format != "json" {
-			format = "csv"
-		}
-		p, err := native.SaveFile(u.Window, "Export usage", "orbit-usage."+format, []mygo.FileFilter{{Name: strings.ToUpper(format), Extensions: []string{format}}})
-		e = err
-		if p != "" {
-			idx, ok := a.Data["index"].(workbench.UsageIndex)
-			filter, _ := a.Data["filter"].(workbench.UsageFilter)
-			if ok {
-				u.Async(func() func() {
-					f, e := os.Create(p)
-					if e == nil {
-						if format == "json" {
-							options, _ := a.Data["options"].(workbench.UsageExportOptions)
-							e = idx.ExportJSON(f, filter, options)
-						} else {
-							e = idx.ExportCSV(f, filter)
-						}
-						if ce := f.Close(); e == nil {
-							e = ce
-						}
-					}
-					return func() { u.save(e) }
-				})
-			}
-		}
+		x.exportUsageDialog(a)
 	case "BrowseBackground":
-		paths, err := mygo.Dialog.Open(mygo.OpenDialogOptions{Parent: u.Window, Title: u.text("settings.choose_background_title", "Choose a background image"), Filters: []mygo.FileFilter{{Name: "Images", Extensions: []string{"png", "jpg", "jpeg", "gif", "webp", "bmp", "tiff"}}}})
-		if err != nil {
-			u.Notify(err.Error(), true)
-		} else if len(paths) > 0 {
-			u.chooseBackground(paths[0])
-		}
+		x.browseBackgroundDialog()
 	case "BrowseAttachments":
-		paths, err := native.BrowseAttachments(u.Window, x.workspace)
-		e = err
-		if e == nil {
-			u.AddPaths(paths)
-		}
+		x.browseAttachmentsDialog()
 	case "PasteImage":
 		raw := mygo.Clipboard.ReadImage()
 		if len(raw) == 0 {
@@ -897,9 +869,8 @@ func Run(o RunOptions) error {
 			}})
 		}
 	})
-	// A closed macOS window still drains active/parked Pi sessions. This is
-	// deliberately only the runtime drain, not source OrbitApp.tick's full
-	// MCP/background/layout work, which still needs a UI-thread lifecycle host.
+	// The retained host continues non-rendering maintenance while windowless,
+	// dispatched on MyGo's owner thread, never on the timer goroutine.
 	x.startHeartbeat()
 	o.Smoke.Start(x.background, func() appbundle.SmokeSnapshot {
 		snapshot := x.Agent.Snapshot()
@@ -944,6 +915,7 @@ func (x *Controller) bindGenerators(dir string) {
 }
 
 func (x *Controller) OpenSession(path string) {
+	x.workspaceBrowse.epoch++
 	if !x.sessionGate.TryRLock() {
 		x.UI.Notify("Runtime maintenance is in progress. Try opening the task again when it finishes.", false)
 		return

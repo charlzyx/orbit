@@ -20,6 +20,10 @@ import (
 )
 
 type liveSession struct {
+	mcpStamp      [32]byte
+	mcpStampKnown bool
+	mcpChecking   uint64
+
 	queueRestoreEpoch    uint64
 	queueRestorePending  bool
 	modelMu              sync.Mutex
@@ -51,12 +55,15 @@ type liveSession struct {
 }
 
 func (s *liveSession) busy() bool {
-	return s.stopping || s.loading || s.state.snapshot.CheckpointRecovering || s.state.awaiting || s.state.snapshot.Running || s.state.snapshot.Compacting || s.state.snapshot.Retrying
+	return s.stopping || s.loading || s.state.snapshot.CheckpointRecovering || s.state.awaiting || s.state.snapshot.Running || s.state.snapshot.Compacting || s.state.manualCompactPending || s.state.snapshot.Retrying
 }
 
 // Manager keeps active and background Pi processes alive independently of any
 // window. Tick is nonblocking; Open/Send/ReloadSessions perform I/O in workers.
 type Manager struct {
+	mcpSelection   uint64
+	mcpFingerprint func(string, string) [32]byte
+
 	patchPolicyEnabled bool
 	patchPolicyVersion uint64
 	patchPolicyMu      sync.Mutex
@@ -153,6 +160,8 @@ func (m *Manager) open(workspace, sessionPath, pendingWorkflow string) error {
 		m.mu.Unlock()
 		return pirpc.ErrClosed
 	}
+	m.mcpSelection++
+	selection := m.mcpSelection
 	if sessionPath != "" {
 		for key, session := range m.sessions {
 			if !session.stopped && session.state.snapshot.ActiveSession.Path == sessionPath && (session.loading || session.client != nil && session.client.Alive()) {
@@ -162,9 +171,26 @@ func (m *Manager) open(workspace, sessionPath, pendingWorkflow string) error {
 						old.state.cancelExtensionUI()
 					}
 				}
+				wasActive := m.active == key
 				m.active = key
+				// A validation in progress is not a busy Pi turn. A second
+				// navigation to this target owns a fresh completion token.
+				wasChecking := session.mcpChecking != 0
+				if wasChecking {
+					// Release only our validation-owned loading gate. A running
+					// event may have arrived while the previous read was pending.
+					session.loading, session.mcpChecking = false, 0
+				}
+				check := (wasChecking || !wasActive || !session.state.snapshot.Connected) && !session.busy()
+				if check {
+					session.mcpChecking = selection
+					session.loading = true
+				}
 				m.mu.Unlock()
 				m.changed()
+				if check {
+					m.launch(func() { m.validateParkedMCP(key, session, workspace, sessionPath, selection) })
+				}
 				return nil
 			}
 		}
@@ -173,16 +199,7 @@ func (m *Manager) open(workspace, sessionPath, pendingWorkflow string) error {
 		previous.parkedAt = time.Now()
 		previous.state.cancelExtensionUI()
 	}
-	m.sequence++
-	key := fmt.Sprintf("live-%d", m.sequence)
-	entry := &liveSession{state: newState(workspace, sessionPath), loading: true, launcher: m.PiBinary()}
-	if validWorkflow(pendingWorkflow) {
-		entry.workflowPending = pendingWorkflow
-		entry.state.snapshot.WorkflowMode = pendingWorkflow
-	}
-	entry.state.snapshot.Status = "Connecting"
-	m.sessions[key] = entry
-	m.active = key
+	key, entry := m.newEntryLocked(workspace, sessionPath, pendingWorkflow)
 	m.mu.Unlock()
 	m.changed()
 	m.launch(func() { m.start(key, entry, workspace, sessionPath) })
@@ -273,6 +290,7 @@ func (m *Manager) start(key string, entry *liveSession, workspace, path string) 
 	if cancelled {
 		return
 	}
+	stamp := m.readMCPStamp(workspace)
 	client, err := pirpc.Start(config)
 	if err != nil {
 		m.startFailed(key, err.Error())
@@ -285,6 +303,7 @@ func (m *Manager) start(key string, entry *liveSession, workspace, path string) 
 		client.Close()
 		return
 	}
+	entry.mcpStamp, entry.mcpStampKnown = stamp, true
 	entry.client = client
 	m.adoptPatchStatusLocked(&status, patchVersion)
 	entry.state.snapshot.Extensions = status
@@ -487,6 +506,13 @@ func (m *Manager) Send(kind string, params map[string]any) error {
 	}
 	command.Params = fields
 	m.mu.Lock()
+	// Marshaling runs outside the lock and may execute caller-owned code.
+	// Revalidate admission before marking a turn busy: an asynchronous MCP
+	// reopen, stop or selection change may have replaced the captured runtime.
+	if m.closed || m.active != key || m.sessions[key] != entry || entry.stopped || entry.loading || entry.client != client || !client.Alive() || !entry.state.snapshot.Connected {
+		m.mu.Unlock()
+		return errors.New("Pi session changed or is not ready; your draft is kept")
+	}
 	var before func()
 	commandContext := m.ctx
 	if kind == pirpc.Abort && entry.promptCancel != nil {
@@ -728,7 +754,7 @@ func (m *Manager) Tick() bool {
 		for _, event := range entry.client.DrainEvents() {
 			if event.Type == "response" && strings.HasPrefix(event.ID, abortRequestPrefix) {
 				origin, valid := parseAbortOrigin(event.ID, event.String("command"))
-				if !valid || !origin.matches(entry) {
+				if !valid || !origin.matches(entry) || event.String("command") == pirpc.Compact && origin.nonce != entry.state.compactionNonce {
 					continue
 				}
 			}
@@ -982,6 +1008,7 @@ func (m *Manager) Snapshot() Snapshot {
 		snapshot = entry.state.snapshot
 		snapshot.RuntimeID = m.active
 		snapshot.Awaiting = entry.state.awaiting
+		snapshot.Compacting = snapshot.Compacting || entry.state.manualCompactPending
 		snapshot.Running = snapshot.Running || entry.state.awaiting
 		snapshot.ActiveSession.Running = snapshot.Running
 		if entry.loading {

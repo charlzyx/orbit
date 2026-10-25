@@ -400,7 +400,7 @@ func TestSourceProviderAuthenticationCardLifecycle(t *testing.T) {
 	}
 }
 
-func TestSourceRetryStatusUsesObservedState(t *testing.T) {
+func TestSourceRetryCancelPresentationRetainsAuthoritativeBusyState(t *testing.T) {
 	a := fixture(t)
 	a.Navigate("settings")
 	a.settingsPage = "agent"
@@ -414,6 +414,11 @@ func TestSourceRetryStatusUsesObservedState(t *testing.T) {
 	}
 	if action.Kind != "AbortRetry" || !a.Model.Retrying {
 		t.Fatal("retry cancellation must use RPC, not optimistic snapshot mutation", action)
+	}
+	// Rust settings.rs5828 clears retry presentation immediately; retain the
+	// manager's authoritative busy fact instead of falsifying it locally.
+	if _, ok := tt.Find(a.Tr("settings.abort_retry")); ok {
+		t.Fatal("optimistic source cancellation did not hide settings action")
 	}
 	a.Model.Retrying = false
 	tt.Frame()

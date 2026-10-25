@@ -9,7 +9,7 @@ import (
 	"github.com/charlzyx/orbit/internal/pirpc"
 )
 
-// The origin travels in these two responseful request IDs, rather than an
+// The origin travels in these responseful abort/clear/compact request IDs, rather than an
 // ever-growing tombstone map. Late replies remain attributable after timeout.
 const abortRequestPrefix = "orbit-abort-v1:"
 
@@ -29,7 +29,7 @@ func parseAbortOrigin(id, command string) (abortOrigin, bool) {
 		return abortOrigin{}, false
 	}
 	parts := strings.Split(strings.TrimPrefix(id, abortRequestPrefix), ":")
-	if len(parts) != 4 || parts[3] != command || (command != pirpc.ClearQueue && command != pirpc.Abort) {
+	if len(parts) != 4 || parts[3] != command || (command != pirpc.ClearQueue && command != pirpc.Abort && command != pirpc.Compact) {
 		return abortOrigin{}, false
 	}
 	reset, err := strconv.ParseUint(parts[0], 10, 64)

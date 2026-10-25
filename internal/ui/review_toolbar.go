@@ -265,4 +265,9 @@ func (s *reviewState) clearReviewSnapshot() {
 	s.selected = 0
 	s.collapsed = map[int]bool{}
 	s.list = ui.ListState{}
+	s.horizontal = ui.ScrollState{}
+	s.vertical = ui.ScrollState{}
+	s.headerHandles = nil
+	s.stickyPanY = 0
+	s.widthCache = reviewWidthCache{}
 }

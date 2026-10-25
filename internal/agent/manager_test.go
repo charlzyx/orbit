@@ -26,6 +26,8 @@ func TestAgentProcess(t *testing.T) {
 	running := false
 	compacted := false
 	retryRequests := 0
+	var heldCompact map[string]any
+	compactCount := 0
 	var heldAbortClear map[string]any
 	var heldAbortResponse map[string]any
 	queuePending, clearHeld := false, false
@@ -121,7 +123,28 @@ func TestAgentProcess(t *testing.T) {
 			if compacted {
 				response["data"] = map[string]any{"tokens": map[string]any{"total": 37}, "cost": 0, "contextUsage": map[string]any{"tokens": nil, "percent": nil, "contextWindow": 200000}}
 			}
+		case "emit_stale_compact_state":
+			write(map[string]any{"type": "response", "command": "get_state", "success": true, "data": map[string]any{"sessionId": sessionID, "isStreaming": false, "isCompacting": false}})
+		case "compact_count":
+			response["data"] = map[string]any{"count": compactCount}
+		case "finish_compact":
+			write(map[string]any{"type": "compaction_end", "aborted": true})
+		case "release_compact":
+			if heldCompact != nil {
+				write(heldCompact)
+				heldCompact = nil
+			}
 		case "compact":
+			compactCount++
+			if os.Getenv("ORBIT_COMPACT_HOLD") == "1" {
+				if os.Getenv("ORBIT_COMPACT_REJECT") == "1" {
+					response["success"] = false
+					response["error"] = "fixture compact rejected"
+				}
+				heldCompact = response
+				write(map[string]any{"type": "compaction_start", "reason": "manual"})
+				continue
+			}
 			compacted = true
 			write(map[string]any{"type": "compaction_start", "reason": "manual"})
 			write(map[string]any{"type": "compaction_end", "reason": "manual", "result": map[string]any{"summary": "Fixture"}, "aborted": false})

@@ -57,7 +57,7 @@ func TestRuntimeSnapshotLifecycleParkSwitchReuseAndRestart(t *testing.T) {
 	if err := m.Open(one, path); err != nil {
 		t.Fatal(err)
 	}
-	resumed := m.RuntimeSnapshot().Active
+	resumed := waitRuntime(t, m, func(s RuntimeSnapshot) bool { return s.Active.State == "idle" }).Active
 	if resumed.PID != first.PID || !resumed.StartedAt.Equal(first.StartedAt) || !resumed.AutoRetry.Known {
 		t.Fatal(resumed)
 	}

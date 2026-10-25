@@ -17,6 +17,12 @@ type reviewState struct {
 	source                                workspace.ReviewSource
 	data                                  workspace.ReviewSnapshot
 	list                                  ui.ListState
+	horizontal                            ui.ScrollState
+	widthCache                            reviewWidthCache
+	vertical                              ui.ScrollState
+	diffViewport                          ui.Handle
+	headerHandles                         map[int]*ui.Handle
+	stickyPanY                            float32
 	loading, split, wrap, tree            bool
 	err, root, ref, path                  string
 	pendingPath, pendingRoot              string
@@ -293,52 +299,24 @@ func (s *reviewState) renderedIndex(index int) (int, bool) {
 	return 0, false
 }
 func (a *App) reviewLine(c *ui.Context, l workspace.ReviewLine, index int) {
+	if l.Kind == "file_header" || l.Kind == "section_header" {
+		a.reviewPinnedRow(c, func() { a.reviewLineContent(c, l, index) })
+		return
+	}
+	a.reviewLineContent(c, l, index)
+}
+func (a *App) reviewLineContent(c *ui.Context, l workspace.ReviewLine, index int) {
 	t := a.Theme
 	s := &a.reviewState
 	switch l.Kind {
 	case "file_header":
-		path := l.Content
-		if l.File >= 0 && l.File < len(s.data.Files) {
-			path = s.data.Files[l.File].Path
-		}
-		ui.Row(c).Height(34).Background(t.Surface).PaddingX(10).AlignItems(ui.Center).Children(func() {
-			icon := "icons/chevron-down.svg"
-			if s.collapsed[l.File] {
-				icon = "icons/chevron-right.svg"
-			}
-			if a.iconButton(c, "Toggle file diff", icon).Clicked() {
-				if s.collapsed == nil {
-					s.collapsed = map[int]bool{}
-				}
-				s.collapsed[l.File] = !s.collapsed[l.File]
-				s.selected = l.File
-			}
-			ui.Text(c, path).MaxLines(1).FontWeight(500).Grow(1)
-			if a.iconButton(c, "Open file", "icons/external-link.svg").Clicked() {
-				a.OpenFile(filepath.Join(a.Model.Workspace, path))
-			}
-		})
+		a.reviewFileHeader(c, l, false)
 		return
 	case "section_header":
 		ui.Text(c, l.Content).Padding(8, 10).Background(t.Elevated).FontWeight(600)
 		return
 	case "gap":
-		if l.Gap == nil {
-			return
-		}
-		b := a.button(c, fmt.Sprintf("Show %d unchanged lines", l.Gap.Count), "", false).AlignSelf(ui.Stretch).Background(t.Surface)
-		b.Disabled(!l.Gap.Expandable())
-		if b.Clicked() {
-			if index < 0 {
-				for i, x := range s.data.Lines {
-					if x.Gap != nil && x.Gap.ID == l.Gap.ID && x.File == l.File {
-						index = i
-						break
-					}
-				}
-			}
-			s.data.ExpandGap(index, "both")
-		}
+		a.reviewGap(c, l, index)
 		return
 	}
 	color, bg, prefix := t.TextSecondary, t.Background, " "
@@ -367,7 +345,7 @@ func (a *App) reviewLine(c *ui.Context, l workspace.ReviewLine, index int) {
 		spans := a.reviewSpans(l)
 		text := ui.RichText(c, spans...).Font(a.Fonts.CodeFamily).FontSize(t.CodeSize).TextColor(color).Grow(1).MinWidth(0)
 		if !s.wrap {
-			text.MaxLines(1)
+			text.NoWrap()
 		}
 	})
 }
@@ -389,10 +367,15 @@ type reviewMarker struct{ row, file int }
 type reviewLineIdentity struct {
 	file, old, next int
 	kind, content   string
+	gap             uint64
 }
 
 func reviewLineKey(l workspace.ReviewLine) reviewLineIdentity {
-	return reviewLineIdentity{l.File, l.OldLine, l.NewLine, l.Kind, l.Content}
+	key := reviewLineIdentity{file: l.File, old: l.OldLine, next: l.NewLine, kind: l.Kind, content: l.Content}
+	if l.Gap != nil {
+		key.gap = l.Gap.ID
+	}
+	return key
 }
 
 func (a *App) toggleReviewSplit() {
@@ -584,12 +567,23 @@ func (a *App) OpenReviewDiff(source, ref, path string) {
 	a.RefreshReview()
 }
 
-func (a *App) reviewDiff(c *ui.Context) {
+func (a *App) reviewDiffRows(c *ui.Context, width float32) {
 	s := &a.reviewState
+	// The inner list is wider than the viewport when unwrapped. Keep its
+	// native vertical scrollbar at the visible right edge, for painting AND
+	// pointer hit-testing; otherwise it is only reachable after panning right.
+	rightInset := float32(0)
+	if !s.wrap {
+		viewport := s.horizontal.Bounds(c)
+		if viewport.W > 0 {
+			rightInset = max(0, max(width, viewport.W)-viewport.W-s.horizontal.X)
+		}
+	}
 	if s.split {
 		visible, indexes := s.visible()
 		_ = indexes
 		rows := workspace.SplitReview(visible)
+		s.list.Header = nil
 		s.list.Key = func(i int) any {
 			r := rows[i]
 			if r.Full != nil {
@@ -618,10 +612,11 @@ func (a *App) reviewDiff(c *ui.Context) {
 					})
 				})
 			}
-		}).Grow(1).MinHeight(0)
+		}).WidthPercent(100).MinWidth(width).FillHeight().Shrink(0).ScrollbarInsets(0, rightInset, 0, 0).TrackScroll(&s.vertical).Children(func() { a.reviewStickyHeader(c) })
 	} else {
 		visible, indexes := s.visible()
+		s.list.Header = nil
 		s.list.Key = func(i int) any { return reviewLineKey(visible[i]) }
-		ui.List(c.Key("review-lines"), &s.list, len(visible), func(i int) { a.reviewLine(c, visible[i], indexes[i]) }).Grow(1).MinHeight(0)
+		ui.List(c.Key("review-lines"), &s.list, len(visible), func(i int) { a.reviewLine(c, visible[i], indexes[i]) }).WidthPercent(100).MinWidth(width).FillHeight().Shrink(0).ScrollbarInsets(0, rightInset, 0, 0).TrackScroll(&s.vertical).Children(func() { a.reviewStickyHeader(c) })
 	}
 }

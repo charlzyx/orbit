@@ -11,18 +11,21 @@ import (
 )
 
 type sessionState struct {
-	uiResponses    []pirpc.UIResponse
-	askToolID      string
-	askQuestions   []AskQuestion
-	askReplay      *askReplay
-	noticeSequence uint64
-	requestStarted time.Time
-	streamClock    streamClock
-	snapshot       Snapshot
-	sequence       uint64
-	activeMessage  int
-	entriesCursor  string
-	awaiting       bool
+	retrySequence        uint64
+	compactionNonce      uint64
+	manualCompactPending bool
+	uiResponses          []pirpc.UIResponse
+	askToolID            string
+	askQuestions         []AskQuestion
+	askReplay            *askReplay
+	noticeSequence       uint64
+	requestStarted       time.Time
+	streamClock          streamClock
+	snapshot             Snapshot
+	sequence             uint64
+	activeMessage        int
+	entriesCursor        string
+	awaiting             bool
 }
 
 func newState(workspace, path string) sessionState {
@@ -52,6 +55,7 @@ func (s *sessionState) applyRecord(event pirpc.Event) {
 		s.snapshot.Running = false
 		s.awaiting = false
 		s.snapshot.Retrying = false
+		s.snapshot.RetryDetail = RetryDetail{}
 		s.snapshot.Queue = Queue{}
 		s.snapshot.Status = "Ready"
 		for i := range s.snapshot.Messages {
@@ -76,6 +80,7 @@ func (s *sessionState) applyRecord(event pirpc.Event) {
 		s.snapshot.Compacting = true
 	case "compaction_end":
 		s.snapshot.Compacting = false
+		s.manualCompactPending = false
 		if result := event.Fields["result"]; len(result) > 0 && string(result) != "null" && !event.Bool("aborted") {
 			// Pi invalidates its context baseline after successful compaction.
 			// Keep cumulative totals, but never flash the pre-compaction percent
@@ -88,8 +93,22 @@ func (s *sessionState) applyRecord(event pirpc.Event) {
 		}
 	case "auto_retry_start":
 		s.snapshot.Retrying = true
+		s.retrySequence++
+		s.snapshot.RetryDetail = retryDetail(event)
+		s.snapshot.RetryDetail.Revision = s.retrySequence
 	case "auto_retry_end":
 		s.snapshot.Retrying = false
+		s.snapshot.RetryDetail = RetryDetail{}
+		// Only an explicit false is exhaustion; cancellation/omitted success
+		// must not invent a terminal failure (pinned events.rs).
+		if string(event.Fields["success"]) == "false" {
+			message := "pi exhausted its automatic retries"
+			var reported string
+			if json.Unmarshal(event.Fields["finalError"], &reported) == nil && string(event.Fields["finalError"]) != "null" {
+				message = reported
+			}
+			s.snapshot.ConnectionError = "Automatic retry failed: " + message
+		}
 	case "session_info_changed":
 		s.snapshot.ActiveSession.Name = event.String("name")
 	case "extension_ui_request":
@@ -102,9 +121,11 @@ func (s *sessionState) applyRecord(event pirpc.Event) {
 	case "process_exited", "transport_error":
 		s.clearExtensionUI()
 		s.snapshot.Connected = false
+		s.manualCompactPending = false
 		s.snapshot.Running = false
 		s.snapshot.Compacting = false
 		s.snapshot.Retrying = false
+		s.snapshot.RetryDetail = RetryDetail{}
 		s.awaiting = false
 		s.snapshot.Status = "Disconnected"
 		if event.Type == "transport_error" || event.String("error") != pirpc.ErrClosed.Error() {
@@ -132,6 +153,10 @@ func (s *sessionState) applyResponse(event pirpc.Event) {
 	var response pirpc.Response
 	if event.Decode(&response) != nil {
 		return
+	}
+	if response.Command == pirpc.Compact {
+		s.manualCompactPending = false
+		s.snapshot.Compacting = false
 	}
 	if !response.Success {
 		if response.Command == pirpc.AuthList {

@@ -25,6 +25,7 @@ func runtimeUsage(s agent.Snapshot) Usage {
 	var out Usage
 	var tokens map[string]json.RawMessage
 	if json.Unmarshal(stats["tokens"], &tokens) == nil && tokens != nil {
+		out.SessionAvailable = true
 		var a, b, c, d bool
 		out.Input, a = usageInteger(tokens["input"])
 		out.Output, b = usageInteger(tokens["output"])
@@ -33,6 +34,21 @@ func runtimeUsage(s agent.Snapshot) Usage {
 		// The pinned SessionStats schema supplies every bucket. A partial or
 		// malformed object must not make omitted buckets look like real zeros.
 		out.TokensAvailable = a && b && c && d
+		out.InputAvailable, out.OutputAvailable, out.CacheReadAvailable, out.CacheWriteAvailable = a, b, c, d
+		var totalOK bool
+		out.Total, totalOK = usageInteger(tokens["total"])
+		if !totalOK && out.TokensAvailable {
+			totalOK = true
+			for _, n := range []int64{out.Input, out.Output, out.CacheRead, out.CacheWrite} {
+				if n > math.MaxInt64-out.Total {
+					out.Total = 0
+					totalOK = false
+					break
+				}
+				out.Total += n
+			}
+		}
+		out.TotalAvailable = totalOK
 	}
 	out.Cost, out.CostAvailable = usageNumber(stats["cost"])
 	var context map[string]json.RawMessage
@@ -40,6 +56,7 @@ func runtimeUsage(s agent.Snapshot) Usage {
 		out.ContextWindow, _ = usageInteger(context["contextWindow"])
 		var haveTokens bool
 		out.ContextTokens, haveTokens = usageInteger(context["tokens"])
+		out.ContextTokensAvailable = haveTokens
 		percent, havePercent := usageNumber(context["percent"])
 		if !havePercent && haveTokens && out.ContextWindow > 0 {
 			percent, havePercent = float64(out.ContextTokens)/float64(out.ContextWindow)*100, true

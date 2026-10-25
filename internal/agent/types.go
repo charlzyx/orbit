@@ -85,6 +85,17 @@ type PendingDialog struct {
 	Cursor                                         json.RawMessage
 	Raw                                            json.RawMessage
 }
+
+// RetryDetail is immutable snapshot data from auto_retry_start, not a local timer.
+type RetryDetail struct {
+	Revision      uint64
+	Active        bool
+	Attempt, Max  uint64
+	HasMax        bool
+	ErrorProvided bool
+	Error         string
+}
+
 type Queue struct {
 	Steering []string `json:"steering"`
 	FollowUp []string `json:"followUp"`
@@ -161,6 +172,7 @@ type Snapshot struct {
 	Model                                    ModelChoice
 	ThinkingLevel, ConnectionError, Status   string
 	Connected, Running, Compacting, Retrying bool
+	RetryDetail                              RetryDetail
 	Dialogs                                  []PendingDialog
 	Approval                                 *ApprovalRequest
 	Ask                                      *AskPrompt

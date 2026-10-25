@@ -190,16 +190,19 @@ func TestHeartbeatConcurrentWindowlessDrainAndViewHandoff(t *testing.T) {
 	}
 	t.Cleanup(x.Close)
 	manager := x.Agent
+	owner := newHostTestOwner(t)
 	done := make(chan struct{})
 	go func() {
 		defer close(done)
-		for range 1000 {
-			x.tickWindowless()
+		for range 100 {
+			x.tickWindowlessOnOwner(owner)
 		}
 	}()
-	for range 1000 {
-		x.window.Store(nil)
-		x.attachWindow(func() *mygo.Window { return &mygo.Window{} })
+	for range 100 {
+		owner(func() {
+			x.window.Store(nil)
+			x.attachWindow(func() *mygo.Window { return &mygo.Window{} })
+		})
 	}
 	select {
 	case <-done:

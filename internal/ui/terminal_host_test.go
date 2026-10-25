@@ -38,6 +38,9 @@ func terminalHostWait(t *testing.T, tt *ui.Tester, what string, check func() boo
 	for time.Now().Before(until) {
 		tt.Frame()
 		if check() {
+			// Paint the completion just observed: a worker may have published it
+			// after the preceding frame sampled the terminal snapshot.
+			tt.Frame()
 			return
 		}
 		time.Sleep(5 * time.Millisecond)
@@ -178,4 +181,22 @@ func TestTerminalHostStartupFailureHasPersistentRetry(t *testing.T) {
 	}
 	next.Send([]byte("printf '__RECOVERED_%s__\\n' yes\r"))
 	terminalHostWait(t, tt, "recovered shell output", func() bool { return strings.Contains(next.Text(), "__RECOVERED_yes__") })
+}
+
+// The worker may publish state after the frame was sampled but before the
+// predicate is observed. A successful wait must paint that observed state,
+// rather than return the previous frame to subsequent visible-text assertions.
+func TestTerminalHostWaitPaintsObservedCompletion(t *testing.T) {
+	ready := false
+	tt := ui.NewTester(func(c *ui.Context) {
+		text := "pending"
+		if ready {
+			text = "observed terminal completion"
+		}
+		ui.Text(c, text)
+	}, 300, 100)
+	terminalHostWait(t, tt, "observed completion", func() bool { ready = true; return true })
+	if !tt.HasText("observed terminal completion") {
+		t.Fatal("wait returned a frame older than its observed completion", tt.Texts())
+	}
 }
