@@ -1,0 +1,63 @@
+name: Native macOS workspace regression
+
+on:
+  push:
+    branches: [redesign/mygo-rpc]
+    paths: [scripts/macos-workspace-probe/**, .github/workflows/macos-workspace-probe.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native-workspace:
+    if: github.repository == 'charlzyx/orbit' && github.ref == 'refs/heads/redesign/mygo-rpc'
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16
+        with:
+          go-version: '1.27.3'
+          cache: false
+      - name: Download and verify exact shipped .3 baseline, copy from read-only DMG
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/workspace-probe/Installed Applications" "$RUNNER_TEMP/workspace-probe/mounted"
+          curl --fail --location --retry 2 --output "$RUNNER_TEMP/workspace-probe/baseline.dmg" 'https://github.com/charlzyx/orbit/releases/download/macos-test-v0.2.12-go-test.20261025.3/Orbit-Go-Test-0.2.12-go-test.20261025.3-e506278bda6b-ci-macos-arm64.dmg'
+          echo 'a92e344af955f949da3ebfd4841611274c8a0df857d016f38d9533ad438dfc77  '"$RUNNER_TEMP/workspace-probe/baseline.dmg" | shasum -a 256 -c -
+          hdiutil attach -readonly -nobrowse -mountpoint "$RUNNER_TEMP/workspace-probe/mounted" "$RUNNER_TEMP/workspace-probe/baseline.dmg"
+          trap 'hdiutil detach "$RUNNER_TEMP/workspace-probe/mounted" || true' EXIT
+          ditto "$RUNNER_TEMP/workspace-probe/mounted/Orbit Go Test.app" "$RUNNER_TEMP/workspace-probe/Installed Applications/Orbit Go Test.app"
+          hdiutil detach "$RUNNER_TEMP/workspace-probe/mounted"
+          trap - EXIT
+          shasum -a 256 "$RUNNER_TEMP/workspace-probe/Installed Applications/Orbit Go Test.app/Contents/MacOS/Orbit" > "$RUNNER_TEMP/workspace-probe/original-executable.sha256"
+      - name: Build exact runtime source with explicit diagnostic-only overlay
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/macos-workspace-probe/prepare.py --output "$RUNNER_TEMP/workspace-probe/overlay"
+          GOFLAGS="-overlay=$RUNNER_TEMP/workspace-probe/overlay/overlay.json" CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 scripts/go-native.sh build -o "$RUNNER_TEMP/workspace-probe/Installed Applications/Orbit Go Test.app/Contents/MacOS/Orbit" ./cmd/orbit
+      - name: Record diagnostic binary code-signing state without changing OS policy
+        run: |
+          codesign -dv --verbose=2 "$RUNNER_TEMP/workspace-probe/Installed Applications/Orbit Go Test.app/Contents/MacOS/Orbit" 2> "$RUNNER_TEMP/workspace-probe/diagnostic-signature.log" || true
+      - name: Native folder dialog cancel, select and repeated workspace lifecycle
+        run: python3 scripts/macos-workspace-probe/run.py --app "$RUNNER_TEMP/workspace-probe/Installed Applications/Orbit Go Test.app" --output "$RUNNER_TEMP/workspace-probe/evidence"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: native-workspace-probe-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/workspace-probe/evidence/*.json
+            ${{ runner.temp }}/workspace-probe/evidence/*.jsonl
+            ${{ runner.temp }}/workspace-probe/evidence/*.png
+            ${{ runner.temp }}/workspace-probe/evidence/*.log
+            ${{ runner.temp }}/workspace-probe/evidence/crash/*.ips
+            ${{ runner.temp }}/workspace-probe/overlay/
+            ${{ runner.temp }}/workspace-probe/original-executable.sha256
+            ${{ runner.temp }}/workspace-probe/diagnostic-signature.log
+          if-no-files-found: warn
+          retention-days: 14

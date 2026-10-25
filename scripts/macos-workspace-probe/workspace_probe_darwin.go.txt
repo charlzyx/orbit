@@ -1,0 +1,614 @@
+//go:build darwin
+
+// Diagnostic overlay only: this file is not part of normal application builds.
+// Native event/accessibility helpers adapted from github.com/egoist/mygo,
+// commit 9c69cf829ece, internal/darwin/testhooks.go and objc.go.
+// Copyright (c) 2026 MyGo contributors, MIT. See MYGO-MIT-LICENSE.
+package orbitui
+
+import (
+	"encoding/json"
+	"errors"
+	"fmt"
+	"os"
+	"path/filepath"
+	"runtime"
+	"runtime/debug"
+	"strings"
+	"sync"
+	"sync/atomic"
+	"time"
+	"unsafe"
+
+	"github.com/ebitengine/purego"
+	"github.com/ebitengine/purego/objc"
+	"github.com/egoist/mygo"
+)
+
+// Capture only diagnostic paths before appbundle.ApplyEnvironment sanitizes HOME.
+var workspaceProbeDir = os.Getenv("ORBIT_WORKSPACE_PROBE_DIR")
+var workspaceProbeOriginalHome = os.Getenv("HOME")
+
+func init() {
+	if workspaceProbeDir != "" {
+		debug.SetTraceback("crash")
+	}
+}
+
+var workspaceProbeOnce sync.Once
+var workspaceProbeMu sync.Mutex
+var workspaceProbeViewDepth atomic.Int32
+var workspaceProbeBrowseCalls atomic.Int32
+var workspaceProbeLastReturned atomic.Value
+
+func workspaceProbeViewEnter() { workspaceProbeViewDepth.Add(1) }
+func workspaceProbeViewLeave() { workspaceProbeViewDepth.Add(-1) }
+func workspaceProbeStage(stage string, data any) {
+	dir := workspaceProbeDir
+	if dir == "" {
+		return
+	}
+	if stage == "browse.before" {
+		workspaceProbeBrowseCalls.Add(1)
+	}
+	if stage == "browse.return" {
+		workspaceProbeLastReturned.Store(data)
+	}
+	row := map[string]any{"time": time.Now().UTC(), "stage": stage, "data": data, "pid": os.Getpid(), "view_depth": workspaceProbeViewDepth.Load()}
+	if stage == "browse.before" || stage == "set_workspace.begin" {
+		stack := make([]byte, 16384)
+		stack = stack[:runtime.Stack(stack, false)]
+		row["go_stack"] = string(stack)
+	}
+	encoded, _ := json.Marshal(row)
+	workspaceProbeMu.Lock()
+	defer workspaceProbeMu.Unlock()
+	file, err := os.OpenFile(filepath.Join(dir, "stages.jsonl"), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0600)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "workspace probe log:", err)
+		return
+	}
+	_, _ = file.Write(append(encoded, '\n'))
+	_ = file.Sync()
+	_ = file.Close()
+	fmt.Fprintln(os.Stderr, "workspace probe:", stage)
+}
+
+type workspaceProbeConfig struct {
+	Workspaces []string `json:"workspaces"`
+	Invalid    string   `json:"invalid"`
+}
+type workspaceProbeState struct {
+	Workspace   string `json:"workspace"`
+	UIWorkspace string `json:"ui_workspace"`
+	PiWorkspace string `json:"pi_workspace"`
+	PID         int    `json:"pi_pid"`
+	SessionID   string `json:"session_id"`
+	RuntimeID   string `json:"runtime_id"`
+	Ready       bool   `json:"ready"`
+	Error       string `json:"error,omitempty"`
+}
+type workspaceProbe struct {
+	x        *Controller
+	w        *mygo.Window
+	dir      string
+	config   workspaceProbeConfig
+	results  []map[string]any
+	deadline time.Time
+}
+
+func workspaceProbeStart(x *Controller, w *mygo.Window) {
+	if workspaceProbeDir == "" {
+		return
+	}
+	workspaceProbeOnce.Do(func() {
+		p := &workspaceProbe{x: x, w: w, dir: workspaceProbeDir, deadline: time.Now().Add(160 * time.Second)}
+		workspaceProbeStage("probe.window_ready", map[string]any{"visible": w.IsVisible(), "native_handle": w.NativeHandle()})
+		go func() {
+			err := p.run()
+			result := map[string]any{"status": "PASS", "pid": os.Getpid(), "results": p.results, "finished_at": time.Now().UTC(), "limitations": "Instrumented production executable, not byte-identical shipped binary; AppKit event queue input and real NSOpenPanel, no model inference."}
+			if err != nil {
+				result["status"] = "FAIL"
+				result["error"] = err.Error()
+			}
+			workspaceProbeStage("probe.complete", result)
+			data, _ := json.MarshalIndent(result, "", "  ")
+			_ = os.WriteFile(filepath.Join(p.dir, "report.json"), append(data, '\n'), 0600)
+			mygo.App.Quit()
+		}()
+	})
+}
+func (p *workspaceProbe) run() error {
+	if !filepath.IsAbs(p.dir) {
+		return errors.New("probe dir must be absolute")
+	}
+	home := workspaceProbeOriginalHome
+	if _, err := os.Stat(filepath.Join(home, ".orbit-workspace-probe-synthetic-home")); err != nil {
+		return errors.New("missing synthetic HOME marker")
+	}
+	data, err := os.ReadFile(filepath.Join(p.dir, "config.json"))
+	if err != nil {
+		return err
+	}
+	if err = json.Unmarshal(data, &p.config); err != nil {
+		return err
+	}
+	if len(p.config.Workspaces) != 3 {
+		return errors.New("exactly three synthetic workspaces required")
+	}
+	for _, path := range append(append([]string{}, p.config.Workspaces...), p.config.Invalid) {
+		rel, e := filepath.Rel(home, path)
+		if e != nil || !filepath.IsAbs(path) || rel == ".." || strings.HasPrefix(rel, ".."+string(os.PathSeparator)) {
+			return fmt.Errorf("path outside synthetic HOME: %q", path)
+		}
+	}
+	if err = probeNativeLoad(); err != nil {
+		return err
+	}
+	initial, err := p.waitReady(p.config.Workspaces[0], workspaceProbeState{}, false)
+	if err != nil {
+		return err
+	}
+	p.record("initial", initial)
+	if err = p.capture("00-initial"); err != nil {
+		return err
+	}
+	if err = p.dialog("01-cancel", "", false); err != nil {
+		return err
+	}
+	if err = p.assertUnchanged("cancel", initial); err != nil {
+		return err
+	}
+	// Same-folder acceptance is an RPC new_session on a reusable process.
+	if err = p.dialog("02-accept-current", p.config.Workspaces[0], true); err != nil {
+		return err
+	}
+	current, err := p.waitReady(p.config.Workspaces[0], initial, false)
+	if err != nil {
+		return err
+	}
+	p.record("accept-current", current)
+	if err = p.capture("02-accepted-current"); err != nil {
+		return err
+	}
+	if err = p.dialog("03-accept-A", p.config.Workspaces[1], true); err != nil {
+		return err
+	}
+	first, err := p.waitReady(p.config.Workspaces[1], current, true)
+	if err != nil {
+		return err
+	}
+	p.record("accept-A", first)
+	if err = p.capture("03-accepted-A"); err != nil {
+		return err
+	}
+	// Exercise the production recent-row handler without showing NSOpenPanel.
+	calls := workspaceProbeBrowseCalls.Load()
+	if err = p.click("Choose workspace"); err != nil {
+		return err
+	}
+	if err = p.click("Workspace: " + p.config.Workspaces[0]); err != nil {
+		return fmt.Errorf("recent initial row: %w", err)
+	}
+	recent, err := p.waitReady(p.config.Workspaces[0], first, true)
+	if err != nil {
+		return err
+	}
+	if workspaceProbeBrowseCalls.Load() != calls {
+		return errors.New("recent row unexpectedly opened native dialog")
+	}
+	p.record("recent-initial", recent)
+	if err = p.capture("04-recent-initial"); err != nil {
+		return err
+	}
+	previous := recent
+	for i, folder := range []string{p.config.Workspaces[2], p.config.Workspaces[1]} {
+		name := fmt.Sprintf("%02d-repeat", i+5)
+		if err = p.dialog(name, folder, true); err != nil {
+			return err
+		}
+		state, e := p.waitReady(folder, previous, true)
+		if e != nil {
+			return e
+		}
+		previous = state
+		p.record(name, state)
+		if err = p.capture(name + "-accepted"); err != nil {
+			return err
+		}
+	}
+	if err = p.invalid(previous); err != nil {
+		return err
+	}
+	return p.capture("08-final")
+}
+func (p *workspaceProbe) record(name string, state workspaceProbeState) {
+	result := map[string]any{"case": name, "state": state}
+	p.results = append(p.results, result)
+	workspaceProbeStage("check.pass", result)
+}
+func (p *workspaceProbe) snapshot() workspaceProbeState {
+	var out workspaceProbeState
+	mygo.RunOnMain(func() {
+		s := p.x.Agent.Snapshot()
+		r := p.x.Agent.RuntimeSnapshot().Active
+		out = workspaceProbeState{Workspace: p.x.workspace, UIWorkspace: p.x.UI.Model.Workspace, SessionID: s.ActiveSession.ID, RuntimeID: s.RuntimeID, Error: s.ConnectionError}
+		if r != nil {
+			out.PID = r.PID
+			out.PiWorkspace = r.Workspace
+			out.Ready = s.Connected && r.Alive && !r.Loading && r.PID > 0 && s.ActiveSession.ID != "" && s.ActiveSession.ID == r.SessionID && s.RuntimeID == r.Key
+		}
+	})
+	return out
+}
+func (p *workspaceProbe) waitReady(path string, previous workspaceProbeState, newPID bool) (workspaceProbeState, error) {
+	deadline := time.Now().Add(25 * time.Second)
+	var state workspaceProbeState
+	for time.Now().Before(deadline) && time.Now().Before(p.deadline) {
+		state = p.snapshot()
+		if state.Ready && state.Workspace == path && state.UIWorkspace == path && state.PiWorkspace == path && (previous.SessionID == "" || state.SessionID != previous.SessionID) && (!newPID || state.PID != previous.PID) {
+			return state, nil
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+	workspaceProbeStage("check.runtime_timeout", state)
+	return state, fmt.Errorf("runtime did not settle at %s with fresh session (new PID=%v): %+v", path, newPID, state)
+}
+func (p *workspaceProbe) assertUnchanged(name string, before workspaceProbeState) error {
+	time.Sleep(400 * time.Millisecond)
+	after := p.snapshot()
+	if !after.Ready || after.Workspace != before.Workspace || after.UIWorkspace != before.UIWorkspace || after.PiWorkspace != before.PiWorkspace || after.PID != before.PID || after.SessionID != before.SessionID {
+		return fmt.Errorf("%s changed runtime: before=%+v after=%+v", name, before, after)
+	}
+	p.record(name, after)
+	return nil
+}
+func (p *workspaceProbe) capture(name string) error {
+	workspaceProbeStage("capture.before", name)
+	data, err := p.w.CapturePage()
+	if err != nil {
+		return err
+	}
+	if err = os.WriteFile(filepath.Join(p.dir, name+".png"), data, 0600); err != nil {
+		return err
+	}
+	workspaceProbeStage("capture.after", name)
+	return nil
+}
+func (p *workspaceProbe) click(label string) error {
+	workspaceProbeStage("ui.click.before", label)
+	deadline := time.Now().Add(5 * time.Second)
+	for time.Now().Before(deadline) {
+		var found bool
+		var err error
+		mygo.RunOnMain(func() { found, err = probeClickLabel(p.w.NativeHandle(), label) })
+		if err != nil {
+			return err
+		}
+		if found {
+			workspaceProbeStage("ui.click_queued", label)
+			time.Sleep(200 * time.Millisecond)
+			return nil
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+	var labels []string
+	mygo.RunOnMain(func() { labels = probeLabels(p.w.NativeHandle()) })
+	workspaceProbeStage("ui.label_missing", map[string]any{"wanted": label, "labels": labels})
+	return fmt.Errorf("native accessibility label absent: %s", label)
+}
+func (p *workspaceProbe) panel() uintptr {
+	var panel uintptr
+	mygo.RunOnMain(func() { panel = probePanel(p.w.NativeHandle()) })
+	return panel
+}
+func (p *workspaceProbe) open(name string) error {
+	workspaceProbeStage("case.begin", name)
+	if p.panel() != 0 {
+		return errors.New("unexpected existing native panel")
+	}
+	if err := p.click("Choose workspace"); err != nil {
+		return err
+	}
+	if err := p.capture(name + "-popup"); err != nil {
+		return err
+	}
+	if err := p.click(p.x.UI.text("workspace_picker.choose_folder", "Choose folder…")); err != nil {
+		return err
+	}
+	deadline := time.Now().Add(8 * time.Second)
+	for time.Now().Before(deadline) {
+		if p.panel() != 0 {
+			workspaceProbeStage("panel.visible", name)
+			return nil
+		}
+		time.Sleep(80 * time.Millisecond)
+	}
+	return fmt.Errorf("%s: real NSOpenPanel absent or blocked after native browse click", name)
+}
+func (p *workspaceProbe) dialog(name, path string, accept bool) error {
+	if err := p.open(name); err != nil {
+		return err
+	}
+	if path != "" {
+		mygo.RunOnMain(func() { probeSetDirectory(probePanel(p.w.NativeHandle()), path) })
+		time.Sleep(600 * time.Millisecond)
+	}
+	var err error
+	mygo.RunOnMain(func() {
+		err = probeCapturePanel(probePanel(p.w.NativeHandle()), filepath.Join(p.dir, name+"-panel.png"))
+	})
+	if err != nil {
+		return err
+	}
+	workspaceProbeStage("panel.action.before", map[string]any{"case": name, "accept": accept, "path": path})
+	mygo.RunOnMain(func() {
+		panel := probePanel(p.w.NativeHandle())
+		if panel == 0 {
+			err = errors.New("panel disappeared before action")
+			return
+		}
+		if accept {
+			probeSend(objc.ID(panel), "ok:", 0)
+		} else {
+			probeSend(objc.ID(panel), "cancel:", 0)
+		}
+	})
+	if err != nil {
+		return err
+	}
+	deadline := time.Now().Add(8 * time.Second)
+	for time.Now().Before(deadline) {
+		if p.panel() == 0 {
+			workspaceProbeStage("panel.closed", name)
+			return nil
+		}
+		time.Sleep(80 * time.Millisecond)
+	}
+	return fmt.Errorf("%s: NSOpenPanel did not close after real action", name)
+}
+func (p *workspaceProbe) invalid(before workspaceProbeState) error {
+	if _, err := os.Stat(p.config.Invalid); !errors.Is(err, os.ErrNotExist) {
+		return errors.New("invalid fixture must not exist")
+	}
+	if err := p.open("07-invalid"); err != nil {
+		return err
+	}
+	// Native UI owns invalid-path validation: attempt a missing directory/name,
+	// not a forced positive completion or synthetic application action.
+	mygo.RunOnMain(func() {
+		panel := probePanel(p.w.NativeHandle())
+		probeSetDirectory(panel, p.config.Invalid)
+		probeSend(objc.ID(panel), "setNameFieldStringValue:", uintptr(probeString(filepath.Base(p.config.Invalid))))
+	})
+	time.Sleep(700 * time.Millisecond)
+	var err error
+	mygo.RunOnMain(func() {
+		err = probeCapturePanel(probePanel(p.w.NativeHandle()), filepath.Join(p.dir, "07-invalid-panel.png"))
+	})
+	if err != nil {
+		return err
+	}
+	workspaceProbeStage("panel.invalid_ok.before", p.config.Invalid)
+	mygo.RunOnMain(func() { probeSend(objc.ID(probePanel(p.w.NativeHandle())), "ok:", 0) })
+	time.Sleep(800 * time.Millisecond)
+	if p.panel() == 0 {
+		return errors.New("invalid-directory attempt closed the panel; cannot claim rejection, inspect stage log")
+	}
+	workspaceProbeStage("panel.invalid_rejected", p.config.Invalid)
+	mygo.RunOnMain(func() {
+		panel := probePanel(p.w.NativeHandle())
+		sheet := probeSend(objc.ID(panel), "attachedSheet")
+		if sheet != 0 {
+			probeSend(objc.ID(panel), "endSheet:returnCode:", uintptr(sheet), 0)
+		}
+		probeSend(objc.ID(panel), "cancel:", 0)
+	})
+	time.Sleep(500 * time.Millisecond)
+	if p.panel() != 0 {
+		return errors.New("invalid-directory panel could not be cancelled")
+	}
+	return p.assertUnchanged("invalid-native-rejected", before)
+}
+
+// Narrow AppKit adapter. No MyGo internal import and no OS event injection/TCC.
+type probePoint struct{ X, Y float64 }
+type probeSize struct{ Width, Height float64 }
+type probeRect struct {
+	Origin probePoint
+	Size   probeSize
+}
+
+var probeMsg uintptr
+var probeRectMsg func(objc.ID, objc.SEL) probeRect
+var probeConvertPoint func(objc.ID, objc.SEL, probePoint) probePoint
+var probeMouseEvent func(objc.ID, objc.SEL, uint, probePoint, uint, float64, int, objc.ID, int, int, float32) objc.ID
+var probeBitmap func(objc.ID, objc.SEL, probeRect) objc.ID
+var probeCacheBitmap func(objc.ID, objc.SEL, probeRect, objc.ID)
+
+func probeNativeLoad() error {
+	lib, err := purego.Dlopen("/usr/lib/libobjc.A.dylib", purego.RTLD_NOW|purego.RTLD_GLOBAL)
+	if err != nil {
+		return err
+	}
+	probeMsg, err = purego.Dlsym(lib, "objc_msgSend")
+	if err != nil {
+		return err
+	}
+	if runtime.GOARCH != "arm64" {
+		return errors.New("probe currently supports native Apple Silicon only")
+	}
+	purego.RegisterFunc(&probeRectMsg, probeMsg)
+	purego.RegisterFunc(&probeConvertPoint, probeMsg)
+	purego.RegisterFunc(&probeMouseEvent, probeMsg)
+	purego.RegisterFunc(&probeBitmap, probeMsg)
+	purego.RegisterFunc(&probeCacheBitmap, probeMsg)
+	return nil
+}
+
+//go:uintptrescapes
+func probeSend(obj objc.ID, selector string, args ...uintptr) objc.ID {
+	if obj == 0 {
+		return 0
+	}
+	var all [12]uintptr
+	all[0] = uintptr(obj)
+	all[1] = uintptr(objc.RegisterName(selector))
+	n := copy(all[2:], args)
+	r, _, _ := purego.SyscallN(probeMsg, all[:n+2]...)
+	return objc.ID(r)
+}
+func probeString(value string) objc.ID {
+	data := unsafe.StringData(value)
+	str := probeSend(probeSend(objc.ID(objc.GetClass("NSString")), "alloc"), "initWithBytes:length:encoding:", uintptr(unsafe.Pointer(data)), uintptr(len(value)), 4)
+	runtime.KeepAlive(value)
+	return probeSend(str, "autorelease")
+}
+func probeGoString(value objc.ID) string {
+	if value == 0 || !probeResponds(value, "UTF8String") || !probeResponds(value, "lengthOfBytesUsingEncoding:") {
+		return ""
+	}
+	ptr := probeSend(value, "UTF8String")
+	n := probeSend(value, "lengthOfBytesUsingEncoding:", 4)
+	if ptr == 0 || n == 0 {
+		return ""
+	}
+	return string(unsafe.Slice(*(**byte)(unsafe.Pointer(&ptr)), int(n)))
+}
+func probePool(fn func()) {
+	pool := probeSend(probeSend(objc.ID(objc.GetClass("NSAutoreleasePool")), "alloc"), "init")
+	defer probeSend(pool, "drain")
+	fn()
+}
+func probeResponds(obj objc.ID, selector string) bool {
+	return obj != 0 && probeSend(obj, "respondsToSelector:", uintptr(objc.RegisterName(selector))) != 0
+}
+func probeOptional(obj objc.ID, selector string) objc.ID {
+	if !probeResponds(obj, selector) {
+		return 0
+	}
+	return probeSend(obj, selector)
+}
+func probeChildren(obj objc.ID, selector string) []objc.ID {
+	arr := probeOptional(obj, selector)
+	if !probeResponds(arr, "count") || !probeResponds(arr, "objectAtIndex:") {
+		return nil
+	}
+	n := int(probeSend(arr, "count"))
+	if n < 0 || n > 10000 {
+		return nil
+	}
+	out := make([]objc.ID, 0, n)
+	for i := 0; i < n; i++ {
+		out = append(out, probeSend(arr, "objectAtIndex:", uintptr(i)))
+	}
+	return out
+}
+func probeWalk(handle uintptr, visit func(objc.ID, string) bool) {
+	seen := map[objc.ID]bool{}
+	var walk func(objc.ID, int) bool
+	walk = func(obj objc.ID, depth int) bool {
+		if obj == 0 || seen[obj] || depth > 30 {
+			return false
+		}
+		seen[obj] = true
+		label := probeGoString(probeOptional(obj, "accessibilityLabel"))
+		title := probeGoString(probeOptional(obj, "accessibilityTitle"))
+		if title != label {
+			label += title
+		}
+		if visit(obj, label) {
+			return true
+		}
+		for _, child := range probeChildren(obj, "accessibilityChildren") {
+			if walk(child, depth+1) {
+				return true
+			}
+		}
+		if probeSend(obj, "respondsToSelector:", uintptr(objc.RegisterName("subviews"))) != 0 {
+			for _, child := range probeChildren(obj, "subviews") {
+				if walk(child, depth+1) {
+					return true
+				}
+			}
+		}
+		return false
+	}
+	walk(probeSend(objc.ID(handle), "contentView"), 0)
+}
+func probeLabels(handle uintptr) []string {
+	var out []string
+	probePool(func() {
+		probeWalk(handle, func(_ objc.ID, label string) bool {
+			if label != "" {
+				out = append(out, label)
+			}
+			return false
+		})
+	})
+	return out
+}
+func probeClickLabel(handle uintptr, label string) (found bool, err error) {
+	probePool(func() {
+		probeWalk(handle, func(obj objc.ID, name string) bool {
+			if name != label || !probeResponds(obj, "accessibilityFrame") {
+				return false
+			}
+			rect := probeRectMsg(obj, objc.RegisterName("accessibilityFrame"))
+			if rect.Size.Width <= 0 || rect.Size.Height <= 0 {
+				return false
+			}
+			center := probePoint{rect.Origin.X + rect.Size.Width/2, rect.Origin.Y + rect.Size.Height/2}
+			loc := probeConvertPoint(objc.ID(handle), objc.RegisterName("convertPointFromScreen:"), center)
+			app := probeSend(objc.ID(objc.GetClass("NSApplication")), "sharedApplication")
+			probeSend(objc.ID(handle), "makeKeyAndOrderFront:", 0)
+			probeSend(app, "activateIgnoringOtherApps:", 1)
+			number := int(probeSend(objc.ID(handle), "windowNumber"))
+			for _, typ := range []uint{1, 2} {
+				ev := probeMouseEvent(objc.ID(objc.GetClass("NSEvent")), objc.RegisterName("mouseEventWithType:location:modifierFlags:timestamp:windowNumber:context:eventNumber:clickCount:pressure:"), typ, loc, 0, 0, number, 0, 0, 1, 1)
+				if ev == 0 {
+					err = errors.New("could not create native mouse event")
+					return true
+				}
+				probeSend(app, "postEvent:atStart:", uintptr(ev), 0)
+			}
+			found = true
+			return true
+		})
+	})
+	return
+}
+func probePanel(handle uintptr) uintptr {
+	panel := probeSend(objc.ID(handle), "attachedSheet")
+	if panel != 0 && probeSend(panel, "isKindOfClass:", uintptr(objc.GetClass("NSOpenPanel"))) != 0 && probeSend(panel, "isVisible") != 0 {
+		return uintptr(panel)
+	}
+	return 0
+}
+func probeSetDirectory(panel uintptr, path string) {
+	probePool(func() {
+		url := probeSend(objc.ID(objc.GetClass("NSURL")), "fileURLWithPath:", uintptr(probeString(path)))
+		probeSend(objc.ID(panel), "setDirectoryURL:", uintptr(url))
+	})
+}
+func probeCapturePanel(panel uintptr, path string) (err error) {
+	if panel == 0 {
+		return errors.New("no NSOpenPanel to capture")
+	}
+	probePool(func() {
+		view := probeSend(objc.ID(panel), "contentView")
+		rect := probeRectMsg(view, objc.RegisterName("bounds"))
+		rep := probeBitmap(view, objc.RegisterName("bitmapImageRepForCachingDisplayInRect:"), rect)
+		if rep == 0 {
+			err = errors.New("native panel bitmap unavailable")
+			return
+		}
+		probeCacheBitmap(view, objc.RegisterName("cacheDisplayInRect:toBitmapImageRep:"), rect, rep)
+		props := probeSend(objc.ID(objc.GetClass("NSDictionary")), "dictionary")
+		data := probeSend(rep, "representationUsingType:properties:", 4, uintptr(props))
+		if data == 0 || probeSend(data, "writeToFile:atomically:", uintptr(probeString(path)), 1) == 0 {
+			err = errors.New("native panel PNG write failed")
+		}
+	})
+	return
+}
