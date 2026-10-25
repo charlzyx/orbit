@@ -94,7 +94,7 @@ func (a *App) shortcuts(c *ui.Context) {
 			if b.Command == "OpenSessionSlot" {
 				value = b.Chord[strings.LastIndexByte(b.Chord, '-')+1:]
 			}
-			a.command(b.Command, value)
+			a.shortcutCommand(b.Command, value)
 		}
 	}
 	if a.thinkingOpen && a.Models == nil {
@@ -120,8 +120,18 @@ func (a *App) nativeCommand(id string) {
 	if id != "Quit" && a.modalOpen() {
 		return
 	}
-	a.command(id, "")
+	a.shortcutCommand(id, "")
 }
+
+// The source OpenGit keyboard action toggles, whereas the command palette's
+// destination opens idempotently (session.rs::on_open_git vs pickers.rs).
+func (a *App) shortcutCommand(id, value string) {
+	if id == "OpenGit" {
+		id = "ToggleGit"
+	}
+	a.command(id, value)
+}
+
 func (a *App) command(id, value string) {
 	if strings.HasPrefix(id, "Review") && id != "ReviewChanges" {
 		a.reviewCommand(id)
@@ -185,22 +195,35 @@ func (a *App) command(id, value string) {
 			a.Navigate("usage")
 		}
 	case "OpenGit":
+		a.closeReviewDock()
 		a.Navigate("git")
+	case "ToggleGit":
+		if a.page == "git" {
+			a.Navigate("chat")
+		} else {
+			a.command("OpenGit", "")
+		}
 	case "OpenFiles":
 		a.Navigate("files")
 	case "OpenWorktrees":
 		a.Navigate("worktrees")
 	case "ToggleProjectPanel":
 		a.ExplorerVisible = !a.ExplorerVisible
-		a.ReviewVisible = false
-		a.Dispatch(Action{Kind: "RefreshFiles"})
-	case "ReviewChanges", "ToggleSidePanel":
-		a.ReviewVisible = !a.ReviewVisible
-		a.ExplorerVisible = false
-		a.Dispatch(Action{Kind: "RefreshReview"})
-	case "ReviewClose":
-		a.ReviewVisible = false
-		a.composer.Focus()
+		if a.ExplorerVisible {
+			a.closeReviewDock()
+			a.Dispatch(Action{Kind: "RefreshFiles"})
+		}
+	case "ReviewChanges":
+		a.openReviewDock()
+	case "ToggleSidePanel":
+		if a.ReviewVisible {
+			// SidePane::toggle preserves its full-width state; explicit close
+			// and switching to another dock use closeReviewDock instead.
+			a.ReviewVisible = false
+			a.reviewState.sourceMenuOpen = false
+		} else {
+			a.openReviewDock()
+		}
 	case "ToggleTerminal":
 		if a.Options.Terminal != nil {
 			a.save(a.Options.Terminal.Toggle())
@@ -278,8 +301,8 @@ func (a *App) command(id, value string) {
 		a.Navigate("settings")
 		a.loadSettings("mcp")
 	default:
-		if strings.HasPrefix(id, "GitTab") {
-			a.Navigate("git")
+		if strings.HasPrefix(id, "GitTab") && a.page != "git" {
+			return
 		}
 		a.Dispatch(Action{Kind: id, Value: value})
 	}

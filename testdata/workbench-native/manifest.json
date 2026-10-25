@@ -1,0 +1,42 @@
+{
+  "branch": "capture-main",
+  "canonicalRoot": "/tmp/orbit-workbench-fixture",
+  "commits": [
+    "2605b2aa960201ff787c69c2e376afda85f35e91\tAdd stable helper",
+    "2657390fd698c3c92bc5bd3aaef99e85ecc18cc2\tInitialize workbench fixture"
+  ],
+  "credentials": false,
+  "emptyDirectories": [
+    "workspace/docs/empty"
+  ],
+  "files": {
+    "home/.bash_profile": "3563fc2b32939be960f55c5ac23630dddde4bee5a6a4ba103b066486001c4228",
+    "home/.orbit-pi/auto-title.json": "dff6c1c94b201948af63a2010209e2cb1dbd7453c75f0eed63a3c5227a7b1ada",
+    "home/.orbit-pi/fonts.json": "7f7ad04160f4ad28719ed14f07bf3e0abe0ed9bd42a08d23747d63d2b28acf6e",
+    "home/.orbit-pi/theme": "a8008ecb6b4856d65eefac0b91121d68479e2ad589c5fe75062d30724dd9b189",
+    "home/.orbit-pi/ui.json": "6069dc67597c4f21445e6a5f6aa1c86ae9f5d74696d12dc4ba41f059c293fd98",
+    "home/.orbit-pi/workspaces.json": "9af8067af2ff13e08136dc071dac200b007d1c03e2c919a662b27d0a3838dd07",
+    "home/.pi/agent/sessions/--tmp-orbit-workbench-fixture-workspace--/01900000-0000-7000-8000-000000000008.jsonl": "3b456a3464855d52ab4e283b9d4d9324e536b4050e7af04c26b53e436f93c83d",
+    "home/.pi/agent/settings.json": "a7a55160492539802ace0a514eec04b8bfdf302da7fa1442cd666c75b0555846",
+    "workspace/alpha.go": "552af27874fc87fffe8e3f6ae2ea4f881f00492215647a0754d6c250802f767b",
+    "workspace/bravo.go": "f2a867a7a7e1ef7ce7c4df7de348f273471b2f467b98dbbfb2d54a49b0bd1e55",
+    "workspace/docs/plan.md": "3a66bd09baf0468cad6774dc7f33ab913533f9a85f12234a6ef1d741d108d8b2",
+    "workspace/notes.txt": "f6152c61925246209065bdea0de698a86e2a276b8c3bba55d191bc7c20b23a14",
+    "workspace/src/helper.go": "75f1a85bed608aac9638f24ab5ecfb801d854b4ecfd1846ee648d4918f342ce4"
+  },
+  "inference": false,
+  "name": "workbench-native-fixed-october",
+  "porcelain": [
+    "M  alpha.go",
+    " M bravo.go",
+    "?? notes.txt"
+  ],
+  "remotes": [],
+  "schema": 1,
+  "session": "home/.pi/agent/sessions/--tmp-orbit-workbench-fixture-workspace--/01900000-0000-7000-8000-000000000008.jsonl",
+  "sessions": 1,
+  "sourceClockFrozen": false,
+  "stagedDiffSha256": "d36d5c725d14b630a1caaaeceb590713c25ec8a22fbbdbeb93ea7804b7aec147",
+  "unstagedDiffSha256": "16b3f7aafcd5acacfc585729f739f9c7f7c120dcf0fc4542c03d04c9ac67d585",
+  "workspace": "/tmp/orbit-workbench-fixture/workspace"
+}

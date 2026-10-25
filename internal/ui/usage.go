@@ -11,7 +11,6 @@ import (
 
 	"github.com/charlzyx/orbit/internal/workbench"
 	"github.com/egoist/mygo/ui"
-	"github.com/egoist/mygo/ui/chart"
 )
 
 type usageState struct {
@@ -582,101 +581,7 @@ func (a *App) usageChart(c *ui.Context) {
 		ui.Text(c, "No buckets in this range.").TextColor(t.TextMuted)
 		return
 	}
-	labels := make([]string, len(points))
-	values := make([]float64, len(points))
-	valid := make([]bool, len(points))
-	maximum := 0.0
-	for i, p := range points {
-		labels[i] = p.At.Format("Jan 2")
-		if s.granularity == "hour" {
-			labels[i] = p.At.Format("Jan 2 15h")
-		}
-		values[i], valid[i] = usageMetricValue(p.usageAggregate, s.metric)
-		if s.metric == "latency" {
-			values[i], valid[i] = p.Latency.value(s.latencyMetric)
-		}
-		if valid[i] {
-			maximum = max(maximum, values[i])
-		}
-	}
-	x := chart.NewBand(labels...).Padding(0, 0)
-	y := chart.NewLinear(0, usageNiceMaximum(maximum))
-	ys := make([]float32, len(points))
-	base := make([]float32, len(points))
-	for i, v := range values {
-		ys[i] = y.At(v)
-		if !valid[i] {
-			ys[i] = float32(math.NaN())
-		}
-	}
-	xs := make([]float32, len(points))
-	for i := range xs {
-		xs[i] = x.At(i)
-	}
-	ticks := x.Ticks()
-	if len(ticks) > 8 {
-		step := (len(ticks) + 7) / 8
-		var sparse []chart.Tick
-		for i := 0; i < len(ticks); i += step {
-			sparse = append(sparse, ticks[i])
-		}
-		ticks = sparse
-	}
-	chart.Plot(c, chart.Axes{Left: y.Ticks(4), Bottom: ticks, Label: func(side chart.Side, tick chart.Tick) {
-		label := tick.Label
-		if side == chart.Left {
-			switch s.metric {
-			case "cost":
-				label = usageCost(tick.Value)
-			case "latency":
-				label = usageDuration(tick.Value)
-			default:
-				label = compactCount(uint64(max(0, tick.Value)))
-			}
-		}
-		ui.Text(c, label).FontSize(10).TextColor(t.TextMuted).NoWrap()
-	}}, func(area ui.Element) {
-		area.Label("Usage trend").Description("Left and right arrow keys inspect buckets. Enter focuses the selected bucket.")
-		area.Draw(func(p *ui.Painter, r ui.Rect) {
-			for quarter := 0; quarter < 4; quarter++ {
-				yy := r.Y + r.H*float32(quarter)/4
-				for xx := r.X; xx < r.X+r.W; xx += 6 {
-					p.Line(xx, yy, min(xx+4, r.X+r.W), yy, 1, t.Border)
-				}
-			}
-			p.Line(r.X, r.Y+r.H, r.X+r.W, r.Y+r.H, 1, t.Border)
-			p.FillPath(chart.Area(r, xs, base, ys, chart.CurveLinear), t.Accent.Alpha(.14))
-			p.StrokePath(chart.Line(r, xs, ys, chart.CurveLinear), 1, t.Accent)
-		})
-		for i := range values {
-			cell := chart.Rect(c, x.Band(i), chart.Span{Lo: 0, Hi: 1}).Tooltip(usagePointReadout(points[i], s.metric, s.latencyMetric)).Label("Usage bucket " + points[i].At.Format(time.RFC3339))
-			if s.filter.FocusStart.Equal(points[i].At) && s.filter.FocusEnd.Equal(points[i].End) {
-				cell.Background(t.Accent.Alpha(.08))
-			}
-			if cell.Clicked() {
-				a.focusUsageBucket(points[i].At, points[i].End)
-			}
-		}
-		chart.Select(c, area, &s.selected, xs, func(i int) string { return labels[i] + ": " + usageMetricText(values[i], valid[i], s.metric) })
-		if i := s.selected; i >= 0 && i < len(points) {
-			chart.RuleX(c, xs[i], 1).Background(t.TextMuted)
-			if valid[i] {
-				chart.Point(c, xs[i], ys[i], 5, 5).Radius(3).Background(t.Accent)
-			}
-			align := ui.Center
-			if xs[i] < .2 {
-				align = ui.Start
-			} else if xs[i] > .8 {
-				align = ui.End
-			}
-			chart.Anchor(c, xs[i], 1, align, ui.Start, func() {
-				ui.Text(c, usagePointReadout(points[i], s.metric, s.latencyMetric)).FontSize(11).Padding(5, 8).Radius(5).Background(t.Surface).Border(1, t.Border).NoWrap()
-			})
-			if area.Shortcut(0, ui.KeyEnter) {
-				a.focusUsageBucket(points[i].At, points[i].End)
-			}
-		}
-	}).Height(168).Gap(8).AlignSelf(ui.Stretch)
+	a.usageTimeline(c, points)
 	if s.projection.Latency.Samples > 0 {
 		a.usageLatencyLine(c, s.projection.Latency, a.text("view.response_time", "Response time"))
 	}
@@ -906,10 +811,17 @@ func usageNiceMaximum(v float64) float64 {
 		return 1
 	}
 	base := math.Pow(10, math.Floor(math.Log10(v)))
+	if base == 0 {
+		return v // Keep a subnormal positive domain usable.
+	}
 	n := v / base
 	for _, step := range []float64{1, 2, 2.5, 5, 10} {
 		if n <= step {
-			return step * base
+			top := step * base
+			if math.IsInf(top, 0) {
+				return v // A finite maximum must not produce an infinite scale.
+			}
+			return top
 		}
 	}
 	return 10 * base

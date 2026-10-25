@@ -32,7 +32,7 @@ func (a *App) reviewToolbar(c *ui.Context) {
 			c.AnimationFrame()
 		}
 		if a.reviewToggle(c.Key("review-close"), "Close review", "icons/x.svg", false, true).Clicked() {
-			a.ReviewVisible = false
+			a.closeReviewDock()
 		}
 	})
 	ui.Row(c.Key("review-toolbar")).Label("Review toolbar").Height(40).Shrink(0).PaddingX(10).Gap(8).AlignItems(ui.Center).BorderWidth(0, 0, 1, 0).BorderColor(t.Border).Children(func() {

@@ -453,7 +453,8 @@ func (a *App) reviewCommand(id string) {
 	s := &a.reviewState
 	switch id {
 	case "ReviewClose":
-		a.ReviewVisible = false
+		// view.rs::on_review_close leaves the dock open and only hands
+		// keyboard focus back to the composer, like sidebar Escape.
 		a.composer.Focus()
 	case "ReviewFileNext":
 		a.reviewFile(1)

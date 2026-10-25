@@ -6,6 +6,9 @@ output=$(realpath -m "$2")
 kind=${3:-reference}
 source_root=${4:-}
 repo_root=$(git rev-parse --show-toplevel)
+node_binary=$(realpath "$(command -v node)")
+node_version=$("$node_binary" --version)
+[[ "$node_version" == v22.23.4 ]] || { echo "Expected pinned Node v22.23.4, got $node_version"; exit 1; }
 source_sha=$(git rev-parse HEAD)
 if [[ -z "$source_root" ]]; then
   [[ "$kind" == go ]] || { echo "Reference capture requires its actual pinned source root as argument4"; exit 1; }
@@ -103,8 +106,15 @@ if [[ "${ORBIT_CAPTURE_USAGE:-0}" == 1 ]]; then
   # on guessed chart/table coordinates, no session opening or model inference.
   xdotool key Escape
   bash "$repo_root/scripts/usage-native/capture-state.sh" simple "$window" "$output"
+  # Resolve Details from THIS run's full native client image. An older
+  # screenshot's coordinates are not authority for a new pointer action.
+  # Verification sends no input; the existing helper sends exactly one click.
+  details_target=$(python3 "$repo_root/scripts/workbench-native/verify-target.py" "$window" "$app_pid" "$output/usage-evidence" Details 1000 70 1470 160)
+  read -r details_x details_y <<< "$details_target"
+  bash "$repo_root/scripts/usage-native/capture-state.sh" details "$window" "$output" "$details_x" "$details_y"
+  printf '%s\n' 'Details target evidence: usage-evidence/details-target.json; selected state remains unreviewed' >> "$output/usage-actions.log"
 fi
-SOURCE_SHA="$source_sha" CAPTURE_KIND="$kind" CAPTURE_OUTPUT="$output" CAPTURE_REPO="$source_root" CAPTURE_BINARY="$binary" CAPTURE_HARNESS="$repo_root" CAPTURE_SOURCE_HEAD="$capture_source_head" CAPTURE_SOURCE_DIRTY="$capture_source_dirty" python3 - <<'PY'
+SOURCE_SHA="$source_sha" CAPTURE_KIND="$kind" CAPTURE_OUTPUT="$output" CAPTURE_REPO="$source_root" CAPTURE_BINARY="$binary" CAPTURE_HARNESS="$repo_root" CAPTURE_SOURCE_HEAD="$capture_source_head" CAPTURE_SOURCE_DIRTY="$capture_source_dirty" CAPTURE_NODE_BINARY="$node_binary" python3 - <<'PY'
 import json, os, subprocess, pathlib, hashlib
 out = os.environ['CAPTURE_OUTPUT']
 images = {}
@@ -125,9 +135,12 @@ usage_fixture = pathlib.Path(out) / 'usage-fixture.json'
 if usage_fixture.exists():
     manifest['usageFixtureSha256'] = hashlib.sha256(usage_fixture.read_bytes()).hexdigest()
     manifest['usageFixture'] = json.loads(usage_fixture.read_text())
-    manifest['usageCaptureState'] = 'Simple requested using Escape then Ctrl+U; selected state and scan completion require manual image review'
+    manifest['usageCaptureState'] = 'Simple requested using Escape then Ctrl+U, then Details at a unique exact-label OCR target in a fresh current-run native client image; Models is fixture-selected. Selected states and scan completion require manual image review'
+    manifest['usageDetailsTargetEvidence'] = json.loads((pathlib.Path(out) / 'usage-evidence/details-target.json').read_text())
     manifest['volatileCases']['usage-simple-dark.png'] = ['scan-relative header age', 'activity calendar trailing-year anchor']
+    manifest['volatileCases']['usage-details-dark.png'] = ['scan-relative header age']
 source_root = pathlib.Path(os.environ['CAPTURE_REPO'])
+manifest['runtimeNode'] = dict(path=os.environ['CAPTURE_NODE_BINARY'], version=subprocess.check_output([os.environ['CAPTURE_NODE_BINARY'], '--version'], text=True).strip(), sha256=hashlib.sha256(pathlib.Path(os.environ['CAPTURE_NODE_BINARY']).read_bytes()).hexdigest())
 manifest['binarySha256'] = hashlib.sha256(pathlib.Path(os.environ['CAPTURE_BINARY']).read_bytes()).hexdigest()
 manifest['sourceRootGitHead'] = os.environ['CAPTURE_SOURCE_HEAD']
 manifest['sourceRootDirty'] = os.environ['CAPTURE_SOURCE_DIRTY'] == 'true'
@@ -140,3 +153,10 @@ fonts = source_root / 'crates/orbit-pi/assets/fonts'
 manifest['bundledFontInputs'] = {str(p.relative_to(fonts)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(fonts.rglob('*')) if p.suffix.lower() in ('.ttf', '.otf')}
 with open(out + '/manifest.json', 'w') as f: json.dump(manifest, f, indent=2)
 PY
+# Workbench is a separate real app launch/home so the existing Settings/Usage
+# fixture and its image count are unchanged. Child output has its own manifest.
+if [[ "${ORBIT_CAPTURE_WORKBENCH:-0}" == 1 ]]; then
+  kill "$app_pid" 2>/dev/null || true
+  wait "$app_pid" 2>/dev/null || true
+  bash "$repo_root/scripts/workbench-native/capture.sh" "$binary" "$output/workbench" "$kind" "$source_root" "$capture_source_head" "$capture_source_dirty" "$source_sha"
+fi

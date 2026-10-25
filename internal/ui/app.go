@@ -791,10 +791,10 @@ func (a *App) header(c *ui.Context) {
 			})
 		}
 		if a.iconButton(c, "Review changes", "icons/panel-right.svg").Background(t.Elevated).Border(1, t.Border).Radius(t.Px(8)).Clicked() {
-			a.command("ReviewChanges", "")
+			a.command("ToggleSidePanel", "")
 		}
 		a.iconButton(c, "More actions", "icons/more.svg").Background(t.Elevated).Border(1, t.Border).Radius(t.Px(8)).Menu(func(m *ui.Menu) {
-			for _, entry := range []struct{ label, kind string }{{"Rename task…", "RenameSession"}, {"Review changes", "ReviewChanges"}, {"Git", "OpenGit"}, {"Worktrees", "OpenWorktrees"}, {"Usage", "ToggleUsage"}, {"Settings", "OpenSettings"}, {"Export session…", "ExportSession"}} {
+			for _, entry := range []struct{ label, kind string }{{"Rename task…", "RenameSession"}, {"Review changes", "ReviewChanges"}, {"Git", "ToggleGit"}, {"Worktrees", "OpenWorktrees"}, {"Usage", "ToggleUsage"}, {"Settings", "OpenSettings"}, {"Export session…", "ExportSession"}} {
 				if m.Item(entry.label).Chosen() {
 					a.command(entry.kind, "")
 				}
