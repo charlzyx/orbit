@@ -2,6 +2,7 @@ package terminal
 
 import (
 	"encoding/json"
+	"runtime"
 	"strings"
 	"sync"
 	"testing"
@@ -23,6 +24,59 @@ func TestCustomANSIFrameOwnsControls(t *testing.T) {
 	if strings.Contains(bad, "\x1b[?25h") {
 		t.Fatal("invalid cursor visible")
 	}
+}
+
+// Native Linux/Windows backends offer role accelerators to focused content
+// first. Exercise that content route separately from literal Edit commands:
+// key C must produce ETX, while the menu command must copy the selection.
+func TestLiveControlKeysAndLiteralEditingCommands(t *testing.T) {
+	requireTerminal(t)
+	var mu sync.Mutex
+	var input string
+	p := NewCustom(CustomOptions{OnInput: func(_ string, data string) error {
+		mu.Lock()
+		input += data
+		mu.Unlock()
+		return nil
+	}})
+	defer p.Close()
+	p.Update("editing", []string{"copy this exact row"}, 96, 20, nil)
+	until(t, nil, "editing grid", func() bool { return p.ActiveTerminal() != nil })
+	tt := ui.NewTester(func(c *ui.Context) { CustomView(c, p).Width(700).Height(350) }, 720, 400)
+	for _, key := range []ui.Key{ui.KeyC, ui.KeyV, ui.KeyA, ui.KeyX, ui.KeyW} {
+		tt.Key(ui.Ctrl, key)
+	}
+	const raw = "\x03\x16\x01\x18\x17"
+	until(t, tt, "shell control bytes", func() bool { mu.Lock(); defer mu.Unlock(); return len(input) >= len(raw) })
+	mu.Lock()
+	got := input
+	mu.Unlock()
+	if got != raw {
+		t.Fatalf("control keys were treated as edit menu: %q", got)
+	}
+	tt.Command("selectAll")
+	tt.Command("copy")
+	if !strings.Contains(tt.Clipboard(), "copy this exact row") {
+		t.Fatal("literal Edit command did not copy terminal selection", tt.Clipboard())
+	}
+	p.ActiveTerminal().Feed([]byte("\x1b[?2004h"))
+	tt.SetClipboard("paste")
+	tt.Command("paste")
+	const pasted = "\x1b[200~paste\x1b[201~"
+	until(t, tt, "literal Edit paste", func() bool { mu.Lock(); defer mu.Unlock(); return strings.HasSuffix(input, pasted) })
+	mu.Lock()
+	got = input
+	mu.Unlock()
+	if got != raw+pasted {
+		t.Fatalf("menu copy injected control bytes: %q", got)
+	}
+	// The platform default terminal paste chord remains separate from Ctrl+V.
+	mods := ui.Ctrl | ui.Shift
+	if runtime.GOOS == "darwin" {
+		mods = ui.Super
+	}
+	tt.Key(mods, ui.KeyV)
+	until(t, tt, "platform paste chord", func() bool { mu.Lock(); defer mu.Unlock(); return input == raw+pasted+pasted })
 }
 func TestLiveCustomRPCGridNoPTY(t *testing.T) {
 	requireTerminal(t)

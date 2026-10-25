@@ -1,0 +1,30 @@
+{
+  "baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "verified_at": "2026-10-25T05:22:31.396727+00:00",
+  "last_verified_sha": null,
+  "source_state": "dirty working tree, not attributed to prior published commit",
+  "files_sha256": {
+    "internal/background/field.go": "7eabd6eb640cae2a1e873b807d69852ff00b7d068862dde73a8ae71ece77af05",
+    "internal/background/field_test.go": "ea1cad63e7ead9a60f1dfa13ed6ce67537ffbed152622d9f8d31a2d004868d44",
+    "internal/background/photo.go": "4aefe822f260cf01b87a5b4ea3f51e0402334fb261b69b2dcf669ae17d98da6c",
+    "internal/background/photo_test.go": "f65f1f80ed819e6d2431d62a9686db775f07b8bf821cf2cdab9149c563205a3d",
+    "internal/background/resize.go": "3e7ca667dfee37ea57e348f95d4bb0604783ec91f9c8cd89a268d4f29c37ba3e",
+    "internal/background/testdata/blur-oracle.json": "5e1f121048dc79578f8d42d0033d8932fc35e79ab9c863420da2570dbba94860",
+    "internal/background/testdata/blur-oracle.rs": "8e6ced8e9ae8fcfcc8a89bb3f286366e2b2e6a8496ee8384b0f50cd2f58dd7a8",
+    "internal/background/testdata/resize-oracle.json": "d2f18b9b75d8106a97ef2160057836c3372bdd8db464c40b23bb80917c958aec",
+    "internal/background/testdata/resize-oracle.rs": "1e797334561bc7e6d2ec52f3dcdfb6854c5365f2724b0612d684db11c35f606c"
+  },
+  "commands": [
+    "go test -race ./internal/background -count=1",
+    "go vet ./internal/background"
+  ],
+  "results": {
+    "named_tests": 13,
+    "rust_blur_pixel_oracles": 72,
+    "rust_resize_pixel_oracles": 4,
+    "status": "PASS_SCOPED",
+    "full_feature_parity": false,
+    "native_os": "UNTESTED",
+    "matched_visual": "UNTESTED"
+  }
+}

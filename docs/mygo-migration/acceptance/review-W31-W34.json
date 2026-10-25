@@ -9,20 +9,6 @@
       "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
       "source_handlers": [
         {
-          "path": "crates/orbit-pi/src/review.rs",
-          "handler": "Source",
-          "line": 28,
-          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/review.rs#L28",
-          "resolution": "definition_located"
-        },
-        {
-          "path": "crates/orbit-pi/src/git.rs",
-          "handler": "collect_review_diff",
-          "line": 304,
-          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git.rs#L304",
-          "resolution": "definition_located"
-        },
-        {
           "path": "crates/orbit-pi/src/git.rs",
           "handler": "resolve_range",
           "line": 333,
@@ -30,10 +16,24 @@
           "resolution": "definition_located"
         },
         {
-          "path": "crates/orbit-pi/src/git.rs",
-          "handler": "branch_base",
-          "line": 426,
-          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git.rs#L426",
+          "path": "crates/orbit-pi/src/app.rs",
+          "handler": "sync_review_context",
+          "line": 2069,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app.rs#L2069",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "source_menu",
+          "line": 2113,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L2113",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "set_turn_context",
+          "line": 486,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L486",
           "resolution": "definition_located"
         }
       ],
@@ -44,8 +44,8 @@
         {
           "id": "W31.behavior",
           "dimension": "functional",
-          "action": "Create distinct baseline/index/worktree/branch/turn states; select all six Review sources.",
-          "expected": "Review sources: Last Turn, Uncommitted, Unstaged, Staged, Committed and Branch. Comparisons respectively use turn refs; HEAD→worktree; index→worktree; HEAD→index; branch base→HEAD; branch base→worktree.",
+          "action": "Create baseline HEAD plus one committed branch change, one staged file, one unstaged edit and one untracked file. Choose each of the six sources and compare both endpoints and exact changed paths.",
+          "expected": "Uncommitted=HEAD→worktree, Unstaged=index→worktree including untracked files, Staged=HEAD→index, Committed=main/master merge-base→HEAD, Branch=base→worktree. Last Turn uses immutable completed refs, not current live worktree or current prompt ordinal.",
           "status": "UNTESTED",
           "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
@@ -53,8 +53,8 @@
         {
           "id": "W31.edge",
           "dimension": "edge",
-          "action": "Use unborn HEAD, no main/master and absent turn checkpoint; compare exact trees and honest source-specific unavailable state.",
-          "expected": "Default branch comparison searches local main/master distinct from current, else HEAD; unborn HEAD uses empty tree. Last Turn unavailable without session/completed checkpoint and falls back on session switch. Exact existing semantics must not be replaced by a generic `git diff`.",
+          "action": "Complete turn1, select Last Turn, start turn2 but withhold its end checkpoint. Refresh three times, then complete turn2. Open the explicit turn1 card afterward.",
+          "expected": "While turn2 runs, the existing turn1 diff remains available. Selected LastTurn{1} remains pinned after completion2 and is labeled Turn 1; choosing Last Turn again selects2. An empty-session source menu disables Last Turn.",
           "status": "UNTESTED",
           "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
@@ -62,46 +62,46 @@
         {
           "id": "W31.error",
           "dimension": "error",
-          "action": "Fail a first load and same-source refresh separately; finish an earlier request after a newer source/workspace selection.",
-          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Default branch comparison searches local main/master distinct from current, else HEAD; unborn HEAD uses empty tree. Last Turn unavailable without session/completed checkpoint and falls back on session switch. Exact existing semantics must not be replaced by a generic `git diff`.",
+          "action": "Remove the ending ref for an explicitly selected turn; separately remove its diff-base ref and then its start ref while keeping the previous ending ref. Switch to a session with no completed refs.",
+          "expected": "Missing ending ref is unavailable, not an empty-success diff. Starting endpoint prefers turn-diff-N, then turn-start-N, then turn-(N-1). Switching sessions with no completed turn changes Last Turn to Uncommitted rather than retaining an error-prone old turn.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W31.loading",
           "dimension": "loading",
-          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
-          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "action": "Pause the completed-turn lookup and a source load independently; change session/workspace/source before the earlier callback completes.",
+          "expected": "The completed count is not inferred from transcript rows or an in-flight Turn. Obsolete source/session/workspace callbacks cannot overwrite the current view. Same-source cached diff remains during refresh; manual feedback follows W39.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W31.persistence",
           "dimension": "persistence",
-          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
-          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "action": "Complete turn3, compact away old transcript messages, recreate runtime and Review, then start the next prompt. Repeat with only turn-start-9 and turn-diff-9 refs added.",
+          "expected": "Persisted ending refs restore completed3 and next counter4. Start/diff refs do not count as completed9. Review selected source/historical turn are controller state, not a separately invented disk preference.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W31.keyboard",
           "dimension": "keyboard",
-          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
-          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "action": "Open the Review source dropdown; select Last Turn by the existing native menu interaction; dismiss without choosing. Inspect source command registration for a dedicated Last Turn chord.",
+          "expected": "Only enabled selection changes source and records the completed turn number. Dismissal changes nothing. No dedicated Last Turn chord is invented. Historical Review buttons pass their actual turn number, not message ordinal.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W31.repeat",
           "dimension": "repeat",
-          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
-          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "action": "Alternate a completed session, a first-run session and a completed historical turn three times while delayed Review loads finish out of order.",
+          "expected": "No previous-session file content or completed counter leaks into the new context. Source set_turn_context only falls back when the new session has no completed turn; otherwise it retains the numeric selected LastTurn{N}, which may be unavailable in that session. Record this source limitation rather than silently rewriting its selection contract.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         }
       ],
@@ -119,10 +119,10 @@
       "source_test_inventory": "`git.rs::{source_modes_compare_consistent_git_snapshots,last_turn_uses_captured_checkpoints_not_the_live_worktree,last_turn_without_checkpoints_reports_an_error,off_repo_reports_not_a_repository}`",
       "verdicts": {
         "functional": {
-          "status": "UNTESTED",
-          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "status": "PARTIAL",
+          "reason": "Named narrow assertions pass; remaining row steps are unverified.",
           "last_verified_sha": null,
-          "last_partial_evidence_sha": null
+          "last_partial_evidence_sha": "94755581807bf98b08a0bbd5550473abc7e5a7dc796e5f8654f6428aa4333b93"
         },
         "visual": {
           "status": "UNTESTED",
@@ -135,11 +135,77 @@
           "last_verified_sha": null
         }
       },
-      "assertion_results": [],
+      "assertion_results": [
+        {
+          "id": "W31.assert.TestReviewSixSourcesAndUntrackedPaths",
+          "status": "PASS",
+          "expected": "Exact HEAD/index/worktree/branch changed-file fixtures, including untracked unusual paths.",
+          "test": "TestReviewSixSourcesAndUntrackedPaths",
+          "package": "github.com/charlzyx/orbit/internal/workspace",
+          "evidence": "checkpoint-evidence.json",
+          "last_verified_sha": "94755581807bf98b08a0bbd5550473abc7e5a7dc796e5f8654f6428aa4333b93",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:46:22.167695055+09:00",
+          "limits": "Named assertion only; no full-scope/visual/native-OS PASS."
+        },
+        {
+          "id": "W31.assert.TestLastTurnUsesPersistedCounterAfterCompaction",
+          "status": "PASS",
+          "expected": "Completed checkpoint number, not transcript row count, drives Last Turn after compaction.",
+          "test": "TestLastTurnUsesPersistedCounterAfterCompaction",
+          "package": "github.com/charlzyx/orbit/internal/ui",
+          "evidence": "checkpoint-evidence.json",
+          "last_verified_sha": "94755581807bf98b08a0bbd5550473abc7e5a7dc796e5f8654f6428aa4333b93",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:46:23.278129809+09:00",
+          "limits": "Named assertion only; no full-scope/visual/native-OS PASS."
+        },
+        {
+          "id": "W31.assert.TestReviewLastTurnKeepsCompletedDiffDuringNextPrompt",
+          "status": "PASS",
+          "expected": "Repeated refresh retains prior completed diff while a newer prompt has no ending ref.",
+          "test": "TestReviewLastTurnKeepsCompletedDiffDuringNextPrompt",
+          "package": "github.com/charlzyx/orbit/internal/ui",
+          "evidence": "checkpoint-evidence.json",
+          "last_verified_sha": "94755581807bf98b08a0bbd5550473abc7e5a7dc796e5f8654f6428aa4333b93",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:46:23.384687693+09:00",
+          "limits": "Named assertion only; no full-scope/visual/native-OS PASS."
+        },
+        {
+          "id": "W31.assert.TestReviewHistoricalTurnStaysPinnedAndEmptySessionFallsBack",
+          "status": "PASS",
+          "expected": "Historical Turn1 remains pinned; empty-session switch falls back to Uncommitted.",
+          "test": "TestReviewHistoricalTurnStaysPinnedAndEmptySessionFallsBack",
+          "package": "github.com/charlzyx/orbit/internal/ui",
+          "evidence": "checkpoint-evidence.json",
+          "last_verified_sha": "94755581807bf98b08a0bbd5550473abc7e5a7dc796e5f8654f6428aa4333b93",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:46:23.55199929+09:00",
+          "limits": "Named assertion only; no full-scope/visual/native-OS PASS."
+        },
+        {
+          "id": "W31.assert.TestCheckpointPlainFolderAndLegacyBaselineAreNonErrors",
+          "status": "PASS",
+          "expected": "Plain-folder capture no-ops; legacy previous-end baseline remains a usable fallback.",
+          "test": "TestCheckpointPlainFolderAndLegacyBaselineAreNonErrors",
+          "package": "github.com/charlzyx/orbit/internal/workspace",
+          "evidence": "checkpoint-evidence.json",
+          "last_verified_sha": "94755581807bf98b08a0bbd5550473abc7e5a7dc796e5f8654f6428aa4333b93",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:46:22.039417397+09:00",
+          "limits": "Named assertion only; no full-scope/visual/native-OS PASS."
+        }
+      ],
       "known_remaining": "Six-source immutable snapshots/checkpoint attribution/diff model tested; native review interaction/presentation parity remains pending.",
       "full_parity_verified": false,
       "supplemental_cases": [],
-      "additional_evidence": []
+      "additional_evidence": [
+        "../checkpoint-acceptance.md",
+        "checkpoint-evidence.json",
+        "checkpoint-failure-history.json",
+        "../intentional-deviations.md"
+      ]
     },
     {
       "id": "W32",
@@ -148,30 +214,30 @@
       "source_handlers": [
         {
           "path": "crates/orbit-pi/src/checkpoint.rs",
+          "handler": "latest_turn",
+          "line": 396,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/checkpoint.rs#L396",
+          "resolution": "definition_located"
+        },
+        {
+          "path": "crates/orbit-pi/src/checkpoint.rs",
           "handler": "capture_turn_start",
           "line": 114,
           "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/checkpoint.rs#L114",
           "resolution": "definition_located"
         },
         {
-          "path": "crates/orbit-pi/src/checkpoint.rs",
-          "handler": "capture_turn",
-          "line": 155,
-          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/checkpoint.rs#L155",
+          "path": "crates/orbit-pi/src/app/session.rs",
+          "handler": "finish_turn",
+          "line": 227,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/session.rs#L227",
           "resolution": "definition_located"
         },
         {
-          "path": "crates/orbit-pi/src/checkpoint.rs",
-          "handler": "capture_worktree_commit",
-          "line": 189,
-          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/checkpoint.rs#L189",
-          "resolution": "definition_located"
-        },
-        {
-          "path": "crates/orbit-pi/src/checkpoint.rs",
-          "handler": "checkpoint_ref",
-          "line": 90,
-          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/checkpoint.rs#L90",
+          "path": "crates/orbit-pi/src/app/session.rs",
+          "handler": "begin_turn",
+          "line": 200,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/session.rs#L200",
           "resolution": "definition_located"
         }
       ],
@@ -182,8 +248,8 @@
         {
           "id": "W32.behavior",
           "dimension": "functional",
-          "action": "Capture tracked/untracked turn-start/end snapshots, restart manager and continue turn numbering.",
-          "expected": "Snapshot tracked and untracked files at turn start/end into session-keyed `refs/orbit/session-…` checkpoint commits; recover latest completed turn after restart and continue numbering.",
+          "action": "Start turn1 in a temporary repository with different HEAD/index/worktree bytes and an untracked file; capture its end after edits. Record bytes, mtime, HEAD and status before/after capture.",
+          "expected": "Private-index snapshots include tracked and untracked content. Real index bytes/mtime, HEAD and worktree remain unchanged. Turn-start and baseline refs are published together; completed ref and branch-aware diff base are separately recorded.",
           "status": "UNTESTED",
           "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
@@ -191,8 +257,8 @@
         {
           "id": "W32.edge",
           "dimension": "edge",
-          "action": "Verify real index/HEAD/worktree unchanged, concurrent checkpoints serialized, non-repository no-op and failed capture diagnostic.",
-          "expected": "Isolated temporary index preserves real index/HEAD/worktree; ref-safe session key and atomic ref updates. Non-repo capture no-ops. Index read uses copied temporary index to avoid file-watch loops.",
+          "action": "Start a first turn without ending it; then complete it. Start a second turn while reading the previously completed diff. Repeat in an unborn repository and a non-Git folder.",
+          "expected": "Start does not enable a nonexistent Last Turn. Completed counter advances only after successful end capture; in-flight counter remains separate. Unborn repository can snapshot its files. Plain-folder capture no-ops; Go deliberately avoids advertising a nonexistent Git ref (deviation D06).",
           "status": "UNTESTED",
           "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
@@ -200,46 +266,46 @@
         {
           "id": "W32.error",
           "dimension": "error",
-          "action": "Fail a first load and same-source refresh separately; finish an earlier request after a newer source/workspace selection.",
-          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Isolated temporary index preserves real index/HEAD/worktree; ref-safe session key and atomic ref updates. Non-repo capture no-ops. Index read uses copied temporary index to avoid file-watch loops.",
+          "action": "Place a disposable .lock file at refs/orbit/session-fixture-turn-N.lock before end capture. Repeat with no prior completed turn and with completed turn1. Remove lock and retry.",
+          "expected": "End capture failure retains completed0/1 respectively, emits bounded diagnostic and never claims a successful new diff. Retry can publish N. Partial object writes are not treated as user edits; real index and HEAD remain unchanged.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W32.loading",
           "dimension": "loading",
-          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
-          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "action": "Pause an earlier checkpoint task, reserve end/start tasks for successive turns, then release it. Abort while the next prompt is waiting; send duplicate agent_settled events.",
+          "expected": "Go reserves checkpoint work off the UI thread in order and gates new prompts during identity recovery (D07). End capture begins only for an open turn; duplicate settles cannot reserve it twice. Source begins capture asynchronously after send acceptance, so Go waiting for start capture before RPC prompt dispatch is an explicit safer ordering difference, not a source timing PASS.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W32.persistence",
           "dimension": "persistence",
-          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
-          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "action": "Complete turns1 and3 for sessionA; add start/diff-only refs99 and completed7 for sessionB. Recreate manager and open A.",
+          "expected": "latest_turn lists only numeric ending suffixes for A; restores3, next prompt uses4, unrelated B and start/diff99 are excluded. Session keys retain ASCII alphanumerics/-/_ and replace each other Unicode scalar with one underscore.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W32.keyboard",
           "dimension": "keyboard",
-          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
-          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "action": "Submit from composer using its configured Enter send mode, issue Escape/Stop during the turn, then use Review without another prompt.",
+          "expected": "Checkpoint creation has no separate keyboard shortcut. Submission and abort dispatch use the ordinary controller path; Review remains read-only and never resets or checks out a checkpoint.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W32.repeat",
           "dimension": "repeat",
-          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
-          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "action": "Reuse one runtime for a new session while an old completion is delayed; also park one running session and complete it while another is active.",
+          "expected": "Each checkpoint closure retains its original session/workspace/turn. Old completion may persist old refs but cannot publish its count into a replacement identity. Background sessions keep their own completed counter; reopening recovers the same refs.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         }
       ],
@@ -257,10 +323,10 @@
       "source_test_inventory": "`checkpoint.rs::{captures_tracked_and_untracked_files_without_touching_the_index,each_turn_diffs_only_its_own_changes,latest_turn_lists_the_sessions_ending_checkpoints}`; `git.rs::index_tree_reads_without_rewriting_the_index`",
       "verdicts": {
         "functional": {
-          "status": "UNTESTED",
-          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "status": "PARTIAL",
+          "reason": "Named narrow assertions pass; remaining row steps are unverified.",
           "last_verified_sha": null,
-          "last_partial_evidence_sha": null
+          "last_partial_evidence_sha": "94755581807bf98b08a0bbd5550473abc7e5a7dc796e5f8654f6428aa4333b93"
         },
         "visual": {
           "status": "UNTESTED",
@@ -273,11 +339,173 @@
           "last_verified_sha": null
         }
       },
-      "assertion_results": [],
+      "assertion_results": [
+        {
+          "id": "W32.assert.TestCheckpointCompletedCounterAdvancesOnlyAfterSuccessfulEnd",
+          "status": "PASS",
+          "expected": "Completed counter advances on success only; lock failure retains old value and retry succeeds.",
+          "test": "TestCheckpointCompletedCounterAdvancesOnlyAfterSuccessfulEnd",
+          "package": "github.com/charlzyx/orbit/internal/agent",
+          "evidence": "checkpoint-evidence.json",
+          "last_verified_sha": "94755581807bf98b08a0bbd5550473abc7e5a7dc796e5f8654f6428aa4333b93",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:46:07.012972157+09:00",
+          "limits": "Named assertion only; no full-scope/visual/native-OS PASS."
+        },
+        {
+          "id": "W32.assert.TestCheckpointCompletionDoesNotLeakAcrossSessionIdentity",
+          "status": "PASS",
+          "expected": "Old completion persists old refs without publishing into reused session identity.",
+          "test": "TestCheckpointCompletionDoesNotLeakAcrossSessionIdentity",
+          "package": "github.com/charlzyx/orbit/internal/agent",
+          "evidence": "checkpoint-evidence.json",
+          "last_verified_sha": "94755581807bf98b08a0bbd5550473abc7e5a7dc796e5f8654f6428aa4333b93",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:46:07.118407538+09:00",
+          "limits": "Named assertion only; no full-scope/visual/native-OS PASS."
+        },
+        {
+          "id": "W32.assert.TestCheckpointFirstEndFailureDoesNotEnableLastTurn",
+          "status": "PASS",
+          "expected": "First end capture failure keeps Last Turn unavailable.",
+          "test": "TestCheckpointFirstEndFailureDoesNotEnableLastTurn",
+          "package": "github.com/charlzyx/orbit/internal/agent",
+          "evidence": "checkpoint-evidence.json",
+          "last_verified_sha": "94755581807bf98b08a0bbd5550473abc7e5a7dc796e5f8654f6428aa4333b93",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:46:07.331923174+09:00",
+          "limits": "Named assertion only; no full-scope/visual/native-OS PASS."
+        },
+        {
+          "id": "W32.assert.TestCheckpointPlainFolderDoesNotAdvertiseMissingDiff",
+          "status": "PASS",
+          "expected": "Plain-folder no-op never advertises a nonexistent Git ending ref (D06).",
+          "test": "TestCheckpointPlainFolderDoesNotAdvertiseMissingDiff",
+          "package": "github.com/charlzyx/orbit/internal/agent",
+          "evidence": "checkpoint-evidence.json",
+          "last_verified_sha": "94755581807bf98b08a0bbd5550473abc7e5a7dc796e5f8654f6428aa4333b93",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:46:07.342368538+09:00",
+          "limits": "Named assertion only; no full-scope/visual/native-OS PASS."
+        },
+        {
+          "id": "W32.assert.TestCheckpointIdentityResponseResetsBothTurnCounters",
+          "status": "PASS",
+          "expected": "Authoritative new session ID resets in-flight and completed counters.",
+          "test": "TestCheckpointIdentityResponseResetsBothTurnCounters",
+          "package": "github.com/charlzyx/orbit/internal/agent",
+          "evidence": "checkpoint-evidence.json",
+          "last_verified_sha": "94755581807bf98b08a0bbd5550473abc7e5a7dc796e5f8654f6428aa4333b93",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:46:07.342387657+09:00",
+          "limits": "Named assertion only; no full-scope/visual/native-OS PASS."
+        },
+        {
+          "id": "W32.assert.TestManagerRestoresCompletedTurnDuringNextPrompt",
+          "status": "PASS",
+          "expected": "Real manager restores completed3, starts4 while retaining3, then settles an isolated turn4 diff.",
+          "test": "TestManagerRestoresCompletedTurnDuringNextPrompt",
+          "package": "github.com/charlzyx/orbit/internal/agent",
+          "evidence": "checkpoint-evidence.json",
+          "last_verified_sha": "94755581807bf98b08a0bbd5550473abc7e5a7dc796e5f8654f6428aa4333b93",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:46:08.508527965+09:00",
+          "limits": "Named assertion only; no full-scope/visual/native-OS PASS."
+        },
+        {
+          "id": "W32.assert.TestCheckpointIdentityRecoveryRejectsStaleGenerationAndLiveTurn",
+          "status": "PASS",
+          "expected": "Obsolete recovery cannot release another identity gate or rewind a live counter.",
+          "test": "TestCheckpointIdentityRecoveryRejectsStaleGenerationAndLiveTurn",
+          "package": "github.com/charlzyx/orbit/internal/agent",
+          "evidence": "checkpoint-evidence.json",
+          "last_verified_sha": "94755581807bf98b08a0bbd5550473abc7e5a7dc796e5f8654f6428aa4333b93",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:46:08.597562297+09:00",
+          "limits": "Named assertion only; no full-scope/visual/native-OS PASS."
+        },
+        {
+          "id": "W32.assert.TestManagerPromptGatePreservesExistingRefDuringCheckpointRecovery",
+          "status": "PASS",
+          "expected": "Pending recovery rejects prompt before reservation; safe retry preserves prior ref1 and starts2 (D07).",
+          "test": "TestManagerPromptGatePreservesExistingRefDuringCheckpointRecovery",
+          "package": "github.com/charlzyx/orbit/internal/agent",
+          "evidence": "checkpoint-evidence.json",
+          "last_verified_sha": "94755581807bf98b08a0bbd5550473abc7e5a7dc796e5f8654f6428aa4333b93",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:46:09.783860357+09:00",
+          "limits": "Named assertion only; no full-scope/visual/native-OS PASS."
+        },
+        {
+          "id": "W32.assert.TestCheckpointRecoveryFailureStaysGatedUntilSuccessfulRetry",
+          "status": "PASS",
+          "expected": "Actual ref-listing failure remains not-ready until repaired recovery publishes a trustworthy counter (D07).",
+          "test": "TestCheckpointRecoveryFailureStaysGatedUntilSuccessfulRetry",
+          "package": "github.com/charlzyx/orbit/internal/agent",
+          "evidence": "checkpoint-evidence.json",
+          "last_verified_sha": "94755581807bf98b08a0bbd5550473abc7e5a7dc796e5f8654f6428aa4333b93",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:46:09.843842064+09:00",
+          "limits": "Named assertion only; no full-scope/visual/native-OS PASS."
+        },
+        {
+          "id": "W32.assert.TestCheckpointDoesNotChangeIndexHeadOrWorktree",
+          "status": "PASS",
+          "expected": "Repeated captures preserve real index bytes/mtime, HEAD/status and remove temporary indexes.",
+          "test": "TestCheckpointDoesNotChangeIndexHeadOrWorktree",
+          "package": "github.com/charlzyx/orbit/internal/workspace",
+          "evidence": "checkpoint-evidence.json",
+          "last_verified_sha": "94755581807bf98b08a0bbd5550473abc7e5a7dc796e5f8654f6428aa4333b93",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:46:21.687411945+09:00",
+          "limits": "Named assertion only; no full-scope/visual/native-OS PASS."
+        },
+        {
+          "id": "W32.assert.TestCheckpointTurnFreezesDiffAndRestoresCounter",
+          "status": "PASS",
+          "expected": "Completed turn remains immutable after later edits and recovers persisted ending count.",
+          "test": "TestCheckpointTurnFreezesDiffAndRestoresCounter",
+          "package": "github.com/charlzyx/orbit/internal/workspace",
+          "evidence": "checkpoint-evidence.json",
+          "last_verified_sha": "94755581807bf98b08a0bbd5550473abc7e5a7dc796e5f8654f6428aa4333b93",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:46:21.759447269+09:00",
+          "limits": "Named assertion only; no full-scope/visual/native-OS PASS."
+        },
+        {
+          "id": "W32.assert.TestCheckpointUnbornAndCancellation",
+          "status": "PASS",
+          "expected": "Unborn capture succeeds; pre-cancelled operation writes no checkpoint ref.",
+          "test": "TestCheckpointUnbornAndCancellation",
+          "package": "github.com/charlzyx/orbit/internal/workspace",
+          "evidence": "checkpoint-evidence.json",
+          "last_verified_sha": "94755581807bf98b08a0bbd5550473abc7e5a7dc796e5f8654f6428aa4333b93",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:46:21.980758912+09:00",
+          "limits": "Named assertion only; no full-scope/visual/native-OS PASS."
+        },
+        {
+          "id": "W32.assert.TestCheckpointStartPrecedesImmediatePiToolMutation",
+          "status": "PASS",
+          "expected": "Actual Pi fixture writes immediately on prompt receipt; start baseline still excludes that mutation (D08).",
+          "test": "TestCheckpointStartPrecedesImmediatePiToolMutation",
+          "package": "github.com/charlzyx/orbit/internal/agent",
+          "evidence": "checkpoint-evidence.json",
+          "last_verified_sha": "94755581807bf98b08a0bbd5550473abc7e5a7dc796e5f8654f6428aa4333b93",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:46:10.997267476+09:00",
+          "limits": "Named assertion only; no full-scope/visual/native-OS PASS."
+        }
+      ],
       "known_remaining": "Six-source immutable snapshots/checkpoint attribution/diff model tested; native review interaction/presentation parity remains pending.",
       "full_parity_verified": false,
       "supplemental_cases": [],
-      "additional_evidence": []
+      "additional_evidence": [
+        "../checkpoint-acceptance.md",
+        "checkpoint-evidence.json",
+        "checkpoint-failure-history.json",
+        "../intentional-deviations.md"
+      ]
     },
     {
       "id": "W33",
@@ -320,8 +548,8 @@
         {
           "id": "W33.behavior",
           "dimension": "functional",
-          "action": "Switch branches during a turn and start with dirty changes on the destination branch.",
-          "expected": "Last Turn attribution handles branch switches during or between turns and dirty files on target branch; starting metadata retains HEAD, branch and repository refs.",
+          "action": "Create main and an existing target branch with target-only files. Capture a turn start on main, switch to target and add only agent.txt, then capture end.",
+          "expected": "Last Turn contains agent.txt only, not target branch preexisting files. Metadata captures starting HEAD, symbolic branch and all local/remote/tag commit refs; annotated tags are peeled.",
           "status": "UNTESTED",
           "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
@@ -329,8 +557,8 @@
         {
           "id": "W33.edge",
           "dimension": "edge",
-          "action": "Last Turn must exclude unrelated branch switch and preexisting destination dirt while retaining actual agent changes.",
-          "expected": "Branch-aware virtual start/diff base prevents a whole branch switch from appearing as agent edits. Checkpoint display is read-only review, not a user-facing rewind/restore workflow.",
+          "action": "Carry an untracked pre-turn dirty file to target; then create a new branch during a separate turn and commit agent changes there. Repeat with detached HEAD and an unborn start.",
+          "expected": "Virtual branch start retains pre-turn dirty content on the target so it is not attributed to the turn. Newly created branch commits remain attributed. Detached comparison uses HEAD identity; an absent target ancestor uses an empty-tree commit.",
           "status": "UNTESTED",
           "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
@@ -338,46 +566,46 @@
         {
           "id": "W33.error",
           "dimension": "error",
-          "action": "Fail a first load and same-source refresh separately; finish an earlier request after a newer source/workspace selection.",
-          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Branch-aware virtual start/diff base prevents a whole branch switch from appearing as agent edits. Checkpoint display is read-only review, not a user-facing rewind/restore workflow.",
+          "action": "Force virtual merge-tree to fail or corrupt the stored turn-start metadata. Inspect end ref and attempt Review through its fallback endpoints.",
+          "expected": "capture_turn reports the failure and does not falsely advance completed UI state. Existing ending object/ref may remain because end publication precedes diff-base preparation. Review falls back only through documented diff/start/previous refs; no worktree rollback occurs.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W33.loading",
           "dimension": "loading",
-          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
-          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "action": "Delay branch-aware diff-base preparation while switching the visible session and workspace.",
+          "expected": "Background capture operates on the original captured path/identity; completion must not relabel another session's Last Turn. The UI may retain its previous completed result until this capture succeeds.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W33.persistence",
           "dimension": "persistence",
-          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
-          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "action": "Record metadata and completed diff refs, switch branches again and edit files after settle, then restart and view the original completed turn.",
+          "expected": "Original immutable refs still produce the same diff; later branch switches/terminal edits are not retroactively attributed. Metadata lives in the start snapshot commit message under Orbit-Turn-Start, not a separate user index or config file.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W33.keyboard",
           "dimension": "keyboard",
-          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
-          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "action": "Open a completed turn through its Review control and navigate its changed files; inspect available actions for Restore/Rewind.",
+          "expected": "This is read-only review. No user-facing checkpoint rewind/restore action is invented and no navigation key mutates HEAD/index/worktree.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W33.repeat",
           "dimension": "repeat",
-          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
-          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "action": "Perform three turns with a branch switch between1/2 and during2, editing one distinct file each time. Compare exact per-turn paths after turn3.",
+          "expected": "Each turn compares its own start to its own end. A branch switch between turns is outside both turns; existing target changes are excluded; each new agent change appears once in its own completed turn.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         }
       ],
@@ -395,10 +623,10 @@
       "source_test_inventory": "`checkpoint.rs::{branch_switch_during_a_turn_is_not_attributed_to_the_turn,worktree_capture_keeps_dirty_files_on_the_target_branch_out_of_the_turn}`",
       "verdicts": {
         "functional": {
-          "status": "UNTESTED",
-          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "status": "PARTIAL",
+          "reason": "Named narrow assertions pass; remaining row steps are unverified.",
           "last_verified_sha": null,
-          "last_partial_evidence_sha": null
+          "last_partial_evidence_sha": "94755581807bf98b08a0bbd5550473abc7e5a7dc796e5f8654f6428aa4333b93"
         },
         "visual": {
           "status": "UNTESTED",
@@ -411,11 +639,41 @@
           "last_verified_sha": null
         }
       },
-      "assertion_results": [],
+      "assertion_results": [
+        {
+          "id": "W33.assert.TestCheckpointBranchSwitchExcludesExistingTargetChanges",
+          "status": "PASS",
+          "expected": "Existing target branch changes and pre-turn dirty files are excluded from the new agent diff.",
+          "test": "TestCheckpointBranchSwitchExcludesExistingTargetChanges",
+          "package": "github.com/charlzyx/orbit/internal/workspace",
+          "evidence": "checkpoint-evidence.json",
+          "last_verified_sha": "94755581807bf98b08a0bbd5550473abc7e5a7dc796e5f8654f6428aa4333b93",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:46:21.855146814+09:00",
+          "limits": "Named assertion only; no full-scope/visual/native-OS PASS."
+        },
+        {
+          "id": "W33.assert.TestCheckpointNewBranchIncludesCommittedAgentWork",
+          "status": "PASS",
+          "expected": "Agent work committed on a newly created branch remains attributed to that turn.",
+          "test": "TestCheckpointNewBranchIncludesCommittedAgentWork",
+          "package": "github.com/charlzyx/orbit/internal/workspace",
+          "evidence": "checkpoint-evidence.json",
+          "last_verified_sha": "94755581807bf98b08a0bbd5550473abc7e5a7dc796e5f8654f6428aa4333b93",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:46:21.932469887+09:00",
+          "limits": "Named assertion only; no full-scope/visual/native-OS PASS."
+        }
+      ],
       "known_remaining": "Six-source immutable snapshots/checkpoint attribution/diff model tested; native review interaction/presentation parity remains pending.",
       "full_parity_verified": false,
       "supplemental_cases": [],
-      "additional_evidence": []
+      "additional_evidence": [
+        "../checkpoint-acceptance.md",
+        "checkpoint-evidence.json",
+        "checkpoint-failure-history.json",
+        "../intentional-deviations.md"
+      ]
     },
     {
       "id": "W34",
@@ -541,7 +799,7 @@
           "status": "PARTIAL",
           "reason": "Named narrow assertions pass; remaining row steps are unverified.",
           "last_verified_sha": null,
-          "last_partial_evidence_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3"
+          "last_partial_evidence_sha": "8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59"
         },
         "visual": {
           "status": "UNTESTED",
@@ -563,9 +821,9 @@
           "package": "github.com/charlzyx/orbit/internal/highlight",
           "command": "go test -race -count=1 ./internal/highlight -run ^TestPinnedSourceOracle$",
           "evidence": "workspace-evidence.json",
-          "last_verified_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3",
+          "last_verified_sha": "8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59",
           "sha_kind": "working-tree-content-manifest; not a Git commit",
-          "verified_at_utc": "2026-10-25T14:01:15.372038317+09:00",
+          "verified_at_utc": "2026-10-25T14:19:02.888688067+09:00",
           "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
         },
         {
@@ -576,9 +834,9 @@
           "package": "github.com/charlzyx/orbit/internal/workspace",
           "command": "go test -race -count=1 ./internal/workspace -run ^TestReviewHighlightCarriesSeparateSidesAndResetsAtHunks$",
           "evidence": "workspace-evidence.json",
-          "last_verified_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3",
+          "last_verified_sha": "8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59",
           "sha_kind": "working-tree-content-manifest; not a Git commit",
-          "verified_at_utc": "2026-10-25T14:01:17.757038767+09:00",
+          "verified_at_utc": "2026-10-25T14:19:05.298004388+09:00",
           "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
         },
         {
@@ -589,9 +847,9 @@
           "package": "github.com/charlzyx/orbit/internal/workspace",
           "command": "go test -race -count=1 ./internal/workspace -run ^TestReviewSourceHeaderPathsMetadataAndSyntheticHunks$",
           "evidence": "workspace-evidence.json",
-          "last_verified_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3",
+          "last_verified_sha": "8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59",
           "sha_kind": "working-tree-content-manifest; not a Git commit",
-          "verified_at_utc": "2026-10-25T14:01:17.757352028+09:00",
+          "verified_at_utc": "2026-10-25T14:19:05.298448085+09:00",
           "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
         },
         {
@@ -602,9 +860,9 @@
           "package": "github.com/charlzyx/orbit/internal/workspace",
           "command": "go test -race -count=1 ./internal/workspace -run ^TestReviewHeaderEscapesAndCompactAsymmetricGaps$",
           "evidence": "workspace-evidence.json",
-          "last_verified_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3",
+          "last_verified_sha": "8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59",
           "sha_kind": "working-tree-content-manifest; not a Git commit",
-          "verified_at_utc": "2026-10-25T14:01:17.757421483+09:00",
+          "verified_at_utc": "2026-10-25T14:19:05.298495697+09:00",
           "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
         },
         {
@@ -615,9 +873,9 @@
           "package": "github.com/charlzyx/orbit/internal/gitworkbench",
           "command": "go test -race -count=1 ./internal/gitworkbench -run ^TestDiffColorSpansPreserveEveryByteAndFontMetrics$",
           "evidence": "workspace-evidence.json",
-          "last_verified_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3",
+          "last_verified_sha": "8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59",
           "sha_kind": "working-tree-content-manifest; not a Git commit",
-          "verified_at_utc": "2026-10-25T14:01:15.557164225+09:00",
+          "verified_at_utc": "2026-10-25T14:19:03.09297281+09:00",
           "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
         }
       ],

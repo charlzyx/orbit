@@ -367,3 +367,9 @@ func (s *State) Submit() {
 }
 func (s *State) ScreenshotCount() int { return len(s.shots) }
 func (s *State) Summary() string      { return fmt.Sprintf("%s · %d screenshots", s.Kind, len(s.shots)) }
+
+// HasModal lets native application-menu routing respect report review and
+// screenshot preview. Merely entering this state never transmits a report.
+func (s *State) HasModal() bool {
+	return s != nil && (s.reviewOpen || (s.preview >= 0 && s.preview < len(s.shots)))
+}

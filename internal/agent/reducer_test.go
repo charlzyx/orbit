@@ -231,3 +231,18 @@ func TestSuccessfulCompactionInvalidatesOnlyContextBaseline(t *testing.T) {
 		})
 	}
 }
+
+func TestAutoCompactionKnownRequiresObservedStateField(t *testing.T) {
+	s := newState("workspace", "session")
+	if s.snapshot.AutoCompactionKnown {
+		t.Fatal("default is not observed state")
+	}
+	apply(t, &s, `{"type":"response","command":"get_state","success":true,"data":{"sessionId":"s","autoCompactionEnabled":false}}`)
+	if !s.snapshot.AutoCompactionKnown || s.snapshot.AutoCompactionEnabled {
+		t.Fatal(s.snapshot)
+	}
+	apply(t, &s, `{"type":"response","command":"get_state","success":true,"data":{"sessionId":"s"}}`)
+	if s.snapshot.AutoCompactionKnown {
+		t.Fatal("missing field treated as false")
+	}
+}

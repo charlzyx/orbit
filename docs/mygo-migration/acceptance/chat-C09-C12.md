@@ -65,7 +65,7 @@ Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 **Executed narrow assertions:**
 - None assigned to this scope yet. Last verified SHA: none.
 
-**Owner challenge UI-C08 [PARTIAL]:** Host has selectable individual text/Markdown, generic collapsible tool output and copy response. Source typed tool cards, full cross-message selection/context menu and detailed turn summaries are incomplete. [Scoped steps/tests](../native-ui-acceptance.json).
+**Owner challenge UI-C08 [PARTIAL]:** Typed tools, logical turns, observed-live elapsed time, source tail/usage footer and shared user/Markdown/alert selection are mounted and native-tested. C11 remains a concrete framework gap: selection clears when a virtualized endpoint unmounts; Rust retains SelectedBlock snapshots. Do not equate mounted-row selection with full parity. [Scoped steps/tests](../native-ui-acceptance.json).
 
 **Remaining:** Native code exists; this row is not validated end to end.
 **Visual/OS gates:** No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state. This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.
@@ -99,7 +99,7 @@ Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 **Executed narrow assertions:**
 - None assigned to this scope yet. Last verified SHA: none.
 
-**Owner challenge UI-C08 [PARTIAL]:** Host has selectable individual text/Markdown, generic collapsible tool output and copy response. Source typed tool cards, full cross-message selection/context menu and detailed turn summaries are incomplete. [Scoped steps/tests](../native-ui-acceptance.json).
+**Owner challenge UI-C08 [PARTIAL]:** Typed tools, logical turns, observed-live elapsed time, source tail/usage footer and shared user/Markdown/alert selection are mounted and native-tested. C11 remains a concrete framework gap: selection clears when a virtualized endpoint unmounts; Rust retains SelectedBlock snapshots. Do not equate mounted-row selection with full parity. [Scoped steps/tests](../native-ui-acceptance.json).
 
 **Remaining:** Native code exists; this row is not validated end to end.
 **Visual/OS gates:** No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state. This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.
@@ -133,7 +133,7 @@ Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 **Executed narrow assertions:**
 - None assigned to this scope yet. Last verified SHA: none.
 
-**Owner challenge UI-C08 [PARTIAL]:** Host has selectable individual text/Markdown, generic collapsible tool output and copy response. Source typed tool cards, full cross-message selection/context menu and detailed turn summaries are incomplete. [Scoped steps/tests](../native-ui-acceptance.json).
+**Owner challenge UI-C08 [PARTIAL]:** Typed tools, logical turns, observed-live elapsed time, source tail/usage footer and shared user/Markdown/alert selection are mounted and native-tested. C11 remains a concrete framework gap: selection clears when a virtualized endpoint unmounts; Rust retains SelectedBlock snapshots. Do not equate mounted-row selection with full parity. [Scoped steps/tests](../native-ui-acceptance.json).
 
 **Remaining:** Native code exists; this row is not validated end to end.
 **Visual/OS gates:** No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state. This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.

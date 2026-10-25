@@ -1,0 +1,25 @@
+{
+  "observed_at_utc": "2026-10-25T05:26:52Z",
+  "command": "go test -race ./internal/ui -run ^TestReviewLastTurnKeepsCompletedDiffDuringNextPrompt$ -count=1",
+  "exit_code": 1,
+  "status": "PARTIAL",
+  "observed_result": "FAIL: Last Turn targeted unfinished turn instead of retained completed turn; ending checkpoint unavailable; files=nil",
+  "baseline_handlers": [
+    "app/session.rs::begin_turn",
+    "app/session.rs::finish_turn",
+    "app.rs::sync_review_context"
+  ],
+  "revision": {
+    "published_commit": null,
+    "kind": "post-observation working-tree hashes; source was moving, not an immutable before/after manifest"
+  },
+  "files_after_observation": {
+    "internal/ui/review.go": "ff9f300f53142dbba2c8b813bf6896584aee5880e25e34ff52b7c193c6ad1dae",
+    "internal/ui/app.go": "992c1e881a87ee2ecf22ef8a8d1ccb6481d9d7e67f92e16f5f394e2297c42f5d",
+    "internal/ui/workspace_review_regression_test.go": "d2d8647d83021eea4a083f8ec76dd30231b4e7d0943fe008404cc9f91b7b5c07",
+    "internal/agent/manager.go": "cf82059ec59c408e889abaa3ef91322f4672fe792bc3bb45d1953c2ed4e415f5",
+    "internal/agent/types.go": "acedd1865f9e8bd7f45018f4ada1181319e566bdcb633a37047cc27f84631c78"
+  },
+  "correction": "Corrected by separate completed-turn state, historical selection, identity recovery and native mapping. Original failing result retained; see checkpoint-evidence.json for20 scoped green assertions and exact immutable-during-test dirty source hashes.",
+  "correction_evidence": "checkpoint-evidence.json"
+}

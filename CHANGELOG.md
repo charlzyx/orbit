@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### In progress
 
+- Native Skills/Plugins/MCP and Runtime process settings, source-correct Usage accounting/filters, procedural/photo backdrops, typed transcript/tool components, and composer autocomplete are implemented with scoped regressions. Additional interaction and visual gaps remain explicit in the source-first checklist.
+- The canonical Go build verifies a tiny attributed MyGo composer compatibility patch for live caret, Unicode range replacement and separate undo transactions. It uses a temporary dependency copy and never alters global module caches.
+- Checklist-driven regressions cover650ms Review feedback, worktree dismissal focus, failed-save retention, honest discard errors, and completed versus in-flight turn checkpoints. Deliberate safety deviations are listed separately, not passed as strict equivalence.
+- Actual hosted Linux Rust-reference and Go native windows now launch and capture. The first pair has mismatched client dimensions and is rejected for pixel-parity scoring; viewport normalization is being corrected in the capture procedure, not by resizing images.
+
 - Full native Go + MyGo reconstruction on `redesign/mygo-rpc`, preserving the original Rust source as a reference only. Adds actual Pi RPC process/session management, native shell, Git/worktree/file/terminal domains, preferences and source-derived parity tests. This checkpoint is not a completed parity claim.
 - Pinned baseline inventory, reproducible native CPU captures and a hosted native-reference capture workflow. Desktop visual, cross-platform and remaining interaction acceptance gates are tracked explicitly in `docs/mygo-migration/feature-parity.md`.
 

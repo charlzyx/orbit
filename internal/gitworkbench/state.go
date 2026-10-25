@@ -8,11 +8,14 @@ import (
 	"errors"
 	"time"
 
+	"github.com/charlzyx/orbit/internal/highlight"
 	"github.com/charlzyx/orbit/internal/workspace"
 	"github.com/egoist/mygo/ui"
 )
 
 type Options struct {
+	// TokenColor is evaluated at paint time so changing palettes never re-lexes or reflows a diff.
+	TokenColor           func(highlight.Class) ui.Color
 	AvatarLoader         func(context.Context, string) ([]byte, error)
 	AvatarHome           string
 	GenerateCommitResult func(context.Context, bool) (workspace.GeneratedText, error)

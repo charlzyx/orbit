@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "observed_at_utc": "2026-10-25T04:29:10.073359+00:00",
+  "observed_at_utc": "2026-10-25T05:12:23.543056+00:00",
   "toolchain": "go1.27.3",
   "host": "linux/amd64",
   "command": "ORBIT_PI_INTEGRATION_BIN=/path/to/pi-1.4.0 go test -race ./internal/pirpc ./internal/agent -count=1 -json",
@@ -20,18 +20,18 @@
     "offline": true
   },
   "test_record_counts": {
-    "pass": 53
+    "pass": 70
   },
   "packages": [
     {
       "name": "github.com/charlzyx/orbit/internal/pirpc",
       "result": "pass",
-      "elapsed_seconds": 4.6530000000000005
+      "elapsed_seconds": 4.892
     },
     {
       "name": "github.com/charlzyx/orbit/internal/agent",
       "result": "pass",
-      "elapsed_seconds": 9.137
+      "elapsed_seconds": 21.081
     }
   ],
   "tests": [
@@ -51,43 +51,43 @@
       "package": "github.com/charlzyx/orbit/internal/pirpc",
       "name": "TestConcurrentOutOfOrderCorrelation",
       "result": "pass",
-      "elapsed_seconds": 0.3
+      "elapsed_seconds": 0.29
     },
     {
       "package": "github.com/charlzyx/orbit/internal/pirpc",
       "name": "TestLargeUnicodeCRLFAndUnknownRecords",
       "result": "pass",
-      "elapsed_seconds": 0.31
+      "elapsed_seconds": 0.3
     },
     {
       "package": "github.com/charlzyx/orbit/internal/pirpc",
       "name": "TestCancellationCleansPendingAndIDCanBeReused",
       "result": "pass",
-      "elapsed_seconds": 0.27
+      "elapsed_seconds": 0.28
     },
     {
       "package": "github.com/charlzyx/orbit/internal/pirpc",
       "name": "TestDuplicateIDRejectedWithoutRemovingOriginal",
       "result": "pass",
-      "elapsed_seconds": 0.26
+      "elapsed_seconds": 0.25
     },
     {
       "package": "github.com/charlzyx/orbit/internal/agent",
       "name": "TestLiveManagerCredentialFree",
       "result": "pass",
-      "elapsed_seconds": 0.53
+      "elapsed_seconds": 0.59
     },
     {
       "package": "github.com/charlzyx/orbit/internal/pirpc",
       "name": "TestUIResponseIsOneWayAndPreservesID",
       "result": "pass",
-      "elapsed_seconds": 0.26
+      "elapsed_seconds": 0.27
     },
     {
       "package": "github.com/charlzyx/orbit/internal/agent",
       "name": "TestLiveRenameSavedSessionNoInference",
       "result": "pass",
-      "elapsed_seconds": 0.27
+      "elapsed_seconds": 0.3
     },
     {
       "package": "github.com/charlzyx/orbit/internal/agent",
@@ -132,16 +132,16 @@
       "elapsed_seconds": 0.02
     },
     {
-      "package": "github.com/charlzyx/orbit/internal/agent",
-      "name": "TestManagerBootstrapActionsAndIdleReuse",
-      "result": "pass",
-      "elapsed_seconds": 1.03
-    },
-    {
       "package": "github.com/charlzyx/orbit/internal/pirpc",
       "name": "TestGracefulAndForcedClose/false",
       "result": "pass",
       "elapsed_seconds": 0.26
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/agent",
+      "name": "TestManagerBootstrapActionsAndIdleReuse",
+      "result": "pass",
+      "elapsed_seconds": 1.03
     },
     {
       "package": "github.com/charlzyx/orbit/internal/pirpc",
@@ -159,13 +159,19 @@
       "package": "github.com/charlzyx/orbit/internal/pirpc",
       "name": "TestCancelledBlockedWriterAndClose",
       "result": "pass",
-      "elapsed_seconds": 0.39
+      "elapsed_seconds": 0.4
     },
     {
       "package": "github.com/charlzyx/orbit/internal/pirpc",
       "name": "TestStartFailureAndResolveOverride",
       "result": "pass",
       "elapsed_seconds": 0
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/pirpc",
+      "name": "TestLiveCredentialFreePi",
+      "result": "pass",
+      "elapsed_seconds": 0.48
     },
     {
       "package": "github.com/charlzyx/orbit/internal/agent",
@@ -175,9 +181,9 @@
     },
     {
       "package": "github.com/charlzyx/orbit/internal/pirpc",
-      "name": "TestLiveCredentialFreePi",
+      "name": "TestProcessSnapshotReportsObservedStartExitAndDetachedCode",
       "result": "pass",
-      "elapsed_seconds": 0.49
+      "elapsed_seconds": 0.25
     },
     {
       "package": "github.com/charlzyx/orbit/internal/agent",
@@ -189,19 +195,19 @@
       "package": "github.com/charlzyx/orbit/internal/agent",
       "name": "TestManagerConcurrentTicksAndSnapshots",
       "result": "pass",
-      "elapsed_seconds": 1.05
+      "elapsed_seconds": 1.06
     },
     {
       "package": "github.com/charlzyx/orbit/internal/agent",
       "name": "TestManagerModePersistence",
       "result": "pass",
-      "elapsed_seconds": 1.03
+      "elapsed_seconds": 1.02
     },
     {
       "package": "github.com/charlzyx/orbit/internal/agent",
       "name": "TestDeleteIsRecoverableAndDoesNotTouchOtherSessions",
       "result": "pass",
-      "elapsed_seconds": 0
+      "elapsed_seconds": 0.01
     },
     {
       "package": "github.com/charlzyx/orbit/internal/agent",
@@ -218,18 +224,6 @@
     {
       "package": "github.com/charlzyx/orbit/internal/agent",
       "name": "TestLiveSessionPathsIncludesParkedLoadingAndReturnsDetachedSet",
-      "result": "pass",
-      "elapsed_seconds": 0
-    },
-    {
-      "package": "github.com/charlzyx/orbit/internal/agent",
-      "name": "TestAnyBusyIncludesEveryBackgroundLifecyclePhase/loading",
-      "result": "pass",
-      "elapsed_seconds": 0
-    },
-    {
-      "package": "github.com/charlzyx/orbit/internal/agent",
-      "name": "TestAnyBusyIncludesEveryBackgroundLifecyclePhase/awaiting",
       "result": "pass",
       "elapsed_seconds": 0
     },
@@ -253,6 +247,18 @@
     },
     {
       "package": "github.com/charlzyx/orbit/internal/agent",
+      "name": "TestAnyBusyIncludesEveryBackgroundLifecyclePhase/loading",
+      "result": "pass",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/agent",
+      "name": "TestAnyBusyIncludesEveryBackgroundLifecyclePhase/awaiting",
+      "result": "pass",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/agent",
       "name": "TestAnyBusyIncludesEveryBackgroundLifecyclePhase",
       "result": "pass",
       "elapsed_seconds": 0
@@ -267,7 +273,7 @@
       "package": "github.com/charlzyx/orbit/internal/agent",
       "name": "TestManualCompactionRefreshesStatsWithoutAgentSettled",
       "result": "pass",
-      "elapsed_seconds": 1.03
+      "elapsed_seconds": 1.02
     },
     {
       "package": "github.com/charlzyx/orbit/internal/agent",
@@ -352,6 +358,102 @@
       "name": "TestSuccessfulCompactionInvalidatesOnlyContextBaseline",
       "result": "pass",
       "elapsed_seconds": 0
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/agent",
+      "name": "TestAutoCompactionKnownRequiresObservedStateField",
+      "result": "pass",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/agent",
+      "name": "TestRuntimeSnapshotLifecycleParkSwitchReuseAndRestart",
+      "result": "pass",
+      "elapsed_seconds": 1.06
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/agent",
+      "name": "TestRuntimeStopStartKeepsParkedAndManagerUsable",
+      "result": "pass",
+      "elapsed_seconds": 2.06
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/agent",
+      "name": "TestRuntimeLoadingAndStopBeforeSpawn",
+      "result": "pass",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/agent",
+      "name": "TestRuntimeFailedSpawnAndUnexpectedExitAreObserved",
+      "result": "pass",
+      "elapsed_seconds": 0.03
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/agent",
+      "name": "TestRuntimeStderrIsBoundedRedactedAndDetached",
+      "result": "pass",
+      "elapsed_seconds": 1.03
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/agent",
+      "name": "TestRetrySetterWaitsForAckAndRejectsConcurrentRequests",
+      "result": "pass",
+      "elapsed_seconds": 1.23
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/agent",
+      "name": "TestRetryRejectedRequestPreservesKnownValueButTimeoutDoesNot/fail_after_first",
+      "result": "pass",
+      "elapsed_seconds": 1.03
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/agent",
+      "name": "TestRetryRejectedRequestPreservesKnownValueButTimeoutDoesNot/timeout_after_first",
+      "result": "pass",
+      "elapsed_seconds": 1.33
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/agent",
+      "name": "TestRetryRejectedRequestPreservesKnownValueButTimeoutDoesNot",
+      "result": "pass",
+      "elapsed_seconds": 2.36
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/agent",
+      "name": "TestRetryFailureDoesNotInventValueOrSupport/unknown",
+      "result": "pass",
+      "elapsed_seconds": 1.02
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/agent",
+      "name": "TestRetryFailureDoesNotInventValueOrSupport/error",
+      "result": "pass",
+      "elapsed_seconds": 1.02
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/agent",
+      "name": "TestRetryFailureDoesNotInventValueOrSupport",
+      "result": "pass",
+      "elapsed_seconds": 2.05
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/agent",
+      "name": "TestRuntimeSnapshotConcurrentReaders",
+      "result": "pass",
+      "elapsed_seconds": 1.02
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/agent",
+      "name": "TestDiagnosticCredentialRedaction",
+      "result": "pass",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/agent",
+      "name": "TestRuntimeBusyProcessRemainsVisibleWhenParked",
+      "result": "pass",
+      "elapsed_seconds": 1.04
     }
   ],
   "vet": {
@@ -381,21 +483,25 @@
     }
   ],
   "source_sha256": {
-    "internal/pirpc/client.go": "0d4f31c617bd030c48a220eb8d2f0bab93d8fd6416520660f91440dfd1661d34",
+    "internal/pirpc/client.go": "32a7ddd90f43fba1755879e32f96c3ca0f8011842232046dea32afd67e4cfe0b",
     "internal/pirpc/client_test.go": "76c29fcd9f5cf98ee7398dcdab10eece3c8df78198123be9c48cf4c004853fd9",
     "internal/pirpc/live_test.go": "41db74c6991dfad10ea30eadcca05cae3d7c3b53738ba2ebfcb28c774de53fec",
+    "internal/pirpc/process_snapshot.go": "a5844e0a17cc617c12d4f4663993e339cf0970ba096fe21a796377aff7101992",
+    "internal/pirpc/process_snapshot_test.go": "45c4b93d4d146216f497f615dfe9f113b7c65412174dd9c97fa95b49ac73d3e2",
     "internal/pirpc/process_unix.go": "aba09dbad71bb998f5af2cbc393f229ea3ceed85b2be5ca2d23378475f1ce1f9",
     "internal/pirpc/process_windows.go": "f89ec338582109cf6cffcb64da0642cab1459bc54235cfe6ad38d5e10cf81fa3",
     "internal/pirpc/protocol.go": "fb21dc9c94abf623bd7fd59a39b850ac4f00dcf479de5f716646caabf18c8ae2",
     "internal/agent/extensions.go": "2ba697cfce0493b312e802f3b24f70bd19cf71e17f7692eba015b742f88e06a4",
-    "internal/agent/live_test.go": "543699a0728ef7574f80e93649594af0dc9ec93b517e9e1bae120c3ae805de54",
-    "internal/agent/manager.go": "29e25bddc7b59e722268b300a5060c809b929ebea2428a15aa151b60a4090f4b",
-    "internal/agent/manager_test.go": "bf19db0d7a76aca4447f3305047ccd5485bc84b332a0b1ab27df4470d9b3d075",
-    "internal/agent/reducer.go": "bafec0137660316d307b02810975ab2d4ae9bd9906a57b8efd15b104d1887a7f",
-    "internal/agent/reducer_test.go": "19555867d73b94c52ba1f85265ba48b367ddbae49288a0be07d6e1d26fdf870c",
+    "internal/agent/live_test.go": "febc54dad6aee8b81548ba348e35416dcc52cd30c0e71275cfdaee9a28c4559c",
+    "internal/agent/manager.go": "e91655bfa55495a51450b56d2529491576f3741724538a5525dc63bcb1d0a900",
+    "internal/agent/manager_test.go": "41156851a309e1b7b9967b29925ec37d2b8dd3b7a3ca8b83bb4d2baa80eec90d",
+    "internal/agent/reducer.go": "d7d4febc70d6a4a567cd9a4470c811d7e0c3508d13fe07b3554949de823a4f61",
+    "internal/agent/reducer_test.go": "14836b56fb45973ffd298153344d5fe04991e1d50f23d35daf2c209bf5cd293d",
+    "internal/agent/runtime.go": "4695d2f5614fffb1cc83c938818d534e51c71d975556756c00a1dcb68e8966c8",
+    "internal/agent/runtime_test.go": "63d2abc73cf24aa03ee85ba5b6a35615c166572d95939be4bffa76fcd7d21367",
     "internal/agent/saved_sessions.go": "479d33ce6cf93b433341acada59c769fbc8932dc0b811aece9fd671a05be6d16",
     "internal/agent/sessions.go": "702504ce7efb8e3953efc2615c210571a9a12d60e33fbabc45c05abbde943a60",
-    "internal/agent/types.go": "6c8163bcded19f667996080b4e0efe6725f9eeae215bcc40c9eb8df5868d6c88"
+    "internal/agent/types.go": "6f5bda860c454997037827e135d81b8a28880f7770afe67d12bfb8af2bb4d018"
   },
   "limitations": [
     "No authenticated model inference, provider OAuth login, or live provider quota was tested.",
@@ -418,5 +524,6 @@
       "command": "go vet ./internal/pirpc ./internal/agent ./internal/ui",
       "result": "pass"
     }
-  }
+  },
+  "runtime_settings_acceptance": "runtime-settings-acceptance.json"
 }

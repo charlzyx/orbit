@@ -86,3 +86,30 @@ the pinned source SHA, before compiling or opening an app. Commit `ae3d5c8`
 fixes that fixture and captures both original and Go native desktop windows.
 Its pixel/OS outcome must be recorded from actual artifacts, not inferred from
 the workflow's presence.
+
+## Canonical native build and current acceptance
+
+Use `scripts/go-native.sh run ./cmd/orbit`, `scripts/go-native.sh test -race ./...`
+and `scripts/go-native.sh vet ./...`. Python3 and Go1.27.3 are build-time tools;
+the resulting application is a native Go executable, not a Python/Rust sidecar.
+Windows may invoke `python scripts/go-native-overlay.py` directly. The wrapper
+verifies the exact MyGo module identity/hashes and adds the small composer
+caret/undo compatibility file only in a temporary copy. No global module cache
+or repository go.mod is patched. An unpatched app refuses startup explicitly.
+The nested terminal module and additive MyGo toolkit tests are separate suites;
+root `./...` alone does not execute them.
+
+[Executable source checklist](acceptance-checklist.md) separates real
+source-specific steps from explicitly unexpanded draft prompts. Neither a green
+package suite nor a successful capture passes an entire feature. See
+[intentional deviations](intentional-deviations.md) for safety/truthfulness
+corrections that are not unqualified source-equivalence claims.
+
+Hosted run [40164537841](https://github.com/charlzyx/orbit/actions/runs/40164537841)
+passed Go tests, real native Go desktop capture and pinned Rust native capture
+at Go commit5d27a6c and Rust299a32b. Native software-Vulkan discovery was fixed
+for the runner's current `lvp_icd.json` filename. The resulting images are
+**not yet a valid pixel pair**: Rust client1469×902 versus Go1470×922. They are
+kept as diagnostic artifacts; the capture script now removes maximization on
+a larger display and rejects nonmatching client sizes. No image resizing is
+permitted to hide geometry errors.

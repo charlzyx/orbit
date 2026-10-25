@@ -31,7 +31,7 @@ Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 **Executed narrow assertions:**
 - None assigned to this scope yet. Last verified SHA: none.
 
-**Owner challenge UI-S01 [PARTIAL]:** Pure restore bounds and native traffic-light clearance pass. Actual maximize/center/close/reopen/16ms-active heartbeat across all OS remains unexecuted. [Scoped steps/tests](../native-ui-acceptance.json).
+**Owner challenge UI-S01 [PARTIAL]:** Source minimum/restore bounds and native traffic-light clearance pass. Native menus now auto-hide on Linux/Windows while retaining edit roles and shortcuts. Actual initial-maximize/Alt-F10/Dock lifetime on each OS remains separate acceptance. [Scoped steps/tests](../native-ui-acceptance.json).
 
 **Remaining:** Native code exists; this row is not validated end to end.
 **Visual/OS gates:** No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state. This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.
@@ -101,7 +101,7 @@ Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 
 **Owner challenge UI-S03 [PARTIAL]:** These exact native CPU flows pass, not every command/context or OS accelerator. [Scoped steps/tests](../native-ui-acceptance.json).
 
-**Owner challenge UI-S04 [PARTIAL]:** Live custom test requires ORBIT_TERMINAL_TEST and pinned Ghostty; it was run previously. Ordinary default suite skips opt-in test. OS-native menu entry/accelerator dispatch remains separate. [Scoped steps/tests](../native-ui-acceptance.json).
+**Owner challenge UI-S04 [PARTIAL]:** Native menu guard includes module-owned Git/Worktrees/MCP/Resources/report review/preview and Usage filter overlays. CPU routing tests pass; actual platform accelerator ordering remains separate. [Scoped steps/tests](../native-ui-acceptance.json).
 
 **Remaining:** Native code exists; this row is not validated end to end.
 **Visual/OS gates:** No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state. This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.

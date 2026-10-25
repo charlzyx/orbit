@@ -291,7 +291,9 @@
       "known_remaining": "Git/temp-repo and fake-gh tests plus scoped six-tab/native controller tests pass; live authenticated GitHub and exact UI interactions remain pending.",
       "full_parity_verified": false,
       "supplemental_cases": [],
-      "additional_evidence": []
+      "additional_evidence": [
+        "../intentional-deviations.md"
+      ]
     },
     {
       "id": "W14",

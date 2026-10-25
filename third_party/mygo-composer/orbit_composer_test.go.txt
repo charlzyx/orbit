@@ -1,0 +1,150 @@
+// SPDX-License-Identifier: MIT
+package ui
+
+import (
+	"testing"
+
+	"github.com/egoist/mygo/internal/platform"
+)
+
+func TestOrbitComposerRangeEditUndoAndLiveCaret(t *testing.T) {
+	for _, indexed := range []bool{false, true} {
+		value := ""
+		buffer := NewTextBuffer("")
+		var saved TextKey
+		var anchor, caret int
+		tt := NewTester(func(c *Context) {
+			var input Element
+			if indexed {
+				input = TextAreaBufferBase(c, buffer)
+			} else {
+				input = TextAreaBase(c, &value)
+			}
+			input.Fill().AutoFocus().OnTextKey(func(k TextKey) bool {
+				if k.Key != KeyEnter {
+					return false
+				}
+				saved = k
+				anchor, caret = k.AnchorCaret()
+				if k.Composing() {
+					return true
+				}
+				return k.ReplaceRange(0, 10, "/review ")
+			})
+		}, 400, 200)
+		text := func() string {
+			if indexed {
+				return buffer.String()
+			}
+			return value
+		}
+		// Queue text and navigation without a render. textKey.prepare must apply all
+		// preceding native edits before exposing AnchorCaret and performing replace.
+		tt.rt.event(platform.SurfaceEvent{Kind: platform.TextInput, Text: "/remainder 😀 arg"})
+		for i := 0; i < 13; i++ {
+			tt.rt.event(platform.SurfaceEvent{Kind: platform.KeyPressed, Key: platform.KeyLeft})
+		}
+		tt.rt.event(platform.SurfaceEvent{Kind: platform.KeyPressed, Key: platform.KeyEnter})
+		tt.Frame()
+		if anchor != 3 || caret != 3 || text() != "/review  😀 arg" {
+			t.Fatalf("indexed=%v anchor/caret=%d/%d text=%q", indexed, anchor, caret, text())
+		}
+		ed := tt.rt.states[tt.rt.focused].editor
+		if ed.caret != 8 {
+			t.Fatalf("completion caret=%d", ed.caret)
+		}
+		tt.Key(Cmd, KeyZ)
+		if text() != "/remainder 😀 arg" || ed.caret != 3 {
+			t.Fatalf("indexed=%v undo=%q caret=%d", indexed, text(), ed.caret)
+		}
+		tt.Key(Cmd|Shift, KeyZ)
+		if text() != "/review  😀 arg" || ed.caret != 8 {
+			t.Fatalf("indexed=%v redo=%q caret=%d", indexed, text(), ed.caret)
+		}
+		tt.Type("next")
+		tt.Key(Cmd, KeyZ)
+		if text() != "/review  😀 arg" {
+			t.Fatal("typing coalesced into completion", text())
+		}
+		func() {
+			defer func() {
+				if recover() == nil {
+					t.Error("retained TextKey failed to reject lifetime misuse")
+				}
+			}()
+			saved.AnchorCaret()
+		}()
+		tt.rt.close()
+	}
+}
+func TestOrbitComposerPointerEditAndGuards(t *testing.T) {
+	value := "/remainder 😀 args"
+	replace, readOnly, disabled := false, false, false
+	var changed bool
+	var caret int
+	tt := NewTester(func(c *Context) {
+		input := TextAreaBase(c, &value).Fill().AutoFocus().ReadOnly(readOnly).Disabled(disabled)
+		if replace {
+			changed = input.ReplaceTextRange(0, 10, "/review ")
+			replace = false
+		}
+		_, caret = input.TextAnchorCaret()
+	}, 400, 200)
+	replace = true
+	tt.Frame()
+	if !changed || value != "/review  😀 args" || caret != 8 {
+		t.Fatal(value, caret, changed)
+	}
+	tt.Key(Cmd, KeyZ)
+	if value != "/remainder 😀 args" {
+		t.Fatal("pointer undo", value)
+	}
+	readOnly = true
+	replace = true
+	tt.Frame()
+	if changed || value != "/remainder 😀 args" {
+		t.Fatal("read only edit")
+	}
+	readOnly = false
+	disabled = true
+	replace = true
+	tt.Frame()
+	if changed {
+		t.Fatal("disabled edit")
+	}
+	disabled = false
+	tt.Frame()
+	tt.Compose("你好", 2)
+	replace = true
+	tt.Frame()
+	if changed || value != "/remainder 😀 args" {
+		t.Fatal("IME edit", value, changed)
+	}
+	tt.rt.close()
+}
+func TestOrbitComposerRangeEditReversedSelectionAndClamping(t *testing.T) {
+	value := "a😀bc"
+	apply := false
+	var anchor, caret int
+	tt := NewTester(func(c *Context) {
+		input := TextAreaBase(c, &value).Fill().AutoFocus()
+		if apply {
+			input.SetTextSelection(4, 1)
+			if !input.ReplaceTextRange(1, 3, "文") {
+				t.Fatal("replacement refused")
+			}
+			apply = false
+		}
+		anchor, caret = input.TextAnchorCaret()
+	}, 400, 200)
+	apply = true
+	tt.Frame()
+	if value != "a文c" || caret != 2 || anchor != 2 {
+		t.Fatal(value, anchor, caret)
+	}
+	tt.Key(Cmd, KeyZ)
+	if value != "a😀bc" || caret != 1 || anchor != 4 {
+		t.Fatal("selection undo", value, anchor, caret)
+	}
+	tt.rt.close()
+}

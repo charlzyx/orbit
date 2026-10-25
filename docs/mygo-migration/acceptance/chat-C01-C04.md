@@ -106,7 +106,7 @@ Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 
 ## C04 — Slash commands and file mentions
 
-Functional **NOT_IMPLEMENTED** · Visual **UNTESTED** · Native OS **UNTESTED**
+Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 
 **Rust source:** [crates/orbit-pi/src/app/composer_ops.rs::autocomplete_entries](https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/composer_ops.rs#L9); [crates/orbit-pi/src/app/composer_ops.rs::commit_entry](https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/composer_ops.rs#L113); [crates/orbit-pi/src/app/composer_ops.rs::attach_file](https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/composer_ops.rs#L471)
 
@@ -133,7 +133,7 @@ Functional **NOT_IMPLEMENTED** · Visual **UNTESTED** · Native OS **UNTESTED**
 **Executed narrow assertions:**
 - None assigned to this scope yet. Last verified SHA: none.
 
-**Owner challenge UI-C03 [NOT_IMPLEMENTED]:** Host currently has no source-equivalent slash/file-mention popup. Plain text commands are forwarded but are not autocomplete parity. [Scoped steps/tests](../native-ui-acceptance.json).
+**Owner challenge UI-C03 [PARTIAL]:** Native source-derived slash/skill/command/file completion is mounted; real command metadata and off-thread bounded filesystem scan, focus/caret/Enter/AltEnter/steer/Escape paths have tests. Canonical hash-checked MyGo compatibility supplies undoable caret-aware replacement; cmd refuses unpatched startup. Actual OS IME candidate panel and full source visual comparison remain unverified. [Scoped steps/tests](../native-ui-acceptance.json).
 
 **Remaining:** Native code exists; this row is not validated end to end.
 **Visual/OS gates:** No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state. This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.

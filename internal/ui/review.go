@@ -4,12 +4,15 @@ import (
 	"context"
 	"fmt"
 	"path/filepath"
+	"time"
 
+	"github.com/charlzyx/orbit/internal/highlight"
 	"github.com/charlzyx/orbit/internal/workspace"
 	"github.com/egoist/mygo/ui"
 )
 
 type reviewState struct {
+	turn                       int // Zero follows latest completed turn; positive pins historical review.
 	source                     workspace.ReviewSource
 	data                       workspace.ReviewSnapshot
 	list                       ui.ListState
@@ -21,10 +24,41 @@ type reviewState struct {
 	handle                     ui.Handle
 	collapsed                  map[int]bool
 	dataIdentity               string
+	refreshSpinUntil           time.Time
+}
+
+const reviewRefreshFeedback = 650 * time.Millisecond
+
+// Loading controls content; click feedback has an independent minimum lifetime.
+// Source: sidepane.rs::refresh_from_button. Repeated clicks extend the deadline.
+func (s *reviewState) refreshFeedback(now time.Time) bool {
+	return s.loading || now.Before(s.refreshSpinUntil)
+}
+func (a *App) refreshReviewFromButton(now time.Time) {
+	s := &a.reviewState
+	s.refreshSpinUntil = now.Add(reviewRefreshFeedback)
+	if !s.loading {
+		a.RefreshReview()
+	}
+	a.Async(func() func() {
+		time.Sleep(reviewRefreshFeedback)
+		return func() {
+			if !time.Now().Before(s.refreshSpinUntil) {
+				s.refreshSpinUntil = time.Time{}
+			}
+		}
+	})
 }
 
 func (a *App) RefreshReview() {
 	s := &a.reviewState
+	if s.source == workspace.ReviewLastTurn && a.Model.LatestTurn == 0 {
+		s.source = workspace.ReviewUncommitted
+		s.turn = 0
+	}
+	if s.source == workspace.ReviewLastTurn && s.turn == 0 {
+		s.turn = a.Model.LatestTurn
+	}
 	s.generation++
 	generation := s.generation
 	if s.loading {
@@ -37,7 +71,7 @@ func (a *App) RefreshReview() {
 	s.loading = true
 	root := a.Model.Workspace
 	ref, path := s.ref, s.path
-	req := workspace.ReviewRequest{Source: s.source, Session: a.Model.SessionID, Turn: a.Model.Turn}
+	req := workspace.ReviewRequest{Source: s.source, Session: a.Model.SessionID, Turn: a.reviewTurn()}
 	identity := fmt.Sprintf("%s\x00%s\x00%s\x00%d\x00%s\x00%s", root, req.Source, req.Session, req.Turn, ref, path)
 	if s.dataIdentity != identity {
 		s.data = workspace.ReviewSnapshot{}
@@ -67,7 +101,7 @@ func (a *App) RefreshReview() {
 		}
 		return func() {
 			s.loading = false
-			if generation != s.generation || root != a.Model.Workspace || req.Source != s.source || ref != s.ref || path != s.path || req.Session != a.Model.SessionID {
+			if generation != s.generation || root != a.Model.Workspace || req.Source != s.source || ref != s.ref || path != s.path || req.Session != a.Model.SessionID || (req.Source == workspace.ReviewLastTurn && req.Turn != a.reviewTurn()) {
 				s.pending = false
 				a.RefreshReview()
 				return
@@ -93,10 +127,14 @@ func (a *App) review(c *ui.Context) {
 	}
 	ui.Column(c.Key("review-pane")).Bind(&s.handle).Width(max(360, a.ReviewWidth)).FillHeight().BorderWidth(0, 0, 0, 1).BorderColor(t.Border).Children(func() {
 		ui.Row(c).Height(40).PaddingX(10).Gap(6).AlignItems(ui.Center).Children(func() {
-			ui.MenuButton(c, reviewLabel(s.source), func(m *ui.Menu) {
+			ui.MenuButton(c, a.currentReviewLabel(), func(m *ui.Menu) {
 				for _, src := range []workspace.ReviewSource{workspace.ReviewLastTurn, workspace.ReviewUncommitted, workspace.ReviewUnstaged, workspace.ReviewStaged, workspace.ReviewCommitted, workspace.ReviewBranch} {
-					if m.Item(reviewLabel(src)).Checked(src == s.source).Chosen() {
+					if m.Item(reviewLabel(src)).Checked(src == s.source).Disabled(src == workspace.ReviewLastTurn && a.Model.LatestTurn == 0).Chosen() {
 						s.source = src
+						s.turn = 0
+						if src == workspace.ReviewLastTurn {
+							s.turn = a.Model.LatestTurn
+						}
 						s.ref = ""
 						s.path = ""
 						a.RefreshReview()
@@ -104,11 +142,11 @@ func (a *App) review(c *ui.Context) {
 				}
 			})
 			ui.Spacer(c)
-			if s.loading {
-				ui.Spinner(c).Size(12, 12)
+			if s.refreshFeedback(time.Now()) {
+				ui.Spinner(c).Size(12, 12).Label("Refreshing review")
 			}
 			if a.iconButton(c, "Refresh review", "icons/refresh.svg").Clicked() {
-				a.RefreshReview()
+				a.refreshReviewFromButton(time.Now())
 			}
 			if a.iconButton(c, "Review options", "icons/more.svg").Menu(func(m *ui.Menu) {
 				if m.Item("Split diff").Checked(s.split).Chosen() {
@@ -296,7 +334,8 @@ func (a *App) reviewLine(c *ui.Context, l workspace.ReviewLine, index int) {
 		}
 		ui.Text(c, num).Width(36).Font(a.Fonts.CodeFamily).FontSize(t.CodeSize).TextColor(t.TextMuted)
 		ui.Text(c, prefix).Width(10).Font(a.Fonts.CodeFamily).TextColor(color)
-		text := ui.Text(c, l.Content).Font(a.Fonts.CodeFamily).FontSize(t.CodeSize).TextColor(color).Grow(1).MinWidth(0)
+		spans := a.reviewSpans(l)
+		text := ui.RichText(c, spans...).Font(a.Fonts.CodeFamily).FontSize(t.CodeSize).TextColor(color).Grow(1).MinWidth(0)
 		if !s.wrap {
 			text.MaxLines(1)
 		}
@@ -382,4 +421,51 @@ func (a *App) reviewCommand(id string) {
 			}
 		}
 	}
+}
+
+func (a *App) reviewSpans(line workspace.ReviewLine) []ui.Span {
+	runs := highlight.Runs(line.Content, line.Tokens)
+	spans := make([]ui.Span, 0, len(runs))
+	for _, run := range runs {
+		span := ui.Span{Text: run.Text}
+		if run.Class != "" {
+			span.Color = a.Theme.TokenColor(run.Class)
+		}
+		spans = append(spans, span)
+	}
+	return spans
+}
+
+func (a *App) reviewTurn() int {
+	if a.reviewState.source != workspace.ReviewLastTurn {
+		return 0
+	}
+	if a.reviewState.turn > 0 {
+		return a.reviewState.turn
+	}
+	return a.Model.LatestTurn
+}
+func (a *App) currentReviewLabel() string {
+	if a.reviewState.source == workspace.ReviewLastTurn && a.reviewState.turn > 0 && a.reviewState.turn != a.Model.LatestTurn {
+		return fmt.Sprintf("Turn %d", a.reviewState.turn)
+	}
+	return reviewLabel(a.reviewState.source)
+}
+
+// OpenTurnReview pins an actual captured turn; zero selects the current newest.
+func (a *App) OpenTurnReview(turn int) {
+	if turn < 0 || turn > a.Model.LatestTurn {
+		return
+	}
+	if turn == 0 {
+		turn = a.Model.LatestTurn
+	}
+	a.reviewState.turn = turn
+	a.reviewState.source = workspace.ReviewLastTurn
+	a.reviewState.ref = ""
+	a.reviewState.path = ""
+	a.Navigate("chat")
+	a.ReviewVisible = true
+	a.ExplorerVisible = false
+	a.RefreshReview()
 }

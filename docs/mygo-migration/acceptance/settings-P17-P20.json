@@ -316,9 +316,12 @@
           "expected": "Source palette/tokens and persistent preferences, complete localization and backdrop.",
           "tests": [
             "TestTokensAndCommandRegistry",
-            "TestFractionalScaleKeepsLogicalComposerGeometry"
+            "TestFractionalScaleKeepsLogicalComposerGeometry",
+            "TestNativeBackdropBoundsAndFeatureVisibility",
+            "TestBackgroundChooseCoalesceFadeReuseFailureAndClear",
+            "TestBackdropPaintsBehindOpaqueComposer"
           ],
-          "remaining": "10 palettes and55 binding parsing pass; many host labels remain English, backdrop integration is pending, and font/density/motion/OS contrast visual matrix remains open.",
+          "remaining": "Source procedural/photo background is mounted below header only on empty task, with source choose/reset/blur/cell/fade controls and worker-only PhotoStore. Native tests cover geometry, pointer pass-through, opaque foreground occlusion, coalescing/cache reuse and failure retention. Runtime/About use truthful versions. Full locale coverage/whole Appearance content/OS dialogs/matched visual acceptance remain open.",
           "evidence": "../native-ui-acceptance.json",
           "last_verified_sha": null,
           "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
@@ -473,9 +476,12 @@
           "expected": "Source palette/tokens and persistent preferences, complete localization and backdrop.",
           "tests": [
             "TestTokensAndCommandRegistry",
-            "TestFractionalScaleKeepsLogicalComposerGeometry"
+            "TestFractionalScaleKeepsLogicalComposerGeometry",
+            "TestNativeBackdropBoundsAndFeatureVisibility",
+            "TestBackgroundChooseCoalesceFadeReuseFailureAndClear",
+            "TestBackdropPaintsBehindOpaqueComposer"
           ],
-          "remaining": "10 palettes and55 binding parsing pass; many host labels remain English, backdrop integration is pending, and font/density/motion/OS contrast visual matrix remains open.",
+          "remaining": "Source procedural/photo background is mounted below header only on empty task, with source choose/reset/blur/cell/fade controls and worker-only PhotoStore. Native tests cover geometry, pointer pass-through, opaque foreground occlusion, coalescing/cache reuse and failure retention. Runtime/About use truthful versions. Full locale coverage/whole Appearance content/OS dialogs/matched visual acceptance remain open.",
           "evidence": "../native-ui-acceptance.json",
           "last_verified_sha": null,
           "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
@@ -630,9 +636,12 @@
           "expected": "Source palette/tokens and persistent preferences, complete localization and backdrop.",
           "tests": [
             "TestTokensAndCommandRegistry",
-            "TestFractionalScaleKeepsLogicalComposerGeometry"
+            "TestFractionalScaleKeepsLogicalComposerGeometry",
+            "TestNativeBackdropBoundsAndFeatureVisibility",
+            "TestBackgroundChooseCoalesceFadeReuseFailureAndClear",
+            "TestBackdropPaintsBehindOpaqueComposer"
           ],
-          "remaining": "10 palettes and55 binding parsing pass; many host labels remain English, backdrop integration is pending, and font/density/motion/OS contrast visual matrix remains open.",
+          "remaining": "Source procedural/photo background is mounted below header only on empty task, with source choose/reset/blur/cell/fade controls and worker-only PhotoStore. Native tests cover geometry, pointer pass-through, opaque foreground occlusion, coalescing/cache reuse and failure retention. Runtime/About use truthful versions. Full locale coverage/whole Appearance content/OS dialogs/matched visual acceptance remain open.",
           "evidence": "../native-ui-acceptance.json",
           "last_verified_sha": null,
           "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."

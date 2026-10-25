@@ -33,7 +33,7 @@ func (a *App) markdownBlock(c *ui.Context, d *parser.Document, i int) bool {
 	title := titleCase(strings.ToLower(strings.TrimSuffix(strings.TrimPrefix(kind, "[!"), "]")))
 	ui.Column(c).Padding(12, 16).Gap(6).BorderWidth(0, 0, 0, 3).BorderColor(color).Background(color.Alpha(.06)).Radius(4).Children(func() {
 		ui.Text(c, title).TextColor(color).FontWeight(600)
-		opts := markdown.Options{Theme: a.md.Theme, OnLink: a.md.OnLink, LoadImage: a.md.LoadImage, WrapCode: a.md.WrapCode, Block: a.markdownBlock}
+		opts := markdown.Options{ShareSelection: true, Theme: a.md.Theme, OnLink: a.md.OnLink, LoadImage: a.md.LoadImage, WrapCode: a.md.WrapCode, Block: a.markdownBlock}
 		markdown.View(c, strings.Join(lines[1:], "\n"), &opts)
 	})
 	return true

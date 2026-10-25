@@ -15,7 +15,7 @@ func TestNativeMenuCommandParity(t *testing.T) {
 			return fallback
 		}}, goos)
 		if len(template) != 4 {
-			t.Fatal("unexpected menu can capture shell control keys", len(template))
+			t.Fatal("menu count differs from source app_menus", len(template))
 		}
 		seen := map[string]bool{}
 		var walk func([]*mygo.MenuItem)
@@ -47,5 +47,16 @@ func TestNativeMenuCommandParity(t *testing.T) {
 	disabled := NativeMenuTemplate(MenuOptions{}, "linux")
 	if !disabled[0].Submenu[1].Disabled {
 		t.Fatal("keyless updater enabled")
+	}
+}
+
+func TestNativeEditMenuUsesContentFirstRoleDispatch(t *testing.T) {
+	for _, goos := range []string{"darwin", "linux", "windows"} {
+		menu := NativeMenuTemplate(MenuOptions{}, goos)[2].Submenu
+		for i, role := range []mygo.MenuRole{mygo.RoleCut, mygo.RoleCopy, mygo.RolePaste, mygo.RoleSelectAll} {
+			if menu[i].Role != role || menu[i].Click != nil || menu[i].ID != "" {
+				t.Fatalf("%s edit %d replaced native role dispatch: %+v", goos, i, menu[i])
+			}
+		}
 	}
 }

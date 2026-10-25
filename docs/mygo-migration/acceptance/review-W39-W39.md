@@ -4,7 +4,7 @@ Pinned baseline: `299a32bc87fe3d4851bdb902d9c03dcf9bf99cac`. Every procedure use
 
 ## W39 — Review loading starts immediately, stale invalidation reloads when visible, generation rejects older source requests, manual refresh feedback minimum 650 ms, source-specific empty/error states.
 
-Functional **UNTESTED** · Visual **UNTESTED** · Native OS **UNTESTED**
+Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 
 **Rust source:** [crates/orbit-pi/src/sidepane.rs::load_review](https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L582); [crates/orbit-pi/src/sidepane.rs::mark_review_stale](https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L515); [crates/orbit-pi/src/sidepane.rs::set_source](https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L786); [crates/orbit-pi/src/sidepane.rs::clear_diff](https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L800)
 
@@ -29,7 +29,11 @@ Functional **UNTESTED** · Visual **UNTESTED** · Native OS **UNTESTED**
 **Existing test candidates, not automatic acceptance:** `internal/workspace/checkpoint_test.go`, `internal/workspace/review_test.go`
 
 **Executed narrow assertions:**
-- None assigned to this scope yet. Last verified SHA: none.
+- **PASS** `TestReviewRefreshKeepsSource650msFeedback`: Native refresh spinner remains active650ms independently of completed content load; repeated clicks extend deadline. [Evidence](ui-feedback-evidence.json). Tested dirty-tree manifest `feb5fa4354edc6faf70b383f3c0ca59e0d1155d3b47c27052c040efbd7fd53db`, not a published commit.
+
+**Owner challenge UI-W01 [PARTIAL]:** Initial acceptance failed at25.821182ms. Corrected with independent deadline and actual rendering predicate; default native regression now passes. Full Review animation/pixels remain open. [Scoped steps/tests](../native-ui-acceptance.json).
+
+**Additional source-specific procedures:** [strict-results.json](strict-results.json), [ui-feedback-evidence.json](ui-feedback-evidence.json)
 
 **Remaining:** Six-source immutable snapshots/checkpoint attribution/diff model tested; native review interaction/presentation parity remains pending. Dedicated native-controller stale source/session/workspace/hidden-toggle regressions pass under -race.
 **Visual/OS gates:** No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state. This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.

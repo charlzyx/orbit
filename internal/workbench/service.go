@@ -102,6 +102,7 @@ func (s *Service) Command(ctx context.Context, binary string, args ...string) (s
 		defer cancel()
 	}
 	cmd := exec.CommandContext(ctx, binary, args...)
+	configureResourceProcess(cmd)
 	cmd.Dir = s.Workspace
 	cmd.Env = append(os.Environ(), "HOME="+s.Preferences.Home, "PI_CODING_AGENT_DIR="+s.Preferences.PiDir, "PI_SKIP_VERSION_CHECK=1", "NO_COLOR=1", "CI=1")
 	secrets, e := s.SecretEnv()
@@ -117,7 +118,7 @@ func (s *Service) Command(ctx context.Context, binary string, args ...string) (s
 	cmd.Stderr = &errout
 	e = cmd.Run()
 	if e != nil {
-		return "", fmt.Errorf("%s: %w: %s", filepath.Base(binary), e, s.Redact(strings.TrimSpace(errout.String())))
+		return s.Redact(out.String()), fmt.Errorf("%s: %w: %s", filepath.Base(binary), e, s.Redact(strings.TrimSpace(errout.String())))
 	}
 	if out.truncated {
 		return "", errors.New("command output exceeded 16 MiB limit")

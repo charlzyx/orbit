@@ -137,8 +137,13 @@ type ExtensionStatus struct {
 	Patches                       PatchStatus
 }
 type Snapshot struct {
-	Awaiting                                 bool
-	Turn                                     int
+	Awaiting bool
+	Turn     int
+	// LatestTurn is the newest successfully captured completed turn. Turn may
+	// already identify a running prompt; Review must never substitute it here.
+	LatestTurn                               int
+	CheckpointRecovering                     bool
+	CheckpointRecoveryError                  string
 	Sessions                                 []SessionRow
 	Messages                                 []Message
 	Models                                   []ModelChoice
@@ -159,6 +164,7 @@ type Snapshot struct {
 	ComposerText                             string
 	SteeringMode, FollowUpMode               string
 	AutoCompactionEnabled                    bool
+	AutoCompactionKnown                      bool
 	AccessMode, WorkflowMode                 string
 	Extensions                               ExtensionStatus
 	Diagnostics                              []string

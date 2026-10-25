@@ -139,15 +139,17 @@
         {
           "id": "UI-S06",
           "status": "PARTIAL",
-          "owner_reported_verdict": "failed_missing_cases",
+          "owner_reported_verdict": "partial",
           "steps": [
             "Use numbered/next/previous session commands.",
             "Rename, pin, archive, restore, clone and recoverably delete.",
             "Change workspace sort/group/mark/icon and refresh fan-out."
           ],
           "expected": "Source ordering, active visibility, collapse persistence, all metadata operations and contextual menu semantics match.",
-          "tests": [],
-          "remaining": "Backend session operations exist, but host-level interaction/restart checks are incomplete. Source workspace marks/icons, all sorting modes and sticky/active reveal presentation are not fully reconstructed.",
+          "tests": [
+            "TestEmptySidebarDoesNotInventCwdProject"
+          ],
+          "remaining": "Fresh cwd no longer manufactures a sidebar project; saved workspaces and actual sessions still populate groups. Source empty-state geometry is mounted. Full marks/icons/sticky active reveal/sort-state persistence remains incomplete.",
           "evidence": "../native-ui-acceptance.json",
           "last_verified_sha": null,
           "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
@@ -282,15 +284,17 @@
         {
           "id": "UI-S06",
           "status": "PARTIAL",
-          "owner_reported_verdict": "failed_missing_cases",
+          "owner_reported_verdict": "partial",
           "steps": [
             "Use numbered/next/previous session commands.",
             "Rename, pin, archive, restore, clone and recoverably delete.",
             "Change workspace sort/group/mark/icon and refresh fan-out."
           ],
           "expected": "Source ordering, active visibility, collapse persistence, all metadata operations and contextual menu semantics match.",
-          "tests": [],
-          "remaining": "Backend session operations exist, but host-level interaction/restart checks are incomplete. Source workspace marks/icons, all sorting modes and sticky/active reveal presentation are not fully reconstructed.",
+          "tests": [
+            "TestEmptySidebarDoesNotInventCwdProject"
+          ],
+          "remaining": "Fresh cwd no longer manufactures a sidebar project; saved workspaces and actual sessions still populate groups. Source empty-state geometry is mounted. Full marks/icons/sticky active reveal/sort-state persistence remains incomplete.",
           "evidence": "../native-ui-acceptance.json",
           "last_verified_sha": null,
           "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."

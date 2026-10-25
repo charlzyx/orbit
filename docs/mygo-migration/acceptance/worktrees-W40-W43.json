@@ -268,7 +268,7 @@
           "status": "PARTIAL",
           "reason": "Named narrow assertions pass; remaining row steps are unverified.",
           "last_verified_sha": null,
-          "last_partial_evidence_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3"
+          "last_partial_evidence_sha": "8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59"
         },
         "visual": {
           "status": "UNTESTED",
@@ -290,9 +290,9 @@
           "package": "github.com/charlzyx/orbit/internal/worktreeui",
           "command": "go test -race -count=1 ./internal/worktreeui -run ^TestNativeCreateNameTypingDerivesBranchUntilManualEdit$",
           "evidence": "workspace-evidence.json",
-          "last_verified_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3",
+          "last_verified_sha": "8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59",
           "sha_kind": "working-tree-content-manifest; not a Git commit",
-          "verified_at_utc": "2026-10-25T14:01:16.210074699+09:00",
+          "verified_at_utc": "2026-10-25T14:19:03.80742882+09:00",
           "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
         }
       ],
@@ -424,7 +424,7 @@
           "status": "PARTIAL",
           "reason": "Named narrow assertions pass; remaining row steps are unverified.",
           "last_verified_sha": null,
-          "last_partial_evidence_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3"
+          "last_partial_evidence_sha": "8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59"
         },
         "visual": {
           "status": "UNTESTED",
@@ -446,9 +446,9 @@
           "package": "github.com/charlzyx/orbit/internal/worktreeui",
           "command": "go test -race -count=1 ./internal/worktreeui -run ^TestNativeBranchInUseOpenRequiresExplicitClick$",
           "evidence": "workspace-evidence.json",
-          "last_verified_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3",
+          "last_verified_sha": "8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59",
           "sha_kind": "working-tree-content-manifest; not a Git commit",
-          "verified_at_utc": "2026-10-25T14:01:16.232293841+09:00",
+          "verified_at_utc": "2026-10-25T14:19:03.834769476+09:00",
           "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
         }
       ],
@@ -498,8 +498,8 @@
         {
           "id": "W43.behavior",
           "dimension": "functional",
-          "action": "Set global worktree root/script/run/open preferences and repository root/script overrides.",
-          "expected": "Settings configure worktree root, setup-script path, run-setup automatically and open-after-create. Repository `.orbit/worktree.json` overrides root/script, not global booleans.",
+          "action": "Set global directory=.wt, setup_script=.orbit/worktree-setup.sh, run_setup_auto=false and open_after_create=false. Set repository .orbit/worktree.json directory=custom and setup_script=scripts/setup.sh.",
+          "expected": "Effective root/script use the repository values relative to main repository root. Both booleans remain false from global configuration; repository boolean keys do not override them.",
           "status": "UNTESTED",
           "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
@@ -516,46 +516,46 @@
         {
           "id": "W43.error",
           "dimension": "error",
-          "action": "Fail the current Git/setup/config write; retry after navigation and verify no prior mutation is replayed.",
-          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Global `~/.orbit-pi/worktrees.json`, defaults `.wt` and `.orbit/worktree-setup.sh`, auto-setup/open true. Absolute and `~/` paths supported. Missing/malformed config falls back safely; setup must be existing file.",
+          "action": "Make ~/.orbit-pi/worktrees.json unwritable, then toggle automatic setup/open-after-create.",
+          "expected": "Rust changes live booleans and ignores persistence failure; Go transactionally retains prior config and exposes retryable error. Record this as deviation D05, not exact parity.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W43.loading",
           "dimension": "loading",
-          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
-          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "action": "Toggle a global worktree setting while a worktree list refresh is delayed.",
+          "expected": "A preference update does not create/move/remove a worktree. List loading cannot replace the changed preference; the settings control reflects actual successful persistence.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W43.persistence",
           "dimension": "persistence",
-          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
-          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "action": "Close/reopen with valid, missing and malformed ~/.orbit-pi/worktrees.json; separately corrupt repository .orbit/worktree.json.",
+          "expected": "Global keys are directory,setup_script,run_setup_auto,open_after_create,allowed_setup_repos. Missing/malformed global data uses source defaults; malformed repository overrides are ignored. Empty setup path disables setup rather than silently restoring default.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W43.keyboard",
           "dimension": "keyboard",
-          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
-          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "action": "Open Worktree settings, edit the text fields using Tab/Shift+Tab; cancel with Escape; reopen and save explicitly.",
+          "expected": "Cancel leaves saved config untouched; text editing does not dispatch Git/create commands. Exact source dialog focus order still needs matched native verification.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W43.repeat",
           "dimension": "repeat",
-          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
-          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "action": "Save the same config twice, switch repositories with different overrides and return.",
+          "expected": "No duplicate allowed-repository entries, no cross-repository override leakage and no hidden setup execution.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         }
       ],
@@ -580,7 +580,7 @@
           "status": "PARTIAL",
           "reason": "Named narrow assertions pass; remaining row steps are unverified.",
           "last_verified_sha": null,
-          "last_partial_evidence_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3"
+          "last_partial_evidence_sha": "8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59"
         },
         "visual": {
           "status": "UNTESTED",
@@ -602,16 +602,18 @@
           "package": "github.com/charlzyx/orbit/internal/worktreeui",
           "command": "go test -race -count=1 ./internal/worktreeui -run ^TestSettingsPersistenceFailureIsTransactionalAndRetryable$",
           "evidence": "workspace-evidence.json",
-          "last_verified_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3",
+          "last_verified_sha": "8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59",
           "sha_kind": "working-tree-content-manifest; not a Git commit",
-          "verified_at_utc": "2026-10-25T14:01:15.927016411+09:00",
+          "verified_at_utc": "2026-10-25T14:19:03.504072266+09:00",
           "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
         }
       ],
       "known_remaining": "Real temporary worktree operations, setup consent/failure/cancel, transactional persistence and scoped native typing/confirm/retry tests pass. Host guide preference/translation hooks exist. Complete localization, host keyboard/focus and platform/pixel equivalence remain pending.",
       "full_parity_verified": false,
       "supplemental_cases": [],
-      "additional_evidence": []
+      "additional_evidence": [
+        "../intentional-deviations.md"
+      ]
     }
   ]
 }

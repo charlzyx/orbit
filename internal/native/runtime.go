@@ -314,6 +314,11 @@ type boundedOutput struct {
 	limit int
 }
 
+// Mask bytes.Buffer.ReadFrom: os/exec copies pipes through io.Copy, whose
+// ReaderFrom optimization would otherwise bypass the bounded Write method.
+func (b *boundedOutput) ReadFrom(r io.Reader) (int64, error) {
+	return io.Copy(struct{ io.Writer }{b}, r)
+}
 func (b *boundedOutput) Write(p []byte) (int, error) {
 	n := len(p)
 	remaining := b.limit - b.Len()

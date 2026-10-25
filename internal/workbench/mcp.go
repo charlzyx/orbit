@@ -7,8 +7,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"hash/fnv"
 	"io/fs"
+	"math"
 	"net/url"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"slices"
@@ -60,8 +63,8 @@ func ValidateMCP(name string, def map[string]any) error {
 		}
 	}
 	if v, ok := def["timeout"]; ok {
-		f, ok := v.(float64)
-		if !ok || f <= 0 || f != float64(uint64(f)) {
+		f, ok := mcpNumber(v)
+		if !ok || f <= 0 || math.IsInf(f, 0) || math.IsNaN(f) || math.Trunc(f) != f {
 			return errors.New("timeout must be a positive integer")
 		}
 	}
@@ -84,9 +87,23 @@ func ValidateMCP(name string, def map[string]any) error {
 		if kind != "" && kind != "http" && kind != "streamable-http" {
 			return errors.New("transport type does not match URL")
 		}
-		if oauth, ok := def["oauth"].(map[string]any); ok {
-			if port, ok := oauth["callbackPort"].(float64); ok && (port < 1 || port > 65535 || port != float64(int(port))) {
-				return errors.New("OAuth callback port must be1–65535")
+		if rawOAuth, exists := def["oauth"]; exists {
+			oauth, ok := rawOAuth.(map[string]any)
+			if !ok {
+				return errors.New("oauth must be an object")
+			}
+			for _, key := range []string{"clientId", "clientSecret", "callbackUrl", "scope"} {
+				if value, exists := oauth[key]; exists {
+					if _, ok := value.(string); !ok {
+						return fmt.Errorf("oauth.%s must be a string", key)
+					}
+				}
+			}
+			if rawPort, exists := oauth["callbackPort"]; exists {
+				port, ok := mcpNumber(rawPort)
+				if !ok || port < 1 || port > 65535 || math.Trunc(port) != port {
+					return errors.New("OAuth callback port must be 1–65535")
+				}
 			}
 			if callback := stringValue(oauth["callbackUrl"]); callback != "" {
 				u, e := url.Parse(callback)
@@ -169,8 +186,13 @@ func (s *Service) MCP() ([]MCPServer, []error) {
 			byName[name] = MCPServer{Name: name, Scope: scope, Source: path, Definition: def}
 		}
 	}
+	metadata, metadataError := s.mcpDescriptions()
+	if metadataError != nil {
+		errs = append(errs, metadataError)
+	}
 	out := make([]MCPServer, 0, len(byName))
 	for _, v := range byName {
+		v.Description = metadata[s.mcpMetadataKey(v.Scope, v.Name)]
 		out = append(out, v)
 	}
 	sort.Slice(out, func(i, j int) bool { return out[i].Name < out[j].Name })
@@ -218,7 +240,7 @@ func (s *Service) RemoveMCP(scope, name string) error {
 	if e != nil {
 		return e
 	}
-	return s.edit(path, func(m map[string]any) error {
+	e = s.edit(path, func(m map[string]any) error {
 		servers, e := object(m, "mcpServers")
 		if e != nil {
 			return e
@@ -226,6 +248,25 @@ func (s *Service) RemoveMCP(scope, name string) error {
 		delete(servers, name)
 		return nil
 	})
+	if e != nil {
+		return e
+	}
+	metadataError := s.SetMCPDescription(scope, name, "")
+	// Only this scope/workspace's generated namespace is eligible. All raw
+	// definitions (including globals shadowed by projects) protect references.
+	namespace := MCPSecretNamespace(scope, s.Workspace)
+	env, secretError := s.SecretEnv()
+	if secretError != nil {
+		return errors.Join(metadataError, secretError)
+	}
+	var candidates []string
+	for _, entry := range env {
+		key, _, _ := strings.Cut(entry, "=")
+		if strings.HasPrefix(key, namespace) {
+			candidates = append(candidates, key)
+		}
+	}
+	return errors.Join(metadataError, s.PruneMCPSecrets(namespace, candidates))
 }
 func (s *Service) SetMCPEnabled(scope, name string, enabled bool) error {
 	path, e := s.mcpPath(scope)
@@ -246,17 +287,48 @@ func (s *Service) SetMCPEnabled(scope, name string, enabled bool) error {
 	})
 }
 func (s *Service) ProbeMCP(ctx context.Context) (json.RawMessage, error) {
-	out, e := s.Pi(ctx, "mcp", "list", "--json", "--approve")
+	out, e := s.Pi(ctx, "mcp", "list", "--json")
 	if e != nil {
-		return nil, e
+		var exit *exec.ExitError
+		if !errors.As(e, &exit) || exit.ExitCode() != 1 {
+			return nil, e
+		}
 	}
 	var m struct {
 		Servers []json.RawMessage `json:"servers"`
 	}
-	if e = json.Unmarshal([]byte(out), &m); e != nil || m.Servers == nil {
+	if parseError := json.Unmarshal([]byte(out), &m); parseError != nil || m.Servers == nil {
+		if e != nil {
+			return nil, e
+		}
 		return nil, errors.New("Pi MCP probe did not return a servers array")
 	}
-	return json.RawMessage(s.Redact(out)), nil
+	// Redact decoded strings, not JSON source: multiline/quoted secret values
+	// are escaped in JSON and would evade a raw string replacement.
+	var doc any
+	if e := json.Unmarshal([]byte(out), &doc); e != nil {
+		return nil, e
+	}
+	var scrub func(any) any
+	scrub = func(value any) any {
+		switch v := value.(type) {
+		case string:
+			return s.Redact(v)
+		case []any:
+			for i, item := range v {
+				v[i] = scrub(item)
+			}
+			return v
+		case map[string]any:
+			for key, item := range v {
+				v[key] = scrub(item)
+			}
+			return v
+		default:
+			return value
+		}
+	}
+	return json.Marshal(scrub(doc))
 }
 func (s *Service) SecretEnv() ([]string, error) {
 	var m map[string]string
@@ -267,10 +339,14 @@ func (s *Service) SecretEnv() ([]string, error) {
 		}
 		return nil, nil
 	}
+	if m == nil {
+		return nil, errors.New("MCP secret store must be an object")
+	}
 	a := make([]string, 0, len(m))
 	for k, v := range m {
 		a = append(a, k+"="+v)
 	}
+	sort.Strings(a)
 	return a, nil
 }
 func (s *Service) SaveSecret(name, value string) error {
@@ -278,6 +354,12 @@ func (s *Service) SaveSecret(name, value string) error {
 		return errors.New("invalid secret variable name")
 	}
 	return s.Preferences.Update("mcp-secrets.json", func(m map[string]json.RawMessage) error {
+		for _, raw := range m {
+			var existing string
+			if e := json.Unmarshal(raw, &existing); e != nil || string(raw) == "null" {
+				return errors.New("MCP secret store must contain only string values; refusing to overwrite it")
+			}
+		}
 		if value == "" {
 			delete(m, name)
 		} else {
@@ -315,4 +397,182 @@ func MCPFingerprint(servers []MCPServer) string {
 	b, _ := json.Marshal(servers)
 	sum := sha256.Sum256(b)
 	return hex.EncodeToString(sum[:])
+}
+
+// mcpNumber accepts Go callers as well as numbers decoded from Pi's JSON.
+func mcpNumber(value any) (float64, bool) {
+	switch n := value.(type) {
+	case float64:
+		return n, true
+	case float32:
+		return float64(n), true
+	case int:
+		return float64(n), true
+	case int64:
+		return float64(n), true
+	case int32:
+		return float64(n), true
+	case uint:
+		return float64(n), true
+	case uint64:
+		return float64(n), true
+	case uint32:
+		return float64(n), true
+	case json.Number:
+		v, e := n.Float64()
+		return v, e == nil
+	default:
+		return 0, false
+	}
+}
+func (s *Service) mcpMetadataKey(scope, name string) string {
+	return scope + "|" + s.Workspace + "|" + name
+}
+func (s *Service) mcpDescriptions() (map[string]string, error) {
+	var root map[string]json.RawMessage
+	e := s.Preferences.Read("mcp-metadata.json", &root)
+	if errors.Is(e, fs.ErrNotExist) {
+		return map[string]string{}, nil
+	}
+	if e != nil {
+		return nil, fmt.Errorf("MCP metadata cannot be read: %w", e)
+	}
+	if root == nil {
+		return nil, errors.New("MCP metadata must be an object")
+	}
+	out := map[string]string{}
+	if raw, ok := root["descriptions"]; ok {
+		if e = json.Unmarshal(raw, &out); e != nil || out == nil {
+			return nil, errors.New("MCP descriptions must be a string map")
+		}
+	}
+	return out, nil
+}
+
+// SetMCPDescription writes Orbit-only UX metadata, never Pi's configuration.
+func (s *Service) SetMCPDescription(scope, name, description string) error {
+	if _, e := s.mcpPath(scope); e != nil {
+		return e
+	}
+	if !mcpName.MatchString(name) {
+		return errors.New("invalid server name")
+	}
+	return s.Preferences.Update("mcp-metadata.json", func(root map[string]json.RawMessage) error {
+		descriptions := map[string]string{}
+		if raw, ok := root["descriptions"]; ok {
+			if e := json.Unmarshal(raw, &descriptions); e != nil || descriptions == nil {
+				return errors.New("MCP descriptions must be a string map")
+			}
+		}
+		key := s.mcpMetadataKey(scope, name)
+		if strings.TrimSpace(description) == "" {
+			delete(descriptions, key)
+		} else {
+			descriptions[key] = strings.TrimSpace(description)
+		}
+		root["version"] = json.RawMessage("1")
+		root["descriptions"], _ = json.Marshal(descriptions)
+		return nil
+	})
+}
+
+// MCPAutoEnableCodemode resolves Pi's top-level flag with project precedence.
+// nil means Pi's default, not a fabricated enabled status.
+func (s *Service) MCPAutoEnableCodemode() (*bool, error) {
+	var out *bool
+	for _, scope := range []string{"global", "project"} {
+		if scope == "project" && s.Workspace == "" {
+			continue
+		}
+		path, e := s.mcpPath(scope)
+		if e != nil {
+			return nil, e
+		}
+		root, e := readObject(path)
+		if e != nil {
+			return nil, e
+		}
+		if raw, ok := root["autoEnableCodemode"]; ok {
+			value, ok := raw.(bool)
+			if !ok {
+				return nil, fmt.Errorf("%s: autoEnableCodemode must be boolean", scope)
+			}
+			out = &value
+		}
+	}
+	return out, nil
+}
+
+// SetMCPAutoEnableCodemode changes only the requested scope's top-level flag.
+func (s *Service) SetMCPAutoEnableCodemode(scope string, enabled bool) error {
+	path, e := s.mcpPath(scope)
+	if e != nil {
+		return e
+	}
+	return s.edit(path, func(root map[string]any) error { root["autoEnableCodemode"] = enabled; return nil })
+}
+
+// PruneMCPSecrets deletes only generated candidates from the supplied namespace
+// that neither raw global nor raw project configuration references. Read both
+// raw files: project shadowing must never hide a live global reference.
+func (s *Service) PruneMCPSecrets(namespace string, candidates []string) error {
+	if !strings.HasPrefix(namespace, "MCP_") || !strings.HasSuffix(namespace, "_") {
+		return errors.New("invalid MCP secret namespace")
+	}
+	referenced := map[string]bool{}
+	for _, scope := range []string{"global", "project"} {
+		if scope == "project" && s.Workspace == "" {
+			continue
+		}
+		path, e := s.mcpPath(scope)
+		if e != nil {
+			return e
+		}
+		root, e := readObject(path)
+		if e != nil {
+			return e
+		}
+		encoded, e := json.Marshal(root)
+		if e != nil {
+			return e
+		}
+		for _, name := range SecretReferences(string(encoded)) {
+			referenced[name] = true
+		}
+	}
+	if len(candidates) == 0 {
+		return nil
+	}
+	return s.Preferences.Update("mcp-secrets.json", func(root map[string]json.RawMessage) error {
+		for _, name := range candidates {
+			if strings.HasPrefix(name, namespace) && !referenced[name] {
+				delete(root, name)
+			}
+		}
+		return nil
+	})
+}
+
+// MCPSecretNamespace is source-compatible with Orbit's persisted FNV-1a names.
+func MCPSecretNamespace(scope, workspace string) string {
+	if scope == "global" {
+		return "MCP_GLOBAL_"
+	}
+	hash := fnv.New64a()
+	_, _ = hash.Write([]byte(workspace))
+	return fmt.Sprintf("MCP_P%016X_", hash.Sum64())
+}
+func MCPGeneratedSecretName(server, field, scope, workspace string) string {
+	clean := func(value string) string {
+		return strings.Map(func(r rune) rune {
+			if r >= 'a' && r <= 'z' {
+				return r - 'a' + 'A'
+			}
+			if r >= 'A' && r <= 'Z' || r >= '0' && r <= '9' {
+				return r
+			}
+			return '_'
+		}, value)
+	}
+	return MCPSecretNamespace(scope, workspace) + clean(server) + "_" + clean(field)
 }

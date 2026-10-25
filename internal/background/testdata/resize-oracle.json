@@ -1,0 +1,30 @@
+[
+  {
+    "height": 17,
+    "out_height": 14,
+    "out_width": 1600,
+    "width": 2001,
+    "SHA256": "6a9f4d6a4cc1d4023a9ddc3b0e391fa2ebb0527e81f57bb082048a54277655f2"
+  },
+  {
+    "height": 2001,
+    "out_height": 1600,
+    "out_width": 14,
+    "width": 17,
+    "SHA256": "5c55bee5524e368e5a44049bd411fcdd92fe27aa587458e8100dd25a76935751"
+  },
+  {
+    "height": 1,
+    "out_height": 1,
+    "out_width": 1600,
+    "width": 2001,
+    "SHA256": "c2e4005e694b2e73d5a90560a5fc9a007c3ce9138e5de0441f35727f8b5b8dc0"
+  },
+  {
+    "height": 2001,
+    "out_height": 1600,
+    "out_width": 1,
+    "width": 1,
+    "SHA256": "5dfd6506a97d4994e2d132fa6ec30aa516bcf11ef933e60aa91f027523ce37a8"
+  }
+]

@@ -1,10 +1,10 @@
 {
   "schema": "orbit-native-ui-acceptance/v1",
   "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
-  "generated_utc": "2026-10-25T04:59:00Z",
+  "generated_utc": "2026-10-25T05:45:00Z",
   "scope": "Supplement to139-row source checklist; scoped cases only, no full-row or visual parity claim",
-  "run": "GOPATH=/workspace/shared/orbit-toolchains/gopath GOCACHE=/workspace/shared/orbit-toolchains/go-cache /workspace/shared/orbit-toolchains/go/bin/go test -race ./internal/ui ./cmd/orbit -count=1",
-  "last_observed_full_ui_race": "2026-10-25T04:57:07Z: PASS,5.537s; later integration rerun in progress",
+  "run": "ORBIT_GO=/path/to/go1.27.3 scripts/go-native.sh test -race ./internal/ui ./cmd/orbit -count=1",
+  "last_observed_full_ui_race": "2026-10-25T05:21:15Z: PASS11.854s before subsequent source corrections; later focused canonical-overlay regressions pass, new aggregate pending.",
   "cases": [
     {
       "id": "UI-S01",
@@ -41,12 +41,13 @@
       "expected": "Source minimum 960×640; restore85% display width and90%height capped1440×920; one parked controller/process survives close.",
       "tests": [
         "TestSourceWindowRestoreBounds",
-        "TestHiddenSidebarReservesNativeTrafficLights"
+        "TestHiddenSidebarReservesNativeTrafficLights",
+        "TestSourceNativeMenuDoesNotAllocatePersistentWindowStrip"
       ],
       "functional_verdict": "partial",
       "visual_verdict": "not_compared_to_matched_Rust_runtime",
       "platform_verdict": "native_CPU_only_unless_explicitly_noted",
-      "remaining": "Pure restore bounds and native traffic-light clearance pass. Actual maximize/center/close/reopen/16ms-active heartbeat across all OS remains unexecuted.",
+      "remaining": "Source minimum/restore bounds and native traffic-light clearance pass. Native menus now auto-hide on Linux/Windows while retaining edit roles and shortcuts. Actual initial-maximize/Alt-F10/Dock lifetime on each OS remains separate acceptance.",
       "full_row_parity_verified": false
     },
     {
@@ -245,12 +246,14 @@
       "tests": [
         "TestNativeMenuCannotMutateBehindModal",
         "TestCustomDialogDoesNotDismissEscape",
-        "TestLiveCustomDialogForwardsEscape"
+        "TestLiveCustomDialogForwardsEscape",
+        "TestNativeMenuRespectsExternalPageModals",
+        "TestHasModalTracksReviewAndActualScreenshotPreview"
       ],
-      "functional_verdict": "pass_scoped",
+      "functional_verdict": "partial",
       "visual_verdict": "not_compared_to_matched_Rust_runtime",
       "platform_verdict": "native_CPU_only_unless_explicitly_noted",
-      "remaining": "Live custom test requires ORBIT_TERMINAL_TEST and pinned Ghostty; it was run previously. Ordinary default suite skips opt-in test. OS-native menu entry/accelerator dispatch remains separate.",
+      "remaining": "Native menu guard includes module-owned Git/Worktrees/MCP/Resources/report review/preview and Usage filter overlays. CPU routing tests pass; actual platform accelerator ordering remains separate.",
       "full_row_parity_verified": false
     },
     {
@@ -460,11 +463,13 @@
         "Change workspace sort/group/mark/icon and refresh fan-out."
       ],
       "expected": "Source ordering, active visibility, collapse persistence, all metadata operations and contextual menu semantics match.",
-      "tests": [],
-      "functional_verdict": "failed_missing_cases",
+      "tests": [
+        "TestEmptySidebarDoesNotInventCwdProject"
+      ],
+      "functional_verdict": "partial",
       "visual_verdict": "not_compared_to_matched_Rust_runtime",
       "platform_verdict": "native_CPU_only_unless_explicitly_noted",
-      "remaining": "Backend session operations exist, but host-level interaction/restart checks are incomplete. Source workspace marks/icons, all sorting modes and sticky/active reveal presentation are not fully reconstructed.",
+      "remaining": "Fresh cwd no longer manufactures a sidebar project; saved workspaces and actual sessions still populate groups. Source empty-state geometry is mounted. Full marks/icons/sticky active reveal/sort-state persistence remains incomplete.",
       "full_row_parity_verified": false
     },
     {
@@ -601,11 +606,13 @@
         "Escape cancels; accepting replaces only trigger range."
       ],
       "expected": "Source composer_ops autocomplete ordering, keyboard ownership and trigger replacement.",
-      "tests": [],
-      "functional_verdict": "failed_missing_implementation",
+      "tests": [
+        "TestNativeComposerCompletionPrecedesSendAndAbort"
+      ],
+      "functional_verdict": "partial",
       "visual_verdict": "not_compared_to_matched_Rust_runtime",
       "platform_verdict": "native_CPU_only_unless_explicitly_noted",
-      "remaining": "Host currently has no source-equivalent slash/file-mention popup. Plain text commands are forwarded but are not autocomplete parity.",
+      "remaining": "Native source-derived slash/skill/command/file completion is mounted; real command metadata and off-thread bounded filesystem scan, focus/caret/Enter/AltEnter/steer/Escape paths have tests. Canonical hash-checked MyGo compatibility supplies undoable caret-aware replacement; cmd refuses unpatched startup. Actual OS IME candidate panel and full source visual comparison remain unverified.",
       "full_row_parity_verified": false
     },
     {
@@ -771,10 +778,10 @@
       "tests": [
         "TestTranscriptVariableHeightFollowAndReaderPosition"
       ],
-      "functional_verdict": "pass_scoped",
+      "functional_verdict": "partial",
       "visual_verdict": "not_compared_to_matched_Rust_runtime",
       "platform_verdict": "native_CPU_only_unless_explicitly_noted",
-      "remaining": "Native CPU follow/read-position test passes. Source navigation rail and full turn grouping remain missing; GPU long-session/performance acceptance is open.",
+      "remaining": "Native variable-height follow/read-position test passes. Logical assistant turns now project across tool-result messages. Source navigation rail and full long-session performance/OS acceptance remain open.",
       "full_row_parity_verified": false
     },
     {
@@ -904,11 +911,14 @@
         "Inspect finished turn duration/tokens/cost."
       ],
       "expected": "Source structured tool presentation, cross-block selection, context menu and turn metrics.",
-      "tests": [],
-      "functional_verdict": "failed_missing_implementation",
+      "tests": [
+        "TestLogicalTranscriptKeepsAssistantProseAndToolResult",
+        "TestHostCrossMessageMarkdownAndAlertSelection"
+      ],
+      "functional_verdict": "partial",
       "visual_verdict": "not_compared_to_matched_Rust_runtime",
       "platform_verdict": "native_CPU_only_unless_explicitly_noted",
-      "remaining": "Host has selectable individual text/Markdown, generic collapsible tool output and copy response. Source typed tool cards, full cross-message selection/context menu and detailed turn summaries are incomplete.",
+      "remaining": "Typed tools, logical turns, observed-live elapsed time, source tail/usage footer and shared user/Markdown/alert selection are mounted and native-tested. C11 remains a concrete framework gap: selection clears when a virtualized endpoint unmounts; Rust retains SelectedBlock snapshots. Do not equate mounted-row selection with full parity.",
       "full_row_parity_verified": false
     },
     {
@@ -945,11 +955,13 @@
         "Stream another matching row while search is active."
       ],
       "expected": "Find stays distinct from command palette; active hit scroll and highlight/count are correct.",
-      "tests": [],
+      "tests": [
+        "TestTranscriptFindKeyboardWrapTrimAndFocus"
+      ],
       "functional_verdict": "partial",
       "visual_verdict": "not_compared_to_matched_Rust_runtime",
       "platform_verdict": "native_CPU_only_unless_explicitly_noted",
-      "remaining": "Search implementation exists, but dedicated interaction test and source highlight/active-hit keyboard behavior are not yet verified.",
+      "remaining": "Native trim/case/tool text, Enter/ShiftEnter wrap, Escape focus/no-abort and active wash tests pass. Search now uses logical turn text. Source floating320px bar geometry and full live-match evolution remain open.",
       "full_row_parity_verified": false
     },
     {
@@ -1176,15 +1188,17 @@
         "Scroll a long page, switch away for8 frames, return.",
         "Search a row label/synonym and activate result."
       ],
-      "expected": "Source section order; retained per-page scroll; search navigates exact row with source keyboard behavior.",
+      "expected": "Source section order and grouped rows; retained page scroll; translated setting-label/synonym search opens its section and clears query.",
       "tests": [
         "TestSettingsNavigationComplete",
-        "TestSettingsPageScrollRetained"
+        "TestSettingsPageScrollRetained",
+        "TestSettingsSourceSearchIndexAndSectionNavigation",
+        "TestSettingsSourceHeaderAndGeneralRows"
       ],
       "functional_verdict": "partial",
       "visual_verdict": "not_compared_to_matched_Rust_runtime",
       "platform_verdict": "native_CPU_only_unless_explicitly_noted",
-      "remaining": "14 sections and retained native scroll pass; fixed missing FillHeight that previously prevented long pages scrolling. Exact-row/synonym search is missing; current category-only search fails source P01.",
+      "remaining": "All14 source sections remain; nav groups/28px rows, fixed16px title,960px outer/912px inner column and source55-row setting-label/synonym search are implemented. Source search clears query and opens a section, not exact-row scrolling. Retained scroll, source-header/search, and actual notification-switch pointer/Space persistence pass under the canonical overlay (-race focused suite3.452s). General CPU capture1470×922 was inspected at05:45; source GPUI phi line-height,1.3 heading, left-aligned grouped nav and native36×20 switch geometry are now explicit. Full Settings cards, notification OS permission state/sound preview, matched pixels and OS flows remain unverified.",
       "full_row_parity_verified": false
     },
     {
@@ -1259,12 +1273,14 @@
       ],
       "expected": "Only real process fields, safe busy gates and source fresh-session-only defaults.",
       "tests": [
-        "TestMaintenanceGateKeepsDraftAndBlocksNewProcess"
+        "TestMaintenanceGateKeepsDraftAndBlocksNewProcess",
+        "TestNativeRuntimeUsesRealSnapshotAndStoppedUnknowns",
+        "TestNativeAgentRetryIsUnknownUntilConfirmed"
       ],
-      "functional_verdict": "failed_missing_data",
+      "functional_verdict": "partial",
       "visual_verdict": "not_compared_to_matched_Rust_runtime",
       "platform_verdict": "native_CPU_only_unless_explicitly_noted",
-      "remaining": "Host lacks actual PID/uptime/stderr/process-row adapter and complete auto-retry/follow-up/title-model controls. Native dependency/install helpers exist; action/OS integration needs execution. Do not fabricate metrics.",
+      "remaining": "Authoritative PID/executable/stderr/parked-processes/alive-only uptime and Start/Stop/Restart are mounted; retry/compaction unknown states are not invented and ACKs govern values. Source Runtime/Agent focused tests pass. Runtime patch enable/disable control and complete install/update/onboarding OS flows remain open.",
       "full_row_parity_verified": false
     },
     {
@@ -1493,10 +1509,10 @@
       ],
       "expected": "Source master/detail, scope/mutation serialization, stale completion rejection and precise persistence.",
       "tests": [],
-      "functional_verdict": "integration_in_progress",
+      "functional_verdict": "partial",
       "visual_verdict": "not_compared_to_matched_Rust_runtime",
       "platform_verdict": "native_CPU_only_unless_explicitly_noted",
-      "remaining": "Dedicated resourceui replaces generic host implementation and is mounted. Worker source checklist/native/race tests are in progress; do not claim completed acceptance until handoff.",
+      "remaining": "Dedicated resourceui source master-detail and CRUD/update/skip lifecycle is mounted, including Offline flag, default-app open, Notify completion and global update notice below toasts.24 scoped package tests/race pass. Host/platform full flow and matched pixels remain unverified; see resource module report.",
       "full_row_parity_verified": false
     },
     {
@@ -1682,12 +1698,15 @@
       "expected": "Source palette/tokens and persistent preferences, complete localization and backdrop.",
       "tests": [
         "TestTokensAndCommandRegistry",
-        "TestFractionalScaleKeepsLogicalComposerGeometry"
+        "TestFractionalScaleKeepsLogicalComposerGeometry",
+        "TestNativeBackdropBoundsAndFeatureVisibility",
+        "TestBackgroundChooseCoalesceFadeReuseFailureAndClear",
+        "TestBackdropPaintsBehindOpaqueComposer"
       ],
       "functional_verdict": "partial",
       "visual_verdict": "not_compared_to_matched_Rust_runtime",
       "platform_verdict": "native_CPU_only_unless_explicitly_noted",
-      "remaining": "10 palettes and55 binding parsing pass; many host labels remain English, backdrop integration is pending, and font/density/motion/OS contrast visual matrix remains open.",
+      "remaining": "Source procedural/photo background is mounted below header only on empty task, with source choose/reset/blur/cell/fade controls and worker-only PhotoStore. Native tests cover geometry, pointer pass-through, opaque foreground occlusion, coalescing/cache reuse and failure retention. Runtime/About use truthful versions. Full locale coverage/whole Appearance content/OS dialogs/matched visual acceptance remain open.",
       "full_row_parity_verified": false
     },
     {
@@ -1934,6 +1953,33 @@
       "visual_verdict": "not_compared_to_matched_Rust_runtime",
       "platform_verdict": "native_CPU_only_unless_explicitly_noted",
       "remaining": "Guard and temporary retention tests pass. Whole native update/install/temp dialogs and real OS notification lifecycle remain platform acceptance gates.",
+      "full_row_parity_verified": false
+    },
+    {
+      "id": "UI-W01",
+      "rows": [
+        "W39"
+      ],
+      "title": "Review refresh minimum feedback",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "symbol": "refresh_from_button",
+          "line": 749
+        }
+      ],
+      "steps": [
+        "Click Refresh against a fast disposable repository.",
+        "Complete content reload, then click again before the first feedback deadline."
+      ],
+      "expected": "Independent click feedback lasts at least650ms; repeated clicks extend it without fabricating loading data.",
+      "tests": [
+        "TestReviewRefreshKeepsSource650msFeedback"
+      ],
+      "functional_verdict": "pass_scoped",
+      "visual_verdict": "not_compared_to_matched_Rust_runtime",
+      "platform_verdict": "native_CPU_only_unless_explicitly_noted",
+      "remaining": "Initial acceptance failed at25.821182ms. Corrected with independent deadline and actual rendering predicate; default native regression now passes. Full Review animation/pixels remain open.",
       "full_row_parity_verified": false
     }
   ]

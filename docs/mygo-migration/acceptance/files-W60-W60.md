@@ -29,8 +29,8 @@ Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 **Existing test candidates, not automatic acceptance:** `internal/workspace/files_test.go`, `internal/workspace/tree_test.go`, `internal/workspace/watch_test.go`
 
 **Executed narrow assertions:**
-- **PASS** `TestFileLoadingModesAndGuards`: Text/image/binary/loading guards use actual file content and bounds. [Evidence](workspace-evidence.json). Tested dirty-tree manifest `4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3`, not a published commit.
-- **PASS** `TestEditorReadonly`: Read-only documents reject edits and saves. [Evidence](workspace-evidence.json). Tested dirty-tree manifest `4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3`, not a published commit.
+- **PASS** `TestFileLoadingModesAndGuards`: Text/image/binary/loading guards use actual file content and bounds. [Evidence](workspace-evidence.json). Tested dirty-tree manifest `8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59`, not a published commit.
+- **PASS** `TestEditorReadonly`: Read-only documents reject edits and saves. [Evidence](workspace-evidence.json). Tested dirty-tree manifest `8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59`, not a published commit.
 
 **Remaining:** File/ignore/editor/autosave/read-only/failure tests pass; native explorer/editor keyboard and visual acceptance remain pending.
 **Visual/OS gates:** No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state. This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.

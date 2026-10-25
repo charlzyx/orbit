@@ -297,15 +297,18 @@
         {
           "id": "UI-C08",
           "status": "PARTIAL",
-          "owner_reported_verdict": "failed_missing_implementation",
+          "owner_reported_verdict": "partial",
           "steps": [
             "Select across multiple Markdown blocks/messages.",
             "Open Bash/read/edit/write/search tool cards and errors.",
             "Inspect finished turn duration/tokens/cost."
           ],
           "expected": "Source structured tool presentation, cross-block selection, context menu and turn metrics.",
-          "tests": [],
-          "remaining": "Host has selectable individual text/Markdown, generic collapsible tool output and copy response. Source typed tool cards, full cross-message selection/context menu and detailed turn summaries are incomplete.",
+          "tests": [
+            "TestLogicalTranscriptKeepsAssistantProseAndToolResult",
+            "TestHostCrossMessageMarkdownAndAlertSelection"
+          ],
+          "remaining": "Typed tools, logical turns, observed-live elapsed time, source tail/usage footer and shared user/Markdown/alert selection are mounted and native-tested. C11 remains a concrete framework gap: selection clears when a virtualized endpoint unmounts; Rust retains SelectedBlock snapshots. Do not equate mounted-row selection with full parity.",
           "evidence": "../native-ui-acceptance.json",
           "last_verified_sha": null,
           "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
@@ -451,15 +454,18 @@
         {
           "id": "UI-C08",
           "status": "PARTIAL",
-          "owner_reported_verdict": "failed_missing_implementation",
+          "owner_reported_verdict": "partial",
           "steps": [
             "Select across multiple Markdown blocks/messages.",
             "Open Bash/read/edit/write/search tool cards and errors.",
             "Inspect finished turn duration/tokens/cost."
           ],
           "expected": "Source structured tool presentation, cross-block selection, context menu and turn metrics.",
-          "tests": [],
-          "remaining": "Host has selectable individual text/Markdown, generic collapsible tool output and copy response. Source typed tool cards, full cross-message selection/context menu and detailed turn summaries are incomplete.",
+          "tests": [
+            "TestLogicalTranscriptKeepsAssistantProseAndToolResult",
+            "TestHostCrossMessageMarkdownAndAlertSelection"
+          ],
+          "remaining": "Typed tools, logical turns, observed-live elapsed time, source tail/usage footer and shared user/Markdown/alert selection are mounted and native-tested. C11 remains a concrete framework gap: selection clears when a virtualized endpoint unmounts; Rust retains SelectedBlock snapshots. Do not equate mounted-row selection with full parity.",
           "evidence": "../native-ui-acceptance.json",
           "last_verified_sha": null,
           "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
@@ -605,15 +611,18 @@
         {
           "id": "UI-C08",
           "status": "PARTIAL",
-          "owner_reported_verdict": "failed_missing_implementation",
+          "owner_reported_verdict": "partial",
           "steps": [
             "Select across multiple Markdown blocks/messages.",
             "Open Bash/read/edit/write/search tool cards and errors.",
             "Inspect finished turn duration/tokens/cost."
           ],
           "expected": "Source structured tool presentation, cross-block selection, context menu and turn metrics.",
-          "tests": [],
-          "remaining": "Host has selectable individual text/Markdown, generic collapsible tool output and copy response. Source typed tool cards, full cross-message selection/context menu and detailed turn summaries are incomplete.",
+          "tests": [
+            "TestLogicalTranscriptKeepsAssistantProseAndToolResult",
+            "TestHostCrossMessageMarkdownAndAlertSelection"
+          ],
+          "remaining": "Typed tools, logical turns, observed-live elapsed time, source tail/usage footer and shared user/Markdown/alert selection are mounted and native-tested. C11 remains a concrete framework gap: selection clears when a virtualized endpoint unmounts; Rust retains SelectedBlock snapshots. Do not equate mounted-row selection with full parity.",
           "evidence": "../native-ui-acceptance.json",
           "last_verified_sha": null,
           "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."

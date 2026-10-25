@@ -99,7 +99,7 @@ Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 **Executed narrow assertions:**
 - None assigned to this scope yet. Last verified SHA: none.
 
-**Owner challenge UI-C06 [PARTIAL]:** Native CPU follow/read-position test passes. Source navigation rail and full turn grouping remain missing; GPU long-session/performance acceptance is open. [Scoped steps/tests](../native-ui-acceptance.json).
+**Owner challenge UI-C06 [PARTIAL]:** Native variable-height follow/read-position test passes. Logical assistant turns now project across tool-result messages. Source navigation rail and full long-session performance/OS acceptance remain open. [Scoped steps/tests](../native-ui-acceptance.json).
 
 **Remaining:** Native code exists; this row is not validated end to end.
 **Visual/OS gates:** No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state. This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.
@@ -133,7 +133,7 @@ Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 **Executed narrow assertions:**
 - None assigned to this scope yet. Last verified SHA: none.
 
-**Owner challenge UI-C06 [PARTIAL]:** Native CPU follow/read-position test passes. Source navigation rail and full turn grouping remain missing; GPU long-session/performance acceptance is open. [Scoped steps/tests](../native-ui-acceptance.json).
+**Owner challenge UI-C06 [PARTIAL]:** Native variable-height follow/read-position test passes. Logical assistant turns now project across tool-result messages. Source navigation rail and full long-session performance/OS acceptance remain open. [Scoped steps/tests](../native-ui-acceptance.json).
 
 **Remaining:** Native code exists; this row is not validated end to end.
 **Visual/OS gates:** No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state. This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.

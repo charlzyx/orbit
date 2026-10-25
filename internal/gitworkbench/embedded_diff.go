@@ -3,6 +3,7 @@ package gitworkbench
 import (
 	"fmt"
 
+	"github.com/charlzyx/orbit/internal/highlight"
 	"github.com/charlzyx/orbit/internal/workspace"
 	"github.com/egoist/mygo/ui"
 )
@@ -115,9 +116,39 @@ func (s *State) paintDiffLine(c *ui.Context, line *workspace.ReviewLine, staged 
 		muted(c, old).Width(35).Font("monospace")
 		muted(c, newLine).Width(35).Font("monospace")
 		ui.Text(c, prefix).Width(10).Font("monospace").TextColor(color)
-		text := ui.Text(c, line.Content).Grow(1).MinWidth(0).Font("monospace").FontSize(12).TextColor(color).Selectable()
+		text := ui.RichText(c, s.diffSpans(c, *line)...).Grow(1).MinWidth(0).Font("monospace").FontSize(12).TextColor(color).Selectable()
 		if !s.DiffWrap {
 			text.SingleLine()
 		}
 	})
+}
+
+// Only Color is overridden. Font metrics, wrapping and selection are still the
+// exact settings of the original text element; spans concatenate losslessly.
+func (s *State) diffSpans(c *ui.Context, line workspace.ReviewLine) []ui.Span {
+	runs := highlight.Runs(line.Content, line.Tokens)
+	spans := make([]ui.Span, 0, len(runs))
+	for _, run := range runs {
+		span := ui.Span{Text: run.Text}
+		if run.Class != "" {
+			if s.Options.TokenColor != nil {
+				span.Color = s.Options.TokenColor(run.Class)
+			} else {
+				switch run.Class {
+				case highlight.Comment:
+					span.Color = c.Theme().TextMuted
+				case highlight.Keyword, highlight.Command:
+					span.Color = c.Theme().Accent
+				case highlight.String, highlight.Added:
+					span.Color = c.Theme().Success
+				case highlight.Removed:
+					span.Color = c.Theme().Danger
+				default:
+					span.Color = c.Theme().Text
+				}
+			}
+		}
+		spans = append(spans, span)
+	}
+	return spans
 }

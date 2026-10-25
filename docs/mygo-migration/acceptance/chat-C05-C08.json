@@ -437,7 +437,7 @@
         {
           "id": "UI-C06",
           "status": "PARTIAL",
-          "owner_reported_verdict": "pass_scoped",
+          "owner_reported_verdict": "partial",
           "steps": [
             "Render120 variable-height messages.",
             "Scroll up in30-DIP steps, append/grow streamed assistant message.",
@@ -447,7 +447,7 @@
           "tests": [
             "TestTranscriptVariableHeightFollowAndReaderPosition"
           ],
-          "remaining": "Native CPU follow/read-position test passes. Source navigation rail and full turn grouping remain missing; GPU long-session/performance acceptance is open.",
+          "remaining": "Native variable-height follow/read-position test passes. Logical assistant turns now project across tool-result messages. Source navigation rail and full long-session performance/OS acceptance remain open.",
           "evidence": "../native-ui-acceptance.json",
           "last_verified_sha": null,
           "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
@@ -586,7 +586,7 @@
         {
           "id": "UI-C06",
           "status": "PARTIAL",
-          "owner_reported_verdict": "pass_scoped",
+          "owner_reported_verdict": "partial",
           "steps": [
             "Render120 variable-height messages.",
             "Scroll up in30-DIP steps, append/grow streamed assistant message.",
@@ -596,7 +596,7 @@
           "tests": [
             "TestTranscriptVariableHeightFollowAndReaderPosition"
           ],
-          "remaining": "Native CPU follow/read-position test passes. Source navigation rail and full turn grouping remain missing; GPU long-session/performance acceptance is open.",
+          "remaining": "Native variable-height follow/read-position test passes. Logical assistant turns now project across tool-result messages. Source navigation rail and full long-session performance/OS acceptance remain open.",
           "evidence": "../native-ui-acceptance.json",
           "last_verified_sha": null,
           "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."

@@ -53,6 +53,14 @@ func (a *App) shortcuts(c *ui.Context) {
 		return
 	}
 
+	if a.autocomplete.IsOpen() && a.composer.Focused(c) && c.Shortcut(0, ui.KeyEscape) {
+		a.autocomplete.Dismiss()
+		return
+	}
+	if a.searchOpen && a.searchInput.Focused(c) && c.Shortcut(0, ui.KeyEscape) {
+		a.closeFind()
+		return
+	}
 	if a.page == "git" && c.Shortcut(0, ui.KeyEscape) {
 		if a.Options.Escape == nil || !a.Options.Escape() {
 			a.Navigate("chat")
@@ -101,7 +109,7 @@ func (a *App) shortcuts(c *ui.Context) {
 	}
 }
 func (a *App) modalOpen() bool {
-	return a.promptOpen || a.confirmOpen || a.Model.Dialog != nil || a.paletteOpen || a.modelOpen || a.jsonOpen || a.secretOpen || a.imageOpen
+	return a.usageState.filterMenu != "" || a.providerState.editor != nil || (a.Options.HasModal != nil && a.Options.HasModal()) || a.promptOpen || a.confirmOpen || a.Model.Dialog != nil || a.paletteOpen || a.modelOpen || a.jsonOpen || a.secretOpen || a.imageOpen || a.usageState.detailError != nil || a.usageState.customOpen || a.usageState.detailRecord != nil || a.usageState.detailSession != nil
 }
 
 // Native menu accelerators arrive outside MyGo's modal shortcut scope. Apply
@@ -143,7 +151,16 @@ func (a *App) command(id, value string) {
 		a.commandCursor = 0
 	case "ToggleSearch":
 		a.searchOpen = !a.searchOpen
+		a.Search = ""
+		a.searchCursor = 0
+		a.searchLastQuery = ""
+		a.searchLastCount = 0
 		a.Navigate("chat")
+		if a.searchOpen {
+			a.searchInput.Focus()
+		} else {
+			a.composer.Focus()
+		}
 	case "OpenSettings":
 		a.Navigate("settings")
 	case "OpenAbout":
@@ -212,10 +229,6 @@ func (a *App) command(id, value string) {
 		})
 	case "ChooseWorkflowMode":
 		a.Prompt("Workflow mode (plan, build, ask)", a.workflow, func(v string) {
-			if e := a.Options.Store.SaveWorkflow(a.Model.SessionID, v); e != nil {
-				a.Notify(e.Error(), true)
-				return
-			}
 			a.workflow = v
 			a.Dispatch(Action{Kind: "SetWorkflow", Value: v})
 		})

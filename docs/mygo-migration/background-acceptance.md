@@ -16,6 +16,35 @@ This is an implementation/verification checklist, not matched-image evidence.
 | BG07 | Use a wide image in a narrow main column. Cover-center image, clip it inside that column below top bar, never bleed onto sidebar. Fade heights0/.08/.14/.22/.32 pair with peaks0/.55/.72/.88/1. | UNTESTED native/visual |
 | BG08 | Repeatedly select images while processing; cancel an older request, navigate away, deny a save path and recover. No stale image/label is installed and real errors remain visible. All I/O/processing stays off the render frame. | UNTESTED host |
 
-No full feature PASS; matched Rust/Go screenshots, native dialogs, and host
-integration remain untested. Current implementation changes are uncommitted;
-do not attribute them to a previously published SHA.
+## Executed narrow verification
+
+`go test -race ./internal/background -count=1` passes13 named tests, and
+`go vet ./internal/background` passes. Exact source hashes and command are in
+`probes/background-verification.json`; changes are still uncommitted, so they
+are not attributed to an earlier published SHA.
+
+- BG03–BG06 domain portions pass: preserved basename/tuning, unreadable-source
+  nonreplacement, no upscaling,1600-edge fitting, per-field fallback, real
+  filesystem persistence/errors, cancellation, repeated clear, concurrent
+  reads/tuning and fade-only cache reuse.
+- BG04 covers every preset and partial cells with independent RGBA/alpha.
+- BG05 has72 exact SHA-256 pixel comparisons against the pinned Rust
+  `image0.25.10::fast_blur` across six dimensions and all12 nonzero slider
+  values. Blur0 also proves pointer/pixel no-op.
+- BG03 has four exact resize pixel oracles including horizontal/vertical
+  nonopaque and one-pixel-edge inputs. The initial generic Go bilinear scaler
+  failed all four, because premultiplied interpolation differs. The replacement
+  uses the source straight-RGBA,float32,normalized Triangle semantics and now
+  matches. These are algorithm fixtures, not complete window pixel parity.
+
+Oracle harnesses and expected hashes live in `internal/background/testdata/`.
+Run each `.rs` as an isolated Cargo binary with exact `image=0.25.10`,
+`default-features=false` and `serde_json`; the cached official dependencies
+allow an offline run. No Rust component is linked into or launched by the Go
+application. Image-rs algorithm attribution is retained in
+`licenses/image-rs-MIT.txt`.
+
+Deliberate hardening difference: refuse decoding above64 megapixels/128MiB
+compressed input instead of permitting an unbounded allocation, and surface
+save/clear errors that the original sometimes ignores. No full feature PASS;
+matched Rust/Go screenshots, native dialogs, and host integration remain open.

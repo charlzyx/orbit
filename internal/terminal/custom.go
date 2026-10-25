@@ -5,11 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"math"
 	"strings"
 	"sync"
 
-	ghostty "github.com/egoist/mygo/plugins/terminal"
+	ghostty "github.com/egoist/mygo/orbit-terminal"
 	"github.com/egoist/mygo/ui"
 )
 
@@ -19,7 +18,11 @@ const CustomRows = 20
 // CustomOptions connects a native ANSI grid to Pi's custom-UI RPC surface.
 // No process or PTY is started. Input/resize/error callbacks run off-thread.
 type CustomOptions struct {
-	Font             ghostty.Font
+	Font ghostty.Font
+	// RowHeight is the row pitch in DIPs. The source custom surface uses
+	// theme.code_px(12) text and theme.code_px(18) rows, independently of
+	// the bottom terminal's font preference. Zero uses Font.Size * 1.5.
+	RowHeight        float32
 	Theme, DarkTheme *ghostty.Theme
 	ReduceMotion     bool
 	OnChange         func()
@@ -40,6 +43,7 @@ type CustomPanel struct {
 	term            *ghostty.Terminal
 	loading, closed bool
 	err             error
+	scale           float32
 	generation      uint64
 	encoded         []byte
 }
@@ -86,7 +90,16 @@ func (c *customConn) fail(e error) {
 		c.options.OnError(e)
 	}
 }
-func NewCustom(o CustomOptions) *CustomPanel { return &CustomPanel{options: o} }
+func NewCustom(o CustomOptions) *CustomPanel {
+	if o.Font.Size <= 0 {
+		o.Font.Size = 12
+	}
+	if o.RowHeight <= 0 {
+		o.RowHeight = o.Font.Size * 1.5
+	}
+	o.Font = fontAtRowHeight(o.Font, o.RowHeight)
+	return &CustomPanel{options: o, scale: 1}
+}
 
 // Update takes an immutable copy of a server frame. A new ID owns a fresh
 // connection so queued keys from a dismissed surface cannot target another.
@@ -267,7 +280,7 @@ func encodeCustomFrame(lines []string, cursor json.RawMessage, width, height int
 // The host owns the surrounding modal header and explicit cancel response.
 func CustomView(c *ui.Context, p *CustomPanel) ui.Element {
 	p.mu.Lock()
-	t, loading, e, rows, font, id := p.term, p.loading, p.err, max(p.frame.height, len(p.frame.lines)), p.options.Font, p.id
+	t, loading, e, rows, pitch, scale, id := p.term, p.loading, p.err, max(p.frame.height, len(p.frame.lines)), p.options.RowHeight, p.scale, p.id
 	p.mu.Unlock()
 	if t == nil {
 		label := "No custom UI surface"
@@ -279,27 +292,27 @@ func CustomView(c *ui.Context, p *CustomPanel) ui.Element {
 		}
 		return ui.Text(c, label)
 	}
-	size := font.Size
-	if size <= 0 {
-		size = 13
-	}
-	family := font.Family
-	if family == "" {
-		family = "monospace"
-	}
-	metrics := (ui.Font{Family: family, Size: size, Weight: font.Weight}).Metrics()
-	lineHeight := font.LineHeight
-	if lineHeight <= 0 {
-		lineHeight = 1
-	}
-	height := float32(rows)*float32(math.Ceil(float64((metrics.Ascent+metrics.Descent+metrics.LineGap)*lineHeight-.05))) + 8
-	return ui.Scroll(c).Children(func() { ghostty.View(c, t).Key(id).Height(height).AlignSelf(ui.Stretch).AutoFocus() })
+	height := float32(rows)*gridRowHeight(pitch, scale) + 8
+	services := c.Services()
+	// The public frame context has no scale accessor. Read the actual scale
+	// from our own paint node (never replace Ghostty's painter), and rebuild
+	// once on monitor/scale changes so the last row is not clipped.
+	return ui.Scroll(c).Draw(func(painter *ui.Painter, _ ui.Rect) {
+		p.mu.Lock()
+		changed := p.scale != painter.Scale()
+		p.scale = painter.Scale()
+		p.mu.Unlock()
+		if changed {
+			services.Invalidate()
+		}
+	}).Children(func() { ghostty.View(c, t).Key(id).Height(height).AlignSelf(ui.Stretch).AutoFocus() })
 }
 
 // SetAppearance updates an already-open surface. Call when preferences change,
 // not each frame; the native view invalidates after font/theme updates.
 func (p *CustomPanel) SetAppearance(font ghostty.Font, light, dark *ghostty.Theme, reduce bool) {
 	p.mu.Lock()
+	font = fontAtRowHeight(font, p.options.RowHeight)
 	p.options.Font = font
 	p.options.Theme = light
 	p.options.DarkTheme = dark
@@ -317,5 +330,24 @@ func (p *CustomPanel) SetAppearance(font ghostty.Font, light, dark *ghostty.Them
 				t.Feed([]byte("\x1b[?12h"))
 			}
 		}
+	}
+}
+
+// SetRowHeight changes the source custom grid's DIP pitch without restarting
+// its RPC connection. Use with SetAppearance when the editor scale changes.
+func (p *CustomPanel) SetRowHeight(height float32) {
+	if height <= 0 {
+		return
+	}
+	p.mu.Lock()
+	p.options.RowHeight = height
+	p.options.Font = fontAtRowHeight(p.options.Font, height)
+	t, font, change := p.term, p.options.Font, p.options.OnChange
+	p.mu.Unlock()
+	if t != nil {
+		t.SetFont(font)
+	}
+	if change != nil {
+		change()
 	}
 }

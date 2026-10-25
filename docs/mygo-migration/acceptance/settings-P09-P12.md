@@ -38,7 +38,7 @@ Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 
 ## P10 — Skills discovery and master/detail
 
-Functional **UNTESTED** · Visual **UNTESTED** · Native OS **UNTESTED**
+Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 
 **Rust source:** [crates/orbit-pi/src/skills.rs::discover](https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/skills.rs#L88); [crates/orbit-pi/src/skills.rs::Skill](https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/skills.rs#L52); [crates/orbit-pi/src/app/skills_ui.rs::render_skills_page](https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/skills_ui.rs#L32); [crates/orbit-pi/src/app/skills_ui.rs::apply_skill_action](https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/skills_ui.rs#L722)
 
@@ -65,16 +65,16 @@ Functional **UNTESTED** · Visual **UNTESTED** · Native OS **UNTESTED**
 **Executed narrow assertions:**
 - None assigned to this scope yet. Last verified SHA: none.
 
-**Owner challenge UI-P05 [PARTIAL]:** Dedicated resourceui replaces generic host implementation and is mounted. Worker source checklist/native/race tests are in progress; do not claim completed acceptance until handoff. [Scoped steps/tests](../native-ui-acceptance.json).
+**Owner challenge UI-P05 [PARTIAL]:** Dedicated resourceui source master-detail and CRUD/update/skip lifecycle is mounted, including Offline flag, default-app open, Notify completion and global update notice below toasts.24 scoped package tests/race pass. Host/platform full flow and matched pixels remain unverified; see resource module report. [Scoped steps/tests](../native-ui-acceptance.json).
 
-**Additional source-specific procedures:** [../settings-backend-implementation.md](../settings-backend-implementation.md), [../settings-backend-source-evidence.json](../settings-backend-source-evidence.json)
+**Additional source-specific procedures:** [../resource-ui-implementation.md](../resource-ui-implementation.md), [../settings-backend-implementation.md](../settings-backend-implementation.md), [../settings-backend-source-evidence.json](../settings-backend-source-evidence.json)
 
 **Remaining:** Native code exists; this row is not validated end to end.
 **Visual/OS gates:** No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state. This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.
 
 ## P11 — Skill enable/disable/delete
 
-Functional **UNTESTED** · Visual **UNTESTED** · Native OS **UNTESTED**
+Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 
 **Rust source:** [crates/orbit-pi/src/skills.rs::set_enabled](https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/skills.rs#L338); [crates/orbit-pi/src/skills.rs::delete](https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/skills.rs#L440); [crates/orbit-pi/src/app/skills_ui.rs::delete_selected_skill](https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/skills_ui.rs#L772)
 
@@ -101,16 +101,16 @@ Functional **UNTESTED** · Visual **UNTESTED** · Native OS **UNTESTED**
 **Executed narrow assertions:**
 - None assigned to this scope yet. Last verified SHA: none.
 
-**Owner challenge UI-P05 [PARTIAL]:** Dedicated resourceui replaces generic host implementation and is mounted. Worker source checklist/native/race tests are in progress; do not claim completed acceptance until handoff. [Scoped steps/tests](../native-ui-acceptance.json).
+**Owner challenge UI-P05 [PARTIAL]:** Dedicated resourceui source master-detail and CRUD/update/skip lifecycle is mounted, including Offline flag, default-app open, Notify completion and global update notice below toasts.24 scoped package tests/race pass. Host/platform full flow and matched pixels remain unverified; see resource module report. [Scoped steps/tests](../native-ui-acceptance.json).
 
-**Additional source-specific procedures:** [../settings-backend-implementation.md](../settings-backend-implementation.md), [../settings-backend-source-evidence.json](../settings-backend-source-evidence.json)
+**Additional source-specific procedures:** [../resource-ui-implementation.md](../resource-ui-implementation.md), [../settings-backend-implementation.md](../settings-backend-implementation.md), [../settings-backend-source-evidence.json](../settings-backend-source-evidence.json)
 
 **Remaining:** Native code exists; this row is not validated end to end.
 **Visual/OS gates:** No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state. This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.
 
 ## P12 — Plugin package management
 
-Functional **UNTESTED** · Visual **UNTESTED** · Native OS **UNTESTED**
+Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 
 **Rust source:** [crates/orbit-pi/src/plugins.rs::discover](https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/plugins.rs#L99); [crates/orbit-pi/src/plugins.rs::install](https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/plugins.rs#L135); [crates/orbit-pi/src/plugins.rs::remove](https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/plugins.rs#L147); [crates/orbit-pi/src/plugins.rs::update](https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/plugins.rs#L157)
 
@@ -137,9 +137,9 @@ Functional **UNTESTED** · Visual **UNTESTED** · Native OS **UNTESTED**
 **Executed narrow assertions:**
 - None assigned to this scope yet. Last verified SHA: none.
 
-**Owner challenge UI-P05 [PARTIAL]:** Dedicated resourceui replaces generic host implementation and is mounted. Worker source checklist/native/race tests are in progress; do not claim completed acceptance until handoff. [Scoped steps/tests](../native-ui-acceptance.json).
+**Owner challenge UI-P05 [PARTIAL]:** Dedicated resourceui source master-detail and CRUD/update/skip lifecycle is mounted, including Offline flag, default-app open, Notify completion and global update notice below toasts.24 scoped package tests/race pass. Host/platform full flow and matched pixels remain unverified; see resource module report. [Scoped steps/tests](../native-ui-acceptance.json).
 
-**Additional source-specific procedures:** [../settings-backend-implementation.md](../settings-backend-implementation.md), [../settings-backend-source-evidence.json](../settings-backend-source-evidence.json)
+**Additional source-specific procedures:** [../resource-ui-implementation.md](../resource-ui-implementation.md), [../settings-backend-implementation.md](../settings-backend-implementation.md), [../settings-backend-source-evidence.json](../settings-backend-source-evidence.json)
 
 **Remaining:** Native code exists; this row is not validated end to end.
 **Visual/OS gates:** No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state. This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.

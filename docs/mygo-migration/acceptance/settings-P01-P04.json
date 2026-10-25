@@ -145,12 +145,14 @@
             "Scroll a long page, switch away for8 frames, return.",
             "Search a row label/synonym and activate result."
           ],
-          "expected": "Source section order; retained per-page scroll; search navigates exact row with source keyboard behavior.",
+          "expected": "Source section order and grouped rows; retained page scroll; translated setting-label/synonym search opens its section and clears query.",
           "tests": [
             "TestSettingsNavigationComplete",
-            "TestSettingsPageScrollRetained"
+            "TestSettingsPageScrollRetained",
+            "TestSettingsSourceSearchIndexAndSectionNavigation",
+            "TestSettingsSourceHeaderAndGeneralRows"
           ],
-          "remaining": "14 sections and retained native scroll pass; fixed missing FillHeight that previously prevented long pages scrolling. Exact-row/synonym search is missing; current category-only search fails source P01.",
+          "remaining": "All14 source sections remain; nav groups/28px rows, fixed16px title,960px outer/912px inner column and source55-row setting-label/synonym search are implemented. Source search clears query and opens a section, not exact-row scrolling. Retained scroll, source-header/search, and actual notification-switch pointer/Space persistence pass under the canonical overlay (-race focused suite3.452s). General CPU capture1470×922 was inspected at05:45; source GPUI phi line-height,1.3 heading, left-aligned grouped nav and native36×20 switch geometry are now explicit. Full Settings cards, notification OS permission state/sound preview, matched pixels and OS flows remain unverified.",
           "evidence": "../native-ui-acceptance.json",
           "last_verified_sha": null,
           "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
@@ -301,7 +303,7 @@
         {
           "id": "UI-P02",
           "status": "PARTIAL",
-          "owner_reported_verdict": "failed_missing_data",
+          "owner_reported_verdict": "partial",
           "steps": [
             "Inspect active/parked PID/executable/uptime/stdout/stderr.",
             "Start/Stop/Restart; dependency install failure/cancel.",
@@ -309,15 +311,18 @@
           ],
           "expected": "Only real process fields, safe busy gates and source fresh-session-only defaults.",
           "tests": [
-            "TestMaintenanceGateKeepsDraftAndBlocksNewProcess"
+            "TestMaintenanceGateKeepsDraftAndBlocksNewProcess",
+            "TestNativeRuntimeUsesRealSnapshotAndStoppedUnknowns",
+            "TestNativeAgentRetryIsUnknownUntilConfirmed"
           ],
-          "remaining": "Host lacks actual PID/uptime/stderr/process-row adapter and complete auto-retry/follow-up/title-model controls. Native dependency/install helpers exist; action/OS integration needs execution. Do not fabricate metrics.",
+          "remaining": "Authoritative PID/executable/stderr/parked-processes/alive-only uptime and Start/Stop/Restart are mounted; retry/compaction unknown states are not invented and ACKs govern values. Source Runtime/Agent focused tests pass. Runtime patch enable/disable control and complete install/update/onboarding OS flows remain open.",
           "evidence": "../native-ui-acceptance.json",
           "last_verified_sha": null,
           "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
         }
       ],
       "additional_evidence": [
+        "../intentional-deviations.md",
         "../runtime-acceptance.md"
       ]
     },
@@ -450,7 +455,7 @@
         {
           "id": "UI-P02",
           "status": "PARTIAL",
-          "owner_reported_verdict": "failed_missing_data",
+          "owner_reported_verdict": "partial",
           "steps": [
             "Inspect active/parked PID/executable/uptime/stdout/stderr.",
             "Start/Stop/Restart; dependency install failure/cancel.",
@@ -458,9 +463,11 @@
           ],
           "expected": "Only real process fields, safe busy gates and source fresh-session-only defaults.",
           "tests": [
-            "TestMaintenanceGateKeepsDraftAndBlocksNewProcess"
+            "TestMaintenanceGateKeepsDraftAndBlocksNewProcess",
+            "TestNativeRuntimeUsesRealSnapshotAndStoppedUnknowns",
+            "TestNativeAgentRetryIsUnknownUntilConfirmed"
           ],
-          "remaining": "Host lacks actual PID/uptime/stderr/process-row adapter and complete auto-retry/follow-up/title-model controls. Native dependency/install helpers exist; action/OS integration needs execution. Do not fabricate metrics.",
+          "remaining": "Authoritative PID/executable/stderr/parked-processes/alive-only uptime and Start/Stop/Restart are mounted; retry/compaction unknown states are not invented and ACKs govern values. Source Runtime/Agent focused tests pass. Runtime patch enable/disable control and complete install/update/onboarding OS flows remain open.",
           "evidence": "../native-ui-acceptance.json",
           "last_verified_sha": null,
           "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
@@ -597,7 +604,7 @@
         {
           "id": "UI-P02",
           "status": "PARTIAL",
-          "owner_reported_verdict": "failed_missing_data",
+          "owner_reported_verdict": "partial",
           "steps": [
             "Inspect active/parked PID/executable/uptime/stdout/stderr.",
             "Start/Stop/Restart; dependency install failure/cancel.",
@@ -605,15 +612,18 @@
           ],
           "expected": "Only real process fields, safe busy gates and source fresh-session-only defaults.",
           "tests": [
-            "TestMaintenanceGateKeepsDraftAndBlocksNewProcess"
+            "TestMaintenanceGateKeepsDraftAndBlocksNewProcess",
+            "TestNativeRuntimeUsesRealSnapshotAndStoppedUnknowns",
+            "TestNativeAgentRetryIsUnknownUntilConfirmed"
           ],
-          "remaining": "Host lacks actual PID/uptime/stderr/process-row adapter and complete auto-retry/follow-up/title-model controls. Native dependency/install helpers exist; action/OS integration needs execution. Do not fabricate metrics.",
+          "remaining": "Authoritative PID/executable/stderr/parked-processes/alive-only uptime and Start/Stop/Restart are mounted; retry/compaction unknown states are not invented and ACKs govern values. Source Runtime/Agent focused tests pass. Runtime patch enable/disable control and complete install/update/onboarding OS flows remain open.",
           "evidence": "../native-ui-acceptance.json",
           "last_verified_sha": null,
           "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
         }
       ],
       "additional_evidence": [
+        "../intentional-deviations.md",
         "../runtime-acceptance.md"
       ]
     }

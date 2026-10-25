@@ -1,0 +1,66 @@
+diff --git a/ui/orbit_composer.go b/ui/orbit_composer.go
+new file mode 100644
+--- /dev/null
++++ b/ui/orbit_composer.go
+@@ -0,0 +1,61 @@
++// Copyright (c) 2026 Orbit contributors.
++// SPDX-License-Identifier: MIT
++// Small opt-in compatibility addition for MyGo 9c69cf829ece196c5b3a3601f1c7bbe70526376f.
++package ui
++
++// AnchorCaret returns live rune offsets, including navigation queued before
++// this key. It is valid only inside this TextKey's OnTextKey callback.
++func (k TextKey) AnchorCaret() (anchor, caret int) {
++	ed := k.valid()
++	return ed.anchor, ed.caret
++}
++
++// Composing reports live marked input. Completion must not consume IME text.
++// It is valid only inside this TextKey's OnTextKey callback.
++func (k TextKey) Composing() bool { return k.valid().compose != "" }
++
++// ReplaceRange replaces rune offsets [start,end) as a separate undoable edit,
++// and puts the caret after the replacement. Unlike SetText, this does not
++// coalesce the replacement with preceding typing or discard indexed history.
++// It refuses read-only inputs and active IME composition. Offsets are clamped
++// to the current text. It is valid only in this key's OnTextKey callback.
++func (k TextKey) ReplaceRange(start, end int, text string) bool {
++	return k.valid().replaceRangeStep(start, end, text)
++}
++
++// ReplaceTextRange is ReplaceRange's build-scoped counterpart for a completion
++// selected with the pointer. A stale/noneditable/disabled Element is a no-op.
++func (e Element) ReplaceTextRange(start, end int, text string) bool {
++	n := e.node()
++	if n == nil || n.st.editor == nil || n.flags&flagEditable == 0 || n.disabled() {
++		return false
++	}
++	return n.st.editor.replaceRangeStep(start, end, text)
++}
++
++func (ed *editor) replaceRangeStep(start, end int, text string) bool {
++	if ed.readOnly || ed.compose != "" {
++		return false
++	}
++	start = min(max(start, 0), ed.buf.n)
++	end = min(max(end, start), ed.buf.n)
++	ed.record(false)
++	ed.replace(start, end, text)
++	ed.coalesce, ed.hasDesired, ed.compositionActive = false, false, false
++	if ed.area != nil {
++		ed.area.reveal = true
++	}
++	if ed.client != nil {
++		ed.client.publish()
++		if st := ed.client.state(); st != nil {
++			st.markChanged()
++		}
++		ed.client.rt.consumed = true
++		ed.client.rt.requestFrame()
++	}
++	if ed.value != nil {
++		*ed.value = ed.String()
++		ed.nativeDirty, ed.nativeValue = false, ""
++	}
++	return true
++}

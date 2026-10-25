@@ -44,6 +44,7 @@ external package-manager acceptance.
 | R18 | Native Tab/input editing, selection arrows/Home/End, focused row scroll visibility, Escape cancellation; list must not consume search-input arrows | `TestNativeKeyboardSkillsAndFilterIsolation`, `TestKeyboardEndFocusesAndRevealsLastSkill`, `TestNativePluginEnterDoesNotCommitButTabButtonDoes` | Pass |
 | R19 | Fixed 240-DIP host slot + 320-DIP skill master; pinned Plugins header; all minimum-window controls reachable; long errors stay below toolbar | `TestMinimumWindowSourceGeometryAndControlReachability`, `TestLongErrorAndBusyRemainReachable`; 800×560 captures | Pass for measured fixture layout |
 | R20 | Render original embedded SVGs, source type/spacing/radius and host palette callbacks, without webview/Rust | `view.go`, `skills.go`, `plugins.go`, `updates.go`; 1470×922 and 800×560 CPU-native captures inspected | Native implementation verified; same-state GPUI pixel comparison remains open |
+| R21 | Source-style mutation completion/error/copy feedback remains available after navigation; routine refresh stays quiet | `TestSourceFactFormattingAndMutationNotifications`; UI-thread `Options.Notify` callback | Pass for component callback; host `Notify: x.UI.Notify` adapter inspected |
 
 The per-plugin “Reset skip” control is an explicitly added recovery affordance,
 not an interaction found in the Rust reference. The component has no production
@@ -86,7 +87,9 @@ they may have partially modified configuration.
    overlapping it.
 7. Initial visual assumptions used 12px compact button text and 20px page title.
    Source token inspection corrected these to 14px Medium/Large button labels
-   and a 16px Plugins title, with the source 28/32px heights and 8px radii.
+   and a 16px Plugins title, with the source 28/32px heights and 8px radii. The skill switch uses native
+   `SwitchBase` with source 36×20 track and 14px knob instead of MyGo’s
+   different default switch drawing.
 
 ## Reproduction and boundaries
 

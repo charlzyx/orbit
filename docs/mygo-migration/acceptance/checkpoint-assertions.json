@@ -1,0 +1,88 @@
+{
+  "W31": [
+    [
+      "TestReviewSixSourcesAndUntrackedPaths",
+      "Exact HEAD/index/worktree/branch changed-file fixtures, including untracked unusual paths."
+    ],
+    [
+      "TestLastTurnUsesPersistedCounterAfterCompaction",
+      "Completed checkpoint number, not transcript row count, drives Last Turn after compaction."
+    ],
+    [
+      "TestReviewLastTurnKeepsCompletedDiffDuringNextPrompt",
+      "Repeated refresh retains prior completed diff while a newer prompt has no ending ref."
+    ],
+    [
+      "TestReviewHistoricalTurnStaysPinnedAndEmptySessionFallsBack",
+      "Historical Turn1 remains pinned; empty-session switch falls back to Uncommitted."
+    ],
+    [
+      "TestCheckpointPlainFolderAndLegacyBaselineAreNonErrors",
+      "Plain-folder capture no-ops; legacy previous-end baseline remains a usable fallback."
+    ]
+  ],
+  "W32": [
+    [
+      "TestCheckpointCompletedCounterAdvancesOnlyAfterSuccessfulEnd",
+      "Completed counter advances on success only; lock failure retains old value and retry succeeds."
+    ],
+    [
+      "TestCheckpointCompletionDoesNotLeakAcrossSessionIdentity",
+      "Old completion persists old refs without publishing into reused session identity."
+    ],
+    [
+      "TestCheckpointFirstEndFailureDoesNotEnableLastTurn",
+      "First end capture failure keeps Last Turn unavailable."
+    ],
+    [
+      "TestCheckpointPlainFolderDoesNotAdvertiseMissingDiff",
+      "Plain-folder no-op never advertises a nonexistent Git ending ref (D06)."
+    ],
+    [
+      "TestCheckpointIdentityResponseResetsBothTurnCounters",
+      "Authoritative new session ID resets in-flight and completed counters."
+    ],
+    [
+      "TestManagerRestoresCompletedTurnDuringNextPrompt",
+      "Real manager restores completed3, starts4 while retaining3, then settles an isolated turn4 diff."
+    ],
+    [
+      "TestCheckpointIdentityRecoveryRejectsStaleGenerationAndLiveTurn",
+      "Obsolete recovery cannot release another identity gate or rewind a live counter."
+    ],
+    [
+      "TestManagerPromptGatePreservesExistingRefDuringCheckpointRecovery",
+      "Pending recovery rejects prompt before reservation; safe retry preserves prior ref1 and starts2 (D07)."
+    ],
+    [
+      "TestCheckpointRecoveryFailureStaysGatedUntilSuccessfulRetry",
+      "Actual ref-listing failure remains not-ready until repaired recovery publishes a trustworthy counter (D07)."
+    ],
+    [
+      "TestCheckpointDoesNotChangeIndexHeadOrWorktree",
+      "Repeated captures preserve real index bytes/mtime, HEAD/status and remove temporary indexes."
+    ],
+    [
+      "TestCheckpointTurnFreezesDiffAndRestoresCounter",
+      "Completed turn remains immutable after later edits and recovers persisted ending count."
+    ],
+    [
+      "TestCheckpointUnbornAndCancellation",
+      "Unborn capture succeeds; pre-cancelled operation writes no checkpoint ref."
+    ],
+    [
+      "TestCheckpointStartPrecedesImmediatePiToolMutation",
+      "Actual Pi fixture writes immediately on prompt receipt; start baseline still excludes that mutation (D08)."
+    ]
+  ],
+  "W33": [
+    [
+      "TestCheckpointBranchSwitchExcludesExistingTargetChanges",
+      "Existing target branch changes and pre-turn dirty files are excluded from the new agent diff."
+    ],
+    [
+      "TestCheckpointNewBranchIncludesCommittedAgentWork",
+      "Agent work committed on a newly created branch remains attributed to that turn."
+    ]
+  ]
+}

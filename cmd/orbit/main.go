@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/charlzyx/orbit/internal/composerui"
 	"github.com/charlzyx/orbit/internal/native"
 	orbitui "github.com/charlzyx/orbit/internal/ui"
 )
@@ -32,6 +33,10 @@ func main() {
 	}
 	if o.Workspace == "" && flag.NArg() > 0 {
 		o.Workspace = flag.Arg(0)
+	}
+	if err := composerui.RequireCompatibility(); err != nil {
+		fmt.Fprintln(os.Stderr, "Orbit:", err)
+		os.Exit(1)
 	}
 	o.Version = version
 	if e := orbitui.Run(o); e != nil {

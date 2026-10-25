@@ -1,8 +1,6 @@
 package orbitui
 
 import (
-	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/charlzyx/orbit/internal/workspace"
 	"path/filepath"
@@ -12,7 +10,6 @@ import (
 
 	"github.com/charlzyx/orbit/internal/preferences"
 	"github.com/egoist/mygo/ui"
-	"github.com/egoist/mygo/ui/markdown"
 )
 
 var settingsCategories = []struct{ ID, Title, Icon, Description string }{
@@ -34,83 +31,137 @@ var settingsCategories = []struct{ ID, Title, Icon, Description string }{
 
 func (a *App) settings(c *ui.Context) {
 	t := a.Theme
-	ui.Column(c).Width(SettingsNavWidth).FillHeight().Background(t.Surface).BorderWidth(0, 1, 0, 0).BorderColor(t.Border).Children(func() {
-		ui.Box(c).Height(HeaderHeight)
-		if a.button(c, "Back", "icons/arrow-left.svg", false).Margin(8, 12).Clicked() {
-			a.Navigate("chat")
-		}
-		ui.TextInput(c, &a.settingsSearch).Placeholder("Search settings…").Label("Search settings").Margin(10, 12).AlignSelf(ui.Stretch)
-		a.line(c)
-		ui.Text(c, "SETTINGS").FontSize(t.Px(10)).TextColor(t.TextMuted).Padding(12, 16, 4)
-		ui.Scroll(c).Grow(1).MinHeight(0).PaddingX(8).Gap(2).Children(func() {
+	ui.Column(c.Key("settings-nav")).Width(SettingsNavWidth).FillHeight().LineHeight(sourceDefaultLineHeight).Background(t.Surface).BorderWidth(0, 1, 0, 0).BorderColor(t.Border).Children(func() {
+		ui.Box(c).Height(HeaderHeight).AlignSelf(ui.Stretch).DragWindow()
+		ui.Column(c).AlignSelf(ui.Stretch).Padding(t.Space(4), t.Space(8), t.Space(12)).Children(func() {
+			if a.button(c, a.text("settings.back", "Back"), "icons/arrow-left.svg", false).Height(t.Px(28)).AlignSelf(ui.Stretch).Clicked() {
+				a.Navigate("chat")
+			}
+		})
+		ui.Column(c).AlignSelf(ui.Stretch).Padding(0, t.Space(8), t.Space(12)).Children(func() {
+			ui.Row(c).Height(t.Px(36)).PaddingX(t.Px(10)).Gap(t.Space(6)).AlignItems(ui.Center).BorderWidth(0, 0, 1, 0).BorderColor(t.Border).Children(func() {
+				a.icon(c, "icons/search.svg", 14, t.TextMuted)
+				ui.TextInputBase(c, &a.settingsSearch).Label("Search settings").Placeholder(a.text("settings.search_settings", "Search settings…")).Grow(1)
+			})
+		})
+		ui.Text(c, a.text("settings.settings", "SETTINGS")).FontSize(t.Px(10)).FontWeight(600).TextColor(t.TextMuted).Padding(0, 0, t.Space(6), t.Space(16))
+		ui.Scroll(c).Grow(1).MinHeight(0).AlignSelf(ui.Stretch).PaddingX(t.Space(8)).Gap(t.Space(2)).Children(func() {
 			for _, cat := range settingsCategories {
-				title := a.settingsTitle(cat.ID, cat.Title)
-				if a.settingsSearch != "" && !strings.Contains(strings.ToLower(title+" "+cat.Title+" "+cat.Description), strings.ToLower(a.settingsSearch)) {
-					continue
+				if cat.ID == "runtime" || cat.ID == "skills" || cat.ID == "about" || cat.ID == "bug" {
+					ui.Box(c).AlignSelf(ui.Stretch).Height(1).Background(t.Border).Margin(t.Space(6), 0, t.Space(6))
 				}
-				if a.button(c, title, cat.Icon, cat.ID == a.settingsPage).AlignSelf(ui.Stretch).Height(32).Clicked() {
-					a.settingsPage = cat.ID
-					a.loadSettings(cat.ID)
+				selected := cat.ID == a.settingsPage
+				b := ui.ButtonBase(c.Key("settings-nav:" + cat.ID)).AlignSelf(ui.Stretch).Height(t.Px(28)).PaddingX(t.Space(8)).Gap(t.Space(8)).Radius(t.Px(6)).Justify(ui.Start).Label(a.settingsTitle(cat.ID, cat.Title))
+				color, icon := t.TextSecondary, t.TextMuted
+				if selected {
+					b.Background(t.Selection)
+					color = t.SelectionFg
+					icon = t.AccentText
+				} else if b.Hovered() {
+					b.Background(t.Hover)
+				}
+				b.Children(func() { a.icon(c, cat.Icon, 14, icon); ui.Text(c, a.settingsTitle(cat.ID, cat.Title)).TextColor(color) })
+				if b.Clicked() {
+					a.selectSettingsPage(cat.ID)
 				}
 			}
 		})
 		a.line(c)
-		ui.Text(c, "Orbit · Go native").Height(HeaderHeight).Padding(12, 16).FontSize(t.Px(12)).TextColor(t.TextMuted)
+		ui.Row(c).Height(HeaderHeight).PaddingX(t.Space(16)).Gap(t.Space(6)).AlignItems(ui.Center).Children(func() {
+			ui.Text(c, a.text("app.name", "Orbit")).FontSize(t.Px(12)).TextColor(t.TextMuted)
+			if a.Options.Version != "" {
+				ui.Text(c, "v"+a.Options.Version).Font(a.Fonts.CodeFamily).FontSize(t.Px(12)).TextColor(t.TextMuted)
+			}
+		})
 	})
+	if strings.TrimSpace(a.settingsSearch) != "" {
+		a.settingsSearchResults(c)
+		return
+	}
 	if a.settingsPage == "bug" && a.Options.BugReport != nil {
 		a.Options.BugReport(c)
 		return
 	}
-	ui.Scroll(c.Key("settings-body:"+a.settingsPage)).Grow(1).MinWidth(0).Padding(24, 32).Children(func() {
-		ui.Column(c).WidthPercent(100).MaxWidth(ContentMaxWidth).AlignSelf(ui.Center).Gap(t.Space(20)).Children(func() {
-			for _, cat := range settingsCategories {
-				if cat.ID == a.settingsPage {
-					ui.Column(c).Gap(6).Children(func() {
-						ui.Text(c, a.settingsTitle(cat.ID, cat.Title)).FontSize(t.Px(20)).FontWeight(500)
-						ui.Text(c, cat.Description).TextColor(t.TextMuted)
-					})
-					break
+	if a.settingsPage == "mcp" && a.Options.MCP != nil {
+		a.Options.MCP(c)
+		return
+	}
+	if (a.settingsPage == "skills" || a.settingsPage == "plugins") && a.Options.Resources != nil {
+		a.Options.Resources(c, a.settingsPage)
+		return
+	}
+	scroll := a.settingsScroll[a.settingsPage]
+	if scroll == nil {
+		scroll = &ui.ScrollState{}
+		a.settingsScroll[a.settingsPage] = scroll
+	}
+	ui.Column(c.Key("settings-main")).Grow(1).FillHeight().MinWidth(0).LineHeight(sourceDefaultLineHeight).Children(func() {
+		ui.Column(c).WidthPercent(100).MaxWidth(ContentMaxWidth).AlignSelf(ui.Center).Children(func() {
+			ui.Column(c).AlignSelf(ui.Stretch).Padding(t.Space(20), t.Space(24), t.Space(12)).Gap(t.Space(4)).Children(func() {
+				for _, cat := range settingsCategories {
+					if cat.ID == a.settingsPage {
+						ui.Text(c, a.settingsTitle(cat.ID, cat.Title)).Label("Settings page title").FontSize(t.Px(16)).LineHeight(1.3).FontWeight(500)
+						ui.Text(c, a.settingsDescription(cat.ID, cat.Description)).FontSize(t.Px(12)).TextColor(t.TextMuted)
+						break
+					}
 				}
-			}
-			a.line(c)
-			if a.settingsLoading {
-				ui.Spinner(c).Size(18, 18)
-			}
-			for _, err := range a.settingsErrors {
-				ui.Text(c, err).TextColor(t.Error).Selectable()
-			}
-			switch a.settingsPage {
-			case "general":
-				a.generalSettings(c)
-			case "appearance":
-				a.appearanceSettings(c)
-			case "shortcuts":
-				a.shortcutsSettings(c)
-			case "runtime":
-				a.runtimeSettings(c)
-			case "agent":
-				a.agentSettings(c)
-			case "worktrees":
-				a.worktreeSettings(c)
-			case "bug":
-				a.bugSettings(c)
-			case "models":
-				a.modelsSettings(c)
-			case "skills":
-				a.skillsSettings(c)
-			case "plugins":
-				a.pluginsSettings(c)
-			case "mcp":
-				a.mcpSettings(c)
-			case "providers":
-				a.providersSettings(c)
-			case "privacy":
-				a.privacySettings(c)
-			case "about":
-				a.aboutSettings(c)
-			}
+			})
+			ui.Box(c).AlignSelf(ui.Stretch).Height(1).MarginX(t.Space(24)).Background(t.Border)
+		})
+		ui.Scroll(c.Key("settings-body:" + a.settingsPage)).TrackScroll(scroll).Grow(1).FillHeight().MinHeight(0).AlignSelf(ui.Stretch).Children(func() {
+			ui.Column(c).WidthPercent(100).MaxWidth(ContentMaxWidth).AlignSelf(ui.Center).Padding(t.Space(20), t.Space(24), t.Space(24)).Gap(t.Space(20)).Children(func() {
+				if a.settingsLoading {
+					ui.Spinner(c).Size(18, 18)
+				}
+				for _, err := range a.settingsErrors {
+					ui.Text(c, err).TextColor(t.Error).Selectable()
+				}
+				switch a.settingsPage {
+				case "general":
+					a.generalSettings(c)
+				case "appearance":
+					a.appearanceSettings(c)
+				case "shortcuts":
+					a.shortcutsSettings(c)
+				case "runtime":
+					a.runtimeSettings(c)
+				case "agent":
+					a.agentSettings(c)
+				case "worktrees":
+					a.worktreeSettings(c)
+				case "models":
+					a.modelsSettings(c)
+				case "providers":
+					a.providersSettings(c)
+				case "privacy":
+					a.privacySettings(c)
+				case "about":
+					a.aboutSettings(c)
+				case "bug":
+					a.bugSettings(c)
+				default:
+					a.Empty(c, "Service unavailable", "The native service has not been mounted.")
+				}
+			})
 		})
 	})
+}
+func (a *App) settingsDescription(id, fallback string) string {
+	key := "settings." + id + "_description"
+	if id == "worktrees" {
+		key = "worktree.settings.description"
+	}
+	if id == "bug" {
+		key = "settings.report_bug_description"
+	}
+	return a.text(key, fallback)
+}
+func (a *App) selectSettingsPage(id string) {
+	a.settingsPage = id
+	a.providerState.editor = nil
+	a.secretOpen = false
+	a.secretValue = ""
+	a.loadSettings(id)
 }
 func (a *App) settingsTitle(id, fallback string) string {
 	key := "settings." + id
@@ -153,60 +204,6 @@ func (a *App) selectSetting(c *ui.Context, title, description, value string, cho
 		}).MinWidth(120)
 	})
 }
-func (a *App) generalSettings(c *ui.Context) {
-	a.section(c, "This machine", func() {
-		status := "Disconnected"
-		if a.Model.Connected {
-			status = "Connected"
-		}
-		a.setting(c, "pi agent", "Spawned as a child process — newline-delimited JSON over stdio.", func() {
-			color := a.Theme.TextMuted
-			if a.Model.Connected {
-				color = a.Theme.Success
-			}
-			ui.Text(c, status).TextColor(color)
-		})
-		a.line(c)
-		a.setting(c, "Local by default", a.Options.Store.PiDir+"/sessions", nil)
-		a.line(c)
-		a.setting(c, "Workspace", a.Model.Workspace, func() {
-			if a.button(c, "Browse…", "icons/folder.svg", false).Clicked() {
-				a.Dispatch(Action{Kind: "BrowseWorkspace"})
-			}
-		})
-	})
-	a.section(c, "Notifications", func() {
-		n := a.Options.Store.Notifications()
-		a.setting(c, "Desktop notifications", "Show a system banner when a run finishes in the background.", func() {
-			if ui.Switch(c, &n.Desktop).Label("Desktop notifications").Changed() {
-				a.save(a.Options.Store.SaveNotifications(n))
-				a.Dispatch(Action{Kind: "NotificationsChanged"})
-			}
-		})
-		a.line(c)
-		a.setting(c, "In-app toasts", "Show results and requests while Orbit is in front.", func() {
-			if ui.Switch(c, &n.Toasts).Label("In-app toasts").Changed() {
-				a.save(a.Options.Store.SaveNotifications(n))
-				a.Dispatch(Action{Kind: "NotificationsChanged"})
-			}
-		})
-		a.line(c)
-		a.setting(c, "Notification sound", "Play an alert when a background task needs attention.", func() {
-			if ui.Switch(c, &n.Sound).Label("Notification sound").Changed() {
-				a.save(a.Options.Store.SaveNotifications(n))
-				a.Dispatch(Action{Kind: "NotificationsChanged"})
-			}
-		})
-	})
-	a.section(c, "Updates", func() {
-		a.updateSettings(c)
-		a.setting(c, "Check for Updates…", "Check for a compatible, signed native Go release.", func() {
-			if a.button(c, "Check for Updates…", "icons/refresh.svg", false).Clicked() {
-				a.Dispatch(Action{Kind: "CheckForUpdates"})
-			}
-		})
-	})
-}
 func (a *App) appearanceSettings(c *ui.Context) {
 	a.section(c, "Appearance", func() {
 		a.selectSetting(c, "Appearance", "Follow the desktop or choose an appearance.", a.Appearance.Mode, []string{"system", "light", "dark"}, func(v string) { a.Appearance.Mode = v; a.save(a.Options.Store.SaveAppearance(a.Appearance)) })
@@ -214,6 +211,7 @@ func (a *App) appearanceSettings(c *ui.Context) {
 		a.selectSetting(c, "Dark theme", "Original Orbit semantic palettes", a.Appearance.DarkTheme, preferences.DarkThemes, func(v string) { a.Appearance.DarkTheme = v; a.save(a.Options.Store.SaveAppearance(a.Appearance)) })
 		a.selectSetting(c, "Light theme", "Original Orbit semantic palettes", a.Appearance.LightTheme, preferences.LightThemes, func(v string) { a.Appearance.LightTheme = v; a.save(a.Options.Store.SaveAppearance(a.Appearance)) })
 	})
+	a.backgroundSettings(c)
 	a.section(c, "Typography", func() {
 		a.selectSetting(c, "UI font size", "Interface text and design tokens scale together.", fmt.Sprint(a.Prefs.UIFontSize), []string{"11", "12", "13", "14", "15", "16", "18", "20"}, func(v string) {
 			a.Prefs.UIFontSize, _ = strconv.ParseFloat(v, 64)
@@ -284,30 +282,9 @@ func (a *App) shortcutsSettings(c *ui.Context) {
 		})
 	}
 }
-func (a *App) runtimeSettings(c *ui.Context) {
-	defer a.runtimeNative(c)
-	a.section(c, "Process", func() {
-		a.setting(c, "Runtime", "pi --mode rpc · direct stdio JSONL", nil)
-		a.setting(c, "Status", a.Model.Status, nil)
-		if a.Model.Error != "" {
-			ui.Text(c, a.Model.Error).TextColor(a.Theme.Error)
-		}
-		ui.Row(c).Gap(8).Children(func() {
-			if a.button(c, "Restart runtime", "icons/refresh.svg", false).Clicked() {
-				a.Dispatch(Action{Kind: "RestartRuntime"})
-			}
-			if a.button(c, "Choose pi executable…", "icons/folder.svg", false).Clicked() {
-				a.Dispatch(Action{Kind: "ChoosePiBinary"})
-			}
-			if a.button(c, "Check pi update", "icons/refresh.svg", false).Clicked() {
-				a.Dispatch(Action{Kind: "CheckPiUpdate"})
-			}
-		})
-	})
-}
 func (a *App) agentSettings(c *ui.Context) {
 	a.section(c, "New sessions", func() {
-		d := a.Options.Store.SessionDefault()
+		d := a.sessionDefaultPrefs
 		label := d.ModelID
 		if label == "" {
 			label = "Use pi default"
@@ -315,27 +292,35 @@ func (a *App) agentSettings(c *ui.Context) {
 		a.setting(c, "Default model", "Applies only to new sessions; existing sessions keep their model.", func() {
 			ui.MenuButton(c, label, func(m *ui.Menu) {
 				if m.Item("Use pi default").Chosen() {
-					a.save(a.Options.Store.SaveSessionDefault(preferences.SessionDefault{}))
+					a.sessionDefaultPrefs = preferences.SessionDefault{}
+					a.save(a.Options.Store.SaveSessionDefault(a.sessionDefaultPrefs))
 				}
 				for _, model := range a.Model.Models {
 					if m.Item(model.Provider + " / " + model.ID).Chosen() {
 						d.Provider = model.Provider
 						d.ModelID = model.ID
+						a.sessionDefaultPrefs = d
 						a.save(a.Options.Store.SaveSessionDefault(d))
 					}
 				}
 			})
 		})
-		a.selectSetting(c, "Default thinking", "Applied when a new session begins.", d.Thinking, a.Model.ThinkingLevels, func(v string) { d.Thinking = v; a.save(a.Options.Store.SaveSessionDefault(d)) })
+		a.selectSetting(c, "Default thinking", "Applied when a new session begins.", d.Thinking, a.Model.ThinkingLevels, func(v string) {
+			d.Thinking = v
+			a.sessionDefaultPrefs = d
+			a.save(a.Options.Store.SaveSessionDefault(d))
+		})
 		a.selectSetting(c, "Send while running", "Enter queues a follow-up or steers the running agent.", a.Prefs.ComposerSendMode, []string{"follow_up", "steer"}, func(v string) { a.Prefs.ComposerSendMode = v; a.save(a.Options.Store.SaveUI(a.Prefs)) })
-		title := a.Options.Store.AutoTitle()
+		title := a.autoTitlePrefs
 		a.setting(c, "Automatic task titles", "Generate task titles using the bundled pi extension.", func() {
 			if ui.Switch(c, &title.Enabled).Label("Automatic task titles").Changed() {
+				a.autoTitlePrefs = title
 				a.save(a.Options.Store.SaveAutoTitle(title))
 				a.Dispatch(Action{Kind: "AutoTitleChanged"})
 			}
 		})
 	})
+	a.agentRuntimeSettings(c)
 	a.section(c, "Access", func() {
 		a.selectSetting(c, "Access policy", "Guarded by Orbit's pi extension, not an OS sandbox.", a.access, preferences.AccessModes, func(v string) {
 			a.access = v
@@ -419,6 +404,14 @@ func (a *App) aboutSettings(c *ui.Context) {
 	})
 }
 func (a *App) loadSettings(category string) {
+	if category == "mcp" && a.Options.RefreshMCP != nil {
+		a.Options.RefreshMCP()
+		return
+	}
+	if (category == "skills" || category == "plugins") && a.Options.RefreshResources != nil {
+		a.Options.RefreshResources(category)
+		return
+	}
 	if category == "providers" {
 		a.refreshProviders()
 		return
@@ -469,157 +462,6 @@ func errorStrings(errs []error) []string {
 		}
 	}
 	return out
-}
-func (a *App) skillsSettings(c *ui.Context) {
-	ui.Row(c).Gap(8).Children(func() {
-		if a.button(c, "Refresh", "icons/refresh.svg", false).Clicked() {
-			a.loadSettings("skills")
-		}
-		if a.button(c, "Open skills folder", "icons/folder.svg", false).Clicked() {
-			a.Dispatch(Action{Kind: "RevealPath", Value: a.Options.Store.PiDir + "/skills"})
-		}
-	})
-	for i, s := range a.skills {
-		i, s := i, s
-		ui.Column(c).Border(1, a.Theme.Border).Radius(8).Padding(12).Gap(8).Children(func() {
-			a.setting(c, s.Name, s.Description, func() {
-				enabled := s.Enabled
-				if ui.Switch(c, &enabled).Label("Enable " + s.Name).Changed() {
-					svc := a.Service()
-					a.Async(func() func() {
-						e := svc.SetSkillEnabled(s, enabled)
-						return func() { a.save(e); a.loadSettings("skills") }
-					})
-				}
-			})
-			ui.Row(c).Gap(6).Children(func() {
-				ui.Text(c, s.Scope+" · "+s.Path).FontSize(11).TextColor(a.Theme.TextMuted).Grow(1)
-				if a.button(c, "View", "", a.selectedSkill == i).Clicked() {
-					if a.selectedSkill == i {
-						a.selectedSkill = -1
-					} else {
-						a.selectedSkill = i
-					}
-				}
-				if a.iconButton(c, "Delete skill", "icons/trash.svg").Clicked() {
-					a.Confirm("Delete skill?", s.Path, func() {
-						svc := a.Service()
-						a.Async(func() func() { e := svc.DeleteSkill(s.Path); return func() { a.save(e); a.loadSettings("skills") } })
-					})
-				}
-			})
-			if a.selectedSkill == i {
-				markdown.View(c, s.Content, &a.md)
-			}
-		})
-	}
-	if len(a.skills) == 0 && !a.settingsLoading {
-		ui.Text(c, "No skills found in the current pi configuration.").TextColor(a.Theme.TextMuted)
-	}
-}
-func (a *App) pluginsSettings(c *ui.Context) {
-	ui.Row(c).Gap(8).Children(func() {
-		if a.button(c, "Install package…", "icons/plus.svg", false).Clicked() {
-			a.Prompt("Install pi package", "", func(source string) { a.pluginAction("install", source, "user") })
-		}
-		if a.button(c, "Refresh", "icons/refresh.svg", false).Clicked() {
-			a.loadSettings("plugins")
-		}
-	})
-	for _, p := range a.plugins {
-		p := p
-		a.section(c, p.Scope, func() {
-			a.setting(c, p.Name, p.Source, func() {
-				a.button(c, "Actions", "icons/more.svg", false).Menu(func(m *ui.Menu) {
-					if m.Item("Update").Chosen() {
-						a.pluginAction("update", p.Source, p.Scope)
-					}
-					if m.Item("Remove…").Chosen() {
-						a.Confirm("Remove package?", p.Source, func() { a.pluginAction("remove", p.Source, p.Scope) })
-					}
-				})
-			})
-		})
-	}
-	if len(a.plugins) == 0 && !a.settingsLoading {
-		ui.Text(c, "No installed packages found.").TextColor(a.Theme.TextMuted)
-	}
-}
-func (a *App) pluginAction(action, source, scope string) {
-	svc := a.Service()
-	a.settingsLoading = true
-	a.Async(func() func() {
-		out, e := svc.PluginAction(context.Background(), action, source, scope)
-		return func() {
-			a.settingsLoading = false
-			if e != nil {
-				a.Notify(e.Error(), true)
-			} else {
-				a.Notify(out, false)
-			}
-			a.loadSettings("plugins")
-		}
-	})
-}
-func (a *App) mcpSettings(c *ui.Context) {
-	ui.Row(c).Gap(8).Children(func() {
-		if a.button(c, "Add server…", "icons/plus.svg", false).Clicked() {
-			a.editMCP("", "user", "", `{"command":"","args":[]}`)
-		}
-		if a.button(c, "Refresh", "icons/refresh.svg", false).Clicked() {
-			a.loadSettings("mcp")
-		}
-		if a.button(c, "Probe servers", "icons/refresh.svg", false).Clicked() {
-			svc := a.Service()
-			a.Async(func() func() {
-				raw, e := svc.ProbeMCP(context.Background())
-				return func() {
-					if e != nil {
-						a.Notify(e.Error(), true)
-					} else {
-						a.Notify(string(raw), false)
-					}
-				}
-			})
-		}
-	})
-	for _, server := range a.servers {
-		s := server
-		a.section(c, s.Scope, func() {
-			a.setting(c, s.Name, s.Description, func() {
-				a.button(c, "Actions", "icons/more.svg", false).Menu(func(m *ui.Menu) {
-					if m.Item("Edit…").Chosen() {
-						b, _ := json.MarshalIndent(s.Definition, "", "  ")
-						a.editMCP(s.Name, s.Scope, s.Name, string(b))
-					}
-					if m.Item("Remove…").Chosen() {
-						a.Confirm("Remove MCP server?", s.Name, func() {
-							svc := a.Service()
-							a.Async(func() func() { e := svc.RemoveMCP(s.Scope, s.Name); return func() { a.save(e); a.loadSettings("mcp") } })
-						})
-					}
-				})
-			})
-		})
-	}
-	if len(a.servers) == 0 && !a.settingsLoading {
-		ui.Text(c, "No MCP servers configured.").TextColor(a.Theme.TextMuted)
-	}
-}
-func (a *App) editMCP(oldName, scope, name, value string) {
-	a.jsonTitle = "MCP server"
-	a.jsonName = name
-	a.jsonScope = scope
-	a.jsonValue = value
-	a.jsonOpen = true
-	svc := a.Service()
-	a.jsonCommit = func(name, scope, value string) error {
-		var d map[string]any
-		if e := json.Unmarshal([]byte(value), &d); e != nil {
-			return e
-		}
-		return svc.SaveMCP(scope, oldName, name, d)
-	}
 }
 func (a *App) jsonDialog(c *ui.Context) {
 	if !a.jsonOpen {
@@ -672,25 +514,35 @@ func (a *App) providersSettings(c *ui.Context) {
 
 func (a *App) worktreeSettings(c *ui.Context) {
 	path := filepath.Join(a.Options.Store.RootDir, "worktrees.json")
-	config := workspace.LoadWorktreeConfig(path)
+	config := a.worktreePrefs
 	a.section(c, "Worktree defaults", func() {
 		a.setting(c, "Directory", config.Directory, func() {
 			if a.button(c, "Edit…", "", false).Clicked() {
-				a.Prompt("Worktree directory", config.Directory, func(v string) { config.Directory = v; a.save(workspace.SaveWorktreeConfig(path, config)) })
+				a.Prompt("Worktree directory", config.Directory, func(v string) {
+					config.Directory = v
+					a.worktreePrefs = config
+					a.save(workspace.SaveWorktreeConfig(path, config))
+				})
 			}
 		})
 		a.setting(c, "Setup script", config.SetupScript, func() {
 			if a.button(c, "Edit…", "", false).Clicked() {
-				a.Prompt("Setup script", config.SetupScript, func(v string) { config.SetupScript = v; a.save(workspace.SaveWorktreeConfig(path, config)) })
+				a.Prompt("Setup script", config.SetupScript, func(v string) {
+					config.SetupScript = v
+					a.worktreePrefs = config
+					a.save(workspace.SaveWorktreeConfig(path, config))
+				})
 			}
 		})
 		a.setting(c, "Run setup automatically", "Untrusted repository scripts still require confirmation.", func() {
 			if ui.Switch(c, &config.RunSetupAuto).Changed() {
+				a.worktreePrefs = config
 				a.save(workspace.SaveWorktreeConfig(path, config))
 			}
 		})
 		a.setting(c, "Open after creation", "Switch to a newly created worktree.", func() {
 			if ui.Switch(c, &config.OpenAfterCreate).Changed() {
+				a.worktreePrefs = config
 				a.save(workspace.SaveWorktreeConfig(path, config))
 			}
 		})

@@ -67,7 +67,7 @@ Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 **Executed narrow assertions:**
 - None assigned to this scope yet. Last verified SHA: none.
 
-**Owner challenge UI-P07 [PARTIAL]:** 10 palettes and55 binding parsing pass; many host labels remain English, backdrop integration is pending, and font/density/motion/OS contrast visual matrix remains open. [Scoped steps/tests](../native-ui-acceptance.json).
+**Owner challenge UI-P07 [PARTIAL]:** Source procedural/photo background is mounted below header only on empty task, with source choose/reset/blur/cell/fade controls and worker-only PhotoStore. Native tests cover geometry, pointer pass-through, opaque foreground occlusion, coalescing/cache reuse and failure retention. Runtime/About use truthful versions. Full locale coverage/whole Appearance content/OS dialogs/matched visual acceptance remain open. [Scoped steps/tests](../native-ui-acceptance.json).
 
 **Additional source-specific procedures:** [../background-acceptance.md](../background-acceptance.md)
 
@@ -103,7 +103,7 @@ Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 **Executed narrow assertions:**
 - None assigned to this scope yet. Last verified SHA: none.
 
-**Owner challenge UI-P07 [PARTIAL]:** 10 palettes and55 binding parsing pass; many host labels remain English, backdrop integration is pending, and font/density/motion/OS contrast visual matrix remains open. [Scoped steps/tests](../native-ui-acceptance.json).
+**Owner challenge UI-P07 [PARTIAL]:** Source procedural/photo background is mounted below header only on empty task, with source choose/reset/blur/cell/fade controls and worker-only PhotoStore. Native tests cover geometry, pointer pass-through, opaque foreground occlusion, coalescing/cache reuse and failure retention. Runtime/About use truthful versions. Full locale coverage/whole Appearance content/OS dialogs/matched visual acceptance remain open. [Scoped steps/tests](../native-ui-acceptance.json).
 
 **Additional source-specific procedures:** [../background-acceptance.md](../background-acceptance.md)
 
@@ -139,7 +139,7 @@ Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 **Executed narrow assertions:**
 - None assigned to this scope yet. Last verified SHA: none.
 
-**Owner challenge UI-P07 [PARTIAL]:** 10 palettes and55 binding parsing pass; many host labels remain English, backdrop integration is pending, and font/density/motion/OS contrast visual matrix remains open. [Scoped steps/tests](../native-ui-acceptance.json).
+**Owner challenge UI-P07 [PARTIAL]:** Source procedural/photo background is mounted below header only on empty task, with source choose/reset/blur/cell/fade controls and worker-only PhotoStore. Native tests cover geometry, pointer pass-through, opaque foreground occlusion, coalescing/cache reuse and failure retention. Runtime/About use truthful versions. Full locale coverage/whole Appearance content/OS dialogs/matched visual acceptance remain open. [Scoped steps/tests](../native-ui-acceptance.json).
 
 **Remaining:** Locale assets and command registry exist, but hard-coded English labels and context-specific bindings prevent full localization/shortcut parity.
 **Visual/OS gates:** No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state. This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.

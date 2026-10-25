@@ -78,6 +78,8 @@ type Client struct {
 	terminalErr error
 	closing     bool
 	exitCode    int
+	startedAt   time.Time
+	exitedAt    time.Time
 }
 
 func Start(config Config) (*Client, error) {
@@ -158,7 +160,7 @@ func Start(config Config) (*Client, error) {
 	}
 	stdoutWriter.Close()
 	stderrWriter.Close()
-	c := &Client{config: config, command: command, stdin: stdin, outgoing: make(chan outgoing, 128), stopWriter: make(chan struct{}), done: make(chan struct{}), pending: map[string]pending{}, exitCode: -1}
+	c := &Client{config: config, command: command, stdin: stdin, outgoing: make(chan outgoing, 128), stopWriter: make(chan struct{}), done: make(chan struct{}), pending: map[string]pending{}, exitCode: -1, startedAt: time.Now()}
 	stdoutDone, stderrDone := make(chan struct{}), make(chan struct{})
 	go func() { defer close(stdoutDone); c.readStdout(stdout) }()
 	go func() { defer close(stderrDone); c.readStderr(stderr) }()
@@ -167,6 +169,10 @@ func Start(config Config) (*Client, error) {
 		// Owned pipe readers are not closed by Wait. Drain the final records,
 		// but do not hang forever if a descendant inherited an output pipe.
 		waitErr := command.Wait()
+		c.mu.Lock()
+		c.exitedAt = time.Now()
+		c.exitCode = command.ProcessState.ExitCode()
+		c.mu.Unlock()
 		for _, drained := range []<-chan struct{}{stdoutDone, stderrDone} {
 			select {
 			case <-drained:

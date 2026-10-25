@@ -14,7 +14,7 @@ import (
 	"time"
 
 	"github.com/charlzyx/orbit/internal/runtimepath"
-	ghostty "github.com/egoist/mygo/plugins/terminal"
+	ghostty "github.com/egoist/mygo/orbit-terminal"
 	"github.com/egoist/mygo/ui"
 )
 
@@ -24,6 +24,7 @@ const (
 	HeaderHeight    float32 = 32
 	SplitterHeight  float32 = 6
 	TabMaximumWidth float32 = 190
+	ScrollbackLines         = 10_000
 )
 
 // Options can be constructed before the native event loop is ready. OnChange
@@ -119,6 +120,7 @@ type Panel struct {
 	tabs                []*tab
 	active              int
 	open, closed, focus bool
+	visible             bool
 	height              float32
 	nextID              uint64
 	restartUntil        time.Time
@@ -135,13 +137,8 @@ func NewPanel(opts Options) *Panel {
 		h = DefaultHeight
 	}
 	h = clampHeight(h)
-	if opts.Font.Size == 0 {
-		opts.Font.Size = 13
-	}
-	if opts.Font.LineHeight == 0 {
-		opts.Font.LineHeight = 1.4
-	}
-	return &Panel{opts: opts, workspace: opts.Workspace, height: h}
+	opts.Font = terminalFont(opts.Font)
+	return &Panel{opts: opts, workspace: opts.Workspace, height: h, visible: true}
 }
 func clampHeight(h float32) float32 {
 	if math.IsNaN(float64(h)) || math.IsInf(float64(h), 0) {
@@ -202,6 +199,7 @@ func (p *Panel) Toggle() error {
 	}
 	if p.open {
 		p.open = false
+		p.updateVisibilityLocked()
 		p.mu.Unlock()
 		p.changed()
 		return nil
@@ -212,13 +210,40 @@ func (p *Panel) Toggle() error {
 	}
 	p.open = true
 	p.focus = true
+	p.updateVisibilityLocked()
 	p.mu.Unlock()
 	p.changed()
 	return nil
 }
 
 // Hide leaves every PTY alive; Close is reserved for quitting the app.
-func (p *Panel) Hide()         { p.mu.Lock(); p.open = false; p.mu.Unlock(); p.changed() }
+func (p *Panel) Hide() {
+	p.mu.Lock()
+	p.open = false
+	p.updateVisibilityLocked()
+	p.mu.Unlock()
+	p.changed()
+}
+
+// SetVisible is separate from the saved open/closed preference. The host calls
+// it when another page or a parked window stops rendering the terminal pane.
+// Hidden PTYs continue running and accumulating output without requesting UI
+// frames. Showing the pane does not create a shell or alter its tab selection.
+func (p *Panel) SetVisible(visible bool) {
+	p.mu.Lock()
+	p.visible = visible
+	p.updateVisibilityLocked()
+	p.mu.Unlock()
+}
+
+func (p *Panel) updateVisibilityLocked() {
+	for i, tab := range p.tabs {
+		if tab.term != nil {
+			tab.term.SetVisible(p.visible && p.open && !p.closed && i == p.active)
+		}
+	}
+}
+
 func (p *Panel) NewTab() error { return p.newTab(nil) }
 
 // NewCommandTab runs an argv directly in a fresh PTY. It is for explicit
@@ -276,6 +301,7 @@ func (p *Panel) newTab(command []string) error {
 	p.open = true
 	p.focus = true
 	generation := t.generation
+	p.updateVisibilityLocked()
 	p.mu.Unlock()
 	p.changed()
 	go p.start(t, generation)
@@ -320,7 +346,7 @@ func (p *Panel) start(t *tab, generation uint64) {
 	p.mu.Unlock()
 	term, err := ghostty.New(ghostty.Options{
 		Command: o.Command, Dir: dir, Env: o.Env, Font: o.Font, Theme: o.Theme, DarkTheme: o.DarkTheme,
-		NoBlink: o.ReduceMotion, Scrollback: 10 << 20, Padding: ghostty.Padding{X: 8, Y: 4},
+		NoBlink: o.ReduceMotion, ScrollbackLines: ScrollbackLines, Padding: ghostty.Padding{X: 8, Y: 4},
 		ClipboardRead: ghostty.ClipboardDeny, OnBell: o.OnBell, OpenLink: o.OpenLink,
 		OnKey: p.HandleKey,
 		OnTitle: func(title string) {
@@ -364,6 +390,7 @@ func (p *Panel) start(t *tab, generation uint64) {
 			term.SetFont(p.opts.Font)
 			term.SetTheme(p.opts.Theme, p.opts.DarkTheme)
 			t.term = term
+			p.updateVisibilityLocked()
 		}
 	}
 	p.mu.Unlock()
@@ -392,6 +419,7 @@ func (p *Panel) Select(index int) {
 	}
 	p.active = index
 	p.focus = true
+	p.updateVisibilityLocked()
 	p.mu.Unlock()
 	p.changed()
 }
@@ -404,6 +432,7 @@ func (p *Panel) Cycle(delta int) {
 	}
 	p.active = ((p.active+delta)%n + n) % n
 	p.focus = true
+	p.updateVisibilityLocked()
 	p.mu.Unlock()
 	p.changed()
 }
@@ -431,6 +460,7 @@ func (p *Panel) CloseTab(index int) error {
 		p.active = min(p.active, len(p.tabs)-1)
 		p.focus = true
 	}
+	p.updateVisibilityLocked()
 	p.mu.Unlock()
 	var err error
 	if t.term != nil {
@@ -479,6 +509,7 @@ func (p *Panel) Close() error {
 	}
 	p.closed = true
 	p.open = false
+	p.updateVisibilityLocked()
 	tabs := p.tabs
 	p.tabs = nil
 	p.mu.Unlock()
@@ -508,6 +539,7 @@ func (p *Panel) SetTheme(light, dark *ghostty.Theme) {
 	p.changed()
 }
 func (p *Panel) SetFont(font ghostty.Font) {
+	font = terminalFont(font)
 	p.mu.Lock()
 	p.opts.Font = font
 	var terms []*ghostty.Terminal
@@ -583,7 +615,7 @@ func (p *Panel) HandleKey(mods ui.Modifiers, key ui.Key) bool {
 // and error/exit cards, with the constants above matching Orbit's geometry.
 func View(c *ui.Context, p *Panel) ui.Element {
 	p.mu.Lock()
-	if !p.open || len(p.tabs) == 0 || p.tabs[p.active].term == nil {
+	if !p.visible || !p.open || len(p.tabs) == 0 || p.tabs[p.active].term == nil {
 		p.mu.Unlock()
 		return ui.Box(c)
 	}

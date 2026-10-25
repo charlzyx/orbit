@@ -5,13 +5,21 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/charlzyx/orbit/internal/composerui"
+	"github.com/charlzyx/orbit/internal/transcriptui"
 	"github.com/egoist/mygo/ui"
 	"github.com/egoist/mygo/ui/markdown"
 )
 
 func (a *App) messages(c *ui.Context) {
 	t := a.Theme
-	ui.Column(c.Key("transcript-wrap")).Grow(1).MinHeight(0).Children(func() {
+	hits := a.searchMatches()
+	active := -1
+	if a.searchOpen && len(hits) > 0 {
+		active = hits[min(a.searchCursor, len(hits)-1)]
+	}
+	scope := ui.Column(c.Key("transcript-wrap")).Selectable().Grow(1).MinHeight(0)
+	scope.Children(func() {
 		a.transcript.Key = func(i int) any {
 			m := a.Model.Messages[i]
 			if m.ID != "" {
@@ -23,20 +31,32 @@ func (a *App) messages(c *ui.Context) {
 			m := a.Model.Messages[i]
 			ui.Column(c).AlignSelf(ui.Stretch).AlignItems(ui.Center).Padding(10, 24).Children(func() {
 				row := ui.Column(c).WidthPercent(100).MaxWidth(ContentMaxWidth).Gap(t.Space(8))
-				if a.Search != "" && strings.Contains(strings.ToLower(m.Text), strings.ToLower(a.Search)) {
-					row.Background(t.Accent.Alpha(.07)).Radius(8)
+				if row.Hovered() {
+					a.transcriptHover = m.Text
+				}
+				if a.searchOpen && strings.TrimSpace(a.Search) != "" && strings.Contains(strings.ToLower(messageSearchText(m)), strings.ToLower(strings.TrimSpace(a.Search))) {
+					alpha := float32(.07)
+					if i == active {
+						alpha = .15
+					}
+					row.Background(t.Accent.Alpha(alpha)).Radius(8)
 				}
 				row.Children(func() {
 					if len(m.Images) > 0 {
 						a.messageImageRow(c, m)
 					}
 					switch {
+					case (m.Logical != nil && m.Role != "user") || m.Role == "changedFiles":
+						a.logicalMessage(c, m)
 					case m.Role == "user":
 						ui.Row(c).AlignSelf(ui.Stretch).Children(func() {
 							ui.Spacer(c)
 							ui.Text(c, m.Text).MaxWidth(800).Padding(12, 16).Radius(t.Px(12)).Background(t.SurfaceSecondary).Selectable()
 						})
-					case m.ToolName != "" || m.Role == "toolResult":
+						if m.Logical != nil {
+							transcriptui.Footer(c, &a.transcriptUI, *m.Logical, a.transcriptOptions(c))
+						}
+					case m.Role == "toolResult" || (m.ToolName != "" && m.Role != "assistant"):
 						a.toolMessage(c, m)
 					default:
 						if m.Thinking != "" {
@@ -84,6 +104,7 @@ func (a *App) messages(c *ui.Context) {
 			})
 		}
 	})
+	transcriptui.SelectionMenu(c, scope, a.transcriptHover, a.transcriptOptions(c))
 }
 func (a *App) toolMessage(c *ui.Context, m Message) {
 	t := a.Theme
@@ -124,6 +145,13 @@ func (a *App) toolMessage(c *ui.Context, m Message) {
 }
 func (a *App) composerView(c *ui.Context) {
 	t := a.Theme
+	a.autocomplete.SetContext(a.Model.Workspace, a.Options.Store.Home, a.Model.SessionID)
+	a.autocomplete.SetCommands(a.Model.CommandsRaw)
+	borderAlpha, badgeAlpha := float32(.14), float32(.09)
+	if !t.Dark {
+		borderAlpha, badgeAlpha = .16, .10
+	}
+	style := composerui.Style{FontSize: t.FontSize, Density: t.Density, Font: t.Font, Dark: t.Dark, Surface: t.Elevated, Border: t.Text.Alpha(borderAlpha), Selection: t.Selection, Hover: t.Hover, Text: t.Text, Secondary: t.TextSecondary, Muted: t.TextMuted, Badge: t.Text.Alpha(badgeAlpha), CommandColor: t.AccentText, FileColor: composerui.MentionFileColor(t.AccentText), TextFor: a.text, Icon: func(c *ui.Context, path string, size float32, color ui.Color) { a.icon(c, path, size, color) }}
 	ui.Column(c.Key("composer-wrap")).AlignSelf(ui.Stretch).AlignItems(ui.Center).Padding(12, 24, 10).Children(func() {
 		ui.Column(c).WidthPercent(100).MaxWidth(ContentMaxWidth).Gap(6).Children(func() {
 			a.attachmentRow(c)
@@ -135,8 +163,13 @@ func (a *App) composerView(c *ui.Context) {
 					}
 				})
 			}
-			ui.Column(c.Key("composer")).AlignSelf(ui.Stretch).Padding(14, 16, 10).Gap(16).Radius(18).Border(1, t.Border).Background(t.Surface).Children(func() {
-				ui.TextAreaBase(c.Key("draft"), &a.Draft).Bind(&a.composer).Label("Message").Placeholder(a.text("composer.placeholder", "Describe the task…")).Lines(2, 10).AlignSelf(ui.Stretch).OnTextKey(func(k ui.TextKey) bool {
+			anchor := ui.Column(c.Key("composer")).AlignSelf(ui.Stretch).Padding(14, 16, 10).Gap(16).Radius(18).Border(1, t.Border).Background(t.Surface)
+			var input ui.Element
+			anchor.Children(func() {
+				input = ui.TextAreaBase(c.Key("draft"), &a.Draft).Bind(&a.composer).Label("Message").Placeholder(a.text("composer.placeholder", "Describe the task…")).Lines(2, 10).AlignSelf(ui.Stretch).OnTextKey(func(k ui.TextKey) bool {
+					if a.autocomplete.HandleKey(k) {
+						return true
+					}
 					if k.Key == ui.KeyEnter && k.Mods == 0 {
 						if a.submit(k.Text(), "") {
 							k.SetText("")
@@ -163,6 +196,11 @@ func (a *App) composerView(c *ui.Context) {
 					}
 					return false
 				})
+
+				if a.autocomplete.SyncInput(input, &a.Draft) {
+					c.AnimationFrame()
+				}
+				composerui.PaintMentions(input, a.Draft, style)
 				ui.Row(c).AlignSelf(ui.Stretch).AlignItems(ui.Center).Gap(5).Children(func() {
 					a.iconButton(c, "Add attachment", "icons/plus.svg").Menu(func(m *ui.Menu) {
 						if m.Item("Attach files…").Chosen() {
@@ -190,9 +228,6 @@ func (a *App) composerView(c *ui.Context) {
 						for _, v := range []string{"plan", "build", "ask"} {
 							if m.Item(titleCase(v)).Checked(a.workflow == v).Chosen() {
 								a.workflow = v
-								if a.Model.SessionID != "" {
-									a.save(a.Options.Store.SaveWorkflow(a.Model.SessionID, v))
-								}
 								a.Dispatch(Action{Kind: "SetWorkflow", Value: v})
 							}
 						}
@@ -226,13 +261,16 @@ func (a *App) composerView(c *ui.Context) {
 					} else {
 						b := a.iconButton(c, "Send message", "icons/send.svg").Disabled(strings.TrimSpace(a.Draft) == "" && len(a.attachments) == 0)
 						if b.Clicked() {
-							if a.submit(a.Draft, "") {
+							if a.autocomplete.CommitInput(input, &a.Draft) {
+								c.AnimationFrame()
+							} else if a.submit(a.Draft, "") {
 								a.Draft = ""
 							}
 						}
 					}
 				})
 			})
+			a.autocomplete.Popup(c, anchor, input, &a.Draft, style)
 			ui.Row(c).Height(24).AlignItems(ui.Center).Gap(12).Children(func() {
 				if a.button(c, filepath.Base(a.Model.Workspace), "icons/folder.svg", false).Height(22).Clicked() {
 					a.Dispatch(Action{Kind: "BrowseWorkspace"})
@@ -291,7 +329,22 @@ func (a *App) submit(text, mode string) bool {
 func (a *App) findBar(c *ui.Context) {
 	t := a.Theme
 	ui.Row(c.Key("find-transcript")).Padding(8, 16).Gap(8).AlignItems(ui.Center).Children(func() {
-		ui.TextInput(c, &a.Search).Placeholder("Find in transcript…").Label("Find in transcript").Grow(1)
+		ui.TextInput(c, &a.Search).Bind(&a.searchInput).Placeholder("Find in transcript…").Label("Find in transcript").Grow(1).OnTextKey(func(k ui.TextKey) bool {
+			if k.Key == ui.KeyEscape && k.Mods == 0 {
+				a.closeFind()
+				return true
+			}
+			if k.Key == ui.KeyEnter && (k.Mods == 0 || k.Mods == ui.Shift) {
+				delta := 1
+				if k.Mods == ui.Shift {
+					delta = -1
+				}
+				a.moveMatch(delta)
+				return true
+			}
+			return false
+		})
+		a.syncFind()
 		matches := a.searchMatches()
 		ui.Text(c, fmt.Sprintf("%d matches", len(matches))).TextColor(t.TextMuted).FontSize(t.Px(12))
 		if a.iconButton(c, "Previous match", "icons/arrow-up.svg").Clicked() {
@@ -301,18 +354,18 @@ func (a *App) findBar(c *ui.Context) {
 			a.moveMatch(1)
 		}
 		if a.iconButton(c, "Close find", "icons/x.svg").Clicked() {
-			a.searchOpen = false
-			a.Search = ""
+			a.closeFind()
 		}
 	})
 }
 func (a *App) searchMatches() []int {
 	var out []int
-	if a.Search == "" {
+	query := strings.TrimSpace(a.Search)
+	if query == "" {
 		return out
 	}
 	for i, m := range a.Model.Messages {
-		if strings.Contains(strings.ToLower(m.Text+"\n"+m.ToolOutput), strings.ToLower(a.Search)) {
+		if strings.Contains(strings.ToLower(messageSearchText(m)), strings.ToLower(query)) {
 			out = append(out, i)
 		}
 	}
@@ -325,4 +378,20 @@ func (a *App) moveMatch(delta int) {
 	}
 	a.searchCursor = (a.searchCursor + delta + len(m)) % len(m)
 	a.transcript.ScrollTo(m[a.searchCursor], ui.Center)
+}
+
+func (a *App) closeFind() { a.searchOpen = false; a.Search = ""; a.composer.Focus() }
+func (a *App) syncFind() {
+	query := strings.TrimSpace(a.Search)
+	count := len(a.Model.Messages)
+	if query == a.searchLastQuery && count == a.searchLastCount {
+		return
+	}
+	a.searchLastQuery = query
+	a.searchLastCount = count
+	matches := a.searchMatches()
+	a.searchCursor = max(0, min(a.searchCursor, len(matches)-1))
+	if len(matches) > 0 {
+		a.transcript.ScrollTo(matches[a.searchCursor], ui.Center)
+	}
 }

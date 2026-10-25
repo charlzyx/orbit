@@ -8,9 +8,9 @@
   },
   "row_count": 139,
   "step_count": 973,
-  "expanded_row_specific_steps": 297,
-  "unexpanded_draft_gates": 676,
-  "narrow_assertions_passed": 24,
+  "expanded_row_specific_steps": 342,
+  "unexpanded_draft_gates": 631,
+  "narrow_assertions_passed": 50,
   "full_feature_pass_count": 0,
   "status_enum": [
     "NOT_IMPLEMENTED",
@@ -82,8 +82,7 @@
       "count": 20,
       "verdict_totals": {
         "functional": {
-          "PARTIAL": 19,
-          "NOT_IMPLEMENTED": 1
+          "PARTIAL": 20
         },
         "visual": {
           "UNTESTED": 20
@@ -151,8 +150,7 @@
       "count": 20,
       "verdict_totals": {
         "functional": {
-          "PARTIAL": 16,
-          "UNTESTED": 4
+          "PARTIAL": 20
         },
         "visual": {
           "UNTESTED": 20
@@ -305,7 +303,8 @@
       "count": 16,
       "verdict_totals": {
         "functional": {
-          "UNTESTED": 16
+          "UNTESTED": 15,
+          "PARTIAL": 1
         },
         "visual": {
           "UNTESTED": 16
@@ -410,8 +409,8 @@
       "count": 9,
       "verdict_totals": {
         "functional": {
-          "UNTESTED": 7,
-          "PARTIAL": 2
+          "PARTIAL": 6,
+          "UNTESTED": 3
         },
         "visual": {
           "UNTESTED": 9
@@ -594,5 +593,6 @@
     }
   ],
   "manifest_evidence": "workspace-evidence.json",
+  "checkpoint_manifest_evidence": "checkpoint-evidence.json",
   "rules": "PASS requires the named complete acceptance scope, exact tested revision and evidence. Visual and native OS verdicts are independent. Pending/blocked source captures never inherit domain-test PASS."
 }

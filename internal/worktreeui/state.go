@@ -15,6 +15,8 @@ import (
 )
 
 type Options struct {
+	FocusComposer  func()
+	OnPickerOpen   func()
 	Translate      func(string) string
 	OnChange       func()
 	OpenWorkspace  func(string)
@@ -26,6 +28,9 @@ type Options struct {
 	OnDismissHowTo func()
 }
 type State struct {
+	workInOpen                                           bool
+	workInCursor                                         int
+	workInDismissedAt                                    time.Time
 	Workspace                                            string
 	Options                                              Options
 	Config                                               workspace.WorktreeConfig
@@ -45,7 +50,7 @@ type State struct {
 	generation                                           uint64
 	results                                              chan result
 	cancel                                               context.CancelFunc
-	initialized, closed                                  bool
+	initialized, closed, refreshPending                  bool
 	refreshed                                            time.Time
 	dialog                                               string
 	dialogOpen                                           bool
@@ -85,6 +90,7 @@ func (s *State) SetWorkspace(dir string) {
 	if workspace.SamePath(dir, s.Workspace) {
 		return
 	}
+	s.workInOpen = false
 	s.Cancel()
 	s.Workspace = dir
 	s.Rows = nil
@@ -101,6 +107,7 @@ func (s *State) SetWorkspace(dir string) {
 	s.Filter = ""
 	s.ShowOutput = false
 	s.initialized = false
+	s.refreshPending = false
 }
 func (s *State) Cancel() {
 	if s.cancel != nil {
@@ -112,7 +119,7 @@ func (s *State) Cancel() {
 	s.Activity = ""
 	s.initialized = false
 }
-func (s *State) Close() { s.Cancel(); s.closed = true }
+func (s *State) Close() { s.Cancel(); s.workInOpen = false; s.closed = true }
 func (s *State) start(label string, job func(context.Context, *workspace.WorktreeManager) result) bool {
 	if s.Busy || s.closed {
 		return false
@@ -214,6 +221,7 @@ func (s *State) Tick() {
 				s.confirmLabel = s.text("worktree.allow_setup.allow", "Allow & Create")
 			}
 		default:
+			s.refreshWhenDue()
 			return
 		}
 	}
@@ -222,7 +230,12 @@ func (s *State) Refresh() bool {
 	return s.start("Refreshing worktrees", func(context.Context, *workspace.WorktreeManager) result { return result{preserveError: true} })
 }
 func (s *State) WatchChanged() {
-	if !s.Busy && time.Since(s.refreshed) >= 2*time.Second {
+	s.refreshPending = true
+	s.refreshWhenDue()
+}
+func (s *State) refreshWhenDue() {
+	if s.refreshPending && !s.Busy && !s.closed && time.Since(s.refreshed) >= 2*time.Second {
+		s.refreshPending = false
 		s.Refresh()
 	}
 }

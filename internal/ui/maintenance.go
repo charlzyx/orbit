@@ -14,7 +14,7 @@ import (
 // with its draft intact while the operation is in progress.
 func sessionMutation(kind string) bool {
 	switch kind {
-	case "NewSession", "Submit", "SetModel", "SetThinking", "SetAccess", "SetWorkflow", "RenameSession", "CloneSession", "DeleteSession", "Login", "Logout", "RestartRuntime", "RuntimeChanged", "ChoosePiBinary", "RefreshMcpServers", "ReconnectMcpServers", "AutoTitleChanged":
+	case "StartRuntime", "StopRuntime", "SetAutoRetry", "SetAutoCompaction", "SetFollowUpMode", "SetSteeringMode", "NewSession", "Submit", "SetModel", "SetThinking", "SetAccess", "SetWorkflow", "RenameSession", "CloneSession", "DeleteSession", "Login", "Logout", "RestartRuntime", "RuntimeChanged", "ChoosePiBinary", "RefreshMcpServers", "ReconnectMcpServers", "AutoTitleChanged":
 		return true
 	}
 	return false

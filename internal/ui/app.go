@@ -12,12 +12,15 @@ import (
 
 	orbitassets "github.com/charlzyx/orbit"
 	"github.com/charlzyx/orbit/internal/agent"
+	"github.com/charlzyx/orbit/internal/composerui"
 	"github.com/charlzyx/orbit/internal/native"
 	"github.com/charlzyx/orbit/internal/preferences"
 	orbiterm "github.com/charlzyx/orbit/internal/terminal"
+	"github.com/charlzyx/orbit/internal/transcriptui"
 	"github.com/charlzyx/orbit/internal/workbench"
+	"github.com/charlzyx/orbit/internal/workspace"
 	"github.com/egoist/mygo"
-	ghostty "github.com/egoist/mygo/plugins/terminal"
+	ghostty "github.com/egoist/mygo/orbit-terminal"
 	"github.com/egoist/mygo/ui"
 	"github.com/egoist/mygo/ui/markdown"
 )
@@ -28,6 +31,9 @@ type SessionRow struct {
 	Running, Pinned, Archived          bool
 }
 type Message struct {
+	SuppressFooter                                        bool
+	Logical                                               *transcriptui.Row
+	ChangedFiles                                          []transcriptui.ChangedFile
 	Images                                                []agent.Image
 	ID, Role, Text, Thinking, ToolName, ToolOutput, Error string
 	Streaming                                             bool
@@ -52,6 +58,12 @@ type Usage struct {
 	ContextTokens, ContextWindow                     int64
 }
 type Snapshot struct {
+	LatestTurn                                                                                              int
+	RawMessages                                                                                             []agent.Message
+	AutoCompactionKnown                                                                                     bool
+	Extensions                                                                                              agent.ExtensionStatus
+	SteeringMode, FollowUpMode, AccessMode, WorkflowMode                                                    string
+	AutoCompactionEnabled                                                                                   bool
 	Connected, Running                                                                                      bool
 	Turn                                                                                                    int
 	Error, Status, SessionID, SessionPath, SessionName, Workspace, ModelID, ModelProvider, Thinking, Branch string
@@ -59,6 +71,7 @@ type Snapshot struct {
 	Sessions                                                                                                []SessionRow
 	Models                                                                                                  []ModelChoice
 	ThinkingLevels, Commands                                                                                []string
+	CommandsRaw                                                                                             []json.RawMessage
 	Dialog                                                                                                  *DialogRequest
 	Queued                                                                                                  []string
 	Usage                                                                                                   Usage
@@ -80,13 +93,20 @@ type Options struct {
 	OnAction              func(Action)
 	Terminal              *orbiterm.Panel
 	// Optional workbench modules mount their actual native views here.
-	Pages     map[string]func(*ui.Context)
-	OnPage    func(string)
-	WorkIn    func(*ui.Context)
-	BugReport func(*ui.Context)
-	Escape    func() bool
-	Workspace string
-	PiBinary  string
+	Pages            map[string]func(*ui.Context)
+	OnPage           func(string)
+	WorkIn           func(*ui.Context)
+	BugReport        func(*ui.Context)
+	MCP              func(*ui.Context)
+	Resources        func(*ui.Context, string)
+	RefreshResources func(string)
+	Overlay          func(*ui.Context)
+	ToastBottom      func(*ui.Context) float32
+	RefreshMCP       func()
+	HasModal         func() bool
+	Escape           func() bool
+	Workspace        string
+	PiBinary         string
 }
 type draftState struct {
 	Text        string
@@ -98,6 +118,15 @@ type Notice struct {
 	Until time.Time
 }
 type App struct {
+	transcriptHover                                                 string
+	transcriptUI                                                    transcriptui.State
+	autocomplete                                                    composerui.Controller
+	backdrop                                                        backdropState
+	Runtime                                                         agent.RuntimeSnapshot
+	notificationPrefs                                               preferences.Notifications
+	sessionDefaultPrefs                                             preferences.SessionDefault
+	autoTitlePrefs                                                  preferences.AutoTitle
+	worktreePrefs                                                   workspace.WorktreeConfig
 	Options                                                         Options
 	Window                                                          *mygo.Window
 	window                                                          atomic.Pointer[mygo.Window]
@@ -132,6 +161,9 @@ type App struct {
 	modelCursor                                                     int
 	modelList                                                       ui.ListState
 	composer                                                        ui.Handle
+	searchInput                                                     ui.Handle
+	searchLastQuery                                                 string
+	searchLastCount                                                 int
 	sessionList, transcript, paletteList                            ui.ListState
 	sessionCursor                                                   int
 	expanded                                                        map[string]bool
@@ -150,6 +182,7 @@ type App struct {
 	history                                                         []string
 	historyAt                                                       int
 	settingsSearch                                                  string
+	settingsScroll                                                  map[string]*ui.ScrollState
 	skills                                                          []workbench.Skill
 	plugins                                                         []workbench.Plugin
 	servers                                                         []workbench.MCPServer
@@ -167,11 +200,13 @@ type App struct {
 	nativeSettings                                                  nativeSettingsState
 	secretOpen                                                      bool
 	secretProvider, secretValue                                     string
+	providerState                                                   providerState
 	providers                                                       []workbench.Provider
 	credentials                                                     map[string]workbench.CredentialStatus
 	retention                                                       preferences.Retention
 	retentionBusy                                                   bool
 	quotaOpen                                                       bool
+	modalWasOpen, restoreComposerAfterModal                         bool
 }
 
 func New(o Options) *App {
@@ -187,18 +222,26 @@ func New(o Options) *App {
 	a.ReviewWidth = float32(a.Layout.SidepaneWidth)
 	a.access = o.Store.Access()
 	a.workflow = o.Store.Workflow("")
+	a.settingsScroll = map[string]*ui.ScrollState{}
 	a.Model.Workspace = o.Workspace
 	a.retention = o.Store.Retention()
+	a.notificationPrefs = o.Store.Notifications()
+	a.sessionDefaultPrefs = o.Store.SessionDefault()
+	a.autoTitlePrefs = o.Store.AutoTitle()
+	a.worktreePrefs = workspace.LoadWorktreeConfig(filepath.Join(o.Store.RootDir, "worktrees.json"))
 	a.english, _ = orbitassets.Locale("en")
 	a.reloadLocale()
 	a.Theme = NewTheme(a.Appearance.DarkTheme, a.Prefs, a.Fonts)
 	a.transcript.FollowEnd = true
 	a.transcript.Key = func(i int) any { return a.Model.Messages[i].ID }
 	a.sessionList.Key = func(i int) any { return a.Model.Sessions[i].ID }
+	a.md.ShareSelection = true
 	a.md.Block = a.markdownBlock
 	a.md.LoadImage = markdown.FileImages(o.Workspace)
 	a.md.Reveal = &markdown.Reveal{Unit: markdown.AtOnce, Fade: -1}
 	a.md.OnLink = func(s string) { a.Dispatch(Action{Kind: "OpenLink", Value: s}) }
+	a.loadUsagePrefs()
+	a.initBackground()
 	return a
 }
 func (a *App) reloadLocale() {
@@ -217,6 +260,9 @@ func (a *App) text(key, fallback string) string {
 	return s
 }
 func (a *App) SetSnapshot(s Snapshot) {
+	oldID, oldLatest := a.Model.SessionID, a.Model.LatestTurn
+	a.transcriptUI.Session(s.SessionID)
+	a.projectTranscript(&s)
 	if s.SessionID != a.Model.SessionID {
 		a.messageImages = map[string]ui.ImageSource{}
 		a.imageLoading = map[string]bool{}
@@ -224,7 +270,7 @@ func (a *App) SetSnapshot(s Snapshot) {
 		a.imageOpen = false
 		a.transcript = ui.ListState{FollowEnd: true}
 		a.transcript.Key = func(i int) any { return a.Model.Messages[i].ID }
-		a.workflow = a.Options.Store.Workflow(s.SessionID)
+		a.workflow = "build"
 		if a.pendingNew {
 			a.pendingNew = false
 		} else if a.Model.SessionID != "" {
@@ -235,6 +281,21 @@ func (a *App) SetSnapshot(s Snapshot) {
 		}
 	}
 	a.Model = s
+	if a.reviewState.source == workspace.ReviewLastTurn {
+		if s.LatestTurn == 0 {
+			a.reviewState.source = workspace.ReviewUncommitted
+			a.reviewState.turn = 0
+		}
+		if a.ReviewVisible && (oldID != s.SessionID || oldLatest != s.LatestTurn) {
+			a.RefreshReview()
+		}
+	}
+	if s.AccessMode != "" {
+		a.access = s.AccessMode
+	}
+	if s.WorkflowMode != "" {
+		a.workflow = s.WorkflowMode
+	}
 	if s.Dialog != nil && s.Dialog.ID != a.dialogID {
 		a.dialogID = s.Dialog.ID
 		a.dialogValue = s.Dialog.Default
@@ -315,9 +376,10 @@ drained:
 		a.Options.Terminal.SetTheme(a.Theme.Terminal(), a.Theme.Terminal())
 		a.terminalThemeID = id
 	}
-	appearanceKey := fmt.Sprintf("%s|%s|%g|%t", id, a.Fonts.CodeFamily, a.Prefs.TerminalFontSize, a.Prefs.ReduceMotion)
+	appearanceKey := fmt.Sprintf("%s|%s|%g|%t", id, a.Fonts.CodeFamily, a.Prefs.EditorFontSize, a.Prefs.ReduceMotion)
 	if a.Options.Custom != nil && a.customAppearanceKey != appearanceKey {
-		a.Options.Custom.SetAppearance(ghostty.Font{Family: a.Fonts.CodeFamily, Size: float32(a.Prefs.TerminalFontSize), Features: []string{"-calt", "-liga", "-dlig"}}, a.Theme.Terminal(), a.Theme.Terminal(), a.Prefs.ReduceMotion)
+		a.Options.Custom.SetAppearance(ghostty.Font{Family: a.Fonts.CodeFamily, Size: float32(a.Prefs.EditorFontSize) * 12 / 13, Features: []string{"-calt", "-liga", "-dlig"}}, a.Theme.Terminal(), a.Theme.Terminal(), a.Prefs.ReduceMotion)
+		a.Options.Custom.SetRowHeight(float32(a.Prefs.EditorFontSize) * 18 / 13)
 		a.customAppearanceKey = appearanceKey
 	}
 	c.SetTheme(a.Theme.Native())
@@ -344,7 +406,21 @@ drained:
 	if paths := root.DroppedFiles(); len(paths) > 0 && a.page != "settings" {
 		a.AddPaths(paths)
 	}
+	if a.Options.Terminal != nil {
+		a.Options.Terminal.SetVisible(a.page == "chat")
+	}
 	a.shortcuts(c)
+	modalNow := a.modalOpen()
+	if !modalNow && a.Options.Overlay != nil {
+		a.Options.Overlay(c)
+	}
+	if modalNow && !a.modalWasOpen {
+		a.restoreComposerAfterModal = a.composer.Focused(c)
+	} else if !modalNow && a.modalWasOpen && a.restoreComposerAfterModal && a.page == "chat" {
+		a.composer.Focus()
+		a.restoreComposerAfterModal = false
+	}
+	a.modalWasOpen = modalNow
 	if a.paletteOpen {
 		a.commandPalette(c)
 	}
@@ -359,6 +435,7 @@ drained:
 	a.confirm(c)
 	a.jsonDialog(c)
 	a.secretDialog(c)
+	a.providerDialog(c)
 	a.toasts(c)
 }
 func (a *App) icon(c *ui.Context, name string, size float32, color ui.Color) ui.Element {
@@ -450,6 +527,9 @@ func (a *App) sidebar(c *ui.Context) {
 			})
 		})
 		rows := a.sidebarRows()
+		if len(rows) == 0 {
+			a.emptySidebar(c)
+		}
 		a.sessionList.Key = func(i int) any { return rows[i].key }
 		a.sessionList.Label = func(i int) string { return rows[i].label }
 		a.sessionList.Selected = &a.sessionCursor
@@ -503,6 +583,9 @@ func (a *App) sidebar(c *ui.Context) {
 				}
 			})
 		}).Grow(1).MinHeight(0)
+		if len(rows) == 0 {
+			list.Grow(0).Height(0)
+		}
 		if list.Submitted() && a.sessionCursor >= 0 && a.sessionCursor < len(rows) {
 			r := rows[a.sessionCursor]
 			if r.group {
@@ -553,9 +636,6 @@ func (a *App) sidebarRows() []sidebarRow {
 			key = ""
 		}
 		groups[key] = append(groups[key], s)
-	}
-	if a.Workspaces.GroupBy != "one_list" && a.Model.Workspace != "" && groups[a.Model.Workspace] == nil {
-		groups[a.Model.Workspace] = []SessionRow{}
 	}
 	for _, w := range a.Workspaces.Workspaces {
 		if a.Workspaces.GroupBy != "one_list" && groups[w.Path] == nil {
@@ -632,7 +712,20 @@ func (a *App) sidebarRows() []sidebarRow {
 	return rows
 }
 func (a *App) main(c *ui.Context) {
-	ui.Column(c.Key("main")).Fill().MinWidth(0).Children(func() {
+	main := ui.Column(c.Key("main")).Fill().MinWidth(0)
+	if a.page == "chat" && len(a.Model.Messages) == 0 {
+		// Absolute children paint above flow siblings in MyGo. Paint on the parent
+		// before children so the background never overlays the composer/buttons.
+		main.Draw(func(p *ui.Painter, r ui.Rect) {
+			r.Y += HeaderHeight
+			r.H -= HeaderHeight
+			p.Clip(r, 0, func() { a.paintBackdrop(p, r, true) })
+		})
+	}
+	main.Children(func() {
+		if a.page == "chat" && len(a.Model.Messages) == 0 {
+			ui.Box(c.Key("new-task-backdrop")).Label("New task backdrop").PassThrough().Absolute().Top(HeaderHeight).Left(0).Right(0).Bottom(0)
+		}
 		a.header(c)
 		if a.Model.Error != "" {
 			ui.Row(c).Padding(8, 16).Background(a.Theme.Error.Alpha(.1)).Children(func() {
@@ -675,10 +768,19 @@ func (a *App) main(c *ui.Context) {
 }
 func (a *App) header(c *ui.Context) {
 	t := a.Theme
-	ui.Row(c.Key("header")).DragWindow().Height(HeaderHeight).Padding(0, max(t.Space(16), c.TitleBar().Right), 0, t.Space(16)).AlignItems(ui.Center).Gap(t.Space(6)).Children(func() {
+	left := t.Space(16)
+	if !a.SidebarVisible {
+		left = max(left, c.TitleBar().Left)
+	}
+	ui.Row(c.Key("header")).DragWindow().Height(HeaderHeight).Padding(0, max(t.Space(16), c.TitleBar().Right), 0, left).AlignItems(ui.Center).Gap(t.Space(6)).Children(func() {
 		if !a.SidebarVisible {
 			if a.iconButton(c, "Show sidebar", "icons/layout-left.svg").Clicked() {
 				a.SidebarVisible = true
+			}
+		}
+		if a.page != "chat" {
+			if a.iconButton(c, "Back to task", "icons/arrow-left.svg").Clicked() {
+				a.Navigate("chat")
 			}
 		}
 		title := a.Model.SessionName
@@ -763,7 +865,7 @@ func (a *App) toasts(c *ui.Context) {
 		return
 	}
 	ui.Overlay(c, func() {
-		ui.Column(c).Absolute().Right(16).Bottom(16).Width(360).Gap(8).Children(func() {
+		ui.Column(c).Absolute().Right(16).Bottom(a.toastBottom(c)).Width(360).Gap(8).Children(func() {
 			for _, n := range items {
 				color := a.Theme.Text
 				switch n.Kind {
@@ -871,4 +973,11 @@ func (a *App) workspaceMenu(m *ui.Menu) {
 		}
 		a.save(a.Options.Store.SaveWorkspaces(a.Workspaces))
 	}
+}
+
+func (a *App) toastBottom(c *ui.Context) float32 {
+	if a.Options.ToastBottom != nil {
+		return a.Options.ToastBottom(c)
+	}
+	return 16
 }

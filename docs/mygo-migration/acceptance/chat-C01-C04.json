@@ -568,7 +568,7 @@
       "source_test_inventory": "T04",
       "verdicts": {
         "functional": {
-          "status": "NOT_IMPLEMENTED",
+          "status": "PARTIAL",
           "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
           "last_verified_sha": null,
           "last_partial_evidence_sha": null
@@ -590,16 +590,18 @@
       "supplemental_cases": [
         {
           "id": "UI-C03",
-          "status": "NOT_IMPLEMENTED",
-          "owner_reported_verdict": "failed_missing_implementation",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "partial",
           "steps": [
             "Type / then filter a command.",
             "Type @ then select a nested file by keyboard.",
             "Escape cancels; accepting replaces only trigger range."
           ],
           "expected": "Source composer_ops autocomplete ordering, keyboard ownership and trigger replacement.",
-          "tests": [],
-          "remaining": "Host currently has no source-equivalent slash/file-mention popup. Plain text commands are forwarded but are not autocomplete parity.",
+          "tests": [
+            "TestNativeComposerCompletionPrecedesSendAndAbort"
+          ],
+          "remaining": "Native source-derived slash/skill/command/file completion is mounted; real command metadata and off-thread bounded filesystem scan, focus/caret/Enter/AltEnter/steer/Escape paths have tests. Canonical hash-checked MyGo compatibility supplies undoable caret-aware replacement; cmd refuses unpatched startup. Actual OS IME candidate panel and full source visual comparison remain unverified.",
           "evidence": "../native-ui-acceptance.json",
           "last_verified_sha": null,
           "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."

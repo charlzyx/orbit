@@ -268,7 +268,7 @@
           "status": "PARTIAL",
           "reason": "Named narrow assertions pass; remaining row steps are unverified.",
           "last_verified_sha": null,
-          "last_partial_evidence_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3"
+          "last_partial_evidence_sha": "8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59"
         },
         "visual": {
           "status": "UNTESTED",
@@ -290,9 +290,9 @@
           "package": "github.com/charlzyx/orbit/internal/worktreeui",
           "command": "go test -race -count=1 ./internal/worktreeui -run ^TestFailedLockRetryDoesNotRepeatPreviousCreate$",
           "evidence": "workspace-evidence.json",
-          "last_verified_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3",
+          "last_verified_sha": "8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59",
           "sha_kind": "working-tree-content-manifest; not a Git commit",
-          "verified_at_utc": "2026-10-25T14:01:15.926506965+09:00",
+          "verified_at_utc": "2026-10-25T14:19:03.503793827+09:00",
           "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
         }
       ],
@@ -342,8 +342,8 @@
         {
           "id": "W50.behavior",
           "dimension": "functional",
-          "action": "Open Work in picker, navigate Local/linked/New using Up/Down/Enter and cancel with Escape.",
-          "expected": "Status “Work in” picker has Local/main, linked worktrees and New; Up/Down wrap selection, Enter chooses, Escape closes/restores composer focus; mutually excludes overlapping popovers.",
+          "action": "Open Work In from composer; inspect Local first, linked worktrees then New; choose current item and another item.",
+          "expected": "Current worktree is selected/highlighted; selecting it closes without reloading the workspace. Selecting another invokes exactly its path; New opens a quick-create dialog with name suggestion.",
           "status": "UNTESTED",
           "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
@@ -360,46 +360,46 @@
         {
           "id": "W50.error",
           "dimension": "error",
-          "action": "Fail the current Git/setup/config write; retry after navigation and verify no prior mutation is replayed.",
-          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Chip intentionally absent at main checkout and no-repo; shown in linked worktree. Top-bar Worktrees page remains entry point from main. Outside-click mouseup reopening guarded 200 ms.",
+          "action": "Remove the selected linked worktree externally before choosing it; open Work In while another worktree dialog is active.",
+          "expected": "Missing path follows source unavailable/open handling rather than silently creating it; an existing modal suppresses the overlapping picker and keeps its focus.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W50.loading",
           "dimension": "loading",
-          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
-          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "action": "Delay worktree discovery and render composer repeatedly; release results after changing workspace.",
+          "expected": "Only current workspace rows become selectable. No fake main/linked entries are rendered while discovery is unavailable; async result guards apply.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W50.persistence",
           "dimension": "persistence",
-          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
-          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "action": "Open/dismiss picker, then restart app from identical preferences; choose a different workspace and restart again.",
+          "expected": "Picker visibility/highlight itself is ephemeral. Current-workspace persistence is owned by the host workspace selection, not a new picker-specific preference file.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W50.keyboard",
           "dimension": "keyboard",
-          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
-          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "action": "From Local press Up to wrap to New, Down to wrap to Local, Down to first linked and Enter. Reopen and press Escape three times in immediate succession.",
+          "expected": "Up/Down wrap exact displayed order; Enter selects once. Escape always closes and focuses composer; immediate Escape/reopen is not delayed. New transfers focus to its dialog, never back to composer.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W50.repeat",
           "dimension": "repeat",
-          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
-          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "action": "Click trigger again while open; dismiss by outside pointer and immediately release over trigger; open a competing composer popup.",
+          "expected": "Trigger toggles closed without reopening on same gesture. Source200ms pointer-dismiss guard applies only to mouse dismissal, not keyboard Escape. Opening Work In closes source-overlapping popovers via host callback.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         }
       ],
@@ -424,7 +424,7 @@
           "status": "PARTIAL",
           "reason": "Named narrow assertions pass; remaining row steps are unverified.",
           "last_verified_sha": null,
-          "last_partial_evidence_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3"
+          "last_partial_evidence_sha": "8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59"
         },
         "visual": {
           "status": "UNTESTED",
@@ -439,6 +439,32 @@
       },
       "assertion_results": [
         {
+          "id": "W50.assert.TestWorkInDismissalRestoresComposerFocus",
+          "status": "PASS",
+          "expected": "Actual Escape returns focus to composer across three immediate reopen/dismiss cycles.",
+          "test": "TestWorkInDismissalRestoresComposerFocus",
+          "package": "github.com/charlzyx/orbit/internal/worktreeui",
+          "command": "go test -race -count=1 ./internal/worktreeui -run ^TestWorkInDismissalRestoresComposerFocus$",
+          "evidence": "workspace-evidence.json",
+          "last_verified_sha": "8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:19:03.171745141+09:00",
+          "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
+        },
+        {
+          "id": "W50.assert.TestWorkInKeyboardWrapNoopAndDialogFocusGuard",
+          "status": "PASS",
+          "expected": "Arrow/Enter wrap, current-worktree no-op and New/existing-dialog focus guard match source.",
+          "test": "TestWorkInKeyboardWrapNoopAndDialogFocusGuard",
+          "package": "github.com/charlzyx/orbit/internal/worktreeui",
+          "command": "go test -race -count=1 ./internal/worktreeui -run ^TestWorkInKeyboardWrapNoopAndDialogFocusGuard$",
+          "evidence": "workspace-evidence.json",
+          "last_verified_sha": "8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:19:03.143121597+09:00",
+          "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
+        },
+        {
           "id": "W50.assert.TestWorkInRowsAndNativeMenuSelection",
           "status": "PASS",
           "expected": "Native Work In menu uses actual main/linked/New rows and selections.",
@@ -446,16 +472,18 @@
           "package": "github.com/charlzyx/orbit/internal/worktreeui",
           "command": "go test -race -count=1 ./internal/worktreeui -run ^TestWorkInRowsAndNativeMenuSelection$",
           "evidence": "workspace-evidence.json",
-          "last_verified_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3",
+          "last_verified_sha": "8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59",
           "sha_kind": "working-tree-content-manifest; not a Git commit",
-          "verified_at_utc": "2026-10-25T14:01:15.575569633+09:00",
+          "verified_at_utc": "2026-10-25T14:19:03.121632464+09:00",
           "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
         }
       ],
       "known_remaining": "Real temporary worktree operations, setup consent/failure/cancel, transactional persistence and scoped native typing/confirm/retry tests pass. Host guide preference/translation hooks exist. Complete localization, host keyboard/focus and platform/pixel equivalence remain pending.",
       "full_parity_verified": false,
       "supplemental_cases": [],
-      "additional_evidence": []
+      "additional_evidence": [
+        "work-in-focus-history.json"
+      ]
     },
     {
       "id": "W51",
@@ -580,7 +608,7 @@
           "status": "PARTIAL",
           "reason": "Named narrow assertions pass; remaining row steps are unverified.",
           "last_verified_sha": null,
-          "last_partial_evidence_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3"
+          "last_partial_evidence_sha": "8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59"
         },
         "visual": {
           "status": "UNTESTED",
@@ -602,9 +630,9 @@
           "package": "github.com/charlzyx/orbit/internal/worktreeui",
           "command": "go test -race -count=1 ./internal/worktreeui -run ^TestThrottledWorktreeWatchEventuallyRefreshesWithoutAnotherEvent$",
           "evidence": "workspace-evidence.json",
-          "last_verified_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3",
+          "last_verified_sha": "8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59",
           "sha_kind": "working-tree-content-manifest; not a Git commit",
-          "verified_at_utc": "2026-10-25T14:01:16.115186296+09:00",
+          "verified_at_utc": "2026-10-25T14:19:03.706985914+09:00",
           "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
         }
       ],

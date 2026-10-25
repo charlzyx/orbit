@@ -7,8 +7,9 @@ import (
 	"sync"
 
 	orbitassets "github.com/charlzyx/orbit"
+	"github.com/charlzyx/orbit/internal/highlight"
 	"github.com/charlzyx/orbit/internal/preferences"
-	ghostty "github.com/egoist/mygo/plugins/terminal"
+	ghostty "github.com/egoist/mygo/orbit-terminal"
 	"github.com/egoist/mygo/ui"
 	"github.com/egoist/mygo/ui/editor"
 	"github.com/egoist/mygo/ui/markdown"
@@ -149,4 +150,36 @@ func LoadAssets() error {
 // Terminal maps the same sixteen semantic ANSI slots as the pinned Rust view.
 func (t Theme) Terminal() *ghostty.Theme {
 	return &ghostty.Theme{Foreground: t.CodeText, Background: t.CodeBg, Cursor: t.AccentText, Selection: t.Selection, SelectionText: t.SelectionFg, Palette: [16]ui.Color{t.TextMuted, t.Error, t.Success, t.SynNumber, t.SynFunction, t.SynString, t.SynType, t.Text, t.TextMuted, t.Error, t.Success, t.SynLiteral, t.SynFunction, t.SynString, t.SynType, t.Text}}
+}
+
+// TokenColor follows the pinned Rust theme token contract; it never changes metrics.
+func (t Theme) TokenColor(class highlight.Class) ui.Color {
+	switch class {
+	case highlight.Keyword, highlight.Command:
+		return t.AccentText
+	case highlight.Literal:
+		return t.SynLiteral
+	case highlight.String:
+		return t.SynString
+	case highlight.Comment:
+		return t.SynComment
+	case highlight.Number, highlight.Flag:
+		return t.SynNumber
+	case highlight.Type:
+		return t.SynType
+	case highlight.Function:
+		return t.SynFunction
+	case highlight.Meta:
+		return t.SynMeta
+	case highlight.Path:
+		return t.Text
+	case highlight.Operator:
+		return t.SynOperator
+	case highlight.Added:
+		return t.Success
+	case highlight.Removed:
+		return t.Error
+	default:
+		return t.CodeText
+	}
 }

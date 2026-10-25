@@ -1,0 +1,19 @@
+{
+  "upstream_commit": "9c69cf829ece196c5b3a3601f1c7bbe70526376f",
+  "module": "github.com/egoist/mygo",
+  "version": "v0.6.4-0.20261025001514-9c69cf829ece",
+  "baseline_sha256": {
+    "ui/textinput.go": "2b7a1b59aa2b564140724614c37eb71b0b6f3f3fe3bfa2af5f326b6a7d572f1c",
+    "ui/editor_history.go": "57a3fe86204ddd8ad2419f8a8a50c3237f047ffa40ca5f4ae724c24ac238f9a1",
+    "ui/editor_navigation.go": "2a3b2378797ae9798a9c064e61b2a411668f8b27cc56aa48455ecccd2a6cd0c7",
+    "ui/textbuffer_input.go": "390084d329e990e4f5917944ea11caaff2e5f04e500991a0a593e37ac8e4bd40",
+    "ui/frame.go": "09ad9a65ee165305fae7b484740b55be1af28923abd4f47307706bc7d232ac7f",
+    "ui/editor_input.go": "3fd0ef5aa3c7d9ff1be47b6dbf2f08f5443be0c3a87ed60545a00655df21e330",
+    "ui/value_input.go": "c1006d34b8d8c886940fc45a494aedd0af861f8d917c146e8d955b17e85913a9"
+  },
+  "added_file": "ui/orbit_composer.go",
+  "added_sha256": "da366a26e7f165cda62341c810d571693d72e81abcfa665a24b6937b6adc3834",
+  "tests_sha256": "c708777becd1c2ac35235d0b680e244ee811aab36bcd3bb43a59121a2c8c5795",
+  "module_sum": "h1:zKaW0m3ftywWzdR18dv/b+MKgS+iKTu7HF5twRZtSvs=",
+  "go_mod_sum": "h1:dVav53PwF2xEotjf4oA5lTY2Jp2exgzyjLhbSXhbMwE="
+}

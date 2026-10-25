@@ -1,0 +1,77 @@
+{
+  "date": "2026-10-25",
+  "source_orbit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "source_mygo": "9c69cf829ece196c5b3a3601f1c7bbe70526376f",
+  "toolchain": "go1.27.3",
+  "state": "implemented_source_cpu_rpc_verified_os_pixel_pending",
+  "tests": [
+    {
+      "command": "ORBIT_REQUIRE_COMPOSER_PATCH=1 ORBIT_PI_INTEGRATION_BIN=<pinned Pi1.4.0> scripts/go-native.sh test -race ./internal/composerui -count=1",
+      "result": "passed",
+      "seconds": 2.805,
+      "tests": 24,
+      "extra": "fuzz seed coverage; real offline credential-free Pi fixture; native CPU screenshots"
+    },
+    {
+      "command": "scripts/go-native.sh vet ./internal/composerui",
+      "result": "passed"
+    },
+    {
+      "command": "scripts/go-native.sh test -race github.com/egoist/mygo/ui -run 'TestOrbitComposer|TestOnTextKey|TestTextAreaUndo|TestBufferInputs' -count=1",
+      "result": "passed",
+      "seconds": 1.545
+    },
+    {
+      "command": "scripts/go-native.sh test -race ./internal/ui -run 'TestNativeComposerCompletionPrecedesSendAndAbort|TestIMECompositionDoesNotSubmit' -count=1",
+      "result": "passed",
+      "seconds": 4.346
+    },
+    {
+      "command": "scripts/go-native.sh -C third_party/mygo-terminal test -race ./...",
+      "result": "passed",
+      "seconds_main_package": 66.57
+    },
+    {
+      "command": "python3 scripts/test-go-native-overlay.py",
+      "result": "passed",
+      "tests": 3
+    },
+    {
+      "command": "isolated cold GOMODCACHE: scripts/go-native.sh list -m github.com/egoist/mygo",
+      "result": "passed",
+      "constraints": "official cached archives/metadata only; no extracted MyGo; GOPROXY=off; source materialized; global cache untouched"
+    }
+  ],
+  "limits": [
+    "Native OS rendering/event delivery and same-state GPUI pixel equality are unverified.",
+    "Externally installed font no-fallback PUA coverage is not exposed by public MyGo; bundled font probe/render was verified.",
+    "No inference, credentials, remote writes, user computer, or Rust runtime used."
+  ],
+  "sha256": {
+    "internal/composerui/badges.go": "9655c975b4d38090f22fe66dce48b5d043a5186827979f91e69cf4477eba5418",
+    "internal/composerui/live_test.go": "a04aab61152ac6bc6572b4d027b3e2cd060c7aeec0ffb696bdd4a241a2b8b3af",
+    "internal/composerui/DEVICONS-LICENSE": "c95bae1d1ce0235ecccd3560b772ec1efb97f348a79f0fbe0a634f0c2ccefe2c",
+    "internal/composerui/state_test.go": "ab61e46449a4861fe6ff01a35e2d75d61dca17355067b78edf96f97bd58cf163",
+    "internal/composerui/catalog_test.go": "50772a66fe66c7e5df26117af21c64ab2358eb69ea52631a0ce772c0513b94e5",
+    "internal/composerui/devicons-source.json": "3500f80cfe3d8edad06e7eae76ee3315d1ede54bee97f0a9e857e41aca143038",
+    "internal/composerui/native.go": "6446dd605ae09242e9f959a95be65ade31f4269cf26c0436ccb4e7109724b572",
+    "internal/composerui/catalog.go": "9b402cf0ac93c8b76df82648b89fd6e4ba33014f4b8b64694ab33613ffee7b0b",
+    "internal/composerui/native_test.go": "d708bd4d3e724bfb143df082ad75790dfc4f855dea0ec48786d270c9a35b5bca",
+    "internal/composerui/devicons_generated.go": "c724cb19dc153abf8b4d74b06a6219e371241e419a053197c4e1bbdfee541ba6",
+    "internal/composerui/files.go": "afdc97af78ecc4dc0d270229e50613d9f7fe7ad9e672b0df2ce7074b16d6adf4",
+    "internal/composerui/state.go": "8663cc49079c40ecd7ce12d1bb6abae0afc73ed1a972c0844f7a47c6a228409f",
+    "internal/composerui/glyphs.go": "8408b273c1ab9028290654233db17ba28340195da01f36f8ff18e348bd435b51",
+    "third_party/mygo-composer/LICENSE": "f0b56f4ab53beb6e18c5e155219c2e2b6000b5475c0ae3ddb3af3894fd9349b4",
+    "third_party/mygo-composer/orbit_composer.go.txt": "da366a26e7f165cda62341c810d571693d72e81abcfa665a24b6937b6adc3834",
+    "third_party/mygo-composer/baseline.json": "e45c25e068be820877de9c8b8de306cfd153462b1ae03d6a22c4a6d5760ec31c",
+    "third_party/mygo-composer/composer-edit.patch": "dad2814dd0f0e9b54d13cab0b1c36c680f99c2f7739fe4bc4e878d468ed2ab4e",
+    "third_party/mygo-composer/orbit_composer_test.go.txt": "c708777becd1c2ac35235d0b680e244ee811aab36bcd3bb43a59121a2c8c5795",
+    "third_party/mygo-composer/README.md": "22c8d545d2250fe475ef961cf731b577d4e6334653d8c3a404acab9d79ceb5dc",
+    "scripts/go-native.sh": "e8141da5873e7dcd0bb9cc9712c935eff19b3703a8093269f3b2259b0ceae2b1",
+    "scripts/go-native-overlay.py": "688f7d6d00dc8f693382443eca8cb200af3b85531191f6f92b03675cb02f7faf",
+    "scripts/test-go-native-overlay.py": "2b23222fb172599a675298cb8240365b2f0c91425e4211dd0d1bf0d981866d7a",
+    "docs/mygo-migration/composer-autocomplete-acceptance.md": "6ce1a90755fe85758254b5bfa6e697c0409f1dffa3eefe00a8c2ee4928e5fac6",
+    "docs/mygo-migration/probes/composerui/composer-slash-native-cpu.png": "4a0c4805b6892ac43b1fe0b0e7c3dc75d11fa2c3584e8508cbba2e54c1e5b76a",
+    "docs/mygo-migration/probes/composerui/composer-files-native-cpu.png": "03978bb550d461be6498f57e16d01b4c0a82ede519cd499c40946f50c8ba5067"
+  }
+}

@@ -137,6 +137,8 @@ Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 
 **Owner challenge UI-S05 [PARTIAL]:** Draft/inactive file generation tests pass. Whole native controller repository-switch interaction with fake Pi and all domain mutations still needs a dedicated end-to-end fixture. [Scoped steps/tests](../native-ui-acceptance.json).
 
+**Additional source-specific procedures:** [../intentional-deviations.md](../intentional-deviations.md)
+
 **Remaining:** Native code exists; this row is not validated end to end.
 **Visual/OS gates:** No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state. This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.
 

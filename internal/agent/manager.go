@@ -17,31 +17,43 @@ import (
 
 	"github.com/charlzyx/orbit/internal/pirpc"
 	"github.com/charlzyx/orbit/internal/preferences"
-	worktree "github.com/charlzyx/orbit/internal/workspace"
 )
 
 type liveSession struct {
-	runContext       context.Context
-	promptCancel     context.CancelFunc
-	redactions       []string
-	turnOpen         bool
-	checkpointDone   <-chan struct{}
-	localDiagnostics []string
-	state            sessionState
-	client           *pirpc.Client
-	loading          bool
-	parkedAt         time.Time
-	lastEntries      time.Time
-	entriesPending   bool
+	checkpointGeneration uint64
+	checkpointID         string
+	workflowPending      string
+	workflowID           string
+	workflowVersion      uint64
+	workflowGeneration   uint64
+	creatingSession      bool
+	autoRetry            RetrySetting
+	launcher             string
+	stopped              bool
+	stopping             bool
+	runContext           context.Context
+	promptCancel         context.CancelFunc
+	redactions           []string
+	turnOpen             bool
+	checkpointDone       <-chan struct{}
+	localDiagnostics     []string
+	state                sessionState
+	client               *pirpc.Client
+	loading              bool
+	parkedAt             time.Time
+	lastEntries          time.Time
+	entriesPending       bool
 }
 
 func (s *liveSession) busy() bool {
-	return s.loading || s.state.awaiting || s.state.snapshot.Running || s.state.snapshot.Compacting || s.state.snapshot.Retrying
+	return s.stopping || s.loading || s.state.snapshot.CheckpointRecovering || s.state.awaiting || s.state.snapshot.Running || s.state.snapshot.Compacting || s.state.snapshot.Retrying
 }
 
 // Manager keeps active and background Pi processes alive independently of any
 // window. Tick is nonblocking; Open/Send/ReloadSessions perform I/O in workers.
 type Manager struct {
+	workflowStore    *preferences.Store
+	workflowMu       sync.Mutex
 	sessionIndex     SessionIndex
 	configuredBinary atomic.Value
 	options          Options
@@ -86,7 +98,7 @@ func NewManager(options Options) *Manager {
 		options.CommandTimeout = 30 * time.Second
 	}
 	ctx, cancel := context.WithCancel(context.Background())
-	manager := &Manager{options: options, sessions: map[string]*liveSession{}, ctx: ctx, cancel: cancel}
+	manager := &Manager{options: options, sessions: map[string]*liveSession{}, ctx: ctx, cancel: cancel, workflowStore: preferences.New(options.Home)}
 	manager.configuredBinary.Store(options.PiBinary)
 	manager.ReloadSessions()
 	return manager
@@ -109,6 +121,9 @@ func (m *Manager) launch(task func()) bool {
 }
 
 func (m *Manager) Open(workspace, sessionPath string) error {
+	return m.open(workspace, sessionPath, "")
+}
+func (m *Manager) open(workspace, sessionPath, pendingWorkflow string) error {
 	if strings.TrimSpace(workspace) == "" {
 		return errors.New("workspace is required")
 	}
@@ -130,7 +145,7 @@ func (m *Manager) Open(workspace, sessionPath string) error {
 	}
 	if sessionPath != "" {
 		for key, session := range m.sessions {
-			if session.state.snapshot.ActiveSession.Path == sessionPath && (session.loading || session.client != nil && session.client.Alive()) {
+			if !session.stopped && session.state.snapshot.ActiveSession.Path == sessionPath && (session.loading || session.client != nil && session.client.Alive()) {
 				if old := m.sessions[m.active]; old != nil {
 					old.parkedAt = time.Now()
 				}
@@ -146,7 +161,11 @@ func (m *Manager) Open(workspace, sessionPath string) error {
 	}
 	m.sequence++
 	key := fmt.Sprintf("live-%d", m.sequence)
-	entry := &liveSession{state: newState(workspace, sessionPath), loading: true}
+	entry := &liveSession{state: newState(workspace, sessionPath), loading: true, launcher: m.PiBinary()}
+	if validWorkflow(pendingWorkflow) {
+		entry.workflowPending = pendingWorkflow
+		entry.state.snapshot.WorkflowMode = pendingWorkflow
+	}
 	entry.state.snapshot.Status = "Connecting"
 	m.sessions[key] = entry
 	m.active = key
@@ -162,6 +181,9 @@ func (m *Manager) start(key string, entry *liveSession, workspace, path string) 
 	}
 	options := m.options
 	options.PiBinary = m.PiBinary()
+	m.mu.Lock()
+	entry.launcher = options.PiBinary
+	m.mu.Unlock()
 	if path != "" {
 		row, rowErr := ReadSession(path)
 		messages, messageErr := ReadSessionMessages(path)
@@ -205,6 +227,16 @@ func (m *Manager) start(key string, entry *liveSession, workspace, path string) 
 			redactions = append(redactions, value)
 		}
 	}
+	baseEnvironment := m.options.Environment
+	if baseEnvironment == nil {
+		baseEnvironment = os.Environ()
+	}
+	redactions = append(redactions, sensitiveEnvironmentValues(baseEnvironment)...)
+	for name, value := range overrides {
+		if sensitiveEnvironmentName(name) && value != "" {
+			redactions = append(redactions, value)
+		}
+	}
 	// Keep diagnostics safe even if spawning fails before a client is installed.
 	m.mu.Lock()
 	entry.redactions = redactions
@@ -213,12 +245,18 @@ func (m *Manager) start(key string, entry *liveSession, workspace, path string) 
 	if _, set := overrides["PI_CODING_AGENT_DIR"]; !set {
 		overrides["PI_CODING_AGENT_DIR"] = filepath.Join(m.options.Home, ".pi", "agent")
 	}
-	config := pirpc.Config{Executable: m.PiBinary(), PrefixArgs: m.options.PiPrefixArgs, WorkspaceDir: workspace, SessionDir: m.options.SessionDir, Extensions: extensions, Args: m.options.PiArgs, Environment: m.options.Environment, EnvOverrides: overrides, TrustProject: true, Offline: m.options.Offline, NoSession: m.options.NoSession}
+	config := pirpc.Config{Executable: options.PiBinary, PrefixArgs: m.options.PiPrefixArgs, WorkspaceDir: workspace, SessionDir: m.options.SessionDir, Extensions: extensions, Args: m.options.PiArgs, Environment: m.options.Environment, EnvOverrides: overrides, TrustProject: true, Offline: m.options.Offline, NoSession: m.options.NoSession}
 	if path == "" {
 		config.Args = append(preferences.New(m.options.Home).SessionDefault().Args(), config.Args...)
 	}
 	if m.options.NoSession {
 		config.SessionDir = ""
+	}
+	m.mu.Lock()
+	cancelled := m.closed || m.sessions[key] != entry || entry.stopped
+	m.mu.Unlock()
+	if cancelled {
+		return
 	}
 	client, err := pirpc.Start(config)
 	if err != nil {
@@ -227,7 +265,7 @@ func (m *Manager) start(key string, entry *liveSession, workspace, path string) 
 	}
 	m.mu.Lock()
 	current, exists := m.sessions[key]
-	if m.closed || !exists || current != entry {
+	if m.closed || !exists || current != entry || entry.stopped {
 		m.mu.Unlock()
 		client.Close()
 		return
@@ -257,22 +295,7 @@ func (m *Manager) start(key string, entry *liveSession, workspace, path string) 
 	}
 	m.Tick()
 	m.mu.Lock()
-	row := entry.state.snapshot.ActiveSession
-	m.mu.Unlock()
-	if !m.options.DisableCheckpoints && row.ID != "" {
-		ctx, cancel := context.WithTimeout(m.ctx, 10*time.Second)
-		turn, err := (worktree.Git{Dir: row.Workspace}).LatestTurn(ctx, row.ID)
-		cancel()
-		if err == nil {
-			m.mu.Lock()
-			entry.state.snapshot.Turn = turn
-			m.mu.Unlock()
-		}
-	}
-	workflow := preferences.New(m.options.Home).Workflow(row.ID)
-	m.mu.Lock()
-	if current := m.sessions[key]; current == entry {
-		entry.state.snapshot.WorkflowMode = workflow
+	if current := m.sessions[key]; current == entry && !entry.stopped {
 		entry.loading = false
 		entry.state.snapshot.Status = "Ready"
 		entry.state.snapshot.Connected = true
@@ -288,6 +311,10 @@ func (m *Manager) start(key string, entry *liveSession, workspace, path string) 
 func (m *Manager) startFailed(key, message string) {
 	m.mu.Lock()
 	if entry := m.sessions[key]; entry != nil {
+		if entry.stopped {
+			m.mu.Unlock()
+			return
+		}
 		entry.loading = false
 		entry.state.snapshot.Status = "Disconnected"
 		entry.state.snapshot.ConnectionError = message
@@ -313,16 +340,34 @@ func (m *Manager) NewSession(workspace string) error {
 	key := m.active
 	entry := m.sessions[key]
 	reusable := entry != nil && !entry.busy() && entry.client != nil && entry.client.Alive() && entry.state.snapshot.ActiveSession.Workspace == absolute
+	var previous sessionState
+	var previousWorkflowID string
 	if reusable {
+		previous = entry.state
+		previousWorkflowID = entry.workflowID
+		extensions, access := entry.state.snapshot.Extensions, entry.state.snapshot.AccessMode
+		entry.state = newState(absolute, "")
+		entry.state.snapshot.Extensions, entry.state.snapshot.AccessMode = extensions, access
+		entry.state.snapshot.Status = "Connecting"
+		entry.workflowPending, entry.workflowID = "", ""
+		entry.checkpointID = ""
+		entry.checkpointGeneration++
+		entry.workflowGeneration++
+		entry.workflowVersion++
+		entry.creatingSession = true
 		entry.loading = true
 	}
 	m.mu.Unlock()
 	if !reusable {
 		return m.Open(absolute, "")
 	}
+	m.changed()
 	m.launch(func() {
 		response, err := m.callClient(entry.client, pirpc.NewCommand(pirpc.NewSession, nil))
 		if err != nil {
+			m.mu.Lock()
+			entry.creatingSession = false
+			m.mu.Unlock()
 			m.startFailed(key, err.Error())
 			return
 		}
@@ -330,15 +375,21 @@ func (m *Manager) NewSession(workspace string) error {
 		_ = response.DecodeData(&result)
 		if result.Cancelled {
 			m.mu.Lock()
+			entry.state = previous
+			entry.workflowID = previousWorkflowID
+			entry.workflowPending = ""
+			entry.workflowVersion++
+			entry.creatingSession = false
 			entry.loading = false
 			m.mu.Unlock()
 			m.changed()
 			return
 		}
+		// Consume any pre-new_session get_state response while the identity
+		// gate is still closed; it must never bind a pending choice to the old ID.
+		m.Tick()
 		m.mu.Lock()
-		extensions := entry.state.snapshot.Extensions
-		entry.state = newState(absolute, "")
-		entry.state.snapshot.Extensions = extensions
+		entry.creatingSession = false
 		m.mu.Unlock()
 		m.applyDefault(entry.client)
 		for _, kind := range []string{pirpc.GetState, pirpc.GetMessages, pirpc.GetSessionStats, pirpc.GetAvailableModels, pirpc.GetAvailableThinkingLevels, pirpc.GetEntries} {
@@ -355,6 +406,13 @@ func (m *Manager) NewSession(workspace string) error {
 // Send exposes Pi's actual command vocabulary without introducing a second API.
 // It queues work and returns immediately; rejection appears in Snapshot.
 func (m *Manager) Send(kind string, params map[string]any) error {
+	if kind == pirpc.SetAutoRetry {
+		enabled, ok := params["enabled"].(bool)
+		if !ok {
+			return errors.New("set_auto_retry requires a boolean enabled value")
+		}
+		return m.SetAutoRetry(enabled)
+	}
 	m.mu.Lock()
 	key := m.active
 	entry := m.sessions[key]
@@ -389,6 +447,10 @@ func (m *Manager) Send(kind string, params map[string]any) error {
 		entry.state.awaiting = false
 	}
 	if kind == pirpc.Prompt {
+		if entry.state.snapshot.CheckpointRecovering {
+			m.mu.Unlock()
+			return errors.New("Recovering turn checkpoints; your draft is kept")
+		}
 		if entry.runContext == nil || (!entry.state.snapshot.Running && !entry.state.awaiting) {
 			if entry.promptCancel != nil {
 				entry.promptCancel()
@@ -590,8 +652,24 @@ func (m *Manager) Tick() bool {
 			continue
 		}
 		for _, event := range entry.client.DrainEvents() {
+			if entry.creatingSession && event.Type == "response" && event.String("command") == pirpc.GetState {
+				continue
+			}
 			wasRunning := entry.state.snapshot.Running
 			entry.state.apply(event)
+			if event.Type == "response" && event.String("command") == pirpc.GetState && event.Bool("success") {
+				id := entry.state.snapshot.ActiveSession.ID
+				if id != "" && id != entry.checkpointID {
+					entry.checkpointID = id
+					entry.turnOpen = false
+					if task := m.checkpointIdentityLocked(entry); task != nil {
+						checkpoints = append(checkpoints, task)
+					}
+				}
+				if task := m.workflowIdentityLocked(entry); task != nil {
+					checkpoints = append(checkpoints, task)
+				}
+			}
 			changed = true
 			if event.Type == "response" && event.String("command") == pirpc.GetEntries {
 				entry.entriesPending = false
@@ -661,6 +739,11 @@ func (m *Manager) Tick() bool {
 			}
 		}
 		entry.state.snapshot.Diagnostics = append(entry.client.RecentStderr(), entry.localDiagnostics...)
+		if entry.stopped {
+			entry.state.snapshot.Connected = false
+			entry.state.snapshot.Running = false
+			entry.state.snapshot.Status = "Stopped"
+		}
 		auth := &entry.state.snapshot.Auth
 		if (auth.Status == "pending" || auth.Status == "waiting") && auth.ExpiresAt > 0 && now.UnixMilli() >= auth.ExpiresAt {
 			operations = append(operations, operation{entry: entry, command: pirpc.NewCommand(pirpc.AuthCancel, map[string]any{"sessionId": auth.SessionID})})
@@ -798,6 +881,14 @@ func (m *Manager) Snapshot() Snapshot {
 			snapshot.Connected = false
 			snapshot.Status = "Connecting"
 		}
+		if snapshot.CheckpointRecovering {
+			snapshot.Connected = false
+			snapshot.Status = "Recovering turn checkpoints"
+			if snapshot.CheckpointRecoveryError != "" {
+				snapshot.Status = "Review checkpoint recovery failed"
+				snapshot.ConnectionError = snapshot.CheckpointRecoveryError
+			}
+		}
 	}
 	rows := append([]SessionRow{}, m.diskRows...)
 	for _, entry := range m.sessions {
@@ -825,15 +916,15 @@ func (m *Manager) Snapshot() Snapshot {
 	if snapshot.ConnectionError == "" {
 		snapshot.ConnectionError = m.lastError
 	}
+	var redactions []string
 	if entry := m.sessions[m.active]; entry != nil {
-		snapshot.Diagnostics = append([]string{}, snapshot.Diagnostics...)
-		for _, secret := range entry.redactions {
-			snapshot.ConnectionError = strings.ReplaceAll(snapshot.ConnectionError, secret, "[redacted]")
-			snapshot.Auth.Error = strings.ReplaceAll(snapshot.Auth.Error, secret, "[redacted]")
-			for i, value := range snapshot.Diagnostics {
-				snapshot.Diagnostics[i] = strings.ReplaceAll(value, secret, "[redacted]")
-			}
-		}
+		redactions = entry.redactions
+	}
+	snapshot.ConnectionError = redactDiagnostic(snapshot.ConnectionError, redactions)
+	snapshot.Auth.Error = redactDiagnostic(snapshot.Auth.Error, redactions)
+	snapshot.Diagnostics = append([]string{}, snapshot.Diagnostics...)
+	for i, value := range snapshot.Diagnostics {
+		snapshot.Diagnostics[i] = redactDiagnostic(value, redactions)
 	}
 	return cloneValue(reflect.ValueOf(snapshot)).Interface().(Snapshot)
 }
@@ -888,13 +979,14 @@ func (m *Manager) Restart() error {
 		return errors.New("no active session")
 	}
 	row := entry.state.snapshot.ActiveSession
+	pendingWorkflow := entry.workflowPending
 	delete(m.sessions, m.active)
 	m.active = ""
 	m.mu.Unlock()
 	if entry.client != nil {
 		m.launch(func() { entry.client.Close() })
 	}
-	return m.Open(row.Workspace, row.Path)
+	return m.open(row.Workspace, row.Path, pendingWorkflow)
 }
 func (m *Manager) Close() error {
 	m.mu.Lock()
@@ -947,34 +1039,7 @@ func (m *Manager) SetAccessMode(mode string) error {
 	return nil
 }
 func (m *Manager) SetWorkflowMode(mode string) error {
-	if !validWorkflow(mode) {
-		return errors.New("unknown workflow mode")
-	}
-	m.mu.Lock()
-	entry := m.sessions[m.active]
-	if entry == nil || entry.state.snapshot.ActiveSession.ID == "" {
-		m.mu.Unlock()
-		return errors.New("session ID unavailable")
-	}
-	id := entry.state.snapshot.ActiveSession.ID
-	m.mu.Unlock()
-	path := filepath.Join(m.options.Home, ".orbit-pi", "workflow.json")
-	values := map[string]string{}
-	if raw, err := os.ReadFile(path); err == nil {
-		if err = json.Unmarshal(raw, &values); err != nil {
-			return err
-		}
-	}
-	values[id] = mode
-	raw, _ := json.Marshal(values)
-	if err := atomicWrite(path, raw); err != nil {
-		return err
-	}
-	m.mu.Lock()
-	entry.state.snapshot.WorkflowMode = mode
-	m.mu.Unlock()
-	m.changed()
-	return nil
+	return m.setWorkflowMode(mode)
 }
 
 // StartLogin delegates the advertised method to Pi; no credential value crosses
@@ -1029,49 +1094,6 @@ func (m *Manager) Logout(provider string) error {
 	return m.Send(pirpc.AuthLogout, map[string]any{"provider": provider})
 }
 func (m *Manager) RefreshQuota() error { return m.Send(pirpc.QuotaList, nil) }
-
-// checkpointLocked reserves ordering while the state mutex is held. The returned
-// work runs off-thread; it serializes end/start captures across consecutive turns.
-func (m *Manager) checkpointLocked(entry *liveSession, start bool) func() {
-	if m.options.DisableCheckpoints {
-		return nil
-	}
-	row, turn := entry.state.snapshot.ActiveSession, entry.state.snapshot.Turn
-	if row.ID == "" {
-		return nil
-	}
-	previous := entry.checkpointDone
-	done := make(chan struct{})
-	entry.checkpointDone = done
-	return func() {
-		defer close(done)
-		if previous != nil {
-			select {
-			case <-previous:
-			case <-m.ctx.Done():
-				return
-			}
-		}
-		ctx, cancel := context.WithTimeout(m.ctx, 30*time.Second)
-		defer cancel()
-		git := worktree.Git{Dir: row.Workspace}
-		var err error
-		if start {
-			err = git.CaptureTurnStart(ctx, row.ID, turn)
-		} else {
-			err = git.CaptureTurn(ctx, row.ID, turn)
-		}
-		if err != nil {
-			m.mu.Lock()
-			entry.localDiagnostics = append(entry.localDiagnostics, "Review checkpoint: "+err.Error())
-			if len(entry.localDiagnostics) > 50 {
-				entry.localDiagnostics = entry.localDiagnostics[len(entry.localDiagnostics)-50:]
-			}
-			m.mu.Unlock()
-		}
-		m.changed()
-	}
-}
 
 func (m *Manager) applyDefault(client *pirpc.Client) {
 	value := preferences.New(m.options.Home).SessionDefault()

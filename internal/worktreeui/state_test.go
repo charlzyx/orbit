@@ -345,3 +345,39 @@ func TestSetupAllowRemembersCanonicalRepositoryBeforeCreation(t *testing.T) {
 		t.Fatal("trusted repo asked again", s.Error, s.Setup)
 	}
 }
+
+func TestThrottledWorktreeWatchEventuallyRefreshesWithoutAnotherEvent(t *testing.T) {
+	root := repo(t)
+	s := New(root, Options{})
+	defer s.Close()
+	s.Refresh()
+	wait(t, s)
+	if len(s.Rows) != 1 {
+		t.Fatal(s.Rows)
+	}
+	if _, err := (&workspace.WorktreeManager{Dir: root}).Create(context.Background(), workspace.CreateWorktreeOptions{Name: "external", Branch: "external", NewBranch: true}); err != nil {
+		t.Fatal(err)
+	}
+	s.refreshed = time.Now()
+	s.WatchChanged()
+	if s.Busy || !s.refreshPending {
+		t.Fatal("throttle did not retain invalidation")
+	}
+	// Tick, not a second filesystem event, releases the elapsed throttle.
+	s.refreshed = time.Now().Add(-3 * time.Second)
+	s.Tick()
+	wait(t, s)
+	if s.Error != nil || len(s.Rows) != 2 || s.refreshPending {
+		t.Fatal(s.Error, s.Rows, s.refreshPending)
+	}
+	s.Refresh()
+	s.WatchChanged()
+	wait(t, s)
+	if !s.refreshPending {
+		t.Fatal("invalidation while busy was dropped")
+	}
+	s.SetWorkspace(t.TempDir())
+	if s.refreshPending {
+		t.Fatal("old workspace invalidation leaked")
+	}
+}

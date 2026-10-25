@@ -10,26 +10,28 @@ Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 
 **Fixture:** Temporary main repository and worktree root, isolated HOME, controlled setup script and no user repositories.
 
-1. **W44.behavior [UNTESTED; ROW_SPECIFIC]** Create with setup enabled in an untrusted repository; cancel Allow Setup, then explicitly allow.
-   - Expected: First setup-script run per repository requires explicit AllowSetup dialog; create dialog can disable setup for that worktree.
+1. **W44.behavior [UNTESTED; ROW_SPECIFIC]** In a fresh fixture repository with a setup script, create a worktree with setup enabled. Cancel Allow Setup, then repeat and choose Allow & Create.
+   - Expected: Before explicit allowance neither creation nor script executes. After allowance, canonical repository is recorded once and that requested worktree is created. Disabling setup per creation bypasses script execution.
 2. **W44.edge [UNTESTED; ROW_SPECIFIC]** Trust canonical repository once; disallow per-create setup and fail trust-store persistence without silently running the script.
    - Expected: Permission remembered under canonical repo root in `allowed_setup_repos`. Script executes arbitrary user-controlled commands; do not bypass the permission merely while restyling create UI. Permission config writes currently best-effort in controller.
-3. **W44.error [UNTESTED; DRAFT_NEEDS_SOURCE_EXPANSION]** Fail the current Git/setup/config write; retry after navigation and verify no prior mutation is replayed.
-   - Expected: Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Permission remembered under canonical repo root in `allowed_setup_repos`. Script executes arbitrary user-controlled commands; do not bypass the permission merely while restyling create UI. Permission config writes currently best-effort in controller.
-4. **W44.loading [UNTESTED; DRAFT_NEEDS_SOURCE_EXPANSION]** Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.
-   - Expected: Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.
-5. **W44.persistence [UNTESTED; DRAFT_NEEDS_SOURCE_EXPANSION]** Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.
-   - Expected: Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.
-6. **W44.keyboard [UNTESTED; DRAFT_NEEDS_SOURCE_EXPANSION]** Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.
-   - Expected: Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.
-7. **W44.repeat [UNTESTED; DRAFT_NEEDS_SOURCE_EXPANSION]** Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.
-   - Expected: No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.
+3. **W44.error [UNTESTED; ROW_SPECIFIC]** After choosing Allow & Create, inject failure persisting the trusted-repository list.
+   - Expected: Rust ignores that persistence failure and continues creation. Go refuses to continue until consent persistence succeeds, per D05; this is an explicit safer divergence, not unqualified source parity.
+4. **W44.loading [UNTESTED; ROW_SPECIFIC]** Delay Git creation after allowance and click confirm repeatedly.
+   - Expected: Only one creation starts; setup begins only after successful creation and never before explicit approval. Busy confirmation cannot enqueue duplicate operations.
+5. **W44.persistence [UNTESTED; ROW_SPECIFIC]** Allow setup through one canonical path, reopen via an equivalent symlink path and reload ~/.orbit-pi/worktrees.json.
+   - Expected: allowed_setup_repos uses canonical repository identity and does not prompt again solely because the path spelling changed. A different repository still prompts.
+6. **W44.keyboard [UNTESTED; ROW_SPECIFIC]** Open the allowance dialog; press Escape, then reopen and click Allow & Create.
+   - Expected: Escape cancels without creating or running; explicit action confirms only the displayed repository/script. Composer/global shortcuts cannot confirm implicitly.
+7. **W44.repeat [UNTESTED; ROW_SPECIFIC]** Create a second worktree in the trusted repository; disable setup for a third; fail and retry setup on the second.
+   - Expected: Stored trust avoids redundant approval, per-create false still prevents running, and setup retry does not create another worktree.
 
 **Go mapping:** `internal/workspace/worktrees.go`, `internal/workspace/setup.go`, `internal/worktreeui/state.go`, `internal/worktreeui/view.go`, `internal/worktreeui/picker.go`, `internal/worktreeui/labels.go`
 **Existing test candidates, not automatic acceptance:** `internal/workspace/worktrees_test.go`, `internal/worktreeui/state_test.go`, `internal/worktreeui/view_test.go`, `internal/worktreeui/picker_test.go`
 
 **Executed narrow assertions:**
-- **PASS** `TestSetupAllowRemembersCanonicalRepositoryBeforeCreation`: Explicit consent persists canonical repository trust before setup-enabled creation. [Evidence](workspace-evidence.json). Tested dirty-tree manifest `4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3`, not a published commit.
+- **PASS** `TestSetupAllowRemembersCanonicalRepositoryBeforeCreation`: Explicit consent persists canonical repository trust before setup-enabled creation. [Evidence](workspace-evidence.json). Tested dirty-tree manifest `8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59`, not a published commit.
+
+**Additional source-specific procedures:** [../intentional-deviations.md](../intentional-deviations.md)
 
 **Remaining:** Real temporary worktree operations, setup consent/failure/cancel, transactional persistence and scoped native typing/confirm/retry tests pass. Host guide preference/translation hooks exist. Complete localization, host keyboard/focus and platform/pixel equivalence remain pending.
 **Visual/OS gates:** No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state. This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.
@@ -61,7 +63,7 @@ Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 **Existing test candidates, not automatic acceptance:** `internal/workspace/worktrees_test.go`, `internal/worktreeui/state_test.go`, `internal/worktreeui/view_test.go`, `internal/worktreeui/picker_test.go`
 
 **Executed narrow assertions:**
-- **PASS** `TestSetupConsentFailureAndRetry`: Setup consent, failure and retry do not duplicate worktree creation. [Evidence](workspace-evidence.json). Tested dirty-tree manifest `4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3`, not a published commit.
+- **PASS** `TestSetupConsentFailureAndRetry`: Setup consent, failure and retry do not duplicate worktree creation. [Evidence](workspace-evidence.json). Tested dirty-tree manifest `8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59`, not a published commit.
 
 **Remaining:** Real temporary worktree operations, setup consent/failure/cancel, transactional persistence and scoped native typing/confirm/retry tests pass. Host guide preference/translation hooks exist. Complete localization, host keyboard/focus and platform/pixel equivalence remain pending.
 **Visual/OS gates:** No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state. This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.

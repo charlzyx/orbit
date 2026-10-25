@@ -168,3 +168,32 @@ func TestSuccessfulSubmitClearsOnlyAfterExplicitReview(t *testing.T) {
 		t.Fatal(gh.calls, s.Title, s.Status, opened)
 	}
 }
+
+func TestHasModalTracksReviewAndActualScreenshotPreview(t *testing.T) {
+	var absent *State
+	if absent.HasModal() {
+		t.Fatal("nil reports modal")
+	}
+	s := New(Options{})
+	defer s.Close()
+	if s.HasModal() {
+		t.Fatal("ordinary form is not modal")
+	}
+	s.reviewOpen = true
+	if !s.HasModal() {
+		t.Fatal("review bypasses menu guard")
+	}
+	s.reviewOpen = false
+	s.preview = 0
+	if s.HasModal() {
+		t.Fatal("invalid preview should not block")
+	}
+	s.shots = []screenshot{{}}
+	if !s.HasModal() {
+		t.Fatal("screenshot preview bypasses menu guard")
+	}
+	s.preview = -1
+	if s.HasModal() {
+		t.Fatal("dismissed preview kept modal guard")
+	}
+}

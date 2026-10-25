@@ -10,6 +10,8 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/charlzyx/orbit/internal/highlight"
 )
 
 const MaxHydratedPatchBytes = 32 * 1024 * 1024
@@ -203,6 +205,7 @@ type ReviewLine struct {
 	File             int
 	OldLine, NewLine int
 	Kind, Content    string
+	Tokens           []highlight.Token // UTF-8 byte spans; precomputed off the rendering thread.
 	Gap              *ReviewGap
 	Section          *ReviewSection
 }
@@ -224,96 +227,136 @@ var hunkHeader = regexp.MustCompile(`^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@
 
 func ParseReview(d ReviewDiff) ReviewSnapshot {
 	s := ReviewSnapshot{Source: d.Source, CompleteContext: d.CompleteContext}
-	// NUL framing is necessary for filenames containing tabs or newlines.
-	for _, record := range strings.Split(d.Numstat, "\x00") {
-		if record == "" {
+	// Collection uses NUL framing; accepting line framing also supports source
+	// fixtures and provider-created synthetic diffs without splitting real names.
+	separator := "\x00"
+	if !strings.Contains(d.Numstat, separator) {
+		separator = "\n"
+	}
+	paths := map[string]int{}
+	for _, record := range strings.Split(d.Numstat, separator) {
+		columns := strings.SplitN(record, "\t", 3)
+		if len(columns) != 3 {
 			continue
 		}
-		f := strings.SplitN(record, "\t", 3)
-		if len(f) != 3 {
-			continue
-		}
-		a, _ := strconv.Atoi(f[0])
-		del, _ := strconv.Atoi(f[1])
+		a, _ := strconv.Atoi(columns[0])
+		del, _ := strconv.Atoi(columns[1])
 		status := "modified"
-		if f[0] == "-" || f[1] == "-" {
+		if columns[0] == "-" || columns[1] == "-" {
 			status = "binary"
 		}
-		s.Files = append(s.Files, ReviewFile{f[2], a, del, status, -1})
+		paths[columns[2]] = len(s.Files)
+		s.Files = append(s.Files, ReviewFile{columns[2], a, del, status, -1})
 		s.Additions += a
 		s.Deletions += del
 	}
 	var lines []ReviewLine
 	file := -1
 	old, newLine := 0, 0
-	inHunk := false
+	previousOld, previousNew := 1, 1
+	positioned := true
+	var oldCarry, newCarry highlight.Carry
+	language := highlight.Unknown
 	var nextGap uint64 = 1
 	for _, raw := range strings.Split(strings.TrimSuffix(d.Patch, "\n"), "\n") {
-		if strings.HasPrefix(raw, "diff --git ") {
-			file++
+		// Git line framing may be CRLF, but content CR is meaningful: do not trim it.
+		if path, ok := reviewHeaderPath(raw); ok {
+			var found bool
+			file, found = paths[path]
+			if !found {
+				file = len(s.Files)
+				paths[path] = file
+				s.Files = append(s.Files, ReviewFile{Path: path, Status: "modified", DiffLine: -1})
+			}
 			old, newLine = 0, 0
-			inHunk = false
-			if file >= len(s.Files) {
-				break
-			}
-			lines = append(lines, ReviewLine{File: file, Kind: "file_header", Content: s.Files[file].Path})
+			previousOld, previousNew = 1, 1
+			positioned = true
+			oldCarry, newCarry = highlight.Carry{}, highlight.Carry{}
+			language = highlight.LanguageForPath(path)
+			lines = append(lines, ReviewLine{File: file, Kind: "file_header", Content: path})
 			continue
 		}
-		if file < 0 || file >= len(s.Files) {
+		if file < 0 {
 			continue
 		}
-		if strings.HasPrefix(raw, "new file mode ") {
-			if s.Files[file].Status != "binary" {
-				s.Files[file].Status = "added"
-			}
-		}
-		if strings.HasPrefix(raw, "deleted file mode ") {
-			if s.Files[file].Status != "binary" {
-				s.Files[file].Status = "deleted"
-			}
+		switch {
+		case strings.HasPrefix(raw, "new file mode "):
+			s.Files[file].Status = "added"
+			continue
+		case strings.HasPrefix(raw, "deleted file mode "):
+			s.Files[file].Status = "deleted"
+			continue
+		case strings.HasPrefix(raw, "Binary files ") || raw == "GIT binary patch":
+			s.Files[file].Status = "binary"
+			lines = append(lines, ReviewLine{File: file, Kind: "meta", Content: "Binary file changed"})
+			continue
+		case strings.HasPrefix(raw, "index ") || strings.HasPrefix(raw, "--- ") || strings.HasPrefix(raw, "+++ ") || strings.HasPrefix(raw, "old mode ") || strings.HasPrefix(raw, "new mode "):
+			continue
 		}
 		if m := hunkHeader.FindStringSubmatch(raw); m != nil {
 			startOld, _ := strconv.Atoi(m[1])
 			startNew, _ := strconv.Atoi(m[3])
-			omitted := startOld - old
-			if !inHunk {
-				omitted = startOld - 1
-			}
+			positioned = true
+			omitted := max(startOld-previousOld, startNew-previousNew)
+			first := previousOld == 1 && previousNew == 1
 			if !d.CompleteContext && omitted > 0 {
-				n := omitted
-				lines = append(lines, ReviewLine{File: file, Kind: "gap", Gap: &ReviewGap{ID: nextGap, Count: n, Position: "between"}})
+				position := "between"
+				if first {
+					position = "leading"
+				}
+				lines = append(lines, ReviewLine{File: file, Kind: "gap", Gap: &ReviewGap{ID: nextGap, Count: omitted, Position: position}})
 				nextGap++
+			} else if !d.CompleteContext && !first {
+				lines = append(lines, ReviewLine{File: file, Kind: "hunk_header", Content: raw})
 			}
 			old, newLine = startOld, startNew
-			inHunk = true
-			lines = append(lines, ReviewLine{File: file, Kind: "hunk_header", Content: raw})
+			oldCarry, newCarry = highlight.Carry{}, highlight.Carry{}
 			continue
 		}
-		l := ReviewLine{File: file, Kind: "meta", Content: raw}
-		if inHunk && len(raw) > 0 {
-			switch raw[0] {
-			case ' ':
-				l.Kind = "context"
-				l.Content = raw[1:]
-				l.OldLine = old
-				l.NewLine = newLine
-				old++
-				newLine++
-			case '+':
-				l.Kind = "addition"
-				l.Content = raw[1:]
-				l.NewLine = newLine
-				newLine++
-			case '-':
-				l.Kind = "deletion"
-				l.Content = raw[1:]
-				l.OldLine = old
-				old++
+		if strings.HasPrefix(raw, "@@") {
+			positioned = false
+			oldCarry, newCarry = highlight.Carry{}, highlight.Carry{}
+			if len(lines) > 0 && lines[len(lines)-1].Kind != "file_header" {
+				lines = append(lines, ReviewLine{File: file, Kind: "hunk_header"})
 			}
+			continue
 		}
-		if raw != "" {
-			lines = append(lines, l)
+		if raw == "" {
+			continue
 		}
+		line := ReviewLine{File: file, Content: raw[1:]}
+		switch raw[0] {
+		case ' ':
+			line.Kind = "context"
+			if positioned {
+				line.OldLine = old
+				line.NewLine = newLine
+			}
+			old++
+			newLine++
+			_, oldCarry = highlight.TokenizeLine(language, line.Content, oldCarry)
+			line.Tokens, newCarry = highlight.TokenizeLine(language, line.Content, newCarry)
+		case '-':
+			line.Kind = "deletion"
+			if positioned {
+				line.OldLine = old
+			}
+			old++
+			line.Tokens, oldCarry = highlight.TokenizeLine(language, line.Content, oldCarry)
+		case '+':
+			line.Kind = "addition"
+			if positioned {
+				line.NewLine = newLine
+			}
+			newLine++
+			line.Tokens, newCarry = highlight.TokenizeLine(language, line.Content, newCarry)
+		case '\\':
+			line.Kind = "meta"
+		default:
+			continue
+		}
+		previousOld, previousNew = old, newLine
+		lines = append(lines, line)
 	}
 	if d.CompleteContext {
 		lines = collapseReview(lines, &nextGap)
@@ -326,6 +369,33 @@ func ParseReview(d ReviewDiff) ReviewSnapshot {
 	s.reindex()
 	return s
 }
+
+// Diff header matching is independent of numstat order. The symmetric form
+// covers space-containing names from --no-renames, while quoted names use Git's
+// C escapes (including octal bytes). A path absent from numstat remains visible.
+func reviewHeaderPath(line string) (string, bool) {
+	rest, ok := strings.CutPrefix(line, "diff --git ")
+	if !ok {
+		return "", false
+	}
+	if strings.HasPrefix(rest, "a/") {
+		half := (len(rest) - 1) / 2
+		if half >= 2 && 2*half+1 == len(rest) && rest[half] == ' ' && strings.HasPrefix(rest[half+1:], "b/") && rest[2:half] == rest[half+3:] {
+			return rest[half+3:], true
+		}
+	}
+	if n := strings.LastIndex(rest, " \"b/"); n >= 0 {
+		path, err := strconv.Unquote(rest[n+1:])
+		if err == nil && strings.HasPrefix(path, "b/") {
+			return path[2:], true
+		}
+	}
+	if n := strings.LastIndex(rest, " b/"); n >= 0 {
+		return rest[n+3:], true
+	}
+	return "", false
+}
+
 func collapseReview(lines []ReviewLine, id *uint64) []ReviewLine {
 	var out []ReviewLine
 	first, last := map[int]int{}, map[int]int{}

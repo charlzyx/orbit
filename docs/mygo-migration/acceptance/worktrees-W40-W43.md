@@ -61,7 +61,7 @@ Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 **Existing test candidates, not automatic acceptance:** `internal/workspace/worktrees_test.go`, `internal/worktreeui/state_test.go`, `internal/worktreeui/view_test.go`, `internal/worktreeui/picker_test.go`
 
 **Executed narrow assertions:**
-- **PASS** `TestNativeCreateNameTypingDerivesBranchUntilManualEdit`: Typing the worktree name derives branch only until the user edits branch explicitly. [Evidence](workspace-evidence.json). Tested dirty-tree manifest `4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3`, not a published commit.
+- **PASS** `TestNativeCreateNameTypingDerivesBranchUntilManualEdit`: Typing the worktree name derives branch only until the user edits branch explicitly. [Evidence](workspace-evidence.json). Tested dirty-tree manifest `8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59`, not a published commit.
 
 **Remaining:** Real temporary worktree operations, setup consent/failure/cancel, transactional persistence and scoped native typing/confirm/retry tests pass. Host guide preference/translation hooks exist. Complete localization, host keyboard/focus and platform/pixel equivalence remain pending.
 **Visual/OS gates:** No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state. This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.
@@ -93,7 +93,7 @@ Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 **Existing test candidates, not automatic acceptance:** `internal/workspace/worktrees_test.go`, `internal/worktreeui/state_test.go`, `internal/worktreeui/view_test.go`, `internal/worktreeui/picker_test.go`
 
 **Executed narrow assertions:**
-- **PASS** `TestNativeBranchInUseOpenRequiresExplicitClick`: Branch-in-use handling does not open another worktree until explicit Open Existing click. [Evidence](workspace-evidence.json). Tested dirty-tree manifest `4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3`, not a published commit.
+- **PASS** `TestNativeBranchInUseOpenRequiresExplicitClick`: Branch-in-use handling does not open another worktree until explicit Open Existing click. [Evidence](workspace-evidence.json). Tested dirty-tree manifest `8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59`, not a published commit.
 
 **Remaining:** Real temporary worktree operations, setup consent/failure/cancel, transactional persistence and scoped native typing/confirm/retry tests pass. Host guide preference/translation hooks exist. Complete localization, host keyboard/focus and platform/pixel equivalence remain pending.
 **Visual/OS gates:** No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state. This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.
@@ -106,26 +106,28 @@ Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 
 **Fixture:** Temporary main repository and worktree root, isolated HOME, controlled setup script and no user repositories.
 
-1. **W43.behavior [UNTESTED; ROW_SPECIFIC]** Set global worktree root/script/run/open preferences and repository root/script overrides.
-   - Expected: Settings configure worktree root, setup-script path, run-setup automatically and open-after-create. Repository `.orbit/worktree.json` overrides root/script, not global booleans.
+1. **W43.behavior [UNTESTED; ROW_SPECIFIC]** Set global directory=.wt, setup_script=.orbit/worktree-setup.sh, run_setup_auto=false and open_after_create=false. Set repository .orbit/worktree.json directory=custom and setup_script=scripts/setup.sh.
+   - Expected: Effective root/script use the repository values relative to main repository root. Both booleans remain false from global configuration; repository boolean keys do not override them.
 2. **W43.edge [UNTESTED; ROW_SPECIFIC]** Reload settings and fail a save; repository overrides must not replace global booleans or falsely persist a toggled value.
    - Expected: Global `~/.orbit-pi/worktrees.json`, defaults `.wt` and `.orbit/worktree-setup.sh`, auto-setup/open true. Absolute and `~/` paths supported. Missing/malformed config falls back safely; setup must be existing file.
-3. **W43.error [UNTESTED; DRAFT_NEEDS_SOURCE_EXPANSION]** Fail the current Git/setup/config write; retry after navigation and verify no prior mutation is replayed.
-   - Expected: Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Global `~/.orbit-pi/worktrees.json`, defaults `.wt` and `.orbit/worktree-setup.sh`, auto-setup/open true. Absolute and `~/` paths supported. Missing/malformed config falls back safely; setup must be existing file.
-4. **W43.loading [UNTESTED; DRAFT_NEEDS_SOURCE_EXPANSION]** Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.
-   - Expected: Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.
-5. **W43.persistence [UNTESTED; DRAFT_NEEDS_SOURCE_EXPANSION]** Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.
-   - Expected: Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.
-6. **W43.keyboard [UNTESTED; DRAFT_NEEDS_SOURCE_EXPANSION]** Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.
-   - Expected: Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.
-7. **W43.repeat [UNTESTED; DRAFT_NEEDS_SOURCE_EXPANSION]** Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.
-   - Expected: No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.
+3. **W43.error [UNTESTED; ROW_SPECIFIC]** Make ~/.orbit-pi/worktrees.json unwritable, then toggle automatic setup/open-after-create.
+   - Expected: Rust changes live booleans and ignores persistence failure; Go transactionally retains prior config and exposes retryable error. Record this as deviation D05, not exact parity.
+4. **W43.loading [UNTESTED; ROW_SPECIFIC]** Toggle a global worktree setting while a worktree list refresh is delayed.
+   - Expected: A preference update does not create/move/remove a worktree. List loading cannot replace the changed preference; the settings control reflects actual successful persistence.
+5. **W43.persistence [UNTESTED; ROW_SPECIFIC]** Close/reopen with valid, missing and malformed ~/.orbit-pi/worktrees.json; separately corrupt repository .orbit/worktree.json.
+   - Expected: Global keys are directory,setup_script,run_setup_auto,open_after_create,allowed_setup_repos. Missing/malformed global data uses source defaults; malformed repository overrides are ignored. Empty setup path disables setup rather than silently restoring default.
+6. **W43.keyboard [UNTESTED; ROW_SPECIFIC]** Open Worktree settings, edit the text fields using Tab/Shift+Tab; cancel with Escape; reopen and save explicitly.
+   - Expected: Cancel leaves saved config untouched; text editing does not dispatch Git/create commands. Exact source dialog focus order still needs matched native verification.
+7. **W43.repeat [UNTESTED; ROW_SPECIFIC]** Save the same config twice, switch repositories with different overrides and return.
+   - Expected: No duplicate allowed-repository entries, no cross-repository override leakage and no hidden setup execution.
 
 **Go mapping:** `internal/workspace/worktrees.go`, `internal/workspace/setup.go`, `internal/worktreeui/state.go`, `internal/worktreeui/view.go`, `internal/worktreeui/picker.go`, `internal/worktreeui/labels.go`
 **Existing test candidates, not automatic acceptance:** `internal/workspace/worktrees_test.go`, `internal/worktreeui/state_test.go`, `internal/worktreeui/view_test.go`, `internal/worktreeui/picker_test.go`
 
 **Executed narrow assertions:**
-- **PASS** `TestSettingsPersistenceFailureIsTransactionalAndRetryable`: Failed worktree settings persistence leaves prior config intact and supports retry. [Evidence](workspace-evidence.json). Tested dirty-tree manifest `4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3`, not a published commit.
+- **PASS** `TestSettingsPersistenceFailureIsTransactionalAndRetryable`: Failed worktree settings persistence leaves prior config intact and supports retry. [Evidence](workspace-evidence.json). Tested dirty-tree manifest `8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59`, not a published commit.
+
+**Additional source-specific procedures:** [../intentional-deviations.md](../intentional-deviations.md)
 
 **Remaining:** Real temporary worktree operations, setup consent/failure/cancel, transactional persistence and scoped native typing/confirm/retry tests pass. Host guide preference/translation hooks exist. Complete localization, host keyboard/focus and platform/pixel equivalence remain pending.
 **Visual/OS gates:** No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state. This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.

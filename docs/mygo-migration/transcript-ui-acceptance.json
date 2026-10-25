@@ -1,0 +1,95 @@
+{
+  "source_pin": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "mygo_pin": "9c69cf829ece196c5b3a3601f1c7bbe70526376f",
+  "toolchain": "Go 1.27.3",
+  "environment": "cloud-only native MyGo CPU tester; no model invocation",
+  "rows": {
+    "C10": {
+      "functional": "pass_scoped",
+      "full_row_parity_verified": false
+    },
+    "C11": {
+      "functional": "partial_known_virtualization_mismatch",
+      "full_row_parity_verified": false
+    },
+    "C12": {
+      "functional": "pass_scoped",
+      "full_row_parity_verified": false
+    }
+  },
+  "commands": [
+    {
+      "command": "go test -race ./internal/transcriptui -count=1",
+      "status": "passed",
+      "fixture_inputs": true
+    },
+    {
+      "command": "go vet ./internal/transcriptui",
+      "status": "passed"
+    },
+    {
+      "command": "ORBIT_TRANSCRIPT_CAPTURE_DIR=docs/mygo-migration/probes/transcriptui go test ./internal/transcriptui -run TestNativeTranscriptCapture -count=1",
+      "status": "passed",
+      "fixture_inputs": true
+    }
+  ],
+  "tests": [
+    "TestProjectSourceLogicalTurnsAndBoundary",
+    "TestTypedToolsAndOutputBounds",
+    "TestSourceFailuresAbortAndMissingMetrics",
+    "TestLiveToolEnvelopeUpdatesAreCumulativeNotDuplicated",
+    "TestSourcePostAnswerGroupingAndChangedFiles",
+    "TestStateSessionResetAndIndependentToggles",
+    "TestObservedWallTimeDoesNotInventReloadTiming",
+    "TestSourceMetricFormattingAndDateBoundaries",
+    "TestQuestionMalformedFallbackAndExactAnswer",
+    "TestSnapshotToolImagesAndUserMetadataStayOutOfText",
+    "TestNativeToolFailureFoldCopyRepeatAndStreaming",
+    "TestNativeLogicalTurnFoldAbortAndMissingUsage",
+    "TestNativeCrossMessageMarkdownSelectionAndMenu",
+    "TestNativeSummaryAndChangedFileLimits",
+    "TestNativeTranscriptCapture",
+    "TestNativeUsageHoverTailOwnsSingleFooter",
+    "TestNativeQuestionRecordWaitingAnsweredDeclined",
+    "TestNativeVirtualizedCrossRowSelectionAndEndpointLimit"
+  ],
+  "captures": [
+    "probes/transcriptui/typed-tools-expanded.png",
+    "probes/transcriptui/typed-tools-failure.png"
+  ],
+  "visual_verdict": "native CPU fixture reviewed, not matched Rust pixel comparison",
+  "platform_verdict": "actual macOS/Linux/Windows window, clipboard, GPU, IME and accessibility not executed by this component suite",
+  "known_limits": [
+    {
+      "case": "T07",
+      "behavior": "Existing cross-message selection after a virtualized selected endpoint unmounts",
+      "source": "transcript_view.rs:518 keeps SelectedBlock snapshots",
+      "mygo": "ui/textselection.go:166-173 clears missing endpoints",
+      "evidence": "TestNativeVirtualizedCrossRowSelectionAndEndpointLimit",
+      "full_parity": false
+    },
+    {
+      "case": "T06",
+      "behavior": "Source per-step thinking clocks and generation-time fallback",
+      "state": "not implemented; missing clocks hidden, never fabricated"
+    },
+    {
+      "case": "T02/T06",
+      "behavior": "Exact source typography/density/devicons/shimmer and matched pixels",
+      "state": "not fully verified"
+    },
+    {
+      "case": "T07",
+      "behavior": "Gutter hit testing uses MyGo glyph bounds rather than source block bounds",
+      "state": "not equivalent; full interaction gate open"
+    }
+  ],
+  "not_claimed": [
+    "full C10/C11/C12 parity",
+    "matched pixel equality",
+    "model inference",
+    "native OS execution",
+    "C17 questionnaire submission parity",
+    "full navigation rail parity"
+  ]
+}

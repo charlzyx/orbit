@@ -122,7 +122,7 @@
           "status": "PARTIAL",
           "reason": "Named narrow assertions pass; remaining row steps are unverified.",
           "last_verified_sha": null,
-          "last_partial_evidence_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3"
+          "last_partial_evidence_sha": "8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59"
         },
         "visual": {
           "status": "UNTESTED",
@@ -144,9 +144,9 @@
           "package": "github.com/charlzyx/orbit/internal/workspace",
           "command": "go test -race -count=1 ./internal/workspace -run ^TestReviewHighlightSurvivesHiddenExpansionAndGrouping$",
           "evidence": "workspace-evidence.json",
-          "last_verified_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3",
+          "last_verified_sha": "8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59",
           "sha_kind": "working-tree-content-manifest; not a Git commit",
-          "verified_at_utc": "2026-10-25T14:01:17.757219679+09:00",
+          "verified_at_utc": "2026-10-25T14:19:05.298304459+09:00",
           "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
         },
         {
@@ -157,9 +157,9 @@
           "package": "github.com/charlzyx/orbit/internal/workspace",
           "command": "go test -race -count=1 ./internal/workspace -run ^TestReviewVisibleLimitAndExpansionCap$",
           "evidence": "workspace-evidence.json",
-          "last_verified_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3",
+          "last_verified_sha": "8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59",
           "sha_kind": "working-tree-content-manifest; not a Git commit",
-          "verified_at_utc": "2026-10-25T14:01:18.019988287+09:00",
+          "verified_at_utc": "2026-10-25T14:19:05.552335048+09:00",
           "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
         }
       ],

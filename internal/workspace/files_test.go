@@ -373,3 +373,32 @@ func TestEditorInactiveLoadNeverStealsSelection(t *testing.T) {
 		t.Fatal("legacy Open no longer selects", d)
 	}
 }
+
+func TestEditorSelfSaveReloadPreservesUndoHistory(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "source.txt")
+	os.WriteFile(path, []byte("before"), 0600)
+	e := NewEditor()
+	defer e.CloseAll()
+	e.Open(path)
+	e.SetText(path, "after")
+	if err := e.Save(path); err != nil {
+		t.Fatal(err)
+	}
+	if err := e.Reload(path); err != nil {
+		t.Fatal(err)
+	}
+	if err := e.Undo(path); err != nil {
+		t.Fatal(err)
+	}
+	d, _ := e.Active()
+	if d.Text != "before" || !d.Dirty {
+		t.Fatal("self-save echo discarded undo", d)
+	}
+	// A matching external save acknowledges the buffer rather than reporting a conflict.
+	os.WriteFile(path, []byte("before"), 0600)
+	e.Reload(path)
+	d, _ = e.Active()
+	if d.Dirty || d.Conflict {
+		t.Fatal("matching external save not reconciled", d)
+	}
+}

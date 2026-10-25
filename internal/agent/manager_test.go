@@ -25,6 +25,7 @@ func TestAgentProcess(t *testing.T) {
 	path := ""
 	running := false
 	compacted := false
+	retryRequests := 0
 	var mu sync.Mutex
 	write := func(value any) {
 		mu.Lock()
@@ -40,12 +41,42 @@ func TestAgentProcess(t *testing.T) {
 		kind, _ := c["type"].(string)
 		response := map[string]any{"type": "response", "id": c["id"], "command": kind, "success": true}
 		switch kind {
+		case "emit_stderr":
+			for i := 0; i < 12; i++ {
+				fmt.Fprintf(os.Stderr, "line-%d %s\n", i, os.Getenv("ORBIT_DYNAMIC_SECRET"))
+			}
+		case "exit_process":
+			os.Exit(7)
+		case "set_auto_retry":
+			retryRequests++
+			switch os.Getenv("ORBIT_RETRY_TEST_MODE") {
+			case "unknown":
+				response["success"] = false
+				response["error"] = "Unknown command: set_auto_retry"
+			case "error":
+				response["success"] = false
+				response["error"] = "temporary settings write failed"
+			case "delayed":
+				time.Sleep(100 * time.Millisecond)
+			case "fail_after_first":
+				if retryRequests > 1 {
+					response["success"] = false
+					response["error"] = "temporary settings write failed"
+				}
+			case "timeout_after_first":
+				if retryRequests > 1 {
+					time.Sleep(300 * time.Millisecond)
+				}
+			}
 		case "extension_ui_response":
 			write(map[string]any{"type": "dialog_answered", "id": c["id"], "cancelled": c["cancelled"]})
 			continue
 		case "inspect_env":
 			response["data"] = map[string]any{"value": os.Getenv("ORBIT_DYNAMIC_SECRET")}
 		case "get_state":
+			if delay, _ := strconv.Atoi(os.Getenv("ORBIT_STATE_DELAY_MS")); delay > 0 {
+				time.Sleep(time.Duration(delay) * time.Millisecond)
+			}
 			response["data"] = map[string]any{"sessionId": sessionID, "sessionFile": path, "isStreaming": running, "thinkingLevel": "off", "autoCompactionEnabled": true, "steeringMode": "one-at-a-time", "followUpMode": "one-at-a-time", "model": map[string]any{"id": "mock", "provider": "test", "name": "Fixture"}}
 		case "get_messages":
 			response["data"] = map[string]any{"messages": []any{}}
@@ -70,6 +101,13 @@ func TestAgentProcess(t *testing.T) {
 			response["success"] = false
 			response["error"] = "Unknown command: " + kind
 		case "new_session":
+			if delay, _ := strconv.Atoi(os.Getenv("ORBIT_NEW_DELAY_MS")); delay > 0 {
+				time.Sleep(time.Duration(delay) * time.Millisecond)
+			}
+			if os.Getenv("ORBIT_NEW_CANCEL") == "1" {
+				response["data"] = map[string]any{"cancelled": true}
+				break
+			}
 			number++
 			sessionID = "s-" + strconv.Itoa(number)
 			response["data"] = map[string]any{"cancelled": false}

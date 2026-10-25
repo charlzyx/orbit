@@ -136,7 +136,7 @@ func (s *sessionState) applyResponse(event pirpc.Event) {
 			IsStreaming, IsCompacting           bool
 			SessionFile, SessionID, SessionName string
 			SteeringMode, FollowUpMode          string
-			AutoCompactionEnabled               bool
+			AutoCompactionEnabled               *bool
 			Capabilities                        struct {
 				ExtensionUI []string `json:"extension_ui"`
 			}
@@ -145,6 +145,10 @@ func (s *sessionState) applyResponse(event pirpc.Event) {
 			return
 		}
 		if s.snapshot.ActiveSession.ID != "" && state.SessionID != s.snapshot.ActiveSession.ID {
+			s.snapshot.Turn = 0
+			s.snapshot.LatestTurn = 0
+			s.snapshot.CheckpointRecovering = false
+			s.snapshot.CheckpointRecoveryError = ""
 			s.snapshot.Messages = nil
 			s.snapshot.Queue = Queue{}
 			s.snapshot.Dialogs = nil
@@ -166,7 +170,10 @@ func (s *sessionState) applyResponse(event pirpc.Event) {
 		s.snapshot.Capabilities = state.Capabilities.ExtensionUI
 		s.snapshot.SteeringMode = state.SteeringMode
 		s.snapshot.FollowUpMode = state.FollowUpMode
-		s.snapshot.AutoCompactionEnabled = state.AutoCompactionEnabled
+		s.snapshot.AutoCompactionKnown = state.AutoCompactionEnabled != nil
+		if state.AutoCompactionEnabled != nil {
+			s.snapshot.AutoCompactionEnabled = *state.AutoCompactionEnabled
+		}
 	case pirpc.GetMessages:
 		var value struct{ Messages []json.RawMessage }
 		if json.Unmarshal(data, &value) != nil {

@@ -148,8 +148,10 @@
             "Stream another matching row while search is active."
           ],
           "expected": "Find stays distinct from command palette; active hit scroll and highlight/count are correct.",
-          "tests": [],
-          "remaining": "Search implementation exists, but dedicated interaction test and source highlight/active-hit keyboard behavior are not yet verified.",
+          "tests": [
+            "TestTranscriptFindKeyboardWrapTrimAndFocus"
+          ],
+          "remaining": "Native trim/case/tool text, Enter/ShiftEnter wrap, Escape focus/no-abort and active wash tests pass. Search now uses logical turn text. Source floating320px bar geometry and full live-match evolution remain open.",
           "evidence": "../native-ui-acceptance.json",
           "last_verified_sha": null,
           "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
@@ -611,7 +613,7 @@
         {
           "id": "UI-S04",
           "status": "PARTIAL",
-          "owner_reported_verdict": "pass_scoped",
+          "owner_reported_verdict": "partial",
           "steps": [
             "Open confirm, prompt, custom terminal, secret, image, model or palette.",
             "Dispatch New task/Settings/Terminal through native menu.",
@@ -621,9 +623,11 @@
           "tests": [
             "TestNativeMenuCannotMutateBehindModal",
             "TestCustomDialogDoesNotDismissEscape",
-            "TestLiveCustomDialogForwardsEscape"
+            "TestLiveCustomDialogForwardsEscape",
+            "TestNativeMenuRespectsExternalPageModals",
+            "TestHasModalTracksReviewAndActualScreenshotPreview"
           ],
-          "remaining": "Live custom test requires ORBIT_TERMINAL_TEST and pinned Ghostty; it was run previously. Ordinary default suite skips opt-in test. OS-native menu entry/accelerator dispatch remains separate.",
+          "remaining": "Native menu guard includes module-owned Git/Worktrees/MCP/Resources/report review/preview and Usage filter overlays. CPU routing tests pass; actual platform accelerator ordering remains separate.",
           "evidence": "../native-ui-acceptance.json",
           "last_verified_sha": null,
           "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."

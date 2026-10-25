@@ -7,7 +7,7 @@ import (
 	"time"
 
 	orbiterm "github.com/charlzyx/orbit/internal/terminal"
-	ghostty "github.com/egoist/mygo/plugins/terminal"
+	ghostty "github.com/egoist/mygo/orbit-terminal"
 	"github.com/egoist/mygo/ui"
 )
 

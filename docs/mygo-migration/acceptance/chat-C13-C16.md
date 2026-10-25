@@ -31,7 +31,7 @@ Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 **Executed narrow assertions:**
 - None assigned to this scope yet. Last verified SHA: none.
 
-**Owner challenge UI-C09 [PARTIAL]:** Search implementation exists, but dedicated interaction test and source highlight/active-hit keyboard behavior are not yet verified. [Scoped steps/tests](../native-ui-acceptance.json).
+**Owner challenge UI-C09 [PARTIAL]:** Native trim/case/tool text, Enter/ShiftEnter wrap, Escape focus/no-abort and active wash tests pass. Search now uses logical turn text. Source floating320px bar geometry and full live-match evolution remain open. [Scoped steps/tests](../native-ui-acceptance.json).
 
 **Remaining:** Native code exists; this row is not validated end to end.
 **Visual/OS gates:** No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state. This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.
@@ -133,7 +133,7 @@ Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 **Executed narrow assertions:**
 - None assigned to this scope yet. Last verified SHA: none.
 
-**Owner challenge UI-S04 [PARTIAL]:** Live custom test requires ORBIT_TERMINAL_TEST and pinned Ghostty; it was run previously. Ordinary default suite skips opt-in test. OS-native menu entry/accelerator dispatch remains separate. [Scoped steps/tests](../native-ui-acceptance.json).
+**Owner challenge UI-S04 [PARTIAL]:** Native menu guard includes module-owned Git/Worktrees/MCP/Resources/report review/preview and Usage filter overlays. CPU routing tests pass; actual platform accelerator ordering remains separate. [Scoped steps/tests](../native-ui-acceptance.json).
 
 **Owner challenge UI-C11 [PARTIAL]:** General modal and ANSI custom bridge exist. Structured questionnaire, specialized inline approval/replay, widget placement and unavailable workflow/access presentation are not fully wired. No full extension parity claim. [Scoped steps/tests](../native-ui-acceptance.json).
 

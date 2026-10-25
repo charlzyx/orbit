@@ -2,6 +2,44 @@
 
 Project guidance for agents and humans. Read this before touching the repo.
 
+## This fork: Go + MyGo migration
+
+The active implementation in this fork is `cmd/orbit` and `internal/`: a Go
+application using MyGo **native UI** and Pi's JSONL RPC. Do not implement new
+product behavior in Rust, add a Rust sidecar, or use a browser/webview to stand
+in for the native application. `INTENT.md` D15 supersedes the historical GPUI-only
+instructions below. The existing Rust source is a pinned behavioral/visual
+reference, not the new deliverable.
+
+The goal is complete source-derived feature and interaction parity, not an MVP.
+Use `docs/mygo-migration/feature-parity.md` and its category reports. Record
+loading, errors, cancellation, persistence, keyboard/focus and repeated flows.
+Controls, mocks, compilation and CPU screenshots are not proof of full parity.
+
+Use Go 1.27.3, the exact MyGo pin in `go.mod`, and Pi 1.4.0 for reproducible
+protocol tests. Native dependencies are called without cgo. The terminal-only
+compatibility module in `third_party/mygo-terminal` is an explicitly attributed
+local fork; MyGo core and native Ghostty binaries remain pinned upstream.
+
+Run `scripts/go-native.sh test -race ./...`, `scripts/go-native.sh vet ./...`,
+and `scripts/go-native.sh -C third_party/mygo-terminal test -race ./...`.
+Also run the additive toolkit regressions with
+`scripts/go-native.sh test -race github.com/egoist/mygo/ui -run '^TestOrbitComposer'`.
+The canonical wrapper verifies the pinned module and applies the composer edit
+patch in a temporary copy/modfile/overlay, never in the module cache. Unpatched
+app binaries fail startup deliberately; do not bypass the compatibility guard. The opt-in real Pi tests use
+`ORBIT_PI_INTEGRATION_BIN`; actual disposable PTYs use `ORBIT_TERMINAL_TEST=1`.
+Use isolated homes/configuration, never a user's credentials or session store.
+Cross-build `cmd/orbit` through `scripts/go-native.sh build` with `CGO_ENABLED=0` for Linux/macOS/Windows on both
+amd64 and arm64. Distinguish compilation from actual OS execution.
+
+Do not publish releases, signing keys, production update feeds, deployments,
+or upstream/default-branch merges. Preserve original licenses and dependency
+notices. Do not claim pixel-perfect parity without same-state native captures
+and measured image/geometry evidence.
+
+## Historical Rust reference guidance
+
 When this file conflicts with `INTENT.md` on architecture choices, **`INTENT.md` wins**.
 Update `INTENT.md` if a recorded decision (D1–D6) changes.
 

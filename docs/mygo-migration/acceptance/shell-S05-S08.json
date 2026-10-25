@@ -618,7 +618,9 @@
           "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
         }
       ],
-      "additional_evidence": []
+      "additional_evidence": [
+        "../intentional-deviations.md"
+      ]
     }
   ]
 }

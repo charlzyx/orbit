@@ -184,8 +184,8 @@
         {
           "id": "W57.behavior",
           "dimension": "functional",
-          "action": "Open multiple files, reopen existing file, close middle/last tab and hide/show Files.",
-          "expected": "Files has multi-tab editor, existing-tab activation preserves buffer, scrolling tab strip, close tab selects neighbor; last close exits Files. Hide preserves tabs and flushes dirty edits.",
+          "action": "Open A,B,C; edit B; reopen B; close A then close active B; close last remaining tab; repeat with hide/show.",
+          "expected": "Reopening B preserves its existing buffer. Closing earlier tab shifts active index; closing active tab picks next or previous at end. Last close exits Files; hiding retains tabs and starts flushing all dirty buffers.",
           "status": "UNTESTED",
           "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
@@ -202,46 +202,46 @@
         {
           "id": "W57.error",
           "dimension": "error",
-          "action": "Fail read/save/rename/delete in the temporary root, then deliver an external watch event or late file load.",
-          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Tabs/buffers are in-memory entity state, no reopen-last-tabs disk store located. First load spinner, later loads keep old content; per-tab generation rejects obsolete reads. `secondary-W` tab close, `secondary-shift-W` surface close.",
+          "action": "Inject a write failure while closing the only dirty file; restore writes and close again.",
+          "expected": "Rust removes the tab immediately after scheduling save. Go keeps the failed draft/tab until a successful retry per D01; exact source equivalence remains deliberately open.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W57.loading",
           "dimension": "loading",
-          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
-          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "action": "Delay loading fileB, switch to another workspace and activate fileA before B completes.",
+          "expected": "A late result cannot steal active selection in the new context. Reopening a loaded tab uses existing buffer rather than re-reading/replacing dirty text.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W57.persistence",
           "dimension": "persistence",
-          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
-          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "action": "Edit two tabs, hide Files and read disk after saves settle; show Files without restarting process.",
+          "expected": "Same in-memory tabs/buffers return and dirty contents reach original files. Do not assume disk persistence of the open-tab list or unsaved drafts across full application restart.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W57.keyboard",
           "dimension": "keyboard",
-          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
-          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "action": "In Files press Cmd+W on macOS or Ctrl+W elsewhere; then Cmd/Ctrl+Shift+W.",
+          "expected": "Unshifted closes only active file tab; shifted hides/exits Files and flushes pending edits. In Terminal those chords follow terminal-specific bindings rather than closing a file.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W57.repeat",
           "dimension": "repeat",
-          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
-          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "action": "Open the same canonical path five times, alternate tabs, close active/end tabs and repeat after a rename.",
+          "expected": "One document per existing path, no duplicate buffer; active-neighbor rule and renamed path remain coherent.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         }
       ],
@@ -264,7 +264,7 @@
           "status": "PARTIAL",
           "reason": "Named narrow assertions pass; remaining row steps are unverified.",
           "last_verified_sha": null,
-          "last_partial_evidence_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3"
+          "last_partial_evidence_sha": "8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59"
         },
         "visual": {
           "status": "UNTESTED",
@@ -279,6 +279,19 @@
       },
       "assertion_results": [
         {
+          "id": "W57.assert.TestEditorFailedCloseKeepsDraftAndCanRetry",
+          "status": "PASS",
+          "expected": "Failed close preserves dirty draft; later successful save closes it, intentional deviation D01.",
+          "test": "TestEditorFailedCloseKeepsDraftAndCanRetry",
+          "package": "github.com/charlzyx/orbit/internal/workspace",
+          "command": "go test -race -count=1 ./internal/workspace -run ^TestEditorFailedCloseKeepsDraftAndCanRetry$",
+          "evidence": "workspace-evidence.json",
+          "last_verified_sha": "8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59",
+          "sha_kind": "working-tree-content-manifest; not a Git commit",
+          "verified_at_utc": "2026-10-25T14:19:05.639724555+09:00",
+          "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
+        },
+        {
           "id": "W57.assert.TestEditorInactiveLoadNeverStealsSelection",
           "status": "PASS",
           "expected": "Background file load registers a document without changing active selection.",
@@ -286,16 +299,18 @@
           "package": "github.com/charlzyx/orbit/internal/workspace",
           "command": "go test -race -count=1 ./internal/workspace -run ^TestEditorInactiveLoadNeverStealsSelection$",
           "evidence": "workspace-evidence.json",
-          "last_verified_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3",
+          "last_verified_sha": "8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59",
           "sha_kind": "working-tree-content-manifest; not a Git commit",
-          "verified_at_utc": "2026-10-25T14:01:15.88274992+09:00",
+          "verified_at_utc": "2026-10-25T14:19:03.408697489+09:00",
           "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
         }
       ],
       "known_remaining": "File/ignore/editor/autosave/read-only/failure tests pass; native explorer/editor keyboard and visual acceptance remain pending.",
       "full_parity_verified": false,
       "supplemental_cases": [],
-      "additional_evidence": []
+      "additional_evidence": [
+        "../intentional-deviations.md"
+      ]
     },
     {
       "id": "W58",
@@ -471,8 +486,8 @@
         {
           "id": "W59.behavior",
           "dimension": "functional",
-          "action": "Edit several tabs, wait 500 ms from latest edit and manually save all; trigger self-save and external watcher reloads.",
-          "expected": "Autosave 500 ms debounce flushes ALL dirty tabs; manual save does same. Status chips show saved/unsaved/saving/failed/changed-on-disk. Watch reload updates clean buffer; dirty buffer retained and conflict flag shown; self-save echo preserves caret/scroll.",
+          "action": "Edit tabA at t0 and tabB at t300ms; observe disk at t499,t799,t800; invoke Save while tabB is active.",
+          "expected": "Latest edit resets one500ms epoch. Settled autosave flushes all dirty tabs, not just tabB. Manual Save also flushes all dirty tabs.",
           "status": "UNTESTED",
           "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
@@ -489,46 +504,46 @@
         {
           "id": "W59.error",
           "dimension": "error",
-          "action": "Fail read/save/rename/delete in the temporary root, then deliver an external watch event or late file load.",
-          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Sibling temp-write+rename with direct-write fallback. Failure marks still-open tab dirty. Close dispatches async flush then removes tab, so close-time save failure cannot remain visible in removed tab. Conflict badge is not an autosave lock/merge resolver.",
+          "action": "Fail tabA write while tabB succeeds; inspect saving/failed/dirty state, then restore writes and retry.",
+          "expected": "Failed draft remains dirty with actual error; successful tab is saved. New edits made during an older save remain dirty and are never replaced by the older snapshot.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W59.loading",
           "dimension": "loading",
-          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
-          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "action": "Block disk write after snapshot; read Documents and type another edit; then release write.",
+          "expected": "Snapshots and typing remain responsive off the rendering thread. Saving state ends on completion; older saved text is acknowledged without falsely marking newer text clean.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W59.persistence",
           "dimension": "persistence",
-          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
-          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "action": "Save a file and deliver its watcher echo; undo. Then externally change a clean file and a dirty file separately.",
+          "expected": "Self-save echo retains undo/caret/scroll. Clean buffer adopts external bytes; dirty buffer keeps user text and sets conflict. Source reload targets the active tab; disk changes do not invent cross-session edits.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W59.keyboard",
           "dimension": "keyboard",
-          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
-          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "action": "In Editor press Cmd/Ctrl+S with several dirty tabs; use Cmd/Ctrl+Z and Cmd/Ctrl+Shift+Z after save; press Enter.",
+          "expected": "Save flushes all dirty tabs, undo/redo remain usable, and Enter inserts newline rather than submitting a chat prompt.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W59.repeat",
           "dimension": "repeat",
-          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
-          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "action": "Generate repeated self-save watcher events, externally write exactly current draft, then change and save again.",
+          "expected": "Repeated equal-content events do not reset history or flash conflict. Matching external bytes reconcile clean state; a later edit restarts normal debounce.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         }
       ],
@@ -551,7 +566,7 @@
           "status": "PARTIAL",
           "reason": "Named narrow assertions pass; remaining row steps are unverified.",
           "last_verified_sha": null,
-          "last_partial_evidence_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3"
+          "last_partial_evidence_sha": "8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59"
         },
         "visual": {
           "status": "UNTESTED",
@@ -573,9 +588,9 @@
           "package": "github.com/charlzyx/orbit/internal/workspace",
           "command": "go test -race -count=1 ./internal/workspace -run ^TestEditorSelfSaveReloadPreservesUndoHistory$",
           "evidence": "workspace-evidence.json",
-          "last_verified_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3",
+          "last_verified_sha": "8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59",
           "sha_kind": "working-tree-content-manifest; not a Git commit",
-          "verified_at_utc": "2026-10-25T14:01:15.883010702+09:00",
+          "verified_at_utc": "2026-10-25T14:19:03.408873975+09:00",
           "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
         },
         {
@@ -586,9 +601,9 @@
           "package": "github.com/charlzyx/orbit/internal/workspace",
           "command": "go test -race -count=1 ./internal/workspace -run ^TestSlowSaveDoesNotBlockSnapshotsOrLoseConcurrentEdits$",
           "evidence": "workspace-evidence.json",
-          "last_verified_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3",
+          "last_verified_sha": "8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59",
           "sha_kind": "working-tree-content-manifest; not a Git commit",
-          "verified_at_utc": "2026-10-25T14:01:15.882196938+09:00",
+          "verified_at_utc": "2026-10-25T14:19:03.40806613+09:00",
           "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
         },
         {
@@ -599,16 +614,18 @@
           "package": "github.com/charlzyx/orbit/internal/workspace",
           "command": "go test -race -count=1 ./internal/workspace -run ^TestEditorDirtyReloadAndFailedSaveKeepBuffer$",
           "evidence": "workspace-evidence.json",
-          "last_verified_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3",
+          "last_verified_sha": "8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59",
           "sha_kind": "working-tree-content-manifest; not a Git commit",
-          "verified_at_utc": "2026-10-25T14:01:15.689361542+09:00",
+          "verified_at_utc": "2026-10-25T14:19:03.214813953+09:00",
           "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
         }
       ],
       "known_remaining": "Global debounce, atomic mode-preserving saves, external conflict flags, edits-during-slow-save, nonblocking snapshots and retaining tabs changed during close are race-tested. Full native editor keyboard/status/visual parity remains open.",
       "full_parity_verified": false,
       "supplemental_cases": [],
-      "additional_evidence": []
+      "additional_evidence": [
+        "../intentional-deviations.md"
+      ]
     }
   ]
 }

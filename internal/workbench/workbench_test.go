@@ -222,7 +222,7 @@ func TestUsageRealFileAccountingCachingAndCSV(t *testing.T) {
 func TestUsageTimeAndInjectionBoundaries(t *testing.T) {
 	now := time.Date(2026, 10, 25, 12, 0, 0, 0, time.UTC)
 	start, end := UsageRange("last7", now)
-	if start.Day() != 19 || end.Day() != 26 {
+	if start.Day() != 19 || !end.Equal(now) {
 		t.Fatal(start, end)
 	}
 	start, end = UsageRange("previous-month", now)

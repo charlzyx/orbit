@@ -1,25 +1,322 @@
 {
   "S01": {
-    "behavior": ["Launch against displays 1280×800 and 1920×1080 and a no-display-metadata fixture; inspect initial window options, then unmaximize.", "Initially maximized and focused, minimum960×640. Restore bounds are min(displayWidth×0.85,1440) by min(displayHeight×0.9,920), centered; no-display fallback1240×840. Composer is focused and app id is dev.orbit.pi."],
-    "error": ["Inject failure from the native open_window adapter, then retry opening without creating another app controller.", "The source logs 'Orbit: could not open the main window' and returns; no success window handle, duplicate OrbitApp or duplicate heartbeat is created."],
-    "loading": ["Start a fixture streaming Pi session, close all windows, advance the heartbeat, finish the session and reopen.", "The app-owned heartbeat still drains while windowless:90ms idle and16ms active after each observed tick; repaint is unnecessary without a window. This is not a window-loading spinner."],
-    "persistence": ["Record OrbitApp identity and child PID; close the macOS window without quitting; reopen from Dock and compare.", "The same global shell entity and existing Pi child are reused. This gate concerns in-process retention, not disk session restoration after full app exit."],
-    "keyboard": ["Use native window close and the macOS application reopen event; inspect app command bindings for a dedicated resize/reopen action.", "No app-specific resize or reopen keyboard chord is invented. Composer focus is restored by open(); normal OS window controls retain their native behavior."],
-    "repeat": ["Close and reopen the main window three times while a controlled Pi child emits numbered events.", "One retained controller and child, one heartbeat; every event is reduced once and returning window shows the current session. Actual macOS Dock behavior remains a native-OS gate."]
+    "behavior": [
+      "Launch against displays 1280×800 and 1920×1080 and a no-display-metadata fixture; inspect initial window options, then unmaximize.",
+      "Initially maximized and focused, minimum960×640. Restore bounds are min(displayWidth×0.85,1440) by min(displayHeight×0.9,920), centered; no-display fallback1240×840. Composer is focused and app id is dev.orbit.pi."
+    ],
+    "error": [
+      "Inject failure from the native open_window adapter, then retry opening without creating another app controller.",
+      "The source logs 'Orbit: could not open the main window' and returns; no success window handle, duplicate OrbitApp or duplicate heartbeat is created."
+    ],
+    "loading": [
+      "Start a fixture streaming Pi session, close all windows, advance the heartbeat, finish the session and reopen.",
+      "The app-owned heartbeat still drains while windowless:90ms idle and16ms active after each observed tick; repaint is unnecessary without a window. This is not a window-loading spinner."
+    ],
+    "persistence": [
+      "Record OrbitApp identity and child PID; close the macOS window without quitting; reopen from Dock and compare.",
+      "The same global shell entity and existing Pi child are reused. This gate concerns in-process retention, not disk session restoration after full app exit."
+    ],
+    "keyboard": [
+      "Use native window close and the macOS application reopen event; inspect app command bindings for a dedicated resize/reopen action.",
+      "No app-specific resize or reopen keyboard chord is invented. Composer focus is restored by open(); normal OS window controls retain their native behavior."
+    ],
+    "repeat": [
+      "Close and reopen the main window three times while a controlled Pi child emits numbered events.",
+      "One retained controller and child, one heartbeat; every event is reduced once and returning window shows the current session. Actual macOS Dock behavior remains a native-OS gate."
+    ]
   },
   "S02": {
-    "behavior": ["Drag Sidebar, Review, Explorer and Terminal below minimum, to a normal size and above maximum; toggle full-width Review independently.", "Sidebar default248/min200; Review default460/min300/drag max900; Explorer default248/min172/max460; Terminal default260/min96. Main content retains480px reserve where the source resize handler applies it. Full-width Review preserves its separate restore width."],
-    "error": ["Make the fixture ~/.orbit-pi/layout.json parent unwritable; drag and allow the settle flush. Restore permission, change a size again and flush.", "Pinned Layout.persist ignores write errors: current live size remains, old disk state is not falsely claimed updated, and a later changed size can persist. This action has no session-scan or Pi dependency."],
-    "loading": ["Record a size change at t=0; flush at499ms and500ms. Record an identical value at400ms and repeat.", "No disk write before500ms; one flush when changed value has settled. Recording the same value does not rearm the timer. Resizing is immediate and has no loading spinner."],
-    "persistence": ["Persist sidebar_width248, sidepane_width460, explorer_width300, terminal_height260 in ~/.orbit-pi/layout.json; relaunch. Repeat with missing, text,10,99999 and nonfinite parsed fields.", "Only those four sizes belong to this store. Numeric finite values in inclusive80…4000 survive parsing before panel-specific clamps; invalid fields become absent/default independently. Malformed file defaults all fields. Open panels, fonts and theme are not restored by this file."],
-    "keyboard": ["After resizing use Cmd+B/Ctrl+B, Cmd+Shift+E/Ctrl+Shift+E and Cmd+J/Ctrl+J to toggle Sidebar, Explorer and Terminal; reopen each.", "The registered source panel actions toggle visibility without treating those keys as resize commands; remembered size is retained. Review ToggleSidePanel has no chord in this command entry, so no invented key is required."],
-    "repeat": ["Perform100 pointer size updates, stop, then leave the splitter stationary and reopen the panel three times.", "Live geometry updates without writing per pixel; one settled write per changed burst. Stationary input does not repeatedly rewrite layout.json; visibility toggles retain size."]
+    "behavior": [
+      "Drag Sidebar, Review, Explorer and Terminal below minimum, to a normal size and above maximum; toggle full-width Review independently.",
+      "Sidebar default248/min200; Review default460/min300/drag max900; Explorer default248/min172/max460; Terminal default260/min96. Main content retains480px reserve where the source resize handler applies it. Full-width Review preserves its separate restore width."
+    ],
+    "error": [
+      "Make the fixture ~/.orbit-pi/layout.json parent unwritable; drag and allow the settle flush. Restore permission, change a size again and flush.",
+      "Pinned Layout.persist ignores write errors: current live size remains, old disk state is not falsely claimed updated, and a later changed size can persist. This action has no session-scan or Pi dependency."
+    ],
+    "loading": [
+      "Record a size change at t=0; flush at499ms and500ms. Record an identical value at400ms and repeat.",
+      "No disk write before500ms; one flush when changed value has settled. Recording the same value does not rearm the timer. Resizing is immediate and has no loading spinner."
+    ],
+    "persistence": [
+      "Persist sidebar_width248, sidepane_width460, explorer_width300, terminal_height260 in ~/.orbit-pi/layout.json; relaunch. Repeat with missing, text,10,99999 and nonfinite parsed fields.",
+      "Only those four sizes belong to this store. Numeric finite values in inclusive80…4000 survive parsing before panel-specific clamps; invalid fields become absent/default independently. Malformed file defaults all fields. Open panels, fonts and theme are not restored by this file."
+    ],
+    "keyboard": [
+      "After resizing use Cmd+B/Ctrl+B, Cmd+Shift+E/Ctrl+Shift+E and Cmd+J/Ctrl+J to toggle Sidebar, Explorer and Terminal; reopen each.",
+      "The registered source panel actions toggle visibility without treating those keys as resize commands; remembered size is retained. Review ToggleSidePanel has no chord in this command entry, so no invented key is required."
+    ],
+    "repeat": [
+      "Perform100 pointer size updates, stop, then leave the splitter stationary and reopen the panel three times.",
+      "Live geometry updates without writing per pixel; one settled write per changed burst. Stationary input does not repeatedly rewrite layout.json; visibility toggles retain size."
+    ]
   },
   "W39": {
-    "behavior": ["Open a Review source without cached data; manually refresh a loaded source; then change to another source while the first load is delayed.", "Loading begins immediately; a source change resets unrelated snapshot. Completion for the obsolete generation cannot replace the selected source."],
-    "error": ["Fail first Review collection; then load successfully and fail refreshing that same source.", "First load shows unavailable/error rather than an empty-success diff. Same-source refresh preserves the previous snapshot with a visible error; failure is not cleared merely by navigating back."],
-    "loading": ["Complete a manually requested refresh in less than50ms using a controlled collector and clock; inspect refresh feedback at100ms,649ms and650ms.", "Source refresh_from_button feedback remains active for at least650ms even when Git finishes immediately. A slow request stays loading until its actual completion; the time floor is not a fake completion delay for content."],
-    "keyboard": ["Focus Review and press Escape during load, then reopen and invoke the registered Refresh action.", "Escape follows Review cancellation/focus behavior rather than sending agent abort. Refresh reloads the current source and keeps its source/ref/path selection."],
-    "repeat": ["Queue sourceA, sourceB and sourceC refreshes; release callbacks in C,A,B order while also switching workspace.", "Only current generation/workspace/session/source/ref/path can apply. If a pending request was deferred while loading, it runs once after stale completion rather than being lost."]
+    "behavior": [
+      "Open a Review source without cached data; manually refresh a loaded source; then change to another source while the first load is delayed.",
+      "Loading begins immediately; a source change resets unrelated snapshot. Completion for the obsolete generation cannot replace the selected source."
+    ],
+    "error": [
+      "Fail first Review collection; then load successfully and fail refreshing that same source.",
+      "First load shows unavailable/error rather than an empty-success diff. Same-source refresh preserves the previous snapshot with a visible error; failure is not cleared merely by navigating back."
+    ],
+    "loading": [
+      "Complete a manually requested refresh in less than50ms using a controlled collector and clock; inspect refresh feedback at100ms,649ms and650ms.",
+      "Source refresh_from_button feedback remains active for at least650ms even when Git finishes immediately. A slow request stays loading until its actual completion; the time floor is not a fake completion delay for content."
+    ],
+    "keyboard": [
+      "Focus Review and press Escape during load, then reopen and invoke the registered Refresh action.",
+      "Escape follows Review cancellation/focus behavior rather than sending agent abort. Refresh reloads the current source and keeps its source/ref/path selection."
+    ],
+    "repeat": [
+      "Queue sourceA, sourceB and sourceC refreshes; release callbacks in C,A,B order while also switching workspace.",
+      "Only current generation/workspace/session/source/ref/path can apply. If a pending request was deferred while loading, it runs once after stale completion rather than being lost."
+    ]
+  },
+  "W09": {
+    "behavior": [
+      "In a temporary repository commit a.txt=base, stage a.txt=staged and staged-new.txt=staged-new, then replace both worktree copies and add scratch/nested.txt. Confirm Discard All.",
+      "Worktree a.txt and staged-new.txt become their indexed bytes; git ls-files --stage -z is identical before/after. Untracked scratch content is removed. Repeat with one selected literal path and verify unrelated files are unchanged."
+    ],
+    "error": [
+      "Set Git executable to a missing fixture binary, then cancel a second discard before dispatch.",
+      "Strict source difference: Rust discard_paths ignores command errors and returns success. Go must retain its explicit error and unmodified fixture content per intentional deviation D02; do not mark exact source-equivalence PASS."
+    ],
+    "loading": [
+      "Pause the discard subprocess after confirmation, then click the same action again and switch Git tabs.",
+      "One mutation starts. Busy state lasts until the real operation finishes; tab navigation cannot cancel/replay a mutation that already succeeded. Error remains visible on failure."
+    ],
+    "persistence": [
+      "Before discard record HEAD, index entries, ignored/keep.txt and an outside temporary target reached through an untracked symlink; discard then recreate the page.",
+      "HEAD/index entries and ignored/outside target bytes remain intact. Reconstructed status shows only the actual remaining staged changes; no saved preference is needed for this operation."
+    ],
+    "keyboard": [
+      "Open the discard confirmation by the file action; press Escape/Cancel; repeat and explicitly Confirm.",
+      "Cancellation invokes no discard callback and changes no file. Confirmation invokes once; global New Session/Settings/Terminal actions cannot mutate context behind the active confirmation."
+    ],
+    "repeat": [
+      "Confirm Discard All twice after the first succeeds, then request discard for a path deleted externally.",
+      "Second discard is idempotent with respect to HEAD/index and remaining ignored files. Missing paths do not select a different path or broaden deletion."
+    ]
+  },
+  "W43": {
+    "behavior": [
+      "Set global directory=.wt, setup_script=.orbit/worktree-setup.sh, run_setup_auto=false and open_after_create=false. Set repository .orbit/worktree.json directory=custom and setup_script=scripts/setup.sh.",
+      "Effective root/script use the repository values relative to main repository root. Both booleans remain false from global configuration; repository boolean keys do not override them."
+    ],
+    "error": [
+      "Make ~/.orbit-pi/worktrees.json unwritable, then toggle automatic setup/open-after-create.",
+      "Rust changes live booleans and ignores persistence failure; Go transactionally retains prior config and exposes retryable error. Record this as deviation D05, not exact parity."
+    ],
+    "loading": [
+      "Toggle a global worktree setting while a worktree list refresh is delayed.",
+      "A preference update does not create/move/remove a worktree. List loading cannot replace the changed preference; the settings control reflects actual successful persistence."
+    ],
+    "persistence": [
+      "Close/reopen with valid, missing and malformed ~/.orbit-pi/worktrees.json; separately corrupt repository .orbit/worktree.json.",
+      "Global keys are directory,setup_script,run_setup_auto,open_after_create,allowed_setup_repos. Missing/malformed global data uses source defaults; malformed repository overrides are ignored. Empty setup path disables setup rather than silently restoring default."
+    ],
+    "keyboard": [
+      "Open Worktree settings, edit the text fields using Tab/Shift+Tab; cancel with Escape; reopen and save explicitly.",
+      "Cancel leaves saved config untouched; text editing does not dispatch Git/create commands. Exact source dialog focus order still needs matched native verification."
+    ],
+    "repeat": [
+      "Save the same config twice, switch repositories with different overrides and return.",
+      "No duplicate allowed-repository entries, no cross-repository override leakage and no hidden setup execution."
+    ]
+  },
+  "W44": {
+    "behavior": [
+      "In a fresh fixture repository with a setup script, create a worktree with setup enabled. Cancel Allow Setup, then repeat and choose Allow & Create.",
+      "Before explicit allowance neither creation nor script executes. After allowance, canonical repository is recorded once and that requested worktree is created. Disabling setup per creation bypasses script execution."
+    ],
+    "error": [
+      "After choosing Allow & Create, inject failure persisting the trusted-repository list.",
+      "Rust ignores that persistence failure and continues creation. Go refuses to continue until consent persistence succeeds, per D05; this is an explicit safer divergence, not unqualified source parity."
+    ],
+    "loading": [
+      "Delay Git creation after allowance and click confirm repeatedly.",
+      "Only one creation starts; setup begins only after successful creation and never before explicit approval. Busy confirmation cannot enqueue duplicate operations."
+    ],
+    "persistence": [
+      "Allow setup through one canonical path, reopen via an equivalent symlink path and reload ~/.orbit-pi/worktrees.json.",
+      "allowed_setup_repos uses canonical repository identity and does not prompt again solely because the path spelling changed. A different repository still prompts."
+    ],
+    "keyboard": [
+      "Open the allowance dialog; press Escape, then reopen and click Allow & Create.",
+      "Escape cancels without creating or running; explicit action confirms only the displayed repository/script. Composer/global shortcuts cannot confirm implicitly."
+    ],
+    "repeat": [
+      "Create a second worktree in the trusted repository; disable setup for a third; fail and retry setup on the second.",
+      "Stored trust avoids redundant approval, per-create false still prevents running, and setup retry does not create another worktree."
+    ]
+  },
+  "W50": {
+    "behavior": [
+      "Open Work In from composer; inspect Local first, linked worktrees then New; choose current item and another item.",
+      "Current worktree is selected/highlighted; selecting it closes without reloading the workspace. Selecting another invokes exactly its path; New opens a quick-create dialog with name suggestion."
+    ],
+    "error": [
+      "Remove the selected linked worktree externally before choosing it; open Work In while another worktree dialog is active.",
+      "Missing path follows source unavailable/open handling rather than silently creating it; an existing modal suppresses the overlapping picker and keeps its focus."
+    ],
+    "loading": [
+      "Delay worktree discovery and render composer repeatedly; release results after changing workspace.",
+      "Only current workspace rows become selectable. No fake main/linked entries are rendered while discovery is unavailable; async result guards apply."
+    ],
+    "persistence": [
+      "Open/dismiss picker, then restart app from identical preferences; choose a different workspace and restart again.",
+      "Picker visibility/highlight itself is ephemeral. Current-workspace persistence is owned by the host workspace selection, not a new picker-specific preference file."
+    ],
+    "keyboard": [
+      "From Local press Up to wrap to New, Down to wrap to Local, Down to first linked and Enter. Reopen and press Escape three times in immediate succession.",
+      "Up/Down wrap exact displayed order; Enter selects once. Escape always closes and focuses composer; immediate Escape/reopen is not delayed. New transfers focus to its dialog, never back to composer."
+    ],
+    "repeat": [
+      "Click trigger again while open; dismiss by outside pointer and immediately release over trigger; open a competing composer popup.",
+      "Trigger toggles closed without reopening on same gesture. Source200ms pointer-dismiss guard applies only to mouse dismissal, not keyboard Escape. Opening Work In closes source-overlapping popovers via host callback."
+    ]
+  },
+  "W57": {
+    "behavior": [
+      "Open A,B,C; edit B; reopen B; close A then close active B; close last remaining tab; repeat with hide/show.",
+      "Reopening B preserves its existing buffer. Closing earlier tab shifts active index; closing active tab picks next or previous at end. Last close exits Files; hiding retains tabs and starts flushing all dirty buffers."
+    ],
+    "error": [
+      "Inject a write failure while closing the only dirty file; restore writes and close again.",
+      "Rust removes the tab immediately after scheduling save. Go keeps the failed draft/tab until a successful retry per D01; exact source equivalence remains deliberately open."
+    ],
+    "loading": [
+      "Delay loading fileB, switch to another workspace and activate fileA before B completes.",
+      "A late result cannot steal active selection in the new context. Reopening a loaded tab uses existing buffer rather than re-reading/replacing dirty text."
+    ],
+    "persistence": [
+      "Edit two tabs, hide Files and read disk after saves settle; show Files without restarting process.",
+      "Same in-memory tabs/buffers return and dirty contents reach original files. Do not assume disk persistence of the open-tab list or unsaved drafts across full application restart."
+    ],
+    "keyboard": [
+      "In Files press Cmd+W on macOS or Ctrl+W elsewhere; then Cmd/Ctrl+Shift+W.",
+      "Unshifted closes only active file tab; shifted hides/exits Files and flushes pending edits. In Terminal those chords follow terminal-specific bindings rather than closing a file."
+    ],
+    "repeat": [
+      "Open the same canonical path five times, alternate tabs, close active/end tabs and repeat after a rename.",
+      "One document per existing path, no duplicate buffer; active-neighbor rule and renamed path remain coherent."
+    ]
+  },
+  "W59": {
+    "behavior": [
+      "Edit tabA at t0 and tabB at t300ms; observe disk at t499,t799,t800; invoke Save while tabB is active.",
+      "Latest edit resets one500ms epoch. Settled autosave flushes all dirty tabs, not just tabB. Manual Save also flushes all dirty tabs."
+    ],
+    "error": [
+      "Fail tabA write while tabB succeeds; inspect saving/failed/dirty state, then restore writes and retry.",
+      "Failed draft remains dirty with actual error; successful tab is saved. New edits made during an older save remain dirty and are never replaced by the older snapshot."
+    ],
+    "loading": [
+      "Block disk write after snapshot; read Documents and type another edit; then release write.",
+      "Snapshots and typing remain responsive off the rendering thread. Saving state ends on completion; older saved text is acknowledged without falsely marking newer text clean."
+    ],
+    "persistence": [
+      "Save a file and deliver its watcher echo; undo. Then externally change a clean file and a dirty file separately.",
+      "Self-save echo retains undo/caret/scroll. Clean buffer adopts external bytes; dirty buffer keeps user text and sets conflict. Source reload targets the active tab; disk changes do not invent cross-session edits."
+    ],
+    "keyboard": [
+      "In Editor press Cmd/Ctrl+S with several dirty tabs; use Cmd/Ctrl+Z and Cmd/Ctrl+Shift+Z after save; press Enter.",
+      "Save flushes all dirty tabs, undo/redo remain usable, and Enter inserts newline rather than submitting a chat prompt."
+    ],
+    "repeat": [
+      "Generate repeated self-save watcher events, externally write exactly current draft, then change and save again.",
+      "Repeated equal-content events do not reset history or flash conflict. Matching external bytes reconcile clean state; a later edit restarts normal debounce."
+    ]
+  },
+  "W31": {
+    "behavior": [
+      "Create baseline HEAD plus one committed branch change, one staged file, one unstaged edit and one untracked file. Choose each of the six sources and compare both endpoints and exact changed paths.",
+      "Uncommitted=HEAD→worktree, Unstaged=index→worktree including untracked files, Staged=HEAD→index, Committed=main/master merge-base→HEAD, Branch=base→worktree. Last Turn uses immutable completed refs, not current live worktree or current prompt ordinal."
+    ],
+    "edge": [
+      "Complete turn1, select Last Turn, start turn2 but withhold its end checkpoint. Refresh three times, then complete turn2. Open the explicit turn1 card afterward.",
+      "While turn2 runs, the existing turn1 diff remains available. Selected LastTurn{1} remains pinned after completion2 and is labeled Turn 1; choosing Last Turn again selects2. An empty-session source menu disables Last Turn."
+    ],
+    "error": [
+      "Remove the ending ref for an explicitly selected turn; separately remove its diff-base ref and then its start ref while keeping the previous ending ref. Switch to a session with no completed refs.",
+      "Missing ending ref is unavailable, not an empty-success diff. Starting endpoint prefers turn-diff-N, then turn-start-N, then turn-(N-1). Switching sessions with no completed turn changes Last Turn to Uncommitted rather than retaining an error-prone old turn."
+    ],
+    "loading": [
+      "Pause the completed-turn lookup and a source load independently; change session/workspace/source before the earlier callback completes.",
+      "The completed count is not inferred from transcript rows or an in-flight Turn. Obsolete source/session/workspace callbacks cannot overwrite the current view. Same-source cached diff remains during refresh; manual feedback follows W39."
+    ],
+    "persistence": [
+      "Complete turn3, compact away old transcript messages, recreate runtime and Review, then start the next prompt. Repeat with only turn-start-9 and turn-diff-9 refs added.",
+      "Persisted ending refs restore completed3 and next counter4. Start/diff refs do not count as completed9. Review selected source/historical turn are controller state, not a separately invented disk preference."
+    ],
+    "keyboard": [
+      "Open the Review source dropdown; select Last Turn by the existing native menu interaction; dismiss without choosing. Inspect source command registration for a dedicated Last Turn chord.",
+      "Only enabled selection changes source and records the completed turn number. Dismissal changes nothing. No dedicated Last Turn chord is invented. Historical Review buttons pass their actual turn number, not message ordinal."
+    ],
+    "repeat": [
+      "Alternate a completed session, a first-run session and a completed historical turn three times while delayed Review loads finish out of order.",
+      "No previous-session file content or completed counter leaks into the new context. Source set_turn_context only falls back when the new session has no completed turn; otherwise it retains the numeric selected LastTurn{N}, which may be unavailable in that session. Record this source limitation rather than silently rewriting its selection contract."
+    ]
+  },
+  "W32": {
+    "behavior": [
+      "Start turn1 in a temporary repository with different HEAD/index/worktree bytes and an untracked file; capture its end after edits. Record bytes, mtime, HEAD and status before/after capture.",
+      "Private-index snapshots include tracked and untracked content. Real index bytes/mtime, HEAD and worktree remain unchanged. Turn-start and baseline refs are published together; completed ref and branch-aware diff base are separately recorded."
+    ],
+    "edge": [
+      "Start a first turn without ending it; then complete it. Start a second turn while reading the previously completed diff. Repeat in an unborn repository and a non-Git folder.",
+      "Start does not enable a nonexistent Last Turn. Completed counter advances only after successful end capture; in-flight counter remains separate. Unborn repository can snapshot its files. Plain-folder capture no-ops; Go deliberately avoids advertising a nonexistent Git ref (deviation D06)."
+    ],
+    "error": [
+      "Place a disposable .lock file at refs/orbit/session-fixture-turn-N.lock before end capture. Repeat with no prior completed turn and with completed turn1. Remove lock and retry.",
+      "End capture failure retains completed0/1 respectively, emits bounded diagnostic and never claims a successful new diff. Retry can publish N. Partial object writes are not treated as user edits; real index and HEAD remain unchanged."
+    ],
+    "loading": [
+      "Pause an earlier checkpoint task, reserve end/start tasks for successive turns, then release it. Abort while the next prompt is waiting; send duplicate agent_settled events.",
+      "Go reserves checkpoint work off the UI thread in order and gates new prompts during identity recovery (D07). End capture begins only for an open turn; duplicate settles cannot reserve it twice. Source begins capture asynchronously after send acceptance, so Go waiting for start capture before RPC prompt dispatch is an explicit safer ordering difference, not a source timing PASS."
+    ],
+    "persistence": [
+      "Complete turns1 and3 for sessionA; add start/diff-only refs99 and completed7 for sessionB. Recreate manager and open A.",
+      "latest_turn lists only numeric ending suffixes for A; restores3, next prompt uses4, unrelated B and start/diff99 are excluded. Session keys retain ASCII alphanumerics/-/_ and replace each other Unicode scalar with one underscore."
+    ],
+    "keyboard": [
+      "Submit from composer using its configured Enter send mode, issue Escape/Stop during the turn, then use Review without another prompt.",
+      "Checkpoint creation has no separate keyboard shortcut. Submission and abort dispatch use the ordinary controller path; Review remains read-only and never resets or checks out a checkpoint."
+    ],
+    "repeat": [
+      "Reuse one runtime for a new session while an old completion is delayed; also park one running session and complete it while another is active.",
+      "Each checkpoint closure retains its original session/workspace/turn. Old completion may persist old refs but cannot publish its count into a replacement identity. Background sessions keep their own completed counter; reopening recovers the same refs."
+    ]
+  },
+  "W33": {
+    "behavior": [
+      "Create main and an existing target branch with target-only files. Capture a turn start on main, switch to target and add only agent.txt, then capture end.",
+      "Last Turn contains agent.txt only, not target branch preexisting files. Metadata captures starting HEAD, symbolic branch and all local/remote/tag commit refs; annotated tags are peeled."
+    ],
+    "edge": [
+      "Carry an untracked pre-turn dirty file to target; then create a new branch during a separate turn and commit agent changes there. Repeat with detached HEAD and an unborn start.",
+      "Virtual branch start retains pre-turn dirty content on the target so it is not attributed to the turn. Newly created branch commits remain attributed. Detached comparison uses HEAD identity; an absent target ancestor uses an empty-tree commit."
+    ],
+    "error": [
+      "Force virtual merge-tree to fail or corrupt the stored turn-start metadata. Inspect end ref and attempt Review through its fallback endpoints.",
+      "capture_turn reports the failure and does not falsely advance completed UI state. Existing ending object/ref may remain because end publication precedes diff-base preparation. Review falls back only through documented diff/start/previous refs; no worktree rollback occurs."
+    ],
+    "loading": [
+      "Delay branch-aware diff-base preparation while switching the visible session and workspace.",
+      "Background capture operates on the original captured path/identity; completion must not relabel another session's Last Turn. The UI may retain its previous completed result until this capture succeeds."
+    ],
+    "persistence": [
+      "Record metadata and completed diff refs, switch branches again and edit files after settle, then restart and view the original completed turn.",
+      "Original immutable refs still produce the same diff; later branch switches/terminal edits are not retroactively attributed. Metadata lives in the start snapshot commit message under Orbit-Turn-Start, not a separate user index or config file."
+    ],
+    "keyboard": [
+      "Open a completed turn through its Review control and navigate its changed files; inspect available actions for Restore/Rewind.",
+      "This is read-only review. No user-facing checkpoint rewind/restore action is invented and no navigation key mutates HEAD/index/worktree."
+    ],
+    "repeat": [
+      "Perform three turns with a branch switch between1/2 and during2, editing one distinct file each time. Compare exact per-turn paths after turn3.",
+      "Each turn compares its own start to its own end. A branch switch between turns is outside both turns; existing target changes are excluded; each new agent change appears once in its own completed turn."
+    ]
   }
 }

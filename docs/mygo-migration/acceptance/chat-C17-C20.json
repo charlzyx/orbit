@@ -570,7 +570,7 @@
         {
           "id": "UI-S04",
           "status": "PARTIAL",
-          "owner_reported_verdict": "pass_scoped",
+          "owner_reported_verdict": "partial",
           "steps": [
             "Open confirm, prompt, custom terminal, secret, image, model or palette.",
             "Dispatch New task/Settings/Terminal through native menu.",
@@ -580,9 +580,11 @@
           "tests": [
             "TestNativeMenuCannotMutateBehindModal",
             "TestCustomDialogDoesNotDismissEscape",
-            "TestLiveCustomDialogForwardsEscape"
+            "TestLiveCustomDialogForwardsEscape",
+            "TestNativeMenuRespectsExternalPageModals",
+            "TestHasModalTracksReviewAndActualScreenshotPreview"
           ],
-          "remaining": "Live custom test requires ORBIT_TERMINAL_TEST and pinned Ghostty; it was run previously. Ordinary default suite skips opt-in test. OS-native menu entry/accelerator dispatch remains separate.",
+          "remaining": "Native menu guard includes module-owned Git/Worktrees/MCP/Resources/report review/preview and Usage filter overlays. CPU routing tests pass; actual platform accelerator ordering remains separate.",
           "evidence": "../native-ui-acceptance.json",
           "last_verified_sha": null,
           "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."

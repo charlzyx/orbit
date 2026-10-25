@@ -31,7 +31,7 @@ Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 **Executed narrow assertions:**
 - None assigned to this scope yet. Last verified SHA: none.
 
-**Owner challenge UI-P01 [PARTIAL]:** 14 sections and retained native scroll pass; fixed missing FillHeight that previously prevented long pages scrolling. Exact-row/synonym search is missing; current category-only search fails source P01. [Scoped steps/tests](../native-ui-acceptance.json).
+**Owner challenge UI-P01 [PARTIAL]:** All14 source sections remain; nav groups/28px rows, fixed16px title,960px outer/912px inner column and source55-row setting-label/synonym search are implemented. Source search clears query and opens a section, not exact-row scrolling. Retained scroll, source-header/search, and actual notification-switch pointer/Space persistence pass under the canonical overlay (-race focused suite3.452s). General CPU capture1470×922 was inspected at05:45; source GPUI phi line-height,1.3 heading, left-aligned grouped nav and native36×20 switch geometry are now explicit. Full Settings cards, notification OS permission state/sound preview, matched pixels and OS flows remain unverified. [Scoped steps/tests](../native-ui-acceptance.json).
 
 **Remaining:** Native code exists; this row is not validated end to end.
 **Visual/OS gates:** No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state. This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.
@@ -65,9 +65,9 @@ Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 **Executed narrow assertions:**
 - None assigned to this scope yet. Last verified SHA: none.
 
-**Owner challenge UI-P02 [PARTIAL]:** Host lacks actual PID/uptime/stderr/process-row adapter and complete auto-retry/follow-up/title-model controls. Native dependency/install helpers exist; action/OS integration needs execution. Do not fabricate metrics. [Scoped steps/tests](../native-ui-acceptance.json).
+**Owner challenge UI-P02 [PARTIAL]:** Authoritative PID/executable/stderr/parked-processes/alive-only uptime and Start/Stop/Restart are mounted; retry/compaction unknown states are not invented and ACKs govern values. Source Runtime/Agent focused tests pass. Runtime patch enable/disable control and complete install/update/onboarding OS flows remain open. [Scoped steps/tests](../native-ui-acceptance.json).
 
-**Additional source-specific procedures:** [../runtime-acceptance.md](../runtime-acceptance.md)
+**Additional source-specific procedures:** [../intentional-deviations.md](../intentional-deviations.md), [../runtime-acceptance.md](../runtime-acceptance.md)
 
 **Remaining:** Native code exists; this row is not validated end to end.
 **Visual/OS gates:** No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state. This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.
@@ -101,7 +101,7 @@ Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 **Executed narrow assertions:**
 - None assigned to this scope yet. Last verified SHA: none.
 
-**Owner challenge UI-P02 [PARTIAL]:** Host lacks actual PID/uptime/stderr/process-row adapter and complete auto-retry/follow-up/title-model controls. Native dependency/install helpers exist; action/OS integration needs execution. Do not fabricate metrics. [Scoped steps/tests](../native-ui-acceptance.json).
+**Owner challenge UI-P02 [PARTIAL]:** Authoritative PID/executable/stderr/parked-processes/alive-only uptime and Start/Stop/Restart are mounted; retry/compaction unknown states are not invented and ACKs govern values. Source Runtime/Agent focused tests pass. Runtime patch enable/disable control and complete install/update/onboarding OS flows remain open. [Scoped steps/tests](../native-ui-acceptance.json).
 
 **Remaining:** Native code exists; this row is not validated end to end.
 **Visual/OS gates:** No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state. This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.
@@ -135,9 +135,9 @@ Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 **Executed narrow assertions:**
 - None assigned to this scope yet. Last verified SHA: none.
 
-**Owner challenge UI-P02 [PARTIAL]:** Host lacks actual PID/uptime/stderr/process-row adapter and complete auto-retry/follow-up/title-model controls. Native dependency/install helpers exist; action/OS integration needs execution. Do not fabricate metrics. [Scoped steps/tests](../native-ui-acceptance.json).
+**Owner challenge UI-P02 [PARTIAL]:** Authoritative PID/executable/stderr/parked-processes/alive-only uptime and Start/Stop/Restart are mounted; retry/compaction unknown states are not invented and ACKs govern values. Source Runtime/Agent focused tests pass. Runtime patch enable/disable control and complete install/update/onboarding OS flows remain open. [Scoped steps/tests](../native-ui-acceptance.json).
 
-**Additional source-specific procedures:** [../runtime-acceptance.md](../runtime-acceptance.md)
+**Additional source-specific procedures:** [../intentional-deviations.md](../intentional-deviations.md), [../runtime-acceptance.md](../runtime-acceptance.md)
 
 **Remaining:** Native code exists; this row is not validated end to end.
 **Visual/OS gates:** No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state. This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.

@@ -1,19 +1,19 @@
 # Native UI source-first acceptance supplement
 
-Frozen Rust: `299a32bc87fe3d4851bdb902d9c03dcf9bf99cac`. Cloud-only. This supplements the139-row master checklist, rather than replacing it. A scoped passing test does not pass an entire source row. Every case keeps `full_row_parity_verified: false`; matched visual and actual platform verdicts remain separate.
+Frozen Rust: `299a32bc87fe3d4851bdb902d9c03dcf9bf99cac`. Cloud-only. This supplements the139-row master checklist. Scoped tests never mark an entire source row complete; every case keeps `full_row_parity_verified: false`. Matched visual and actual platform verdicts remain separate.
 
 ## Reproduce
 
-Run `go test -race ./internal/ui ./cmd/orbit -count=1` with the pinned Go1.27.3 toolchain. Tests use disposable homes and explicit fixture content. No model inference or authenticated remote mutation is used. The optional live custom-terminal test requires `ORBIT_TERMINAL_TEST=1` and the pinned `MYGO_GHOSTTY_VT` library. Default skips are not evidence it executed.
+Use the pinned Go1.27.3 toolchain through `scripts/go-native.sh test -race ./internal/ui ./cmd/orbit -count=1`. The canonical wrapper verifies upstream hashes and applies the isolated composer range-edit compatibility; cmd refuses unpatched startup. Tests use disposable homes and explicit fixtures, never authenticated model inference. Opt-in actual Ghostty tests require `ORBIT_TERMINAL_TEST=1` plus the pinned library. Skips are not passing evidence.
 
-Native fixture captures: `ORBIT_CAPTURE_DIR=/absolute/output go test ./internal/ui -run '^Test(NativeCapture|NativeUsageCapture)$' -count=1`. Usage captures are explicitly synthetic fixtures, not live usage and not matched Rust pixel comparisons.
+Native CPU captures: `ORBIT_CAPTURE_DIR=/absolute/output scripts/go-native.sh test ./internal/ui -run '^Test(NativeCapture|NativeUsageCapture)$' -count=1`. These are not matched Rust pixel comparisons.
 
-## Highest-priority concrete failures
+## Highest-priority remaining failures
 
-- C04 slash/file-mention popup is missing. C10/C11/C12 typed tool presentation, cross-message selection and full turn summaries are incomplete. C17/C19/C20 specialized approval/questionnaire/widgets are not completely wired.
-- P01 settings search is category-only, not source exact-row/synonym search. P02 runtime process details and P04 some agent toggles lack authoritative host data. P08 favorites/provider-filter model catalog remains incomplete.
-- U02/U04 source comparison signals, cache/latency detail sections, independent table state and column management remain incomplete. Identical model IDs across providers are not fully distinguished in the filter UI.
-- S12/S13 source sidebar sort/mark/icon/sticky-active-reveal behavior is incomplete. Broad locale coverage, backdrop integration, matched pixel and actual OS IME/accessibility/native menu lifecycle are open gates.
+- C11: selection survives across mounted rows, but pinned MyGo clears it when a virtualized endpoint unmounts; Rust retains source selection snapshots. C17/C19/C20 specialized approval/questionnaire/widgets are not complete.
+- P08 favorites/provider-filter model catalog and full appearance/localization remain incomplete. Settings source search semantics were corrected: label/synonym results open sections, not exact-row highlighting.
+- Usage comparison/table/filter acceptance is being reconstructed separately; do not infer full UI parity from backend export/accounting tests.
+- S12/S13 full sidebar marks/icons/sticky reveal remain incomplete. Linux desktop captures exist, but current Rust/Go viewport mismatch prevents a valid pixel comparison; no image is resized to conceal it. OS IME/accessibility/native lifecycle on all targets remains open.
 
 ## Cases
 
@@ -28,9 +28,9 @@ Source: `crates/orbit-pi/src/main_window.rs:77::open`; `crates/orbit-pi/src/main
 
 Expected: Source minimum 960×640; restore85% display width and90%height capped1440×920; one parked controller/process survives close.
 
-Executed test coverage: `TestSourceWindowRestoreBounds`, `TestHiddenSidebarReservesNativeTrafficLights`.
+Executed test coverage: `TestSourceWindowRestoreBounds`, `TestHiddenSidebarReservesNativeTrafficLights`, `TestSourceNativeMenuDoesNotAllocatePersistentWindowStrip`.
 
-Remaining: Pure restore bounds and native traffic-light clearance pass. Actual maximize/center/close/reopen/16ms-active heartbeat across all OS remains unexecuted.
+Remaining: Source minimum/restore bounds and native traffic-light clearance pass. Native menus now auto-hide on Linux/Windows while retaining edit roles and shortcuts. Actual initial-maximize/Alt-F10/Dock lifetime on each OS remains separate acceptance.
 
 ### UI-S02 · Geometry, fractional scaling and restored dimensions (S02)
 
@@ -66,7 +66,7 @@ Remaining: These exact native CPU flows pass, not every command/context or OS ac
 
 ### UI-S04 · Native menu and modal precedence (S03, C16, C20)
 
-**Functional verdict:** `pass_scoped`. **Visual:** not compared to a matched Rust runtime. **Platform:** native CPU only unless explicitly noted.
+**Functional verdict:** `partial`. **Visual:** not compared to a matched Rust runtime. **Platform:** native CPU only unless explicitly noted.
 
 Source: `crates/orbit-pi/src/commands.rs:224::COMMANDS`; `crates/orbit-pi/src/commands.rs:794::BINDINGS`; `crates/orbit-pi/src/main.rs:357::bind_keys`; `crates/orbit-pi/src/app/pickers.rs:415::run_command`; `crates/orbit-pi/src/dialog.rs:171::Dialog`; `crates/orbit-pi/src/app/dialogs.rs:10::handle_extension_ui_request`; `crates/orbit-pi/src/app/dialogs.rs:205::open_dialog`; `crates/orbit-pi/src/app/dialogs.rs:236::respond_to_dialog`; `crates/orbit-pi/src/widgets.rs:?::source`; `crates/orbit-pi/src/custom_ui.rs:?::source`; `crates/orbit-pi/src/app/dialogs.rs:76::apply_extension_widget`; `crates/orbit-pi/src/app/dialogs.rs:114::apply_custom_frame`.
 
@@ -76,9 +76,9 @@ Source: `crates/orbit-pi/src/commands.rs:224::COMMANDS`; `crates/orbit-pi/src/co
 
 Expected: No action mutates behind modal. Custom Escape sends ESC to Pi rather than dismissing; explicit Cancel cancels.
 
-Executed test coverage: `TestNativeMenuCannotMutateBehindModal`, `TestCustomDialogDoesNotDismissEscape`, `TestLiveCustomDialogForwardsEscape`.
+Executed test coverage: `TestNativeMenuCannotMutateBehindModal`, `TestCustomDialogDoesNotDismissEscape`, `TestLiveCustomDialogForwardsEscape`, `TestNativeMenuRespectsExternalPageModals`, `TestHasModalTracksReviewAndActualScreenshotPreview`.
 
-Remaining: Live custom test requires ORBIT_TERMINAL_TEST and pinned Ghostty; it was run previously. Ordinary default suite skips opt-in test. OS-native menu entry/accelerator dispatch remains separate.
+Remaining: Native menu guard includes module-owned Git/Worktrees/MCP/Resources/report review/preview and Usage filter overlays. CPU routing tests pass; actual platform accelerator ordering remains separate.
 
 ### UI-S05 · Session switch, workspace routing and drafts (S06, S07, S08)
 
@@ -98,7 +98,7 @@ Remaining: Draft/inactive file generation tests pass. Whole native controller re
 
 ### UI-S06 · Sidebar sessions and workspace management (S09, S10, S11, S12, S13, S14)
 
-**Functional verdict:** `failed_missing_cases`. **Visual:** not compared to a matched Rust runtime. **Platform:** native CPU only unless explicitly noted.
+**Functional verdict:** `partial`. **Visual:** not compared to a matched Rust runtime. **Platform:** native CPU only unless explicitly noted.
 
 Source: `crates/orbit-pi/src/app/sidebar.rs:2509::open_session_slot`; `crates/orbit-pi/src/app/sidebar.rs:2521::cycle_session`; `crates/orbit-pi/src/app/sidebar.rs:2618::on_sidebar_confirm`; `crates/orbit-pi/src/app/session.rs:613::clone_session`; `crates/orbit-pi/src/app/settings.rs:5836::rename_session`; `crates/orbit-pi/src/sessions.rs:?::source`; `crates/orbit-pi/src/app/events.rs:18::tick`; `crates/orbit-pi/src/app/sidebar.rs:2188::on_menu_clone_session`; `crates/orbit-pi/src/pins.rs:?::source`; `crates/orbit-pi/src/archive.rs:?::source`; `crates/orbit-pi/src/app/sidebar.rs:2231::on_menu_delete_confirm`; `crates/orbit-pi/src/app/sidebar.rs:2214::on_menu_toggle_archive`; `crates/orbit-pi/src/app/sidebar.rs:176::build_sidebar_rows`; `crates/orbit-pi/src/app/sidebar.rs:370::build_flat_sidebar_rows`; `crates/orbit-pi/src/app.rs:2248::WorkspaceSort`; `crates/orbit-pi/src/app.rs:2339::SidebarGroupBy`; `crates/orbit-pi/src/app/sidebar.rs:2383::on_workspace_remove`; `crates/orbit-pi/src/app/sidebar.rs:2373::on_workspace_open_picker`; `crates/orbit-pi/src/workspace_mark.rs:13::WorkspaceMark`; `crates/orbit-pi/src/app.rs:?::save_workspaces`; `crates/orbit-pi/src/app/session.rs:2702::on_refresh`; `crates/orbit-pi/src/app/events.rs:1237::sync_workspace_watcher`; `crates/orbit-pi/src/app/refresh_tests.rs:?::source`.
 
@@ -108,9 +108,9 @@ Source: `crates/orbit-pi/src/app/sidebar.rs:2509::open_session_slot`; `crates/or
 
 Expected: Source ordering, active visibility, collapse persistence, all metadata operations and contextual menu semantics match.
 
-Executed test coverage: No host test is claimed for this complete scenario..
+Executed test coverage: `TestEmptySidebarDoesNotInventCwdProject`.
 
-Remaining: Backend session operations exist, but host-level interaction/restart checks are incomplete. Source workspace marks/icons, all sorting modes and sticky/active reveal presentation are not fully reconstructed.
+Remaining: Fresh cwd no longer manufactures a sidebar project; saved workspaces and actual sessions still populate groups. Source empty-state geometry is mounted. Full marks/icons/sticky active reveal/sort-state persistence remains incomplete.
 
 ### UI-C01 · Multiline and Chinese composition (C01)
 
@@ -146,7 +146,7 @@ Remaining: Exact tested sends/rejection pass. Source individual queue editing/re
 
 ### UI-C03 · Slash and file-mention autocomplete (C04)
 
-**Functional verdict:** `failed_missing_implementation`. **Visual:** not compared to a matched Rust runtime. **Platform:** native CPU only unless explicitly noted.
+**Functional verdict:** `partial`. **Visual:** not compared to a matched Rust runtime. **Platform:** native CPU only unless explicitly noted.
 
 Source: `crates/orbit-pi/src/app/composer_ops.rs:9::autocomplete_entries`; `crates/orbit-pi/src/app/composer_ops.rs:113::commit_entry`; `crates/orbit-pi/src/app/composer_ops.rs:471::attach_file`; `crates/orbit-pi/src/mentions.rs:?::source`.
 
@@ -156,9 +156,9 @@ Source: `crates/orbit-pi/src/app/composer_ops.rs:9::autocomplete_entries`; `crat
 
 Expected: Source composer_ops autocomplete ordering, keyboard ownership and trigger replacement.
 
-Executed test coverage: No host test is claimed for this complete scenario..
+Executed test coverage: `TestNativeComposerCompletionPrecedesSendAndAbort`.
 
-Remaining: Host currently has no source-equivalent slash/file-mention popup. Plain text commands are forwarded but are not autocomplete parity.
+Remaining: Native source-derived slash/skill/command/file completion is mounted; real command metadata and off-thread bounded filesystem scan, focus/caret/Enter/AltEnter/steer/Escape paths have tests. Canonical hash-checked MyGo compatibility supplies undoable caret-aware replacement; cmd refuses unpatched startup. Actual OS IME candidate panel and full source visual comparison remain unverified.
 
 ### UI-C04 · Attachments, drag/paste and partial failure (C05)
 
@@ -194,7 +194,7 @@ Remaining: Keyboard picker works. Source favorites-only/provider filter/detail c
 
 ### UI-C06 · Long streamed transcript reading position (C07, C08)
 
-**Functional verdict:** `pass_scoped`. **Visual:** not compared to a matched Rust runtime. **Platform:** native CPU only unless explicitly noted.
+**Functional verdict:** `partial`. **Visual:** not compared to a matched Rust runtime. **Platform:** native CPU only unless explicitly noted.
 
 Source: `crates/orbit-pi/src/transcript.rs:1081::load_from`; `crates/orbit-pi/src/transcript.rs:1181::apply_event`; `crates/orbit-pi/src/app/events.rs:645::apply_messages_snapshot`; `crates/orbit-pi/src/message_scroller.rs:?::source`; `crates/orbit-pi/src/transcript.rs:2278::jump_turn`; `crates/orbit-pi/src/transcript_view.rs:1396::render_navigation_rail`; `crates/orbit-pi/src/transcript.rs:877::persist_hint`.
 
@@ -206,7 +206,7 @@ Expected: Stable keys retain reader position; follow resumes only at end; variab
 
 Executed test coverage: `TestTranscriptVariableHeightFollowAndReaderPosition`.
 
-Remaining: Native CPU follow/read-position test passes. Source navigation rail and full turn grouping remain missing; GPU long-session/performance acceptance is open.
+Remaining: Native variable-height follow/read-position test passes. Logical assistant turns now project across tool-result messages. Source navigation rail and full long-session performance/OS acceptance remain open.
 
 ### UI-C07 · Rich Markdown and code (C09)
 
@@ -226,7 +226,7 @@ Remaining: GFM alert/geometry sample passes; highlight tokenizer has1204 source-
 
 ### UI-C08 · Transcript selection, tools and turn summaries (C10, C11, C12)
 
-**Functional verdict:** `failed_missing_implementation`. **Visual:** not compared to a matched Rust runtime. **Platform:** native CPU only unless explicitly noted.
+**Functional verdict:** `partial`. **Visual:** not compared to a matched Rust runtime. **Platform:** native CPU only unless explicitly noted.
 
 Source: `crates/orbit-pi/src/transcript_view.rs:302::TextSelection`; `crates/orbit-pi/src/transcript_view.rs:912::text_selection_menu`; `crates/orbit-pi/src/transcript.rs:1076::selected_text`; `crates/orbit-pi/src/transcript.rs:2271::mark_copied`; `crates/orbit-pi/src/transcript_view.rs:2387::render_activity_group`; `crates/orbit-pi/src/transcript_view.rs:3551::render_tool_detail`; `crates/orbit-pi/src/transcript_view.rs:3512::render_tool_error_strip`; `crates/orbit-pi/src/transcript_view.rs:3973::build_edit_diff`; `crates/orbit-pi/src/transcript_view.rs:7391::mcp_tool_parts`; `crates/orbit-pi/src/transcript_view.rs:4820::render_working_indicator`; `crates/orbit-pi/src/transcript_view.rs:4369::render_message_footer`; `crates/orbit-pi/src/transcript_view.rs:1811::render_summary_card`; `crates/orbit-pi/src/transcript_view.rs:7053::render_changed_files`.
 
@@ -236,9 +236,9 @@ Source: `crates/orbit-pi/src/transcript_view.rs:302::TextSelection`; `crates/orb
 
 Expected: Source structured tool presentation, cross-block selection, context menu and turn metrics.
 
-Executed test coverage: No host test is claimed for this complete scenario..
+Executed test coverage: `TestLogicalTranscriptKeepsAssistantProseAndToolResult`, `TestHostCrossMessageMarkdownAndAlertSelection`.
 
-Remaining: Host has selectable individual text/Markdown, generic collapsible tool output and copy response. Source typed tool cards, full cross-message selection/context menu and detailed turn summaries are incomplete.
+Remaining: Typed tools, logical turns, observed-live elapsed time, source tail/usage footer and shared user/Markdown/alert selection are mounted and native-tested. C11 remains a concrete framework gap: selection clears when a virtualized endpoint unmounts; Rust retains SelectedBlock snapshots. Do not equate mounted-row selection with full parity.
 
 ### UI-C09 · Transcript search (C13)
 
@@ -252,9 +252,9 @@ Source: `crates/orbit-pi/src/app/search.rs:12::TranscriptSearch`; `crates/orbit-
 
 Expected: Find stays distinct from command palette; active hit scroll and highlight/count are correct.
 
-Executed test coverage: No host test is claimed for this complete scenario..
+Executed test coverage: `TestTranscriptFindKeyboardWrapTrimAndFocus`.
 
-Remaining: Search implementation exists, but dedicated interaction test and source highlight/active-hit keyboard behavior are not yet verified.
+Remaining: Native trim/case/tool text, Enter/ShiftEnter wrap, Escape focus/no-abort and active wash tests pass. Search now uses logical turn text. Source floating320px bar geometry and full live-match evolution remain open.
 
 ### UI-C10 · Stop/retry/compact and context freshness (C14, C15)
 
@@ -298,15 +298,15 @@ Source: `crates/orbit-pi/src/app.rs:2679::SettingsSection`; `crates/orbit-pi/src
 2. Scroll a long page, switch away for8 frames, return.
 3. Search a row label/synonym and activate result.
 
-Expected: Source section order; retained per-page scroll; search navigates exact row with source keyboard behavior.
+Expected: Source section order and grouped rows; retained page scroll; translated setting-label/synonym search opens its section and clears query.
 
-Executed test coverage: `TestSettingsNavigationComplete`, `TestSettingsPageScrollRetained`.
+Executed test coverage: `TestSettingsNavigationComplete`, `TestSettingsPageScrollRetained`, `TestSettingsSourceSearchIndexAndSectionNavigation`, `TestSettingsSourceHeaderAndGeneralRows`.
 
-Remaining: 14 sections and retained native scroll pass; fixed missing FillHeight that previously prevented long pages scrolling. Exact-row/synonym search is missing; current category-only search fails source P01.
+Remaining: All14 source sections remain; nav groups/28px rows, fixed16px title,960px outer/912px inner column and source55-row setting-label/synonym search are implemented. Source search clears query and opens a section, not exact-row scrolling. Retained scroll, source-header/search, and actual notification-switch pointer/Space persistence pass under the canonical overlay (-race focused suite3.452s). General CPU capture1470×922 was inspected at05:45; source GPUI phi line-height,1.3 heading, left-aligned grouped nav and native36×20 switch geometry are now explicit. Full Settings cards, notification OS permission state/sound preview, matched pixels and OS flows remain unverified.
 
 ### UI-P02 · Runtime diagnostics and agent settings (P02, P03, P04)
 
-**Functional verdict:** `failed_missing_data`. **Visual:** not compared to a matched Rust runtime. **Platform:** native CPU only unless explicitly noted.
+**Functional verdict:** `partial`. **Visual:** not compared to a matched Rust runtime. **Platform:** native CPU only unless explicitly noted.
 
 Source: `crates/orbit-pi/src/app/settings.rs:4931::runtime_rows`; `crates/orbit-pi/src/app/runtime.rs:488::runtime_start`; `crates/orbit-pi/src/app/runtime.rs:518::runtime_stop`; `crates/orbit-pi/src/app/runtime.rs:532::runtime_restart`; `crates/orbit-pi/src/onboarding.rs:?::source`; `crates/orbit-pi/src/pi_install.rs:?::source`; `crates/orbit-pi/src/app/view.rs:2664::render_onboarding`; `crates/orbit-pi/src/app/view.rs:2903::render_pi_migration`; `crates/orbit-pi/src/session_defaults.rs:?::source`; `crates/orbit-pi/src/auto_title.rs:?::source`; `crates/orbit-pi/src/app/settings.rs:5196::agent_rows`; `crates/orbit-pi/src/app/runtime.rs:217::apply_default_model`; `contrib/orbit-title-extension/index.js:?::source`.
 
@@ -316,9 +316,9 @@ Source: `crates/orbit-pi/src/app/settings.rs:4931::runtime_rows`; `crates/orbit-
 
 Expected: Only real process fields, safe busy gates and source fresh-session-only defaults.
 
-Executed test coverage: `TestMaintenanceGateKeepsDraftAndBlocksNewProcess`.
+Executed test coverage: `TestMaintenanceGateKeepsDraftAndBlocksNewProcess`, `TestNativeRuntimeUsesRealSnapshotAndStoppedUnknowns`, `TestNativeAgentRetryIsUnknownUntilConfirmed`.
 
-Remaining: Host lacks actual PID/uptime/stderr/process-row adapter and complete auto-retry/follow-up/title-model controls. Native dependency/install helpers exist; action/OS integration needs execution. Do not fabricate metrics.
+Remaining: Authoritative PID/executable/stderr/parked-processes/alive-only uptime and Start/Stop/Restart are mounted; retry/compaction unknown states are not invented and ACKs govern values. Source Runtime/Agent focused tests pass. Runtime patch enable/disable control and complete install/update/onboarding OS flows remain open.
 
 ### UI-P03 · Provider catalog, typed editor and credentials (P05, P06)
 
@@ -354,7 +354,7 @@ Remaining: Pure quota rules pass; live OAuth, full quota popup grouping/hidden-p
 
 ### UI-P05 · Skills and plugin resources (P10, P11, P12, P13)
 
-**Functional verdict:** `integration_in_progress`. **Visual:** not compared to a matched Rust runtime. **Platform:** native CPU only unless explicitly noted.
+**Functional verdict:** `partial`. **Visual:** not compared to a matched Rust runtime. **Platform:** native CPU only unless explicitly noted.
 
 Source: `crates/orbit-pi/src/skills.rs:88::discover`; `crates/orbit-pi/src/skills.rs:52::Skill`; `crates/orbit-pi/src/app/skills_ui.rs:32::render_skills_page`; `crates/orbit-pi/src/app/skills_ui.rs:722::apply_skill_action`; `crates/orbit-pi/src/skills.rs:338::set_enabled`; `crates/orbit-pi/src/skills.rs:440::delete`; `crates/orbit-pi/src/app/skills_ui.rs:772::delete_selected_skill`; `crates/orbit-pi/src/plugins.rs:99::discover`; `crates/orbit-pi/src/plugins.rs:135::install`; `crates/orbit-pi/src/plugins.rs:147::remove`; `crates/orbit-pi/src/plugins.rs:157::update`; `crates/orbit-pi/src/app/settings.rs:7478::plugin_run`; `crates/orbit-pi/src/plugins.rs:165::find_updates`; `crates/orbit-pi/src/app/plugin_update_ui.rs:19::start_plugin_update_check`; `crates/orbit-pi/src/app/plugin_update_ui.rs:52::skip_plugin_updates`; `crates/orbit-pi/src/app/plugin_update_ui.rs:69::apply_plugin_updates`.
 
@@ -366,7 +366,7 @@ Expected: Source master/detail, scope/mutation serialization, stale completion r
 
 Executed test coverage: No host test is claimed for this complete scenario..
 
-Remaining: Dedicated resourceui replaces generic host implementation and is mounted. Worker source checklist/native/race tests are in progress; do not claim completed acceptance until handoff.
+Remaining: Dedicated resourceui source master-detail and CRUD/update/skip lifecycle is mounted, including Offline flag, default-app open, Notify completion and global update notice below toasts.24 scoped package tests/race pass. Host/platform full flow and matched pixels remain unverified; see resource module report.
 
 ### UI-P06 · Typed MCP lifecycle (P14, P15, P16, P17)
 
@@ -396,9 +396,9 @@ Source: `crates/orbit-pi/src/theme.rs:324::UiPrefs`; `crates/orbit-pi/src/theme.
 
 Expected: Source palette/tokens and persistent preferences, complete localization and backdrop.
 
-Executed test coverage: `TestTokensAndCommandRegistry`, `TestFractionalScaleKeepsLogicalComposerGeometry`.
+Executed test coverage: `TestTokensAndCommandRegistry`, `TestFractionalScaleKeepsLogicalComposerGeometry`, `TestNativeBackdropBoundsAndFeatureVisibility`, `TestBackgroundChooseCoalesceFadeReuseFailureAndClear`, `TestBackdropPaintsBehindOpaqueComposer`.
 
-Remaining: 10 palettes and55 binding parsing pass; many host labels remain English, backdrop integration is pending, and font/density/motion/OS contrast visual matrix remains open.
+Remaining: Source procedural/photo background is mounted below header only on empty task, with source choose/reset/blur/cell/fade controls and worker-only PhotoStore. Native tests cover geometry, pointer pass-through, opaque foreground occlusion, coalescing/cache reuse and failure retention. Runtime/About use truthful versions. Full locale coverage/whole Appearance content/OS dialogs/matched visual acceptance remain open.
 
 ### UI-U01 · Actual usage accounting and unavailable data (U01)
 
@@ -479,4 +479,19 @@ Expected: No prompt loss/new process during exclusive update; live sessions prot
 Executed test coverage: `TestMaintenanceGateKeepsDraftAndBlocksNewProcess`, `TestRetentionRunsOffThreadAndReloadsArchiveSet`.
 
 Remaining: Guard and temporary retention tests pass. Whole native update/install/temp dialogs and real OS notification lifecycle remain platform acceptance gates.
+
+### UI-W01 · Review refresh minimum feedback (W39)
+
+**Functional verdict:** `pass_scoped`. **Visual:** not compared to a matched Rust runtime. **Platform:** native CPU only unless explicitly noted.
+
+Source: `crates/orbit-pi/src/sidepane.rs:749::refresh_from_button`.
+
+1. Click Refresh against a fast disposable repository.
+2. Complete content reload, then click again before the first feedback deadline.
+
+Expected: Independent click feedback lasts at least650ms; repeated clicks extend it without fabricating loading data.
+
+Executed test coverage: `TestReviewRefreshKeepsSource650msFeedback`.
+
+Remaining: Initial acceptance failed at25.821182ms. Corrected with independent deadline and actual rendering predicate; default native regression now passes. Full Review animation/pixels remain open.
 

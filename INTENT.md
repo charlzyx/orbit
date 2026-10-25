@@ -11,11 +11,13 @@ architecture that follows from it.
 
 ## Vision
 
-Orbit is a **100% Rust, GPU-rendered desktop workbench for the pi coding agent** —
-the same architecture as Waku, scoped to pi only — with **every current feature preserved**:
+This fork reconstructs Orbit as a **Go + MyGo native desktop workbench for the
+pi coding agent**, with **every implemented feature at the pinned Orbit baseline
+in scope**. The original Rust/GPUI source is retained as a reference, not the new
+application. Full parity is a target still under verification, not a completed claim:
 
 - no browser, no webview, no Node.js daemon anywhere in the app
-- UI rendered by GPUI (the framework Zed is built on) on Metal
+- native UI rendered by pinned MyGo on macOS, Linux and Windows, without cgo
 - the pi CLI (`pi --mode rpc`) as the only agent runtime, spoken to over stdio JSONL
 - same sessions as the terminal (`~/.pi/agent/sessions/`), pi's own catalog, thinking levels, and persistence
 
@@ -43,6 +45,10 @@ record actual Go implementation and tests before it can be marked complete.
 
 No release, default-branch replacement, upstream merge, signing identity, or
 deployment is authorized or performed as part of this work-in-progress branch.
+
+Current verification uses the [source-first checklist](docs/mygo-migration/acceptance-checklist.md): source-specific procedures and unexpanded draft gates are distinct, and functional, native-OS and visual results are separate. The [intentional deviations](docs/mygo-migration/intentional-deviations.md) retain drafts on save failure and avoid false runtime/discard claims instead of reproducing unsafe source defects.
+
+The required composer caret/undo compatibility addition is hash-pinned and attributed. Canonical `scripts/go-native.sh` commands verify the original module, copy it temporarily, and apply an explicit source overlay. The app rejects an unpatched build at startup. No Rust executable or runtime sidecar is part of the new application.
 
 ### D1 — Transport: pi CLI RPC over stdio (replaces the Node daemon + SSE)
 **Choice:** spawn `pi --mode rpc` as a child process per open session; JSONL commands on stdin,
@@ -318,7 +324,7 @@ legacy app today:
     on language change), native dialogs, keyboard operability. Orbit's actions are also exposed
     as keyboard/mouse surfaces (⌘P palette, shortcuts), not only through menus.
 
-### Implementation status (living)
+### Original Rust reference implementation status (living)
 
 Done: streaming transcript + virtualization; markdown + highlighting; composer with steering, follow-ups, cancel, autocomplete, attachments; extension dialogs; diff/Review + Git page + GitHub issues/PRs (where `gh` is available); sessions (list/switch/new/delete/clone/cross-workspace) over an Orbit-owned project list (only folders the user added; removing one never touches pi) whose groups sort by activity, added date, name, or session count, with a **warm process pool** so re-opening a recent session is a resume, not a Node spawn; Git worktrees as first-class workspaces (`worktree.rs` + the Worktrees page: discovery, create from a new/existing branch, open/rename/move/lock/remove/prune/repair, configurable `.wt` root, optional async setup script with `ORBIT_ROOT_PATH`/`ORBIT_WORKTREE_PATH`, sessions rooted in and restored to the worktree — D14); Explorer project panel + editable Files surface; integrated terminal (⌘J); usage, skills, plugins, models, providers, settings pages; transcript find; image lightbox; theming (dark/light/system, ten palettes) + reduce-motion; localization (ten locales + System, D9); in-app signed updater + Version History; notifications; open-in-editor; signed/notarizable macOS packaging + best-effort Windows/Linux bundles (D5); CI; access modes (a guard, not a sandbox), workflow modes (Plan/Build/Ask per D8), and the auto-title / quota extension bridges (D10); Zed design tokens (D11) with context menus, the tooltip, the extension dialog, the floating modal cards (provider usage / API-key / editor, update dialog, custom UI), the sidebar session / workspace rows, the transcript's message / card chrome, the settings section / group / row chrome, UI type on `TextSize` across every surface, corner radii on `Radius`, and one-shot motion on `AnimationDuration` migrated onto them.
 

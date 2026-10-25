@@ -273,8 +273,8 @@
       "source_test_inventory": "T15",
       "verdicts": {
         "functional": {
-          "status": "UNTESTED",
-          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
           "last_verified_sha": null,
           "last_partial_evidence_sha": null
         },
@@ -296,7 +296,7 @@
         {
           "id": "UI-P05",
           "status": "PARTIAL",
-          "owner_reported_verdict": "integration_in_progress",
+          "owner_reported_verdict": "partial",
           "steps": [
             "Search/select Skills, inspect frontmatter-stripped detail, enable/disable/delete with cancellation.",
             "Install by global/project scope; double-click operation, cancel, change workspace while pending.",
@@ -304,13 +304,14 @@
           ],
           "expected": "Source master/detail, scope/mutation serialization, stale completion rejection and precise persistence.",
           "tests": [],
-          "remaining": "Dedicated resourceui replaces generic host implementation and is mounted. Worker source checklist/native/race tests are in progress; do not claim completed acceptance until handoff.",
+          "remaining": "Dedicated resourceui source master-detail and CRUD/update/skip lifecycle is mounted, including Offline flag, default-app open, Notify completion and global update notice below toasts.24 scoped package tests/race pass. Host/platform full flow and matched pixels remain unverified; see resource module report.",
           "evidence": "../native-ui-acceptance.json",
           "last_verified_sha": null,
           "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
         }
       ],
       "additional_evidence": [
+        "../resource-ui-implementation.md",
         "../settings-backend-implementation.md",
         "../settings-backend-source-evidence.json"
       ]
@@ -428,8 +429,8 @@
       "source_test_inventory": "T15",
       "verdicts": {
         "functional": {
-          "status": "UNTESTED",
-          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
           "last_verified_sha": null,
           "last_partial_evidence_sha": null
         },
@@ -451,7 +452,7 @@
         {
           "id": "UI-P05",
           "status": "PARTIAL",
-          "owner_reported_verdict": "integration_in_progress",
+          "owner_reported_verdict": "partial",
           "steps": [
             "Search/select Skills, inspect frontmatter-stripped detail, enable/disable/delete with cancellation.",
             "Install by global/project scope; double-click operation, cancel, change workspace while pending.",
@@ -459,13 +460,14 @@
           ],
           "expected": "Source master/detail, scope/mutation serialization, stale completion rejection and precise persistence.",
           "tests": [],
-          "remaining": "Dedicated resourceui replaces generic host implementation and is mounted. Worker source checklist/native/race tests are in progress; do not claim completed acceptance until handoff.",
+          "remaining": "Dedicated resourceui source master-detail and CRUD/update/skip lifecycle is mounted, including Offline flag, default-app open, Notify completion and global update notice below toasts.24 scoped package tests/race pass. Host/platform full flow and matched pixels remain unverified; see resource module report.",
           "evidence": "../native-ui-acceptance.json",
           "last_verified_sha": null,
           "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
         }
       ],
       "additional_evidence": [
+        "../resource-ui-implementation.md",
         "../settings-backend-implementation.md",
         "../settings-backend-source-evidence.json"
       ]
@@ -590,8 +592,8 @@
       "source_test_inventory": "T15",
       "verdicts": {
         "functional": {
-          "status": "UNTESTED",
-          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
           "last_verified_sha": null,
           "last_partial_evidence_sha": null
         },
@@ -613,7 +615,7 @@
         {
           "id": "UI-P05",
           "status": "PARTIAL",
-          "owner_reported_verdict": "integration_in_progress",
+          "owner_reported_verdict": "partial",
           "steps": [
             "Search/select Skills, inspect frontmatter-stripped detail, enable/disable/delete with cancellation.",
             "Install by global/project scope; double-click operation, cancel, change workspace while pending.",
@@ -621,13 +623,14 @@
           ],
           "expected": "Source master/detail, scope/mutation serialization, stale completion rejection and precise persistence.",
           "tests": [],
-          "remaining": "Dedicated resourceui replaces generic host implementation and is mounted. Worker source checklist/native/race tests are in progress; do not claim completed acceptance until handoff.",
+          "remaining": "Dedicated resourceui source master-detail and CRUD/update/skip lifecycle is mounted, including Offline flag, default-app open, Notify completion and global update notice below toasts.24 scoped package tests/race pass. Host/platform full flow and matched pixels remain unverified; see resource module report.",
           "evidence": "../native-ui-acceptance.json",
           "last_verified_sha": null,
           "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
         }
       ],
       "additional_evidence": [
+        "../resource-ui-implementation.md",
         "../settings-backend-implementation.md",
         "../settings-backend-source-evidence.json"
       ]

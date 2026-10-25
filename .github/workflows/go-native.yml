@@ -3,8 +3,9 @@ name: Go native migration
 on:
   push:
     branches: ["redesign/mygo-rpc"]
+    paths: ["**/*.go", "**/*.go.txt", "**/go.mod", "**/go.sum", "scripts/go-native*", "scripts/capture-native-reference.sh", "third_party/mygo-composer/**", "assets/**", ".github/workflows/go-native.yml"]
   pull_request:
-    paths: ["**/*.go", "go.mod", "go.sum", "scripts/capture-native-reference.sh", ".github/workflows/go-native.yml"]
+    paths: ["**/*.go", "**/*.go.txt", "**/go.mod", "**/go.sum", "scripts/go-native*", "scripts/capture-native-reference.sh", "third_party/mygo-composer/**", "assets/**", ".github/workflows/go-native.yml"]
   workflow_dispatch:
 
 permissions:
@@ -13,6 +14,8 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-24.04
+    env:
+      ORBIT_REQUIRE_COMPOSER_PATCH: "1"
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
       - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16
@@ -22,22 +25,24 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y libpango-1.0-0 libcairo2 libfontconfig1
       - name: Install pinned Pi for credential-free protocol integration
         run: npm install --prefix /tmp/orbit-pi-runtime @earendil-works/pi-coding-agent@1.4.0
-      - run: go vet ./...
-      - run: go test -race ./...
+      - run: scripts/go-native.sh vet ./...
+      - run: scripts/go-native.sh test -race ./...
         env:
           ORBIT_PI_INTEGRATION_BIN: /tmp/orbit-pi-runtime/node_modules/.bin/pi
           ORBIT_TERMINAL_TEST: "1"
+      - name: Composer compatibility toolkit regressions
+        run: scripts/go-native.sh test -race github.com/egoist/mygo/ui -run "^TestOrbitComposer" -count=1
       - name: Terminal compatibility module regressions
         run: |
           if [ -f third_party/mygo-terminal/go.mod ]; then
-            go -C third_party/mygo-terminal test -race ./...
+            scripts/go-native.sh -C third_party/mygo-terminal test -race ./...
           fi
       - name: Reproducible CPU captures (not desktop integration)
-        run: ORBIT_CAPTURE_DIR="$PWD/capture/native-cpu" go test ./internal/ui -run '^TestNativeCapture$' -count=1
+        run: ORBIT_CAPTURE_DIR="$PWD/capture/native-cpu" scripts/go-native.sh test ./internal/ui -run '^TestNativeCapture$' -count=1
       - name: No-cgo cross compilation
         run: |
           for target in linux/amd64 linux/arm64 darwin/amd64 darwin/arm64 windows/amd64 windows/arm64; do
-            GOOS=${target%/*} GOARCH=${target#*/} CGO_ENABLED=0 go build ./...
+            GOOS=${target%/*} GOARCH=${target#*/} CGO_ENABLED=0 scripts/go-native.sh build -o "/tmp/orbit-cross-${target%/*}-${target#*/}" ./cmd/orbit
           done
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
@@ -53,15 +58,21 @@ jobs:
       - name: Reference renderer and isolated display dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang cmake pkg-config libfontconfig-dev libvulkan1 mesa-vulkan-drivers vulkan-tools libwayland-dev libx11-xcb-dev libxi-dev libxtst-dev libxkbcommon-x11-dev libssl-dev libgtk-3-0 libpango-1.0-0 libcairo2 xvfb openbox xdotool x11-utils imagemagick
+          sudo apt-get install -y clang cmake pkg-config libfontconfig-dev libvulkan1 mesa-vulkan-drivers vulkan-tools libwayland-dev libx11-xcb-dev libxi-dev libxtst-dev libxkbcommon-x11-dev libssl-dev libgtk-3-0 libpango-1.0-0 libcairo2 xvfb openbox xdotool wmctrl x11-utils imagemagick
       - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
         with:
           toolchain: '1.94.0'
-      - name: Build pinned original source (reference only)
+      - name: Materialize pinned original source
         run: |
           git fetch --depth=1 origin 299a32bc87fe3d4851bdb902d9c03dcf9bf99cac
           git worktree add --detach /tmp/orbit-reference 299a32bc87fe3d4851bdb902d9c03dcf9bf99cac
-          cargo build --locked --manifest-path /tmp/orbit-reference/Cargo.toml -p orbit-pi
+      - name: Cache pinned reference build
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
+        with:
+          workspaces: /tmp/orbit-reference -> target
+          shared-key: orbit-reference-299a32b-rust-1.94
+      - name: Build pinned original source (reference only)
+        run: cargo build --locked --manifest-path /tmp/orbit-reference/Cargo.toml -p orbit-pi
       - name: Install pinned Pi without credentials or inference
         run: npm install --prefix /tmp/orbit-pi-runtime @earendil-works/pi-coding-agent@1.4.0
       - name: Capture actual original native window
@@ -83,10 +94,10 @@ jobs:
       - name: Isolated native display dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgtk-3-0 libpango-1.0-0 libcairo2 libfontconfig1 libgl1-mesa-dri mesa-vulkan-drivers vulkan-tools xvfb openbox xdotool x11-utils imagemagick
+          sudo apt-get install -y libgtk-3-0 libpango-1.0-0 libcairo2 libfontconfig1 libgl1-mesa-dri mesa-vulkan-drivers vulkan-tools xvfb openbox xdotool wmctrl x11-utils imagemagick
       - name: Build native Go app and pinned Pi fixture
         run: |
-          CGO_ENABLED=0 go build -o /tmp/orbit-go-native ./cmd/orbit
+          CGO_ENABLED=0 scripts/go-native.sh build -o /tmp/orbit-go-native ./cmd/orbit
           npm install --prefix /tmp/orbit-pi-runtime @earendil-works/pi-coding-agent@1.4.0
       - name: Capture real Go native desktop window
         run: scripts/capture-native-reference.sh /tmp/orbit-go-native "$PWD/capture/go-desktop" go

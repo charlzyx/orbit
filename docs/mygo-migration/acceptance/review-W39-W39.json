@@ -119,8 +119,8 @@
       "source_test_inventory": "Review/parser/view tests above; no forced-async-race/error-preservation integration test located.",
       "verdicts": {
         "functional": {
-          "status": "UNTESTED",
-          "reason": "Source-derived acceptance procedure is ready; this full row has not been executed end-to-end.",
+          "status": "PARTIAL",
+          "reason": "Owner source challenge identifies scoped tests and/or concrete omissions; see supplemental cases. No full acceptance PASS.",
           "last_verified_sha": null,
           "last_partial_evidence_sha": null
         },
@@ -135,11 +135,43 @@
           "last_verified_sha": null
         }
       },
-      "assertion_results": [],
+      "assertion_results": [
+        {
+          "id": "W39.assert.TestReviewRefreshKeepsSource650msFeedback",
+          "status": "PASS",
+          "expected": "Native refresh spinner remains active650ms independently of completed content load; repeated clicks extend deadline.",
+          "test": "TestReviewRefreshKeepsSource650msFeedback",
+          "evidence": "ui-feedback-evidence.json",
+          "last_verified_sha": "feb5fa4354edc6faf70b383f3c0ca59e0d1155d3b47c27052c040efbd7fd53db",
+          "sha_kind": "dirty-tree source manifest",
+          "limits": "Named native CPU feedback regression only."
+        }
+      ],
       "known_remaining": "Six-source immutable snapshots/checkpoint attribution/diff model tested; native review interaction/presentation parity remains pending. Dedicated native-controller stale source/session/workspace/hidden-toggle regressions pass under -race.",
       "full_parity_verified": false,
-      "supplemental_cases": [],
-      "additional_evidence": []
+      "supplemental_cases": [
+        {
+          "id": "UI-W01",
+          "status": "PARTIAL",
+          "owner_reported_verdict": "pass_scoped",
+          "steps": [
+            "Click Refresh against a fast disposable repository.",
+            "Complete content reload, then click again before the first feedback deadline."
+          ],
+          "expected": "Independent click feedback lasts at least650ms; repeated clicks extend it without fabricating loading data.",
+          "tests": [
+            "TestReviewRefreshKeepsSource650msFeedback"
+          ],
+          "remaining": "Initial acceptance failed at25.821182ms. Corrected with independent deadline and actual rendering predicate; default native regression now passes. Full Review animation/pixels remain open.",
+          "evidence": "../native-ui-acceptance.json",
+          "last_verified_sha": null,
+          "limits": "Owner-scoped report; no full-row or immutable-revision PASS assigned by this index."
+        }
+      ],
+      "additional_evidence": [
+        "strict-results.json",
+        "ui-feedback-evidence.json"
+      ]
     }
   ]
 }

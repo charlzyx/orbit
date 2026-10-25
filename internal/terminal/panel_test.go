@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	ghostty "github.com/egoist/mygo/plugins/terminal"
+	ghostty "github.com/egoist/mygo/orbit-terminal"
 	"github.com/egoist/mygo/ui"
 )
 
@@ -255,4 +255,48 @@ func TestLiveDirectCommandTabPreservesArgv(t *testing.T) {
 	}
 	again := ready(t, p, tt)
 	until(t, tt, "restarted same direct argv", func() bool { return strings.Contains(again.Text(), "__ARGV__"+literal) })
+}
+
+func TestLiveHiddenPTYKeepsRunningWithoutWindowFrames(t *testing.T) {
+	requireTerminal(t)
+	p := NewPanel(Options{Workspace: t.TempDir(), Command: []string{"/bin/sh"}, Env: []string{"PS1=orbit> ", "ENV="}, ReduceMotion: true})
+	defer p.Close()
+	if e := p.NewTab(); e != nil {
+		t.Fatal(e)
+	}
+	frames := 0
+	tt := ui.NewTester(func(c *ui.Context) { frames++; View(c, p) }, 640, 240)
+	term := ready(t, p, tt)
+	until(t, tt, "visible shell ready", func() bool { return strings.Contains(term.Text(), "orbit>") })
+	p.Hide()
+	tt.Frame()
+	before := frames
+	term.Send([]byte("printf '__HIDDEN_%s__\\n' alive\r"))
+	until(t, nil, "hidden shell completed command", func() bool { return strings.Contains(term.Text(), "__HIDDEN_alive__") })
+	tt.Advance(time.Second)
+	if frames != before {
+		t.Fatalf("hidden PTY requested %d window frames", frames-before)
+	}
+	if e := p.Toggle(); e != nil {
+		t.Fatal(e)
+	}
+	tt.Advance(time.Second)
+	if frames == before || p.ActiveTerminal() != term {
+		t.Fatal("showing did not redraw the existing PTY")
+	}
+	// A visible preference can belong to an unrendered settings/parked page.
+	p.SetVisible(false)
+	tt.Frame()
+	before = frames
+	term.Send([]byte("printf '__PARKED_%s__\\n' alive\r"))
+	until(t, nil, "parked shell completed command", func() bool { return strings.Contains(term.Text(), "__PARKED_alive__") })
+	tt.Advance(time.Second)
+	if frames != before || !p.IsOpen() {
+		t.Fatal("page visibility changed saved openness or invalidated window")
+	}
+	p.SetVisible(true)
+	tt.Advance(time.Second)
+	if frames == before {
+		t.Fatal("restored page did not redraw")
+	}
 }

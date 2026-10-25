@@ -1,0 +1,58 @@
+{
+  "scope": "Usage native source interaction checkpoint",
+  "timestamp_utc": "2026-10-25T05:46:31.812514+00:00",
+  "baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "full_row_parity_verified": false,
+  "native_os": "not executed by this capture",
+  "matched_pixels": "OPEN; CPU fixture images are not matched Rust comparisons",
+  "commands": [
+    {
+      "command": "./scripts/go-native.sh test -race ./internal/ui ./internal/workbench -run '^TestUsage|^TestSettingsBackend|^TestLatency' -count=1",
+      "result": "PASS",
+      "ui_seconds": 4.434,
+      "workbench_seconds": 1.442
+    },
+    {
+      "command": "ORBIT_CAPTURE_DIR=$PWD/docs/mygo-migration/probes/usageui ./scripts/go-native.sh test ./internal/ui -run '^TestNativeUsageCapture$' -count=1",
+      "result": "PASS",
+      "seconds": 0.771
+    }
+  ],
+  "files": {
+    "internal/ui/usage.go": "28e04a568025fff6a34b9ec22591580c2acf3547cf5bd777b490e8b06b6de1b6",
+    "internal/ui/usage_projection.go": "17aed671f4d787f3552be63e8eed6c099cffe2a8c422ca71dc6ae84d55c5587f",
+    "internal/ui/usage_analytics.go": "7e04f87d88d957a08d3c0d931bc5b62cfdbbf641016fc96ada4ceceb50158563",
+    "internal/ui/usage_tables.go": "b27bad0910b0dfaba984fc6f65c03dd1dcf1698bc39bb14caa5048e6f2b86762",
+    "internal/ui/usage_filters.go": "46c4b9db42e42438285dceadd7b14c912dd15947761610ca995cd93e6aac0ce8",
+    "internal/ui/usage_test.go": "ed49ebd9106ea094f1f693ef4f5b31fcd8b2e011e7a47f91b7e496d1dd0bf529",
+    "internal/ui/usage_interactions_test.go": "e7b3471094aab06f5999f5b1298ac84cde92db749d4b3ddfcfc42d4f8eb438b7",
+    "internal/workbench/usage.go": "f984a43f57d1f46625b870a3e78ecbe2098f2366752fcc7743e59043b5c28ea8",
+    "internal/workbench/usage_model_scope_test.go": "2b4aaae08df358da9eee6fd7c1f9bb817311beb57e45d43f94fa42fe0b447e1c",
+    "crates/orbit-pi/src/usage/aggregate.rs": "8012398f96d0828a627aaafff8e804801429895299da02c431621a659d62e62c",
+    "crates/orbit-pi/src/usage/chart.rs": "96efbbb05ecafdba4b2703d86a071af1307d184c1bc4e7a089a6706f1c4d9e13",
+    "crates/orbit-pi/src/usage/collect.rs": "cac36e4b181153dd0c4fc59f4c2f807ce17799126dc5fd48d7c52968d3f0225d",
+    "crates/orbit-pi/src/usage/filters.rs": "8c3d338230662e320a231c98dd4b566c9c182ad449be926c3a821d80c69e3a7f",
+    "crates/orbit-pi/src/usage/format.rs": "794f28416c2747239d4bd3ae548c991acdbe577e18836b4b5caf03829d97bf8c",
+    "crates/orbit-pi/src/usage/heatmap.rs": "f7dc308de1b1e0545c8697d6914285dad5ad63d1977bed4fad7b79f773e8c738",
+    "crates/orbit-pi/src/usage/model.rs": "a7b84cd748e2971d399c94dc43a10b5e00ef3632a0edadc20b4b28b3cf760b3f",
+    "crates/orbit-pi/src/usage/page.rs": "1a5ca8e0960e345e7cd7c146841d6993f455f6f8176280cdbbcdf782a419e24e",
+    "crates/orbit-pi/src/usage/table.rs": "4525d6279ac9bdb2ca2b03f226e72530b17013585c59e5185de148ee4610daf2",
+    "crates/orbit-pi/src/usage/view.rs": "3a8620f8c55d9e3a053bda4bc789acc7a80fe2af4e45886a47278bb89e5772af",
+    "docs/mygo-migration/probes/usageui/usage-simple-fixture-dark.png": "f02b4656fa8eabb43eb01dc3528a03a966589b3e87ec3540ff1defb211aa3c38",
+    "docs/mygo-migration/probes/usageui/usage-details-fixture-dark.png": "c2f86d8fb4aca2fd7316c94a4740d2fcb7961722a42e3de8b92d28e586b2b152"
+  },
+  "captures": {
+    "renderer": "MyGo CPU",
+    "width": 1470,
+    "height": 922,
+    "scale": 1,
+    "theme": "dark",
+    "fixture": "usageFixtureIndex; explicitly synthetic session store and paths",
+    "inspected": true,
+    "timezone_env": null,
+    "host_timezone": [
+      "JST",
+      "JST"
+    ]
+  }
+}

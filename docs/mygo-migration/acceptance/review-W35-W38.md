@@ -29,8 +29,8 @@ Functional **PARTIAL** · Visual **UNTESTED** · Native OS **UNTESTED**
 **Existing test candidates, not automatic acceptance:** `internal/workspace/checkpoint_test.go`, `internal/workspace/review_test.go`
 
 **Executed narrow assertions:**
-- **PASS** `TestReviewHighlightSurvivesHiddenExpansionAndGrouping`: Token spans survive retained context expansion, grouping and split conversion. [Evidence](workspace-evidence.json). Tested dirty-tree manifest `4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3`, not a published commit.
-- **PASS** `TestReviewVisibleLimitAndExpansionCap`: Visible-line cap remains 50,000 and expansion cannot exceed it. [Evidence](workspace-evidence.json). Tested dirty-tree manifest `4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3`, not a published commit.
+- **PASS** `TestReviewHighlightSurvivesHiddenExpansionAndGrouping`: Token spans survive retained context expansion, grouping and split conversion. [Evidence](workspace-evidence.json). Tested dirty-tree manifest `8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59`, not a published commit.
+- **PASS** `TestReviewVisibleLimitAndExpansionCap`: Visible-line cap remains 50,000 and expansion cannot exceed it. [Evidence](workspace-evidence.json). Tested dirty-tree manifest `8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59`, not a published commit.
 
 **Remaining:** Six-source immutable snapshots/checkpoint attribution/diff model tested; native review interaction/presentation parity remains pending.
 **Visual/OS gates:** No matched pinned-Rust/Go image baseline run at equal OS, scale, font, viewport and state. This row has not passed its complete native host interaction sequence. Linux CPU/domain tests and cross-builds do not establish macOS/Windows runtime parity.

@@ -107,11 +107,84 @@ func TestLastTurnUsesPersistedCounterAfterCompaction(t *testing.T) {
 		t.Fatal(e)
 	}
 	a := fixture(t)
-	a.Model = Snapshot{Workspace: root, SessionID: "compacted", Turn: 3, Messages: []Message{{Role: "assistant", Text: "Earlier turns were compacted."}}}
+	a.Model = Snapshot{Workspace: root, SessionID: "compacted", Turn: 3, LatestTurn: 3, Messages: []Message{{Role: "assistant", Text: "Earlier turns were compacted."}}}
 	a.reviewState.source = workspace.ReviewLastTurn
 	a.RefreshReview()
 	drainRegressionUpdates(t, a, func() bool { return !a.reviewState.loading && a.reviewState.root == root })
 	if a.reviewState.err != "" || len(a.reviewState.data.Files) != 1 || a.reviewState.data.Files[0].Path != "agent-change" {
 		t.Fatal(a.reviewState.err, a.reviewState.data.Files)
+	}
+}
+
+// Source app/session.rs keeps latest_turn separate from the in-flight
+// turn_count, and app.rs::sync_review_context passes only the completed one.
+func TestReviewLastTurnKeepsCompletedDiffDuringNextPrompt(t *testing.T) {
+	root := regressionRepo(t)
+	g := workspace.Git{Dir: root}
+	ctx := context.Background()
+	if e := g.CaptureTurnStart(ctx, "active", 1); e != nil {
+		t.Fatal(e)
+	}
+	if e := os.WriteFile(filepath.Join(root, "completed.txt"), []byte("first completed turn\n"), 0600); e != nil {
+		t.Fatal(e)
+	}
+	if e := g.CaptureTurn(ctx, "active", 1); e != nil {
+		t.Fatal(e)
+	}
+	a := fixture(t)
+	a.Model = Snapshot{Workspace: root, SessionID: "active", Turn: 1, LatestTurn: 1}
+	a.reviewState.source = workspace.ReviewLastTurn
+	a.RefreshReview()
+	drainRegressionUpdates(t, a, func() bool { return !a.reviewState.loading })
+	if a.reviewState.err != "" || len(a.reviewState.data.Files) != 1 {
+		t.Fatal("completed turn did not load", a.reviewState.err, a.reviewState.data.Files)
+	}
+	if e := g.CaptureTurnStart(ctx, "active", 2); e != nil {
+		t.Fatal(e)
+	}
+	if e := os.WriteFile(filepath.Join(root, "in-flight.txt"), []byte("unfinished second turn\n"), 0600); e != nil {
+		t.Fatal(e)
+	}
+	a.Model.Turn = 2
+	a.Model.Running = true
+	for i := 0; i < 3; i++ {
+		a.RefreshReview()
+		drainRegressionUpdates(t, a, func() bool { return !a.reviewState.loading })
+		if a.reviewState.err != "" || len(a.reviewState.data.Files) != 1 || a.reviewState.data.Files[0].Path != "completed.txt" {
+			t.Fatalf("Last Turn targeted unfinished turn instead of retained completed turn: error=%q files=%#v", a.reviewState.err, a.reviewState.data.Files)
+		}
+	}
+}
+
+func TestReviewHistoricalTurnStaysPinnedAndEmptySessionFallsBack(t *testing.T) {
+	root := regressionRepo(t)
+	g := workspace.Git{Dir: root}
+	ctx := context.Background()
+	for turn, name := range []string{"first.txt", "second.txt"} {
+		if e := g.CaptureTurnStart(ctx, "history", turn+1); e != nil {
+			t.Fatal(e)
+		}
+		if e := os.WriteFile(filepath.Join(root, name), []byte(name+"\n"), 0600); e != nil {
+			t.Fatal(e)
+		}
+		if e := g.CaptureTurn(ctx, "history", turn+1); e != nil {
+			t.Fatal(e)
+		}
+	}
+	a := fixture(t)
+	a.Model = Snapshot{Workspace: root, SessionID: "history", Turn: 2, LatestTurn: 2}
+	a.OpenTurnReview(1)
+	drainRegressionUpdates(t, a, func() bool { return !a.reviewState.loading })
+	for i := 0; i < 3; i++ {
+		if a.currentReviewLabel() != "Turn 1" || a.reviewState.err != "" || len(a.reviewState.data.Files) != 1 || a.reviewState.data.Files[0].Path != "first.txt" {
+			t.Fatal("historical turn changed to latest", a.currentReviewLabel(), a.reviewState.err, a.reviewState.data.Files)
+		}
+		a.RefreshReview()
+		drainRegressionUpdates(t, a, func() bool { return !a.reviewState.loading })
+	}
+	a.SetSnapshot(Snapshot{Workspace: root, SessionID: "new-session", Turn: 1, Running: true})
+	drainRegressionUpdates(t, a, func() bool { return !a.reviewState.loading })
+	if a.reviewState.source != workspace.ReviewUncommitted || a.reviewState.turn != 0 || a.reviewState.err != "" {
+		t.Fatal("session without completed checkpoint stayed on old source", a.reviewState.source, a.reviewState.turn, a.reviewState.err)
 	}
 }

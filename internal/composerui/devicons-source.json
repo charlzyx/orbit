@@ -1,0 +1,12 @@
+{
+  "source": "devicons 0.6.13",
+  "url": "https://crates.io/crates/devicons/0.6.13",
+  "license": "Apache-2.0",
+  "entries": 591,
+  "source_sha256": {
+    "src/icons.rs": "37656e63d8b1eed4d1edb53f3d563cf917af2349ea6e85038d02b6c2c8444cd2",
+    "src/icons/dark.rs": "876f8a726ff87544b6dea6ca34b6f71ac69a4a8bdd1e13fc4485ee72cb6ef8f9",
+    "src/icons/light.rs": "2ea67869b03c04d6e1a8433c1f94a94219a34482c05876066b60aac6ae27d805"
+  },
+  "modification": "Translated static mappings and filename/extension lookup to Go; no Rust runtime."
+}

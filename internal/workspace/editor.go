@@ -371,6 +371,16 @@ func (e *Editor) Reload(path string) error {
 	if live != d {
 		return nil
 	}
+	if content.Error == "" && content.Text == d.Text && content.Mode != FileImage && content.Mode != FileBinary && content.Mode != FileTooLarge {
+		// A self-save echo (or matching external save) must not reset undo,
+		// cursor or scroll state in the native adapter.
+		d.Content = content
+		d.saved = content.Text
+		d.Dirty = false
+		d.Conflict = false
+		e.notify()
+		return nil
+	}
 	if d.Dirty || d.Saving {
 		d.Conflict = content.Error != "" || content.Text != d.saved
 		e.notify()

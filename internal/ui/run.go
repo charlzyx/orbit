@@ -16,15 +16,18 @@ import (
 	"github.com/charlzyx/orbit/internal/agent"
 	"github.com/charlzyx/orbit/internal/bugreportui"
 	"github.com/charlzyx/orbit/internal/gitworkbench"
+	"github.com/charlzyx/orbit/internal/highlight"
+	"github.com/charlzyx/orbit/internal/mcpui"
 	"github.com/charlzyx/orbit/internal/native"
 	"github.com/charlzyx/orbit/internal/pirpc"
 	"github.com/charlzyx/orbit/internal/preferences"
+	"github.com/charlzyx/orbit/internal/resourceui"
 	orbiterm "github.com/charlzyx/orbit/internal/terminal"
 	"github.com/charlzyx/orbit/internal/workbench"
 	"github.com/charlzyx/orbit/internal/workspace"
 	"github.com/charlzyx/orbit/internal/worktreeui"
 	"github.com/egoist/mygo"
-	ghostty "github.com/egoist/mygo/plugins/terminal"
+	ghostty "github.com/egoist/mygo/orbit-terminal"
 	"github.com/egoist/mygo/ui"
 )
 
@@ -38,6 +41,9 @@ type Controller struct {
 	Agent            *agent.Manager
 	Terminal         *orbiterm.Panel
 	Git              *gitworkbench.State
+	Resources        *resourceui.State
+	MCP              *mcpui.State
+	configApplyAfter time.Time
 	BugReport        *bugreportui.State
 	Worktrees        *worktreeui.State
 	Store            *preferences.Store
@@ -110,8 +116,8 @@ func NewController(o RunOptions) (*Controller, error) {
 	x.Agent = agent.NewManager(agent.Options{PiBinary: o.PiBinary, Home: s.Home, SessionDir: filepath.Join(s.PiDir, "sessions"), Resources: orbitassets.Extensions(), ResolveChildEnv: func(dir string) ([]string, error) { return workbench.New(s, dir).SecretEnv() }, Offline: o.Offline, DisableExtensions: o.NoExtensions, OnChange: invalidate, OnNotification: func(n agent.Notification) {
 		x.Notifier.Deliver(native.Notification{Session: n.SessionPath, Title: n.Title, Body: n.Message, Kind: native.ToastKind(n.Kind)})
 	}})
-	x.UI.Options.Custom = orbiterm.NewCustom(orbiterm.CustomOptions{Font: ghostty.Font{Family: s.Fonts().CodeFamily, Size: float32(s.UI().TerminalFontSize), Features: []string{"-calt", "-liga", "-dlig"}}, Theme: NewTheme(s.Appearance().LightTheme, s.UI(), s.Fonts()).Terminal(), DarkTheme: NewTheme(s.Appearance().DarkTheme, s.UI(), s.Fonts()).Terminal(), ReduceMotion: s.UI().ReduceMotion, OnChange: invalidate, OnInput: x.Agent.CustomUIInput, OnResize: x.Agent.CustomUIResize, OnError: func(e error) { x.enqueue(func() { x.UI.save(e) }) }})
-	x.Git = gitworkbench.New(o.Workspace, gitworkbench.Options{AvatarLoader: gitworkbench.LoadAvatar, AvatarHome: s.Home, OnChange: invalidate, OpenFile: x.UI.OpenFile, RevealFile: native.RevealPath, OpenReview: func(source, ref, path string) {
+	x.UI.Options.Custom = orbiterm.NewCustom(orbiterm.CustomOptions{RowHeight: float32(s.UI().EditorFontSize) * 18 / 13, Font: ghostty.Font{Family: s.Fonts().CodeFamily, Size: float32(s.UI().EditorFontSize) * 12 / 13, Features: []string{"-calt", "-liga", "-dlig"}}, Theme: NewTheme(s.Appearance().LightTheme, s.UI(), s.Fonts()).Terminal(), DarkTheme: NewTheme(s.Appearance().DarkTheme, s.UI(), s.Fonts()).Terminal(), ReduceMotion: s.UI().ReduceMotion, OnChange: invalidate, OnInput: x.Agent.CustomUIInput, OnResize: x.Agent.CustomUIResize, OnError: func(e error) { x.enqueue(func() { x.UI.save(e) }) }})
+	x.Git = gitworkbench.New(o.Workspace, gitworkbench.Options{TokenColor: func(class highlight.Class) ui.Color { return x.UI.Theme.TokenColor(class) }, AvatarLoader: gitworkbench.LoadAvatar, AvatarHome: s.Home, OnChange: invalidate, OpenFile: x.UI.OpenFile, RevealFile: native.RevealPath, OpenReview: func(source, ref, path string) {
 		x.UI.Navigate("chat")
 		x.UI.ReviewVisible = true
 		x.UI.ExplorerVisible = false
@@ -122,7 +128,7 @@ func NewController(o RunOptions) (*Controller, error) {
 	}, OpenURL: func(url string) { x.UI.save(native.OpenURL(url)) }, Authenticate: func() { x.UI.Navigate("chat"); x.UI.save(x.Terminal.NewCommandTab([]string{"gh", "auth", "login"})) }})
 	var hints map[string]bool
 	_ = s.Read("hints.json", &hints)
-	x.Worktrees = worktreeui.New(o.Workspace, worktreeui.Options{Translate: x.UI.Tr, HideHowTo: hints["worktree_howto_dismissed"], OnDismissHowTo: func() {
+	x.Worktrees = worktreeui.New(o.Workspace, worktreeui.Options{FocusComposer: func() { x.UI.composer.Focus() }, OnPickerOpen: func() { x.UI.autocomplete.Dismiss(); x.UI.thinkingOpen = false; x.UI.workspaceOpen = false }, Translate: x.UI.Tr, HideHowTo: hints["worktree_howto_dismissed"], OnDismissHowTo: func() {
 		x.UI.save(s.Update("hints.json", func(m map[string]json.RawMessage) error {
 			m["worktree_howto_dismissed"] = json.RawMessage("true")
 			return nil
@@ -152,13 +158,45 @@ func NewController(o RunOptions) (*Controller, error) {
 		cfg := workspace.GenerationConfig{Pi: pirpc.Config{Executable: x.Agent.PiBinary(), WorkspaceDir: s.Home, Environment: append(os.Environ(), env...), EnvOverrides: map[string]string{"PI_CODING_AGENT_DIR": s.PiDir}}, Provider: snap.Model.Provider, Model: snap.Model.ID}
 		return workspace.GenerateReportDraftRPC(ctx, cfg, string(kind), notes)
 	}, Text: x.UI.text})
+	x.MCP = mcpui.New(s, o.Workspace, mcpui.Options{OnChange: invalidate, PiBinary: o.PiBinary, Text: x.UI.text, Theme: func() mcpui.Theme {
+		return mcpui.Theme{Elevated: x.UI.Theme.Elevated, CodeFont: x.UI.Fonts.CodeFamily, Px: x.UI.Theme.Px, Space: x.UI.Theme.Space}
+	}, OnModified: func() { x.configApplyAfter = time.Now().Add(500 * time.Millisecond) }, OnApply: func() { x.configApplyAfter = time.Now() }})
+	x.Resources = resourceui.New(s, o.Workspace, resourceui.Options{Notify: x.UI.Notify, Offline: o.Offline, OnChange: invalidate, OnModified: func() { x.configApplyAfter = time.Now().Add(500 * time.Millisecond) }, Text: x.UI.text, PiBinary: o.PiBinary, Theme: func() resourceui.Theme {
+		return resourceui.Theme{Secondary: x.UI.Theme.TextSecondary, Action: x.UI.Theme.Action, ActionText: x.UI.Theme.ActionFg, SelectionText: x.UI.Theme.SelectionFg, Elevated: x.UI.Theme.Elevated, CodeFont: x.UI.Fonts.CodeFamily, Px: x.UI.Theme.Px, Space: x.UI.Theme.Space}
+	}, OpenFile: func(path string) { x.UI.save(native.OpenPath(path)) }, RevealPath: native.RevealPath, CopyText: func(text string) { x.Action(Action{Kind: "CopyText", Value: text}) }, InvokeSkill: func(command string) { x.UI.Navigate("chat"); x.UI.Draft = command + " "; x.UI.composer.Focus() }})
+	x.UI.Options.Overlay = x.Resources.Overlay
+	x.UI.Options.ToastBottom = func(c *ui.Context) float32 {
+		h := x.Resources.NoticeHeight(c)
+		if h > 0 {
+			return 16 + h + 8
+		}
+		return 16
+	}
+	x.UI.Options.RefreshMCP = x.MCP.Refresh
+	x.UI.Options.Resources = func(c *ui.Context, page string) { x.Resources.View(c, page).Fill() }
+	x.UI.Options.RefreshResources = func(page string) {
+		if page == "plugins" {
+			x.Resources.RefreshPlugins()
+		} else {
+			x.Resources.Refresh()
+		}
+	}
+	x.UI.Options.MCP = func(c *ui.Context) { x.MCP.View(c).Fill() }
+	x.UI.Options.HasModal = func() bool {
+		return (x.UI.page == "git" && x.Git.HasModal()) || (x.UI.page == "worktrees" && x.Worktrees.HasModal()) || (x.UI.page == "settings" && ((x.UI.settingsPage == "bug" && x.BugReport.HasModal()) || (x.UI.settingsPage == "mcp" && x.MCP.HasModal()) || ((x.UI.settingsPage == "skills" || x.UI.settingsPage == "plugins") && x.Resources.HasModal())))
+	}
 	x.UI.Options.BugReport = func(c *ui.Context) { bugreportui.View(c, x.BugReport).Fill() }
 	x.UI.Options.OnPage = func(page string) {
+		if page != "usage" {
+			x.UI.closeUsage()
+		}
 		switch page {
+		case "settings":
+			x.UI.loadSettings(x.UI.settingsPage)
 		case "files":
 			x.UI.RefreshFiles()
 		case "usage":
-			x.UI.refreshUsage()
+			x.UI.openUsage()
 		case "git":
 			x.Git.Refresh()
 		case "worktrees":
@@ -185,7 +223,9 @@ func (x *Controller) enqueue(f func()) {
 }
 func (x *Controller) sync() {
 	s := x.Agent.Snapshot()
+	x.UI.Runtime = x.Agent.RuntimeSnapshot()
 	x.UI.SetSnapshot(adaptSnapshot(s, x.workspace, x.pinned, x.archived))
+	x.UI.syncUsageStore()
 	if d := x.UI.Model.Dialog; d != nil && d.Method == "custom" {
 		x.UI.Options.Custom.Update(d.ID, d.Lines, d.Width, d.Height, d.Cursor)
 	} else {
@@ -221,6 +261,17 @@ func (x *Controller) sync() {
 				}
 			}
 		default:
+		}
+	}
+	x.MCP.Tick()
+	x.Resources.Tick()
+	if !x.configApplyAfter.IsZero() && time.Now().After(x.configApplyAfter) && !x.Agent.AnyBusy() && x.sessionGate.TryRLock() {
+		x.configApplyAfter = time.Time{}
+		err := x.Agent.Restart()
+		x.sessionGate.RUnlock()
+		x.UI.save(err)
+		if err == nil {
+			x.UI.Notify("Pi configuration reload requested for the current session. Other open sessions keep their running configuration.", false)
 		}
 	}
 	x.BugReport.Tick()
@@ -262,6 +313,8 @@ func (x *Controller) changeWorkspaceServices(path string) {
 	x.Git.Refresh()
 	x.bindGenerators(path)
 	x.Worktrees.SetWorkspace(path)
+	x.MCP.SetWorkspace(path)
+	x.Resources.SetWorkspace(path)
 	if x.watcher != nil {
 		old := x.watcher
 		go old.Close()
@@ -280,6 +333,10 @@ func (x *Controller) Close() {
 		}
 		x.Git.Close()
 		x.BugReport.Close()
+		x.MCP.Close()
+		x.Resources.Close()
+		x.UI.autocomplete.Close()
+		x.UI.closeBackground()
 		x.Worktrees.Close()
 		x.Agent.Close()
 		x.Terminal.Close()
@@ -291,7 +348,14 @@ func (x *Controller) Close() {
 	})
 }
 func adaptSnapshot(s agent.Snapshot, workspacePath string, pinned, archived map[string]bool) Snapshot {
-	v := Snapshot{Turn: s.Turn, Connected: s.Connected, Running: s.Running, Error: s.ConnectionError, Status: s.Status, SessionID: s.ActiveSession.ID, SessionPath: s.ActiveSession.Path, SessionName: s.ActiveSession.Name, Workspace: workspacePath, ModelID: s.Model.ID, ModelProvider: s.Model.Provider, Thinking: s.ThinkingLevel, ThinkingLevels: s.ThinkingLevels, AuthProviders: s.Auth.Providers, AuthURL: s.Auth.URL, AuthStatus: s.Auth.Status, AuthCode: s.Auth.UserCode}
+	v := Snapshot{LatestTurn: s.LatestTurn, CommandsRaw: s.Commands, RawMessages: s.Messages, Turn: s.Turn, Connected: s.Connected, Running: s.Running, Error: s.ConnectionError, Status: s.Status, SessionID: s.ActiveSession.ID, SessionPath: s.ActiveSession.Path, SessionName: s.ActiveSession.Name, Workspace: workspacePath, ModelID: s.Model.ID, ModelProvider: s.Model.Provider, Thinking: s.ThinkingLevel, ThinkingLevels: s.ThinkingLevels, AuthProviders: s.Auth.Providers, AuthURL: s.Auth.URL, AuthStatus: s.Auth.Status, AuthCode: s.Auth.UserCode}
+	v.Extensions = s.Extensions
+	v.SteeringMode = s.SteeringMode
+	v.FollowUpMode = s.FollowUpMode
+	v.AutoCompactionEnabled = s.AutoCompactionEnabled
+	v.AutoCompactionKnown = s.AutoCompactionKnown
+	v.AccessMode = s.AccessMode
+	v.WorkflowMode = s.WorkflowMode
 	v.Usage, v.Quotas, v.QuotaSupport = runtimeUsage(s), s.Quotas, s.QuotaSupport
 	if s.ActiveSession.Workspace != "" {
 		v.Workspace = s.ActiveSession.Workspace
@@ -378,7 +442,22 @@ func (x *Controller) Action(a Action) {
 	case "SetAccess":
 		e = m.SetAccessMode(a.Value)
 	case "SetWorkflow":
-		e = m.SetWorkflowMode(a.Value)
+		target, mode, supported := m.CaptureWorkflowTarget(), a.Value, u.Model.Extensions.Workflow
+		u.Async(func() func() {
+			var err error
+			if !x.sessionGate.TryRLock() {
+				err = errors.New("Runtime maintenance is in progress. Workflow was not changed.")
+			} else {
+				err = m.SetWorkflowModeFor(target, mode)
+				x.sessionGate.RUnlock()
+			}
+			return func() {
+				u.save(err)
+				if err == nil && !supported {
+					u.Notify(strings.ReplaceAll(u.text("workflow.mode_set_unavailable", "%{mode} selected, but the workflow extension is unavailable."), "%{mode}", titleCase(mode)), true)
+				}
+			}
+		})
 	case "RenameSession":
 		path := str("path")
 		if path == "" {
@@ -436,6 +515,24 @@ func (x *Controller) Action(a Action) {
 		e = m.CancelLogin()
 	case "RestartRuntime":
 		e = m.Restart()
+	case "StartRuntime":
+		if m.RuntimeSnapshot().Active == nil {
+			e = m.Open(u.Model.Workspace, u.Model.SessionPath)
+		} else {
+			e = m.Start()
+		}
+	case "StopRuntime":
+		e = m.Stop()
+	case "SetAutoRetry":
+		e = m.SetAutoRetry(flag("enabled"))
+	case "SetAutoCompaction":
+		e = m.Send(pirpc.SetAutoCompaction, map[string]any{"enabled": flag("enabled")})
+	case "SetFollowUpMode", "SetSteeringMode":
+		command := pirpc.SetFollowUpMode
+		if a.Kind == "SetSteeringMode" {
+			command = pirpc.SetSteeringMode
+		}
+		e = m.Send(command, map[string]any{"mode": a.Value})
 	case "CheckPiUpdate":
 		u.checkPiUpdate()
 	case "ChoosePiBinary":
@@ -449,6 +546,8 @@ func (x *Controller) Action(a Action) {
 			u.save(e)
 			if e == nil {
 				u.Options.PiBinary = p
+				x.MCP.SetPiBinary(p)
+				x.Resources.SetPiBinary(p)
 				u.save(x.Store.Write("runtime.json", map[string]any{"piBinary": p}))
 			}
 		})
@@ -506,7 +605,11 @@ func (x *Controller) Action(a Action) {
 			e = m.Send(pirpc.ExportHTML, map[string]any{"outputPath": p})
 		}
 	case "ExportUsage":
-		p, err := native.SaveFile(u.Window, "Export usage", "orbit-usage.csv", []mygo.FileFilter{{Name: "CSV", Extensions: []string{"csv"}}})
+		format := a.Value
+		if format != "json" {
+			format = "csv"
+		}
+		p, err := native.SaveFile(u.Window, "Export usage", "orbit-usage."+format, []mygo.FileFilter{{Name: strings.ToUpper(format), Extensions: []string{format}}})
 		e = err
 		if p != "" {
 			idx, ok := a.Data["index"].(workbench.UsageIndex)
@@ -515,7 +618,12 @@ func (x *Controller) Action(a Action) {
 				u.Async(func() func() {
 					f, e := os.Create(p)
 					if e == nil {
-						e = idx.ExportCSV(f, filter)
+						if format == "json" {
+							options, _ := a.Data["options"].(workbench.UsageExportOptions)
+							e = idx.ExportJSON(f, filter, options)
+						} else {
+							e = idx.ExportCSV(f, filter)
+						}
 						if ce := f.Close(); e == nil {
 							e = ce
 						}
@@ -523,6 +631,13 @@ func (x *Controller) Action(a Action) {
 					return func() { u.save(e) }
 				})
 			}
+		}
+	case "BrowseBackground":
+		paths, err := mygo.Dialog.Open(mygo.OpenDialogOptions{Parent: u.Window, Title: u.text("settings.choose_background_title", "Choose a background image"), Filters: []mygo.FileFilter{{Name: "Images", Extensions: []string{"png", "jpg", "jpeg", "gif", "webp", "bmp", "tiff"}}}})
+		if err != nil {
+			u.Notify(err.Error(), true)
+		} else if len(paths) > 0 {
+			u.chooseBackground(paths[0])
 		}
 	case "BrowseAttachments":
 		paths, err := native.BrowseAttachments(u.Window, x.workspace)
@@ -540,12 +655,14 @@ func (x *Controller) Action(a Action) {
 	case "AddMcpServer":
 		u.settingsPage = "mcp"
 		u.Navigate("settings")
-		u.editMCP("", "user", "", `{"command":"","args":[]}`)
+		x.MCP.AddServer()
 	case "RefreshMcpServers", "ReconnectMcpServers":
-		u.loadSettings("mcp")
-		e = m.Submit("/mcp", nil, agent.SendMode("follow_up"))
-	case "AutoTitleChanged":
-		e = m.Restart()
+		x.MCP.Refresh()
+		if a.Kind == "ReconnectMcpServers" {
+			x.configApplyAfter = time.Now()
+		}
+	case "AutoTitleChanged", "RuntimeConfigChanged":
+		x.configApplyAfter = time.Now().Add(500 * time.Millisecond)
 	case "NotificationsChanged":
 		p := x.Store.Notifications()
 		x.Notifier.SetPrefs(native.NotificationPrefs{Desktop: p.Desktop, Sound: p.Sound, Toasts: p.Toasts})
@@ -593,7 +710,11 @@ func Run(o RunOptions) error {
 	mygo.App.SetName("Orbit")
 	var lifecycle *native.Lifecycle
 	create := func() *mygo.Window {
-		w := mygo.NewWindow(mygo.WindowOptions{Title: "Orbit", Width: 1280, Height: 800, MinWidth: 800, MinHeight: 560, TitleBarStyle: mygo.TitleBarHidden, TitleBarHeight: 44, TrafficLightPosition: &mygo.Point{X: 12, Y: 16}, Content: ui.View(x.View)})
+		display := mygo.Screen.PrimaryDisplay()
+		width, height := windowRestoreSize(display.Bounds.Width, display.Bounds.Height)
+		options := sourceWindowOptions(width, height)
+		options.Content = ui.View(x.View)
+		w := mygo.NewWindow(options)
 		x.window.Store(w)
 		x.UI.Window = w
 		x.UI.window.Store(w)
@@ -660,6 +781,7 @@ func Run(o RunOptions) error {
 				return
 			case <-timer.C:
 				if w := x.window.Load(); w == nil || w.IsDestroyed() {
+					x.Terminal.SetVisible(false)
 					x.Agent.Tick()
 				}
 			}
@@ -733,4 +855,18 @@ func (x *Controller) OpenSession(path string) {
 			x.UI.save(x.Agent.Open(dir, path))
 		}
 	})
+}
+
+// Source main_window.rs::open sizes restore bounds relative to the primary display.
+func windowRestoreSize(displayWidth, displayHeight int) (int, int) {
+	if displayWidth <= 0 || displayHeight <= 0 {
+		return 1240, 840
+	}
+	return min(1440, int(float64(displayWidth)*.85)), min(920, int(float64(displayHeight)*.9))
+}
+
+// The source has no in-window menu bar on Linux. Auto-hide retains native edit
+// roles and accelerators without allocating an unwanted GTK/Windows strip.
+func sourceWindowOptions(width, height int) mygo.WindowOptions {
+	return mygo.WindowOptions{Title: "Orbit", Width: width, Height: height, MinWidth: 960, MinHeight: 640, Maximized: true, AutoHideMenuBar: true, TitleBarStyle: mygo.TitleBarHidden, TitleBarHeight: 44, TrafficLightPosition: &mygo.Point{X: 12, Y: 16}}
 }

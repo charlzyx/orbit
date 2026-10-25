@@ -44,8 +44,8 @@
         {
           "id": "W44.behavior",
           "dimension": "functional",
-          "action": "Create with setup enabled in an untrusted repository; cancel Allow Setup, then explicitly allow.",
-          "expected": "First setup-script run per repository requires explicit AllowSetup dialog; create dialog can disable setup for that worktree.",
+          "action": "In a fresh fixture repository with a setup script, create a worktree with setup enabled. Cancel Allow Setup, then repeat and choose Allow & Create.",
+          "expected": "Before explicit allowance neither creation nor script executes. After allowance, canonical repository is recorded once and that requested worktree is created. Disabling setup per creation bypasses script execution.",
           "status": "UNTESTED",
           "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
@@ -62,46 +62,46 @@
         {
           "id": "W44.error",
           "dimension": "error",
-          "action": "Fail the current Git/setup/config write; retry after navigation and verify no prior mutation is replayed.",
-          "expected": "Compare with the linked Rust handler using the same fault. Preserve its documented guard and error state: Permission remembered under canonical repo root in `allowed_setup_repos`. Script executes arbitrary user-controlled commands; do not bypass the permission merely while restyling create UI. Permission config writes currently best-effort in controller.",
+          "action": "After choosing Allow & Create, inject failure persisting the trusted-repository list.",
+          "expected": "Rust ignores that persistence failure and continues creation. Go refuses to continue until consent persistence succeeds, per D05; this is an explicit safer divergence, not unqualified source parity.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W44.loading",
           "dimension": "loading",
-          "action": "Pause the fixture dependency at request start; inspect immediately, finish it, then repeat while navigating away and back. For synchronous handlers record that there is no asynchronous loading phase.",
-          "expected": "Loading/disabled/empty/error transitions must match the pinned handler; no fabricated success, duplicate operation or stale cross-context result. Record baseline timing rather than assume a universal spinner.",
+          "action": "Delay Git creation after allowance and click confirm repeatedly.",
+          "expected": "Only one creation starts; setup begins only after successful creation and never before explicit approval. Busy confirmation cannot enqueue duplicate operations.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W44.persistence",
           "dimension": "persistence",
-          "action": "Run this row in two cloned fixture homes, baseline then Go. Record touched files and active state; relaunch both; repeat the action and compare restored/reset state.",
-          "expected": "Restore/reset behavior and file contents must match the pinned handler. In-memory-only state stays in-memory; persistence is not inferred from an available store helper. Apply the specific source state contract above.",
+          "action": "Allow setup through one canonical path, reopen via an equivalent symlink path and reload ~/.orbit-pi/worktrees.json.",
+          "expected": "allowed_setup_repos uses canonical repository identity and does not prompt again solely because the path spelling changed. A different repository still prompts.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W44.keyboard",
           "dimension": "keyboard",
-          "action": "Invoke the same operation by each registered source chord/menu/palette/button available for this row. Use Tab/Shift+Tab and Escape; repeat from composer, editor, terminal and modal focus. If no binding exists, explicitly record none.",
-          "expected": "Dispatch, focus restoration and cancellation match source CommandId/BINDINGS and local handler; no unintended prompt, shell bytes or destructive mutation. The positive-action and edge expectations still hold.",
+          "action": "Open the allowance dialog; press Escape, then reopen and click Allow & Create.",
+          "expected": "Escape cancels without creating or running; explicit action confirms only the displayed repository/script. Composer/global shortcuts cannot confirm implicitly.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         },
         {
           "id": "W44.repeat",
           "dimension": "repeat",
-          "action": "Perform the primary sequence three times, including a workspace/session change between runs, with delayed callback from the first run.",
-          "expected": "No duplicate mutations, leaked child/watchers, stale selection or old-context update; current visible state remains the actual underlying state.",
+          "action": "Create a second worktree in the trusted repository; disable setup for a third; fail and retry setup on the second.",
+          "expected": "Stored trust avoids redundant approval, per-create false still prevents running, and setup retry does not create another worktree.",
           "status": "UNTESTED",
-          "specification": "DRAFT_NEEDS_SOURCE_EXPANSION",
+          "specification": "ROW_SPECIFIC",
           "last_verified_sha": null
         }
       ],
@@ -126,7 +126,7 @@
           "status": "PARTIAL",
           "reason": "Named narrow assertions pass; remaining row steps are unverified.",
           "last_verified_sha": null,
-          "last_partial_evidence_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3"
+          "last_partial_evidence_sha": "8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59"
         },
         "visual": {
           "status": "UNTESTED",
@@ -148,16 +148,18 @@
           "package": "github.com/charlzyx/orbit/internal/worktreeui",
           "command": "go test -race -count=1 ./internal/worktreeui -run ^TestSetupAllowRemembersCanonicalRepositoryBeforeCreation$",
           "evidence": "workspace-evidence.json",
-          "last_verified_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3",
+          "last_verified_sha": "8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59",
           "sha_kind": "working-tree-content-manifest; not a Git commit",
-          "verified_at_utc": "2026-10-25T14:01:16.053571638+09:00",
+          "verified_at_utc": "2026-10-25T14:19:03.635629351+09:00",
           "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
         }
       ],
       "known_remaining": "Real temporary worktree operations, setup consent/failure/cancel, transactional persistence and scoped native typing/confirm/retry tests pass. Host guide preference/translation hooks exist. Complete localization, host keyboard/focus and platform/pixel equivalence remain pending.",
       "full_parity_verified": false,
       "supplemental_cases": [],
-      "additional_evidence": []
+      "additional_evidence": [
+        "../intentional-deviations.md"
+      ]
     },
     {
       "id": "W45",
@@ -282,7 +284,7 @@
           "status": "PARTIAL",
           "reason": "Named narrow assertions pass; remaining row steps are unverified.",
           "last_verified_sha": null,
-          "last_partial_evidence_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3"
+          "last_partial_evidence_sha": "8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59"
         },
         "visual": {
           "status": "UNTESTED",
@@ -304,9 +306,9 @@
           "package": "github.com/charlzyx/orbit/internal/worktreeui",
           "command": "go test -race -count=1 ./internal/worktreeui -run ^TestSetupConsentFailureAndRetry$",
           "evidence": "workspace-evidence.json",
-          "last_verified_sha": "4cffa4086622c4bf76ab8da24cf144f678119ec1b2f926fbdb09dca2d126d0a3",
+          "last_verified_sha": "8a0cce65c52c9e7494d292a39cf6d34c28d7a6f9a75896e80a43b2ab711c5c59",
           "sha_kind": "working-tree-content-manifest; not a Git commit",
-          "verified_at_utc": "2026-10-25T14:01:15.779757515+09:00",
+          "verified_at_utc": "2026-10-25T14:19:03.362118995+09:00",
           "limits": "Only the named assertion. Does not pass the parent acceptance case or visual/native-OS gates."
         }
       ],
