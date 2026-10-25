@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "fixture": "synthetic workbench WB07 History",
+  "referenceSource": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "harnessRevisionPrefix": "3f4ee2",
+  "sourceImage": "workbench/evidence/WB07-settle.png",
+  "sourceImageSha256": "aaae9f4da73dadebd2639bc25718495a266722ecf2376a2dd08f4aa3cfd482ee",
+  "nativeViewport": [
+    1470,
+    922
+  ],
+  "imageTransformations": [],
+  "primary": "Hosted capture tesseract whole-image --psm 11 tsv",
+  "alternate": "Same unchanged whole-image tesseract --psm 3 tsv",
+  "files": {
+    "wb07-rust-psm11.tsv": "e4ad6ec118a7a7cc79954a3c5c9f68085866b9d7eac07b8c99a73090b989d37d",
+    "wb07-rust-psm3.tsv": "54814e2f10d9eb68e83795cce34b4185d77723af29a601e908d6fee3bec6b795"
+  },
+  "requiredPhrases": [
+    "History",
+    "Add stable helper",
+    "Initialize workbench fixture"
+  ],
+  "fullSourceTsvSha256": {
+    "wb07-rust-psm11.tsv": "bbcfac303ff4292c329b48637b8b3c6f63e8949e2f1825f6fd7e30a8080ff360",
+    "wb07-rust-psm3.tsv": "3398530f5743249140b2cce254914555f2b2668cce4e94166a7cd8acf072caa8"
+  },
+  "retainedEvidence": "Verbatim word rows for the History label and both commit titles only; coordinates, confidence and text unchanged. No screenshot or general capture log included."
+}

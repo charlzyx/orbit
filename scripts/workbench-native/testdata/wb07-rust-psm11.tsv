@@ -1,0 +1,8 @@
+level	page_num	block_num	par_num	line_num	word_num	left	top	width	height	conf	text
+5	1	8	1	1	1	379	58	63	15	12.309708	History
+5	1	27	1	1	1	396	189	21	9	68.965668	Ada
+5	1	27	1	1	2	421	189	32	9	73.346977	stable
+5	1	27	1	1	3	457	189	34	11	94.898415	helper
+5	1	30	1	1	1	315	248	46	9	86.467194	Initialize
+5	1	30	1	1	2	364	248	59	9	96.676811	workbench
+5	1	30	1	1	3	427	248	35	9	96.066208	fixture

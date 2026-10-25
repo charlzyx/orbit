@@ -74,6 +74,35 @@ class Capture:
                                title=run('xdotool', 'getwindowname', self.window), pngSha256=sha(path),
                                ocrSha256=sha(path.with_suffix('.tsv')))
 
+    def readiness(self, image, rows, metadata, required, sample):
+        acceptable, detail = ready(rows, required)
+        primary = dict(psm=11, **detail, ready=acceptable,
+                       pngSha256=metadata.get('pngSha256'), tsvSha256=metadata.get('ocrSha256'))
+        passes = [primary]
+        selected = 11 if acceptable else None
+        # This is a readiness-only fallback. Never merge partial recognitions,
+        # alter required phrases, or override a primary loading/error marker.
+        # Pointer targets continue to use the original exact-label OCR path.
+        if not acceptable and detail['missing'] and not detail['blocked']:
+            evidence = self.evidence / f'{image.stem}-fallback-{sample:03d}.png'
+            evidence.write_bytes(image.read_bytes())
+            evidence.with_suffix('.tsv').write_bytes(image.with_suffix('.tsv').read_bytes())
+            before_hash = sha(evidence)
+            if before_hash != metadata['pngSha256']:
+                raise ValueError('Readiness fallback image differs from the captured whole native window')
+            alternate = run('tesseract', str(evidence), 'stdout', '--psm', '3', 'tsv')
+            alternate_path = evidence.with_suffix('.psm3.tsv')
+            alternate_path.write_text(alternate + '\n')
+            if sha(evidence) != before_hash:
+                raise ValueError('Readiness OCR modified its input image')
+            acceptable, detail = ready(words(alternate), required)
+            passes[0].update(image=str(evidence.relative_to(self.out)), tsv=str(evidence.with_suffix('.tsv').relative_to(self.out)))
+            passes.append(dict(psm=3, **detail, ready=acceptable, pngSha256=before_hash,
+                               image=str(evidence.relative_to(self.out)), tsv=str(alternate_path.relative_to(self.out)),
+                               tsvSha256=sha(alternate_path)))
+            selected = 3 if acceptable else None
+        return acceptable, detail, dict(metadata, readinessOcrPasses=passes, selectedReadinessOcrPSM=selected)
+
     def settle(self, case):
         config = self.suite['settle']
         deadline = time.monotonic() + config['timeoutSeconds']
@@ -81,7 +110,7 @@ class Capture:
         image = self.evidence / f'{case["id"]}-settle.png'
         while time.monotonic() < deadline:
             rows, metadata = self.capture(image)
-            acceptable, detail = ready(rows, case['require'])
+            acceptable, detail, metadata = self.readiness(image, rows, metadata, case['require'], len(samples) + 1)
             consecutive = consecutive + 1 if acceptable else 0
             samples.append(dict(sample=len(samples) + 1, ready=acceptable, consecutive=consecutive, **detail, **metadata))
             (self.evidence / f'{case["id"]}-settle.json').write_text(json.dumps(samples, indent=2) + '\n')
