@@ -131,7 +131,12 @@ func (a *App) usageNativeTable(c *ui.Context, kind string, columns []ui.TableCol
 					}
 				}
 				h.Children(func() {
-					ui.Text(c, col.Title).MinWidth(0).SingleLine().FontSize(a.Theme.Px(14)).FontWeight(500).TextColor(a.Theme.Text)
+					// GPUI's header is a clipped container around a nowrap label.
+					// Keep that boundary instead of shortening the text itself:
+					// SingleLine reserves an ellipsis and loses extra characters.
+					ui.Box(c).MinWidth(0).Clip().Label("Usage header label " + kind + " " + col.ID).Children(func() {
+						ui.Text(c, col.Title).Label("Usage header text " + kind + " " + col.ID).NoWrap().Shrink(0).FontSize(a.Theme.Px(14)).FixedLineHeight(usageLineHeight(a.Theme.Px(14))).FontWeight(500).TextColor(a.Theme.Text)
+					})
 					if col.Sortable {
 						caret := ui.Column(c).Shrink(0).Gap(0).AlignItems(ui.Center).Label("Sort carets " + kind + " " + col.ID)
 						if t.Sort.Column != col.ID {

@@ -461,7 +461,8 @@ func (a *App) usageTable(c *ui.Context, kind string) {
 	t := s.table(kind)
 	all := a.usageColumns(kind, s.metric)
 	required := all[0].ID
-	ui.Row(c.Key("usage-toolbar:" + kind)).Gap(a.Theme.Space(8)).AlignItems(ui.Center).Children(func() {
+	toolbar := ui.Row(c.Key("usage-toolbar:" + kind)).AlignSelf(ui.Stretch).Gap(a.Theme.Space(8)).AlignItems(ui.Center)
+	toolbar.Children(func() {
 		ui.Row(c).Grow(1).MinWidth(180).Height(a.Theme.Px(36)).Padding(0, a.Theme.Px(10)).Gap(a.Theme.Space(8)).AlignItems(ui.Center).BorderWidth(0, 0, 1, 0).BorderColor(a.Theme.Border).Clip().Label("Usage table search head " + kind).Children(func() {
 			a.icon(c, "icons/search.svg", a.Theme.Px(14), a.Theme.TextMuted)
 			if ui.TextInputBase(c, &t.Search).Label("Search " + kind).Placeholder(a.usageSearchPlaceholder(kind)).Grow(1).MinWidth(0).FontSize(a.Theme.Px(14)).FocusRing(false).Changed() {
@@ -473,8 +474,9 @@ func (a *App) usageTable(c *ui.Context, kind string) {
 		})
 		a.usageColumnControl(c, kind, all, required)
 	})
-	probe := ui.Box(c.Key("usage-table-width:" + kind)).Height(0).AlignSelf(ui.Stretch)
-	width := probe.Bounds().W
+	// Measure an existing full-width child. Even a zero-height probe in this
+	// source-spaced column creates another gap between the toolbar and table.
+	width := toolbar.Bounds().W
 	if width <= 0 {
 		width, _ = c.Size()
 		if a.SidebarVisible {
@@ -555,26 +557,26 @@ func (a *App) usageTable(c *ui.Context, kind string) {
 		})
 	}
 	filtered, pageTotals := a.usageTableTotals(kind, result)
-	ui.Row(c).AlignSelf(ui.Stretch).Gap(a.Theme.Space(12)).Children(func() {
-		ui.Text(c, filtered).TextColor(a.Theme.TextMuted).FontSize(a.Theme.Px(12))
+	ui.Row(c).AlignSelf(ui.Stretch).Padding(a.Theme.Space(8), 0, 0, 0).Gap(a.Theme.Space(12)).AlignItems(ui.Center).Label("Usage table totals " + kind).Children(func() {
+		ui.Text(c, filtered).TextColor(a.Theme.TextMuted).FontSize(a.Theme.Px(12)).FixedLineHeight(usageLineHeight(a.Theme.Px(12)))
 		ui.Spacer(c)
-		ui.Text(c, pageTotals).TextColor(a.Theme.TextMuted).FontSize(a.Theme.Px(12))
+		ui.Text(c, pageTotals).TextColor(a.Theme.TextMuted).FontSize(a.Theme.Px(12)).FixedLineHeight(usageLineHeight(a.Theme.Px(12)))
 	})
-	ui.Row(c.Key("usage-pager:" + kind)).Gap(8).AlignItems(ui.Center).Children(func() {
+	ui.Row(c.Key("usage-pager:"+kind)).Padding(a.Theme.Space(12), 0, 0, 0).Gap(a.Theme.Space(8)).AlignItems(ui.Center).Label("Usage table pager " + kind).Children(func() {
 		summary := a.usageTableEmpty(kind, true)
 		if result.Total > 0 {
 			first := (result.Page-1)*t.Size + 1
 			summary = a.usageText("usage.showing_range", "Showing %{first}–%{last} of %{total}", map[string]string{"first": fmt.Sprint(first), "last": fmt.Sprint(first + len(result.Rows) - 1), "total": usageCount(uint64(result.Total))})
 		}
-		ui.Text(c, summary).Grow(1).TextColor(a.Theme.TextMuted)
-		ui.Text(c, a.text("view.rows", "Rows")).FontSize(12).TextColor(a.Theme.TextMuted)
+		ui.Text(c, summary).Grow(1).MinWidth(0).FontSize(a.Theme.Px(14)).FixedLineHeight(usageLineHeight(a.Theme.Px(14))).TextColor(a.Theme.TextMuted)
+		ui.Text(c, a.text("view.rows", "Rows")).FontSize(a.Theme.Px(12)).FixedLineHeight(usageLineHeight(a.Theme.Px(12))).TextColor(a.Theme.TextMuted)
 		a.usagePageSizeControl(c, kind)
-		ui.Text(c, fmt.Sprintf("%d/%d", result.Page, result.Pages)).FontSize(12).TextColor(a.Theme.TextMuted)
-		if a.button(c, a.text("usage.previous", "Previous"), "icons/arrow-left.svg", false).Disabled(result.Page <= 1).Clicked() {
+		ui.Text(c, fmt.Sprintf("%d/%d", result.Page, result.Pages)).PaddingX(a.Theme.Space(2)).FontSize(a.Theme.Px(12)).FixedLineHeight(usageLineHeight(a.Theme.Px(12))).TextColor(a.Theme.TextMuted)
+		if a.usagePagerButton(c, a.text("usage.previous", "Previous"), result.Page > 1).Clicked() {
 			t.Page--
 			t.Selected = -1
 		}
-		if a.button(c, a.text("usage.next", "Next"), "icons/arrow-right.svg", false).Disabled(result.Page >= result.Pages).Clicked() {
+		if a.usagePagerButton(c, a.text("usage.next", "Next"), result.Page < result.Pages).Clicked() {
 			t.Page++
 			t.Selected = -1
 		}

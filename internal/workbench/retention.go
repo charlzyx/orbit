@@ -1,7 +1,9 @@
 package workbench
 
 import (
+	"errors"
 	"github.com/charlzyx/orbit/internal/agent"
+	"github.com/charlzyx/orbit/internal/preferences"
 	"os"
 	"path/filepath"
 	"slices"
@@ -15,13 +17,24 @@ type RetentionOutcome struct {
 }
 
 // ApplyRetention uses message activity rather than filesystem mtime. live must
-// include parked processes as well as the foreground session. No default policy
-// removes anything: the user must enable it explicitly in Privacy settings.
+// include parked processes as well as the foreground session. This automatic
+// entry point is opt-in. Privacy's explicit one-shot action uses CleanupSessions.
 func (s *Service) ApplyRetention(now time.Time, live []string) (RetentionOutcome, error) {
-	out := RetentionOutcome{Failed: map[string]string{}}
 	policy := s.Preferences.Retention()
 	if !policy.Enabled {
-		return out, nil
+		return RetentionOutcome{Failed: map[string]string{}}, nil
+	}
+	return s.CleanupSessions(now, live, policy)
+}
+
+// CleanupSessions applies an explicitly requested policy without changing the
+// automatic-at-launch preference. Match Rust retention_ui.rs: enabled gates the
+// launch hook, not "Clean up now". The caller snapshots the policy before moving
+// work off the UI thread, and confirms a manual permanent-delete action first.
+func (s *Service) CleanupSessions(now time.Time, live []string, policy preferences.Retention) (RetentionOutcome, error) {
+	out := RetentionOutcome{Failed: map[string]string{}}
+	if (policy.Mode != "archive" && policy.Mode != "delete") || !slices.Contains(preferences.RetentionDays, policy.Days) {
+		return out, errors.New("invalid retention policy")
 	}
 	sessions, e := agent.ScanSessions(filepath.Join(s.Preferences.PiDir, "sessions"))
 	if e != nil {

@@ -158,3 +158,26 @@ func (a *App) usageSegments(c *ui.Context, key string, options []string, active 
 		}
 	})
 }
+
+// filters.rs::outline_button uses the same medium frame as the page chips,
+// without arrows; disabled pagination remains visible in the overlay fill.
+func (a *App) usagePagerButton(c *ui.Context, label string, enabled bool) ui.Element {
+	t := a.Theme
+	b := a.usageButtonFrame(c, label).Border(1, t.Border).Disabled(!enabled)
+	fg := t.TextDisabled
+	if !enabled {
+		b.Background(t.overlay())
+	} else {
+		fg = t.Text
+		fill := t.Background
+		if b.Hovered() {
+			fill = t.Hover
+			b.BorderColor(t.BorderStrong())
+		}
+		a.usageRaised(b, fill, true)
+	}
+	b.Children(func() {
+		ui.Text(c, label).FontSize(t.Px(14)).FixedLineHeight(t.Px(14)).TextColor(fg).NoWrap()
+	})
+	return b
+}

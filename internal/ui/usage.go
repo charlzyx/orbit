@@ -611,26 +611,20 @@ func (a *App) usageDetails(c *ui.Context) {
 	s := &a.usageState
 	ui.Text(c, strings.ToUpper(a.text("usage.details", "Details"))).FontSize(a.Theme.Px(12)).FontWeight(500).Height(a.Theme.Px(14)).TextColor(a.Theme.TextMuted)
 	a.usageCard(c, a.text("usage.breakdown", "Breakdown"), a.usageBreakdownMeta(), func() {
-		ui.Row(c).Wrap().Gap(4).Children(func() {
-			for _, tab := range []string{"models", "workspaces", "providers", "tools"} {
-				if a.button(c, a.text("usage.tab_"+tab, titleCase(tab)), "", s.breakdown == tab).Clicked() {
-					s.breakdown = tab
-					a.saveUsagePrefs()
-				}
-			}
-		})
+		a.usageSegments(c, "breakdown", []string{"models", "workspaces", "providers", "tools"}, s.breakdown, true,
+			func(tab string) string { return a.text("usage.tab_"+tab, titleCase(tab)) }, nil, func(tab string) {
+				s.breakdown = tab
+				a.saveUsagePrefs()
+			})
 		a.usageBreakdownChart(c, "breakdown:"+s.breakdown)
 		a.usageTable(c, "breakdown:"+s.breakdown)
 	})
 	a.usageCard(c, a.text("usage.records", "Records"), a.usageTableMeta(s.detail), func() {
-		ui.Row(c).Wrap().Gap(4).Children(func() {
-			for _, tab := range []string{"sessions", "daily", "failures"} {
-				if a.button(c, a.text("usage.tab_"+tab, titleCase(tab)), "", s.detail == tab).Clicked() {
-					s.detail = tab
-					a.saveUsagePrefs()
-				}
-			}
-		})
+		a.usageSegments(c, "records", []string{"sessions", "daily", "failures"}, s.detail, true,
+			func(tab string) string { return a.text("usage.tab_"+tab, titleCase(tab)) }, nil, func(tab string) {
+				s.detail = tab
+				a.saveUsagePrefs()
+			})
 		a.usageTable(c, s.detail)
 	})
 }

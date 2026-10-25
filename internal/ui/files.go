@@ -3,14 +3,15 @@ package orbitui
 import (
 	"context"
 	"fmt"
-	_ "golang.org/x/image/tiff"
 	"path/filepath"
 	"strings"
 
+	"github.com/charlzyx/orbit/internal/composerui"
 	"github.com/charlzyx/orbit/internal/workspace"
 	"github.com/egoist/mygo/ui"
 	"github.com/egoist/mygo/ui/editor"
 	"github.com/egoist/mygo/ui/markdown"
+	_ "golang.org/x/image/tiff"
 )
 
 type filesState struct {
@@ -25,6 +26,8 @@ type filesState struct {
 	images                map[string]ui.ImageSource
 	badges                map[string]string
 	selected              int
+	active, treeWorkspace string
+	resizeDirty           bool
 	generation            uint64
 	desired               string
 	openGeneration        uint64
@@ -44,11 +47,18 @@ func (a *App) initFiles() {
 	if a.files != nil {
 		return
 	}
-	a.files = &filesState{expanded: map[string]bool{}, editor: workspace.NewEditor(), versions: map[string]uint64{}, states: map[string]*editor.State{}, images: map[string]ui.ImageSource{}}
+	a.files = &filesState{selected: -1, expanded: map[string]bool{}, editor: workspace.NewEditor(), versions: map[string]uint64{}, states: map[string]*editor.State{}, images: map[string]ui.ImageSource{}}
 }
 func (a *App) RefreshFiles() {
 	a.initFiles()
 	s := a.files
+	if s.treeWorkspace != a.Model.Workspace {
+		s.treeWorkspace = a.Model.Workspace
+		s.tree = workspace.TreeSnapshot{Root: a.Model.Workspace}
+		s.expanded = map[string]bool{}
+		s.selected, s.active, s.err = -1, "", ""
+		s.list.ScrollTo(0, ui.Start)
+	}
 	s.generation++
 	generation := s.generation
 	if s.loading {
@@ -65,7 +75,7 @@ func (a *App) RefreshFiles() {
 		badges := map[string]string{}
 		rows, _ := (workspace.Git{Dir: root}).Status(context.Background())
 		for _, r := range rows {
-			badges[r.Path] = strings.TrimSpace(string([]byte{r.Index, r.Worktree}))
+			badges[r.Path] = string([]byte{r.Index, r.Worktree})
 		}
 		return func() {
 			s.loading = false
@@ -167,131 +177,322 @@ func (a *App) syncDocument(d workspace.Document) {
 		}
 	}
 }
+
+// Pinned explorer/panel.rs: width includes the left gutter, not only the card.
+const explorerDefaultWidth float32 = 248
+const explorerMinWidth float32 = 172
+const explorerMaxWidth float32 = 460
+
+func (a *App) explorerPaneWidth() float32 {
+	w := a.ExplorerWidth
+	if w <= 0 {
+		w = explorerDefaultWidth
+	}
+	return max(explorerMinWidth, min(w, explorerMaxWidth))
+}
 func (a *App) explorer(c *ui.Context) {
 	a.initFiles()
-	ui.Column(c.Key("explorer")).Width(max(200, a.ExplorerWidth)).FillHeight().BorderWidth(0, 0, 0, 1).BorderColor(a.Theme.Border).Children(func() { a.fileTree(c) })
+	t := a.Theme
+	ui.Column(c.Key("explorer")).Label("Explorer dock").Width(a.explorerPaneWidth()).Shrink(0).FillHeight().MinHeight(0).Padding(0, 0, 0, t.Space(12)).Children(func() {
+		ui.Column(c.Key("explorer-card")).Label("Explorer card").Fill().MinHeight(0).Background(t.Surface).Border(1, t.Border).Radius(t.Px(12)).Clip().Children(func() { a.fileTree(c) })
+		h := ui.Box(c.Key("explorer-resize")).Label("Resize explorer").Absolute().Left(9).Top(0).Bottom(0).Width(6).Cursor(ui.CursorResizeEW)
+		if h.Hovered() {
+			h.Background(t.Accent.Alpha(.4))
+		}
+		if dx, _, dragging := h.Dragged(); dragging && dx != 0 {
+			// app/view.rs uses distance from the actual pointer to the dock's
+			// right edge, not a delta from the initial width or a main reserve.
+			viewport, _ := c.Size()
+			x, _, _ := h.PointerPosition()
+			width := max(explorerMinWidth, min(viewport-h.Bounds().X-x, explorerMaxWidth))
+			if width != a.explorerPaneWidth() {
+				a.ExplorerWidth = width
+				a.Layout.ExplorerWidth = float64(width)
+				a.files.resizeDirty = true
+				c.AnimationFrame()
+			}
+		}
+		if _, _, ended := h.DragEnded(); ended && a.files.resizeDirty {
+			a.files.resizeDirty = false
+			a.save(a.Options.Store.SaveLayout(a.Layout))
+		}
+	})
+}
+func (a *App) explorerIcon(c *ui.Context, label, icon string, loading bool) ui.Element {
+	t := a.Theme
+	b := ui.ButtonBase(c).Label(label).Tooltip(label).Size(t.Px(22), t.Px(22)).Shrink(0).Radius(t.Px(6)).Center()
+	if b.Hovered() {
+		b.Background(t.Hover)
+	}
+	b.Children(func() {
+		if loading {
+			ui.Spinner(c).Size(t.Px(14), t.Px(14))
+		} else {
+			a.icon(c, icon, t.Px(14), t.TextMuted)
+		}
+	})
+	return b
 }
 func (a *App) fileTree(c *ui.Context) {
 	a.initFiles()
-	s := a.files
-	t := a.Theme
-	if s.loaded != a.Model.Workspace && !s.loading {
+	s, t := a.files, a.Theme
+	if s.treeWorkspace != a.Model.Workspace || (s.loaded != a.Model.Workspace && !s.loading) {
 		a.RefreshFiles()
 	}
-	ui.Row(c).Height(40).PaddingX(10).AlignItems(ui.Center).Children(func() {
-		ui.Text(c, "Files").Grow(1).FontWeight(500)
-		if s.loading {
-			ui.Spinner(c).Size(12, 12)
+	ui.Row(c).Label("Explorer toolbar").Height(40).Shrink(0).Padding(0, 6, 0, t.Space(12)).Gap(2).AlignItems(ui.Center).Children(func() {
+		title := filepath.Base(a.Model.Workspace)
+		if a.Model.Workspace == "" {
+			title = a.text("explorer.files", "Files")
 		}
-		if a.iconButton(c, "Refresh files", "icons/refresh.svg").Clicked() {
+		ui.Text(c, title).Grow(1).MinWidth(0).MaxLines(1).FontSize(t.Px(12)).FontWeight(500)
+		if a.explorerIcon(c, "New file", "icons/file-plus.svg", false).Clicked() {
+			a.createFile(a.explorerCreateParent(), false)
+		}
+		if a.explorerIcon(c, "New folder", "icons/folder-plus.svg", false).Clicked() {
+			a.createFile(a.explorerCreateParent(), true)
+		}
+		if a.explorerIcon(c, "Refresh files", "icons/refresh.svg", s.loading).Clicked() {
 			a.RefreshFiles()
 		}
-		a.iconButton(c, "File options", "icons/more.svg").Menu(func(m *ui.Menu) {
-			if m.Item("New file…").Chosen() {
-				a.createFile(a.Model.Workspace, false)
-			}
-			if m.Item("New folder…").Chosen() {
-				a.createFile(a.Model.Workspace, true)
-			}
-			if m.Item("Show hidden files").Checked(s.hidden).Chosen() {
-				s.hidden = !s.hidden
-				a.RefreshFiles()
-			}
-			if m.Item("Collapse all").Chosen() {
-				s.expanded = map[string]bool{}
-			}
-		})
+		if a.explorerIcon(c, "Collapse all", "icons/chevron-up.svg", false).Clicked() {
+			s.expanded = map[string]bool{}
+		}
+		hiddenLabel, hiddenIcon := "Show hidden files", "icons/eye-off.svg"
+		if s.hidden {
+			hiddenLabel, hiddenIcon = "Hide hidden files", "icons/eye.svg"
+		}
+		if a.explorerIcon(c, hiddenLabel, hiddenIcon, false).Clicked() {
+			s.hidden = !s.hidden
+			a.RefreshFiles()
+		}
+		if a.explorerIcon(c, "Hide explorer", "icons/x.svg", false).Clicked() {
+			a.ExplorerVisible = false
+		}
 	})
-	ui.TextInput(c, &s.query).Placeholder("Filter files…").Label("Filter files").Margin(4, 8).AlignSelf(ui.Stretch)
+	ui.Row(c).Label("Explorer filter row").Height(t.Px(36)).Shrink(0).PaddingX(t.Px(10)).Gap(t.Space(6)).AlignItems(ui.Center).BorderWidth(0, 0, 1, 0).BorderColor(t.Border).Children(func() {
+		a.icon(c, "icons/search.svg", t.Px(14), t.TextMuted)
+		input := ui.TextInputBase(c, &s.query).Placeholder("Filter files…").Label("Filter files").Grow(1).MinWidth(0)
+		if input.Shortcut(0, ui.KeyEscape) {
+			s.query = ""
+		}
+		if s.query != "" && a.explorerIcon(c, "Clear file filter", "icons/x.svg", false).Clicked() {
+			s.query = ""
+		}
+	})
 	if s.err != "" {
 		ui.Text(c, s.err).Padding(10).TextColor(t.Error)
 	}
+	active := ""
+	if d, ok := s.editor.Active(); ok {
+		if relative, err := filepath.Rel(a.Model.Workspace, d.Content.Path); err == nil && relative != ".." && !strings.HasPrefix(relative, ".."+string(filepath.Separator)) {
+			active = filepath.ToSlash(relative)
+		}
+	}
+	changedActive := active != s.active
+	if changedActive {
+		s.active = active
+		for parent := filepath.ToSlash(filepath.Dir(active)); active != "" && parent != "." && parent != ""; parent = filepath.ToSlash(filepath.Dir(parent)) {
+			s.expanded[parent] = true
+		}
+	}
 	rows := workspace.TreeRows(s.tree, s.expanded, s.query, s.badges)
-	s.list.Key = func(i int) any { return rows[i].Path }
-	s.list.Label = func(i int) string { return rows[i].Name }
-	s.list.Selected = &s.selected
-	list := ui.List(c.Key("file-tree"), &s.list, len(rows), func(i int) {
-		r := rows[i]
-		path := filepath.Join(s.tree.Root, filepath.FromSlash(r.Path))
-		icon := "icons/file.svg"
-		if r.Directory {
-			icon = "icons/folder.svg"
-		}
-		b := a.button(c, r.Name+func() string {
-			if r.GitStatus != "" {
-				return "  " + r.GitStatus
+	if s.selected >= len(rows) {
+		s.selected = -1
+	}
+	if changedActive {
+		for i, r := range rows {
+			if r.Path == active {
+				s.list.ScrollIntoView(i)
+				break
 			}
-			return ""
-		}(), icon, i == s.selected).AlignSelf(ui.Stretch).PaddingStart(float32(10 + r.Depth*14)).Height(28)
-		if b.Clicked() {
-			if r.Directory {
-				s.expanded[r.Path] = !s.expanded[r.Path]
-			} else {
-				a.OpenFile(path)
-			}
-		}
-		b.ContextMenu(func(m *ui.Menu) {
-			if r.Directory {
-				if m.Item("New file…").Chosen() {
-					a.createFile(path, false)
-				}
-				if m.Item("New folder…").Chosen() {
-					a.createFile(path, true)
-				}
-			} else {
-				if m.Item("Open").Chosen() {
-					a.OpenFile(path)
-				}
-			}
-			if m.Item("Reveal in file manager").Chosen() {
-				a.Dispatch(Action{Kind: "RevealPath", Value: path})
-			}
-			if m.Item("Copy path").Chosen() {
-				c.Services().WriteClipboard(path)
-			}
-			if m.Item("Copy relative path").Chosen() {
-				if relative, e := filepath.Rel(a.Model.Workspace, path); e == nil {
-					c.Services().WriteClipboard(filepath.ToSlash(relative))
-				}
-			}
-			if m.Item("Rename…").Chosen() {
-				a.renameFile(path)
-			}
-			if m.Item("Delete…").Chosen() {
-				a.deleteFile(path)
-			}
-		})
-	}).Grow(1).MinHeight(0)
-
-	if list.Submitted() && s.selected >= 0 && s.selected < len(rows) {
-		r := rows[s.selected]
-		if r.Directory {
-			s.expanded[r.Path] = !s.expanded[r.Path]
-		} else {
-			a.OpenFile(filepath.Join(s.tree.Root, filepath.FromSlash(r.Path)))
 		}
 	}
-	if list.FocusWithin() && s.selected >= 0 && s.selected < len(rows) {
-		r := rows[s.selected]
-		if c.Shortcut(0, ui.KeyRight) && r.Directory {
-			s.expanded[r.Path] = true
+	tree := ui.Column(c.Key("explorer-tree")).Label("Explorer files").Focusable().Grow(1).MinHeight(0)
+	// Source cursor navigation does not select the active file. In particular,
+	// an unopened tree starts with no cursor, and Left never jumps to a parent.
+	if tree.Shortcut(0, ui.KeyEscape) {
+		s.query = ""
+	}
+	if len(rows) > 0 {
+		for _, k := range []struct {
+			key ui.Key
+			row int
+		}{
+			{ui.KeyDown, min(s.selected+1, len(rows)-1)}, {ui.KeyUp, max(s.selected-1, 0)},
+			{ui.KeyHome, 0}, {ui.KeyEnd, len(rows) - 1},
+		} {
+			if tree.Shortcut(0, k.key) {
+				s.selected = k.row
+				s.list.ScrollIntoView(k.row)
+			}
 		}
-		if c.Shortcut(0, ui.KeyLeft) {
-			if r.Directory && s.expanded[r.Path] {
+		if tree.Shortcut(ui.Cmd, ui.KeyRight) {
+			for _, d := range s.tree.Dirs {
+				s.expanded[d] = true
+			}
+		}
+		if tree.Shortcut(ui.Cmd, ui.KeyLeft) {
+			s.expanded = map[string]bool{}
+		}
+		if s.selected >= 0 && s.selected < len(rows) {
+			r := rows[s.selected]
+			if tree.Shortcut(0, ui.KeyRight) && r.Directory {
+				s.expanded[r.Path] = true
+			}
+			if tree.Shortcut(0, ui.KeyLeft) && r.Directory {
 				s.expanded[r.Path] = false
-			} else {
-				parent := filepath.ToSlash(filepath.Dir(r.Path))
-				for i, row := range rows {
-					if row.Path == parent {
-						s.selected = i
-						break
-					}
-				}
+			}
+			if tree.Shortcut(0, ui.KeyEnter) || tree.Shortcut(0, ui.KeySpace) {
+				a.activateExplorerRow(r)
 			}
 		}
 	}
-	if s.tree.Truncated {
-		ui.Text(c, "Tree limited to 50,000 entries.").Padding(8).TextColor(t.Warning)
+	tree.Children(func() {
+		s.list.Key = func(i int) any { return rows[i].Path }
+		s.list.Label = func(i int) string { return rows[i].Name }
+		// Native Selected paints a blue keyboard cursor and owns different
+		// activation semantics. Keep virtualization, but paint/route the source
+		// cursor and active file separately on our sole tree.
+		s.list.Selected = nil
+		ui.List(c.Key("file-tree"), &s.list, len(rows), func(i int) {
+			r := rows[i]
+			path := filepath.Join(s.tree.Root, filepath.FromSlash(r.Path))
+			ui.Row(c).FillWidth().PaddingX(t.Space(4)).Children(func() {
+				indent := float32(23 + r.Depth*14)
+				if r.Directory {
+					indent = float32(7 + r.Depth*14)
+				}
+				b := ui.ButtonBase(c.Key(r.Path)).Label("Explorer row "+r.Path).Height(28).Grow(1).MinWidth(0).Padding(0, t.Space(8), 0, indent).Radius(t.Px(6)).Gap(t.Space(6)).AlignItems(ui.Center).Justify(ui.Start)
+				isActive := r.Path == s.active
+				if isActive {
+					b.Background(t.Selection)
+				} else if i == s.selected {
+					b.Background(t.overlay())
+				} else if b.Hovered() {
+					b.Background(t.Hover)
+				}
+				b.Children(func() {
+					if r.Directory {
+						arrow := "icons/chevron-right.svg"
+						if r.Expanded {
+							arrow = "icons/chevron-down.svg"
+						}
+						a.icon(c, arrow, t.Px(10), t.TextMuted)
+						a.icon(c, "icons/folder.svg", t.Px(14), t.TextMuted)
+					} else {
+						a.explorerFileBadge(c, r.Path)
+					}
+					color := t.TextSecondary
+					if isActive {
+						color = t.Text
+					}
+					name := ui.Text(c, r.Name).FontSize(t.Px(12)).TextColor(color).Grow(1).MinWidth(0).MaxLines(1)
+					if r.Directory {
+						name.FontWeight(500)
+					}
+					if r.GitStatus != "" {
+						badge, color := a.explorerStatusBadge(r.GitStatus)
+						ui.Text(c, badge).FontSize(t.Px(12)).FontWeight(600).TextColor(color).Shrink(0)
+					}
+				})
+				if b.Clicked() {
+					s.selected = i
+					tree.Focus()
+					a.activateExplorerRow(r)
+					c.AnimationFrame()
+				}
+				if b.RightClicked() {
+					s.selected = i
+					tree.Focus()
+				}
+				b.ContextMenu(func(m *ui.Menu) {
+					if r.Directory {
+						if m.Item("New file…").Chosen() {
+							a.createFile(path, false)
+						}
+						if m.Item("New folder…").Chosen() {
+							a.createFile(path, true)
+						}
+					} else {
+						if m.Item("Open").Chosen() {
+							a.OpenFile(path)
+						}
+					}
+					if m.Item("Reveal in file manager").Chosen() {
+						a.Dispatch(Action{Kind: "RevealPath", Value: path})
+					}
+					if m.Item("Copy path").Chosen() {
+						c.Services().WriteClipboard(path)
+					}
+					if m.Item("Copy relative path").Chosen() {
+						if relative, e := filepath.Rel(a.Model.Workspace, path); e == nil {
+							c.Services().WriteClipboard(filepath.ToSlash(relative))
+						}
+					}
+					if m.Item("Rename…").Chosen() {
+						a.renameFile(path)
+					}
+					if m.Item("Delete…").Chosen() {
+						a.deleteFile(path)
+					}
+				})
+			})
+		}).Grow(1).MinHeight(0).PaddingY(t.Space(4))
+	})
+	ui.Row(c).Label("Explorer footer").Height(26).Shrink(0).PaddingX(t.Space(12)).AlignItems(ui.Center).BorderWidth(1, 0, 0, 0).BorderColor(t.Border).Children(func() {
+		label, color := fmt.Sprintf("%d files", len(s.tree.Files)), t.TextMuted
+		if s.tree.Truncated {
+			label = fmt.Sprintf("%d+ files (truncated)", len(s.tree.Files))
+			color = t.Warning
+		}
+		ui.Text(c, label).FontSize(t.Px(12)).TextColor(color)
+	})
+}
+func (a *App) activateExplorerRow(r workspace.TreeRow) {
+	if r.Directory {
+		a.files.expanded[r.Path] = !a.files.expanded[r.Path]
+	} else {
+		a.OpenFile(filepath.Join(a.files.tree.Root, filepath.FromSlash(r.Path)))
+	}
+}
+func (a *App) explorerCreateParent() string {
+	s := a.files
+	rows := workspace.TreeRows(s.tree, s.expanded, s.query, s.badges)
+	if s.selected >= 0 && s.selected < len(rows) {
+		r := rows[s.selected]
+		if r.Directory {
+			return filepath.Join(a.Model.Workspace, filepath.FromSlash(r.Path))
+		}
+		return filepath.Dir(filepath.Join(a.Model.Workspace, filepath.FromSlash(r.Path)))
+	}
+	return a.Model.Workspace
+}
+func (a *App) explorerFileBadge(c *ui.Context, path string) {
+	t, badge := a.Theme, composerui.FileBadge(path)
+	hex := badge.Light
+	if t.Dark {
+		hex = badge.Dark
+	}
+	color := ui.RGB(uint8(hex>>16), uint8(hex>>8), uint8(hex))
+	ui.Box(c).Size(17, 17).Shrink(0).Radius(t.Px(4)).Background(color.Alpha(.16)).Center().Children(func() {
+		ui.Text(c, badge.Label).FontSize(t.Px(7.5)).LineHeight(t.Px(8)).FontWeight(600).TextColor(color)
+	})
+}
+func (a *App) explorerStatusBadge(status string) (string, ui.Color) {
+	t := a.Theme
+	switch {
+	case status == "??":
+		return "U", t.Success
+	case strings.Contains(status, "U"):
+		return "!", t.Error
+	case strings.Contains(status, "D"):
+		return "D", t.Error
+	case strings.ContainsAny(status, "RC"):
+		return "R", t.AccentText
+	case strings.HasPrefix(status, "A"):
+		return "A", t.Success
+	default:
+		return "M", t.Warning
 	}
 }
 func (a *App) createFile(parent string, directory bool) {

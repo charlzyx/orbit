@@ -63,7 +63,7 @@ func (a *App) syncReviewLayout(c *ui.Context) {
 		w -= a.SidebarWidth
 	}
 	if a.ExplorerVisible && !a.ReviewVisible {
-		w -= max(float32(200), a.ExplorerWidth)
+		w -= a.explorerPaneWidth()
 	}
 	s.available = max(float32(300), w)
 	if s.full {

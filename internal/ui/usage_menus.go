@@ -47,6 +47,10 @@ func (a *App) usagePopover(c *ui.Context, key, label, icon string, enabled bool,
 		anchor = a.usageChip(c, label, icon, false, true).Disabled(!enabled)
 	}
 	anchor.AlignSelf(ui.Start)
+	if strings.HasPrefix(key, "columns:") {
+		// Source table_toolbar centers its medium chip beside the 36px search.
+		anchor.AlignSelf(ui.Center)
+	}
 	if strings.HasPrefix(key, "page-size:") {
 		anchor.Label("Rows per page " + strings.TrimPrefix(key, "page-size:"))
 	}

@@ -389,93 +389,123 @@ func (s *State) history(c *ui.Context, graph bool) {
 			}
 		}
 	})
-	ui.Row(c).Grow(1).MinHeight(0).Children(func() {
-		ui.Column(c).Grow(1).MinWidth(0).Children(func() {
-			count := len(s.Data.History)
+	count := len(s.Data.History)
+	if graph {
+		count = len(s.Data.Graph)
+	}
+	if count == 0 {
+		// The source centers empty/loading notes, but never shows Load more
+		// until there are commits. Only nonempty histories use the scroller.
+		title, detail := "No commits yet", "Commits on this branch will show up here."
+		switch {
+		case s.Error != nil:
+			title, detail = "History unavailable", ""
 			if graph {
-				count = len(s.Data.Graph)
+				title = "Graph unavailable"
 			}
-			s.list.Key = func(i int) any {
-				if graph {
-					return s.Data.Graph[i].Commit.Hash
-				}
-				return s.Data.History[i].Hash
-			}
-			ui.List(c.Key("commits"), &s.list, count, func(i int) {
-				var entry workspace.CommitEntry
-				if graph {
-					entry = s.Data.Graph[i].Commit.CommitEntry
-				} else {
-					entry = s.Data.History[i]
-				}
-				ui.Column(c).AlignSelf(ui.Stretch).Children(func() {
-					b := ui.ButtonBase(c).AlignSelf(ui.Stretch).Height(56).Padding(4, 14).Gap(8).Label(entry.Subject)
-					if s.CommitDetail != nil && s.CommitDetail.Hash == entry.Hash {
-						b.Background(c.Theme().Selection)
-					}
-					b.Children(func() {
-						if graph {
-							drawGraph(c, s.Data.Graph[i])
-						}
-						s.avatar(c, entry.Author, entry.AuthorEmail)
-						ui.Column(c).Grow(1).MinWidth(0).Gap(3).Children(func() {
-							ui.Text(c, entry.Subject).SingleLine()
-							author := ui.ButtonBase(c).Label("Filter author " + entry.Author).Children(func() { muted(c, entry.Author+" · "+entry.Relative).SingleLine() })
-							if author.Clicked() {
-								s.HistoryOptions.Author = entry.Author
-								s.Tab = 1
-								s.Refresh()
-							}
-						})
-						for _, r := range entry.Refs {
-							ui.Text(c, r.Name).FontSize(11).Padding(2, 4).Radius(3).Background(c.Theme().Accent.Alpha(.14))
-						}
-						muted(c, entry.Short).Font("monospace")
-					})
-					if b.Clicked() {
-						if s.CommitDetail != nil && s.CommitDetail.Hash == entry.Hash {
-							s.CommitDetail = nil
-						} else {
-							s.SelectCommit(entry.Hash)
-						}
-					}
-					b.ContextMenu(func(m *ui.Menu) {
-						if m.Item("Copy commit hash").Chosen() {
-							c.WriteClipboard(entry.Hash)
-						}
-						if m.Item("Review commit").Chosen() {
-							s.review("committed", entry.Hash, "")
-						}
-						if s.Options.OpenURL != nil && m.Item("Open commit on remote").Chosen() {
-							open := s.Options.OpenURL
-							s.start("Resolving remote", func(ctx context.Context, g workspace.Git, _ workspace.GitHub) (func(*State), string, error) {
-								web, e := g.RemoteWeb(ctx)
-								return func(*State) {
-									if e == nil {
-										open(web.CommitURL(entry.Hash))
-									}
-								}, "", e
-							})
-						}
-					})
-					if s.CommitDetail != nil && s.CommitDetail.Hash == entry.Hash {
-						s.commitView(c)
-					}
-				})
-			}).Grow(1).MinHeight(0)
-			if count == 0 && !s.Busy {
-				muted(c, "No commits match these filters.").Padding(20)
-			}
-			if button(c, "Load more", s.Busy).Clicked() {
-				if graph {
-					s.GraphLimit += 40
-				} else {
-					s.HistoryOptions.Limit += 40
-				}
-				s.Refresh()
+		case s.Busy:
+			title, detail = "Reading history…", ""
+		case graph:
+			detail = "Commits across your local branches will show up here."
+		case s.HistoryOptions.AllBranches || s.HistoryOptions.Author != "" || s.HistoryOptions.Path != "" || s.HistoryOptions.Grep != "":
+			detail = "No commits match the current filters."
+		}
+		ui.Column(c).Grow(1).MinHeight(0).MinWidth(0).Center().Padding(20).Gap(6).Children(func() {
+			ui.Text(c, title).FontWeight(500)
+			if detail != "" {
+				muted(c, detail).MaxWidth(360).TextAlign(ui.Center)
 			}
 		})
-	})
+		return
+	}
+	s.list.Key = func(i int) any {
+		if i == count {
+			return "history-footer"
+		}
+		if graph {
+			return s.Data.Graph[i].Commit.Hash
+		}
+		return s.Data.History[i].Hash
+	}
+	// Keep the footer in the same scroller as the commits, as in the source
+	// history_tab. A centered Row around an auto-height Column displaced short
+	// histories; a stretched list plus a sibling footer would pin Load more to
+	// the viewport bottom instead of following the last commit.
+	ui.List(c.Key("commits"), &s.list, count+1, func(i int) {
+		if i == count {
+			ui.Column(c).AlignSelf(ui.Stretch).Children(func() {
+				if button(c, "Load more", s.Busy).Clicked() {
+					if graph {
+						s.GraphLimit += 40
+					} else {
+						s.HistoryOptions.Limit += 40
+					}
+					s.Refresh()
+				}
+			})
+			return
+		}
+		var entry workspace.CommitEntry
+		if graph {
+			entry = s.Data.Graph[i].Commit.CommitEntry
+		} else {
+			entry = s.Data.History[i]
+		}
+		ui.Column(c).AlignSelf(ui.Stretch).Children(func() {
+			b := ui.ButtonBase(c).AlignSelf(ui.Stretch).Height(56).Padding(4, 14).Gap(8).Label(entry.Subject)
+			if s.CommitDetail != nil && s.CommitDetail.Hash == entry.Hash {
+				b.Background(c.Theme().Selection)
+			}
+			b.Children(func() {
+				if graph {
+					drawGraph(c, s.Data.Graph[i])
+				}
+				s.avatar(c, entry.Author, entry.AuthorEmail)
+				ui.Column(c).Grow(1).MinWidth(0).Gap(3).Children(func() {
+					ui.Text(c, entry.Subject).SingleLine()
+					author := ui.ButtonBase(c).Label("Filter author " + entry.Author).Children(func() { muted(c, entry.Author+" · "+entry.Relative).SingleLine() })
+					if author.Clicked() {
+						s.HistoryOptions.Author = entry.Author
+						s.Tab = 1
+						s.Refresh()
+					}
+				})
+				for _, r := range entry.Refs {
+					ui.Text(c, r.Name).FontSize(11).Padding(2, 4).Radius(3).Background(c.Theme().Accent.Alpha(.14))
+				}
+				muted(c, entry.Short).Font("monospace")
+			})
+			if b.Clicked() {
+				if s.CommitDetail != nil && s.CommitDetail.Hash == entry.Hash {
+					s.CommitDetail = nil
+				} else {
+					s.SelectCommit(entry.Hash)
+				}
+			}
+			b.ContextMenu(func(m *ui.Menu) {
+				if m.Item("Copy commit hash").Chosen() {
+					c.WriteClipboard(entry.Hash)
+				}
+				if m.Item("Review commit").Chosen() {
+					s.review("committed", entry.Hash, "")
+				}
+				if s.Options.OpenURL != nil && m.Item("Open commit on remote").Chosen() {
+					open := s.Options.OpenURL
+					s.start("Resolving remote", func(ctx context.Context, g workspace.Git, _ workspace.GitHub) (func(*State), string, error) {
+						web, e := g.RemoteWeb(ctx)
+						return func(*State) {
+							if e == nil {
+								open(web.CommitURL(entry.Hash))
+							}
+						}, "", e
+					})
+				}
+			})
+			if s.CommitDetail != nil && s.CommitDetail.Hash == entry.Hash {
+				s.commitView(c)
+			}
+		})
+	}).Grow(1).MinHeight(0)
 }
 func drawGraph(c *ui.Context, row workspace.GraphRow) {
 	palette := []ui.Color{c.Theme().Accent, c.Theme().Success, c.Theme().Warning, ui.RGB(179, 131, 227), ui.RGB(60, 190, 190)}

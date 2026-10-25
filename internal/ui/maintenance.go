@@ -33,10 +33,8 @@ func (x *Controller) beginRuntimeOperation() (func(), error) {
 }
 
 func (x *Controller) runRetention(manual bool) {
-	if !x.Store.Retention().Enabled {
-		if manual {
-			x.UI.Notify("Enable the session cleanup policy first.", false)
-		}
+	policy := x.Store.Retention()
+	if !manual && !policy.Enabled {
 		return
 	}
 	if !x.sessionGate.TryLock() {
@@ -51,7 +49,7 @@ func (x *Controller) runRetention(manual bool) {
 	svc := workbench.New(x.Store, x.workspace)
 	x.UI.Async(func() func() {
 		defer func() { x.maintenance.Store(false); x.sessionGate.Unlock() }()
-		out, err := svc.ApplyRetention(time.Now(), live)
+		out, err := svc.CleanupSessions(time.Now(), live, policy)
 		return func() {
 			x.UI.retentionBusy = false
 			x.UI.save(err)

@@ -97,7 +97,7 @@ func (a *App) privacySettings(c *ui.Context) {
 		})
 		a.sourceSettingsDivider(c)
 		a.sourceSettingsRow(c, a.Tr("settings.session_retention_run"), a.Tr("settings.session_retention_run_description"), "", func() {
-			if a.sourceSettingsButton(c, a.Tr("settings.session_retention_run")).Height(a.Theme.Px(32)).Disabled(!a.retention.Enabled || a.retentionBusy).Clicked() {
+			if a.sourceSettingsButton(c, a.Tr("settings.session_retention_run")).Label("Run session cleanup").Height(a.Theme.Px(32)).Disabled(a.retentionBusy).Clicked() {
 				if a.retention.Mode == "delete" {
 					a.Confirm("Permanently delete old tasks?", fmt.Sprintf("Delete saved sessions idle for more than %d days. Open tasks are excluded. This cannot be undone.", a.retention.Days), func() { a.Dispatch(Action{Kind: "RunRetention"}) })
 				} else {

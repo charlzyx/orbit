@@ -1,0 +1,130 @@
+{
+  "source_base": "0af37538a766d57243f9170f28c726327d053127",
+  "overlay_base": "d9c78fa4b0719efc89b82cb0124f2792da2eb85d",
+  "files": [
+    {
+      "path": "internal/gitworkbench/history_layout_test.go",
+      "bytes": 10590,
+      "sha256": "95e075df6e377ec705ea6d702ee72170a789a8d0dccaae8486e1f5fd18eb81ed"
+    },
+    {
+      "path": "internal/gitworkbench/view.go",
+      "bytes": 20453,
+      "sha256": "6b5aeaa3d611cc70341046e923f9d786d7ee5c8350d21b670b7776af9038c41a"
+    },
+    {
+      "path": "internal/ui/explorer_dock_test.go",
+      "bytes": 8475,
+      "sha256": "8ffaf01dc11e66f8e8079cad45402ce483c47f9d78de4be023ec88ebe0c76aec"
+    },
+    {
+      "path": "internal/ui/files.go",
+      "bytes": 27205,
+      "sha256": "478775d193a6fd2c2f420e1db0a048841d4bf3ad8989beed724e1c7b32da4b9a"
+    },
+    {
+      "path": "internal/ui/maintenance.go",
+      "bytes": 2773,
+      "sha256": "41ac7a69523f3aa98936815d5cff8a0c811624ac976409ec15c27ef95fad14ea"
+    },
+    {
+      "path": "internal/ui/retention_manual_test.go",
+      "bytes": 3353,
+      "sha256": "57776ca04dea25d603392e2ef0c0b119fb64dee234bbeff73258d4ac2678f2d3"
+    },
+    {
+      "path": "internal/ui/review_layout.go",
+      "bytes": 5793,
+      "sha256": "9201303a28b54090eab7c7e9f5622660fabfeeb67ab58dca1031062e93dfa623"
+    },
+    {
+      "path": "internal/ui/settings_misc.go",
+      "bytes": 7535,
+      "sha256": "558523d5ba644dc450573e5131a233d7faa16a58bdbb036297fa5fbbeae22556"
+    },
+    {
+      "path": "internal/ui/usage.go",
+      "bytes": 32124,
+      "sha256": "f5498da9999165e5922e95774a55cc33914decb1e2c3047c235ee12debf60b2b"
+    },
+    {
+      "path": "internal/ui/usage_breakdown.go",
+      "bytes": 3675,
+      "sha256": "5e7c78c22b8b6a999c9b7928b5f9bd3c52f33b22cd4c2760bc25256fca9b6b2c"
+    },
+    {
+      "path": "internal/ui/usage_chrome.go",
+      "bytes": 5648,
+      "sha256": "f671fcbad2ed0d59b79e60950edf6bc33a58401680dbecf17e0c2c70d90b93a7"
+    },
+    {
+      "path": "internal/ui/usage_details_geometry_test.go",
+      "bytes": 9771,
+      "sha256": "e30354fe7dafaf660e6342f8e20d1f89f758f437b24239544fa95bb364bd744c"
+    },
+    {
+      "path": "internal/ui/usage_menus.go",
+      "bytes": 6326,
+      "sha256": "ef7415df64393698fcc04800b6b21a76118e1a7b10e217ade3d8bc20dcd7654f"
+    },
+    {
+      "path": "internal/ui/usage_native_table.go",
+      "bytes": 9025,
+      "sha256": "3876e00b61c8acbb6b2d81cfb44f35436461c367844d53458d9969bfe77ec795"
+    },
+    {
+      "path": "internal/ui/usage_tables.go",
+      "bytes": 22521,
+      "sha256": "2ae872fb0da12a7a785ae74a7f158bb39595d0c3a02b00d14e6919f733cd0b85"
+    },
+    {
+      "path": "internal/workbench/retention.go",
+      "bytes": 2475,
+      "sha256": "cadc968805c88d37707876e971117387615adf21162ac52bbee3e443611cd1b5"
+    },
+    {
+      "path": "internal/workbench/retention_manual_test.go",
+      "bytes": 2586,
+      "sha256": "71b5eee9713a4c44608cda1d8f4bd6072d3824c41f5ad49bb8bacce7b2e764e3"
+    }
+  ],
+  "validation": {
+    "root_race": {
+      "pass": 2344,
+      "skip": 14
+    },
+    "package_results": {
+      "pass": 24
+    },
+    "vet": "PASS",
+    "toolkit": "PASS",
+    "terminal": "PASS",
+    "wrapper": "PASS",
+    "cross_builds": "PASS (five targets, macOS arm64 only)",
+    "native_capture": "PENDING",
+    "successful_model_inference": "NOT_ESTABLISHED"
+  },
+  "environment": {
+    "go": "1.27.3",
+    "pi": "1.4.0",
+    "node": "24.22.1",
+    "notes": "Local tests only; hosted CI separately uses its pinned Node toolchain. Source copy uses -buildvcs=false."
+  },
+  "binary_sha256": {
+    "orbit-windows-arm64": "ee3d1898e5a6425835334f580b73905b2d279b489b09b8af81969cee0dd370b2",
+    "orbit-windows-amd64": "1c21173512601c036e7b10bc50f0161527a29bf5e5b1aaa7fcd6d59ccc909f91",
+    "orbit-darwin-arm64": "398ddc07d4534719ac4099b6af38b0a19b768da15de6d7975c0fcfa8ec08ee89",
+    "orbit-linux-arm64": "51bb7f2b0c337b586b18f71fd47382ccb7ac4ad612e2396c138045436dfc0d6a",
+    "orbit-linux-amd64": "00efa2cce61f4344f5664ae6a3fb3ca78d0cbff65bce02d93123d66a44945904"
+  },
+  "logs_sha256": {
+    "parity-focused.log": "dbd6080a6a1134271bac5a8f6ee6cbb2804f4be705ff0e5c24b0321a04ecf47e",
+    "integrated-race-retry.jsonl": "0c4f324c50bbc43debb902cf5103a66c16ee31c41de4fa275a699f701e7ae9d7",
+    "integrated-vet-retry.log": "4563659a8e94e95f1c1fc623706f380d4e244d1b11c1b4b584ebcea7d1aaca08",
+    "integrated-toolkit.log": "76225f0f54e9e62b89b91237e944aff68cfb2a04379b75ced27c3be109b74801",
+    "integrated-terminal-final.log": "00a7d172aae22c0936a9a3b4f8b08f376c3555e1767e01e0d21dd617dfb74997",
+    "integrated-wrapper.log": "f36ecc2b704062e33d505bfa3c2fb8093365b9d12db9d7bd957fa8966f67b432"
+  },
+  "earlier_attempts": "Initial aggregate/vet failed on /tmp capacity and unwritable font/native caches. Preserved separately; corrected environment rerun passed. No application defect inferred from infrastructure failures.",
+  "limits": "This is not in released .4, not native visual parity, not full feature acceptance. Only generated synthetic session fixtures used for retention; permanent deletion confirmation retained."
+}
