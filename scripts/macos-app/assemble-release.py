@@ -24,6 +24,8 @@ def assemble(root,inputs,out,commit):
  write(out/'SHA256SUMS',''.join(f'{digest(p)}  {p.name}\n' for p in paths))
  write(out/'RELEASE-NOTES.md',f'''Experimental native Go + MyGo Finder app, source {commit}.
 
+Corrects the .2 file-open crash: opening an Explorer file no longer mounts the same native list twice. Verified with whole-app repeated open/close/sidebar/Review undo regressions and fresh hosted Linux first-file/two-tab captures. Full editor feature and visual parity remain incomplete. Existing .1/.2 tags and assets are unchanged.
+
 Download the arm64 DMG for Apple Silicon. Future builds are arm64 only; existing Intel releases and assets remain unchanged. Open the disk image, drag Orbit Go Test.app to Applications, eject the image, then open the app. No Terminal command or separate Node/Pi installation is required. Bundled Node22.23.4 and Pi1.4.0 materialize into isolated test app data on first launch. Configure a provider in the app before model inference; no account or credential is bundled.
 
 This exact arm64 DMG passed matching-architecture hosted macOS launch smoke: read-only mount, copy outside build directory, detach, native visible first frame with captured PNG, Ghostty load, Pi RPC get_state, second launch and unchanged app bytes. These are bounded smoke checks, not full feature or pixel parity, not downloaded-app Gatekeeper acceptance, and not successful model inference.

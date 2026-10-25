@@ -2,6 +2,11 @@ KNOWN LIMITS / 已知限制 — experimental Finder app
 
 - Future macOS builds support Apple Silicon (arm64) only. Existing Intel
   releases and assets remain unchanged.
+- The file-open crash found in .2 is corrected: the main editor no longer
+  mounts a duplicate Explorer tree. Whole-app regressions and fresh hosted
+  Linux native first-file/two-tab captures passed. This is not a claim of
+  complete editor acceptance on macOS. The right Explorer resize handle and
+  source toolbar/geometry alignment are still incomplete.
 - Full 139-feature source-derived acceptance is still open. No pixel-perfect
   claim: all 16 older published-state native comparison pairs differed.
 - Review staged+edited-file duplication and hidden-window heartbeat have later
