@@ -1,0 +1,2475 @@
+{
+  "schema_version": 1,
+  "category": "settings",
+  "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "fixture_contract": "fixture.json",
+  "cases": [
+    {
+      "category": "settings",
+      "slug": "settings-general-baseline",
+      "feature_ids": [
+        "P01",
+        "P02",
+        "U05"
+      ],
+      "expected_controls": [
+        "Settings general baseline",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "settings_body",
+          "line": 676,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L676"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "settings_rows",
+          "line": 932,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L932"
+        }
+      ],
+      "id": "V070",
+      "title": "Settings general baseline",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated settings surface in fixture.json.",
+        "Configure the named source state: Settings general baseline.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "CAPTURED_DIAGNOSTIC_FULL_FIXTURE_NOT_VERIFIED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "PARTIAL",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V070/rust.png",
+        "actual_path": "/workspace/shared/orbit-toolchains/reference-capture-1821f982/reference-desktop/settings-general-dark.png",
+        "sha256": "97b2186bf23698998f9eb66c6fd67762e7720acfb347a2c87485265f9a0fee70",
+        "capture_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+        "client_bounds": [
+          0,
+          0,
+          1470,
+          922
+        ],
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V070/go.png",
+        "actual_path": "/workspace/shared/orbit-toolchains/native-capture-1821f982/go-desktop/settings-general-dark.png",
+        "sha256": "22d2dbd09a6af6b43f83f05e31db79333146d2acadb8364ed8289bfb518f9c5c",
+        "capture_commit": "1821f9829e20a620bfb7863cba7bba48ebe9f239",
+        "client_bounds": [
+          0,
+          0,
+          1470,
+          922
+        ],
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": false,
+        "differing_pixels": 47020,
+        "max_channel_delta": 205,
+        "mean_absolute_channel_error": 1.1009276270160993,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask.",
+        "diagnostic_same_geometry_pair": true,
+        "changed_percent": 3.469240190653268,
+        "normalized_rmse": 0.03720001426629926,
+        "difference_bbox": [
+          0,
+          18,
+          1451,
+          907
+        ],
+        "evidence_path": "/workspace/shared/orbit-toolchains/comparison-1821f982/comparison.json",
+        "full_fixture_gate": "BLOCKED: no actual resolved font/file hashes or frozen clock/animation record; manifest dpi=1 mislabeled scale although Xvfb launched with -dpi96."
+      },
+      "manual_review": {
+        "status": "DIFFERENT",
+        "reviewer": "Independent inventory auditor; coordinator also inspected all4 native PNGs",
+        "checked_at": "2026-10-25T06:20:51Z",
+        "finding": "DIFFERENT: This Machine/Notifications cards and separators have small vertical offsets; text/glyph metrics differ; Go adds top-right native window controls and a -go-dev version suffix. Main labels and section ordering agree, but pixel parity does not."
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "PARTIAL",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": "1821f9829e20a620bfb7863cba7bba48ebe9f239",
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent inventory auditor",
+        "evidence": "Pinned handler read and both native screenshots inspected. Actual screen exists; strict fixture/font/clock normalization is still incomplete."
+      }
+    },
+    {
+      "category": "settings",
+      "slug": "settings-appearance-baseline",
+      "feature_ids": [
+        "P01",
+        "P18",
+        "P19",
+        "P20"
+      ],
+      "expected_controls": [
+        "Settings appearance baseline",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "settings_body",
+          "line": 676,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L676"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "settings_rows",
+          "line": 932,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L932"
+        }
+      ],
+      "id": "V071",
+      "title": "Settings appearance baseline",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated settings surface in fixture.json.",
+        "Configure the named source state: Settings appearance baseline.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V071/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V071/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "settings",
+      "slug": "settings-shortcuts-baseline",
+      "feature_ids": [
+        "P01",
+        "P20",
+        "S03",
+        "S05",
+        "W71"
+      ],
+      "expected_controls": [
+        "Settings shortcuts baseline",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "settings_body",
+          "line": 676,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L676"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "settings_rows",
+          "line": 932,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L932"
+        }
+      ],
+      "id": "V072",
+      "title": "Settings shortcuts baseline",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated settings surface in fixture.json.",
+        "Configure the named source state: Settings shortcuts baseline.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "cmd/orbit/main.go",
+        "internal/native",
+        "internal/preferences",
+        "internal/ui",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V072/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V072/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "settings",
+      "slug": "settings-privacy-baseline",
+      "feature_ids": [
+        "P01",
+        "U06",
+        "U07",
+        "U13"
+      ],
+      "expected_controls": [
+        "Settings privacy baseline",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "settings_body",
+          "line": 676,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L676"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "settings_rows",
+          "line": 932,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L932"
+        }
+      ],
+      "id": "V073",
+      "title": "Settings privacy baseline",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated settings surface in fixture.json.",
+        "Configure the named source state: Settings privacy baseline.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V073/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V073/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "settings",
+      "slug": "settings-runtime-baseline",
+      "feature_ids": [
+        "P01",
+        "P02",
+        "U11"
+      ],
+      "expected_controls": [
+        "Settings runtime baseline",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "settings_body",
+          "line": 676,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L676"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "settings_rows",
+          "line": 932,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L932"
+        }
+      ],
+      "id": "V074",
+      "title": "Settings runtime baseline",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated settings surface in fixture.json.",
+        "Configure the named source state: Settings runtime baseline.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V074/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V074/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "settings",
+      "slug": "settings-agent-baseline",
+      "feature_ids": [
+        "P01",
+        "P04"
+      ],
+      "expected_controls": [
+        "Settings agent baseline",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "settings_body",
+          "line": 676,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L676"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "settings_rows",
+          "line": 932,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L932"
+        }
+      ],
+      "id": "V075",
+      "title": "Settings agent baseline",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated settings surface in fixture.json.",
+        "Configure the named source state: Settings agent baseline.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V075/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V075/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "settings",
+      "slug": "settings-worktrees-baseline",
+      "feature_ids": [
+        "P01",
+        "W43"
+      ],
+      "expected_controls": [
+        "Settings worktrees baseline",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "settings_body",
+          "line": 676,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L676"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "settings_rows",
+          "line": 932,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L932"
+        }
+      ],
+      "id": "V076",
+      "title": "Settings worktrees baseline",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated settings surface in fixture.json.",
+        "Configure the named source state: Settings worktrees baseline.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench",
+        "internal/workspace/setup.go",
+        "internal/workspace/worktrees.go",
+        "internal/worktreeui/labels.go",
+        "internal/worktreeui/picker.go",
+        "internal/worktreeui/state.go",
+        "internal/worktreeui/view.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V076/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V076/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "settings",
+      "slug": "settings-providers-baseline",
+      "feature_ids": [
+        "P01",
+        "P05",
+        "P06",
+        "P07",
+        "P09"
+      ],
+      "expected_controls": [
+        "Settings providers baseline",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "settings_body",
+          "line": 676,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L676"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "settings_rows",
+          "line": 932,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L932"
+        }
+      ],
+      "id": "V077",
+      "title": "Settings providers baseline",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated settings surface in fixture.json.",
+        "Configure the named source state: Settings providers baseline.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V077/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V077/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "settings",
+      "slug": "settings-about-baseline",
+      "feature_ids": [
+        "P01",
+        "U08",
+        "U10",
+        "U14"
+      ],
+      "expected_controls": [
+        "Settings about baseline",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "settings_body",
+          "line": 676,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L676"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "settings_rows",
+          "line": 932,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L932"
+        }
+      ],
+      "id": "V078",
+      "title": "Settings about baseline",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated settings surface in fixture.json.",
+        "Configure the named source state: Settings about baseline.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V078/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V078/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "settings",
+      "slug": "settings-search-label-keyword-matches",
+      "feature_ids": [
+        "P01"
+      ],
+      "expected_controls": [
+        "Settings search label keyword matches",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "settings_search_results",
+          "line": 766,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L766"
+        }
+      ],
+      "id": "V079",
+      "title": "Settings search label keyword matches",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated settings surface in fixture.json.",
+        "Configure the named source state: Settings search label keyword matches.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V079/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V079/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "settings",
+      "slug": "settings-search-zero-results",
+      "feature_ids": [
+        "P01"
+      ],
+      "expected_controls": [
+        "Settings search zero results",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "settings_search_results",
+          "line": 766,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L766"
+        }
+      ],
+      "id": "V080",
+      "title": "Settings search zero results",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated settings surface in fixture.json.",
+        "Configure the named source state: Settings search zero results.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V080/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V080/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "settings",
+      "slug": "settings-general-notifications-denied",
+      "feature_ids": [
+        "P01",
+        "P02",
+        "U05"
+      ],
+      "expected_controls": [
+        "Settings general notifications denied",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "native-os",
+      "note": "Requires macOS packaged/unbundled platform; CPU mock is not OS proof.",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "notification_rows",
+          "line": 4778,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L4778"
+        }
+      ],
+      "id": "V081",
+      "title": "Settings general notifications denied",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated settings surface in fixture.json.",
+        "Configure the named source state: Settings general notifications denied.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "BLOCKED",
+      "blocker": "Actual native OS menu/dialog/notification execution not yet captured; headless CPU descriptors are insufficient.",
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V081/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V081/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "BLOCKED",
+      "native_os_verdict": "BLOCKED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "settings",
+      "slug": "settings-general-notifications-unbundled-macos",
+      "feature_ids": [
+        "P01",
+        "P02",
+        "U05"
+      ],
+      "expected_controls": [
+        "Settings general notifications unbundled macos",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "native-os",
+      "note": "Requires macOS packaged/unbundled platform; CPU mock is not OS proof.",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "notification_rows",
+          "line": 4778,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L4778"
+        }
+      ],
+      "id": "V082",
+      "title": "Settings general notifications unbundled macos",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated settings surface in fixture.json.",
+        "Configure the named source state: Settings general notifications unbundled macos.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "BLOCKED",
+      "blocker": "Actual native OS menu/dialog/notification execution not yet captured; headless CPU descriptors are insufficient.",
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V082/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V082/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "BLOCKED",
+      "native_os_verdict": "BLOCKED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "settings",
+      "slug": "settings-runtime-active-pid-uptime-stderr",
+      "feature_ids": [
+        "P01",
+        "P02",
+        "U11"
+      ],
+      "expected_controls": [
+        "Settings runtime active pid uptime stderr",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "Actual process facts required; no invented PID/version/metrics.",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "runtime_rows",
+          "line": 4931,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L4931"
+        }
+      ],
+      "id": "V083",
+      "title": "Settings runtime active pid uptime stderr",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated settings surface in fixture.json.",
+        "Configure the named source state: Settings runtime active pid uptime stderr.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V083/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V083/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "settings",
+      "slug": "settings-runtime-parked-processes",
+      "feature_ids": [
+        "P01",
+        "P02",
+        "U11"
+      ],
+      "expected_controls": [
+        "Settings runtime parked processes",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "Actual process facts required; no invented PID/version/metrics.",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "runtime_rows",
+          "line": 4931,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L4931"
+        }
+      ],
+      "id": "V084",
+      "title": "Settings runtime parked processes",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated settings surface in fixture.json.",
+        "Configure the named source state: Settings runtime parked processes.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V084/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V084/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "settings",
+      "slug": "settings-runtime-stopped",
+      "feature_ids": [
+        "P01",
+        "P02",
+        "U11"
+      ],
+      "expected_controls": [
+        "Settings runtime stopped",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "Actual process facts required; no invented PID/version/metrics.",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "runtime_rows",
+          "line": 4931,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L4931"
+        }
+      ],
+      "id": "V085",
+      "title": "Settings runtime stopped",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated settings surface in fixture.json.",
+        "Configure the named source state: Settings runtime stopped.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V085/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V085/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "settings",
+      "slug": "settings-runtime-failed-stderr",
+      "feature_ids": [
+        "P01",
+        "P02",
+        "U11"
+      ],
+      "expected_controls": [
+        "Settings runtime failed stderr",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "Actual process facts required; no invented PID/version/metrics.",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "runtime_rows",
+          "line": 4931,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L4931"
+        }
+      ],
+      "id": "V086",
+      "title": "Settings runtime failed stderr",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated settings surface in fixture.json.",
+        "Configure the named source state: Settings runtime failed stderr.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V086/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V086/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "settings",
+      "slug": "settings-runtime-patch-status",
+      "feature_ids": [
+        "P01",
+        "P02",
+        "U11"
+      ],
+      "expected_controls": [
+        "Settings runtime patch status",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "Actual process facts required; no invented PID/version/metrics.",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "runtime_rows",
+          "line": 4931,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L4931"
+        }
+      ],
+      "id": "V087",
+      "title": "Settings runtime patch status",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated settings surface in fixture.json.",
+        "Configure the named source state: Settings runtime patch status.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V087/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V087/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "settings",
+      "slug": "settings-providers-catalog-custom-connected-cards",
+      "feature_ids": [
+        "P05",
+        "P06",
+        "P07",
+        "P09"
+      ],
+      "expected_controls": [
+        "Settings providers catalog custom connected cards",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_rows",
+          "line": 2391,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L2391"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_editor_layer",
+          "line": 4145,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L4145"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_key_layer",
+          "line": 3926,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L3926"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_usage_layer",
+          "line": 3798,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L3798"
+        }
+      ],
+      "id": "V088",
+      "title": "Settings providers catalog custom connected cards",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated settings surface in fixture.json.",
+        "Configure the named source state: Settings providers catalog custom connected cards.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V088/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V088/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "settings",
+      "slug": "settings-providers-filtered-zero",
+      "feature_ids": [
+        "P05",
+        "P06",
+        "P07",
+        "P09"
+      ],
+      "expected_controls": [
+        "Settings providers filtered zero",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_rows",
+          "line": 2391,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L2391"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_editor_layer",
+          "line": 4145,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L4145"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_key_layer",
+          "line": 3926,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L3926"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_usage_layer",
+          "line": 3798,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L3798"
+        }
+      ],
+      "id": "V089",
+      "title": "Settings providers filtered zero",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated settings surface in fixture.json.",
+        "Configure the named source state: Settings providers filtered zero.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V089/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V089/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "settings",
+      "slug": "settings-providers-partial-catalog-error",
+      "feature_ids": [
+        "P05",
+        "P06",
+        "P07",
+        "P09"
+      ],
+      "expected_controls": [
+        "Settings providers partial catalog error",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_rows",
+          "line": 2391,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L2391"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_editor_layer",
+          "line": 4145,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L4145"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_key_layer",
+          "line": 3926,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L3926"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_usage_layer",
+          "line": 3798,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L3798"
+        }
+      ],
+      "id": "V090",
+      "title": "Settings providers partial catalog error",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated settings surface in fixture.json.",
+        "Configure the named source state: Settings providers partial catalog error.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V090/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V090/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "settings",
+      "slug": "settings-provider-add-modal",
+      "feature_ids": [
+        "P05",
+        "P06",
+        "P07",
+        "P09"
+      ],
+      "expected_controls": [
+        "Settings provider add modal",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_rows",
+          "line": 2391,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L2391"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_editor_layer",
+          "line": 4145,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L4145"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_key_layer",
+          "line": 3926,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L3926"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_usage_layer",
+          "line": 3798,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L3798"
+        }
+      ],
+      "id": "V091",
+      "title": "Settings provider add modal",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated settings surface in fixture.json.",
+        "Configure the named source state: Settings provider add modal.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V091/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V091/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "settings",
+      "slug": "settings-provider-edit-modal",
+      "feature_ids": [
+        "P05",
+        "P06",
+        "P07",
+        "P09"
+      ],
+      "expected_controls": [
+        "Settings provider edit modal",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_rows",
+          "line": 2391,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L2391"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_editor_layer",
+          "line": 4145,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L4145"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_key_layer",
+          "line": 3926,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L3926"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_usage_layer",
+          "line": 3798,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L3798"
+        }
+      ],
+      "id": "V092",
+      "title": "Settings provider edit modal",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated settings surface in fixture.json.",
+        "Configure the named source state: Settings provider edit modal.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V092/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V092/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "settings",
+      "slug": "settings-provider-invalid-save-preserves-draft",
+      "feature_ids": [
+        "P05",
+        "P06",
+        "P07",
+        "P09"
+      ],
+      "expected_controls": [
+        "Settings provider invalid save preserves draft",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_rows",
+          "line": 2391,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L2391"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_editor_layer",
+          "line": 4145,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L4145"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_key_layer",
+          "line": 3926,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L3926"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_usage_layer",
+          "line": 3798,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L3798"
+        }
+      ],
+      "id": "V093",
+      "title": "Settings provider invalid save preserves draft",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated settings surface in fixture.json.",
+        "Configure the named source state: Settings provider invalid save preserves draft.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V093/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V093/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "settings",
+      "slug": "settings-provider-secret-key-modal",
+      "feature_ids": [
+        "P05",
+        "P06",
+        "P07",
+        "P09"
+      ],
+      "expected_controls": [
+        "Settings provider secret key modal",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_rows",
+          "line": 2391,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L2391"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_editor_layer",
+          "line": 4145,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L4145"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_key_layer",
+          "line": 3926,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L3926"
+        },
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "provider_usage_layer",
+          "line": 3798,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L3798"
+        }
+      ],
+      "id": "V094",
+      "title": "Settings provider secret key modal",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated settings surface in fixture.json.",
+        "Configure the named source state: Settings provider secret key modal.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": "Real authentication remains unverified; only deterministic noncredential visual fixtures are permitted without the relevant authorization.",
+      "rust_image": {
+        "planned_path": "../probes/visual/V094/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V094/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,377 @@
+{
+  "schema_version": 1,
+  "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "source_version": "0.2.12",
+  "inventory_revision": "audited-candidates-2026-10-25-0620",
+  "enumerated_case_count": 490,
+  "canonical_in_app_cases": 471,
+  "native_os_blocked_cases": 19,
+  "planned_image_count": 980,
+  "valid_matching_pairs": 0,
+  "visual_pass_count": 0,
+  "feature_scope_count": 139,
+  "feature_scope_crosswalk_count": 139,
+  "behavior_only_scope_count": 4,
+  "all_settings_sections": 14,
+  "category_totals": {
+    "shell": 32,
+    "composer": 18,
+    "transcript": 69,
+    "extensions": 13,
+    "settings": 42,
+    "updates-privacy": 11,
+    "platform": 17,
+    "models": 29,
+    "resources": 21,
+    "mcp": 22,
+    "bug-report": 9,
+    "usage": 45,
+    "git": 40,
+    "github": 33,
+    "review": 23,
+    "files": 30,
+    "worktrees": 23,
+    "terminal": 13
+  },
+  "status_totals": {
+    "PARTIAL": 2,
+    "UNTESTED": 468,
+    "BLOCKED": 20
+  },
+  "exhaustiveness_verdict": "AUDITED_CANDIDATES_STATE_RECIPES_UNDER_REVIEW",
+  "recipe_execution_verdict": "NOT_EXECUTED",
+  "source_anchor_validation": "490 pinned source paths/handlers checked; this is not actual-state validation.",
+  "existing_diagnostics": "Two prior diagnostic pairs used mismatched client sizes and count as zero valid pairs. Old30 count is not reused. CPU standalone component captures do not count as full-window pairs.",
+  "stable_id_policy": "These IDs are frozen. Append discoveries; mark superseded duplicates explicitly without renumbering.",
+  "shards": [
+    {
+      "category": "shell",
+      "count": 25,
+      "first_id": "V001",
+      "last_id": "V025",
+      "markdown": "shell-01.md",
+      "json": "shell-01.json"
+    },
+    {
+      "category": "shell",
+      "count": 7,
+      "first_id": "V026",
+      "last_id": "V469",
+      "markdown": "shell-02.md",
+      "json": "shell-02.json"
+    },
+    {
+      "category": "composer",
+      "count": 18,
+      "first_id": "V030",
+      "last_id": "V056",
+      "markdown": "composer-01.md",
+      "json": "composer-01.json"
+    },
+    {
+      "category": "transcript",
+      "count": 25,
+      "first_id": "V044",
+      "last_id": "V168",
+      "markdown": "transcript-01.md",
+      "json": "transcript-01.json"
+    },
+    {
+      "category": "transcript",
+      "count": 25,
+      "first_id": "V169",
+      "last_id": "V193",
+      "markdown": "transcript-02.md",
+      "json": "transcript-02.json"
+    },
+    {
+      "category": "transcript",
+      "count": 19,
+      "first_id": "V194",
+      "last_id": "V212",
+      "markdown": "transcript-03.md",
+      "json": "transcript-03.json"
+    },
+    {
+      "category": "extensions",
+      "count": 13,
+      "first_id": "V057",
+      "last_id": "V069",
+      "markdown": "extensions-01.md",
+      "json": "extensions-01.json"
+    },
+    {
+      "category": "settings",
+      "count": 25,
+      "first_id": "V070",
+      "last_id": "V094",
+      "markdown": "settings-01.md",
+      "json": "settings-01.json"
+    },
+    {
+      "category": "settings",
+      "count": 17,
+      "first_id": "V095",
+      "last_id": "V111",
+      "markdown": "settings-02.md",
+      "json": "settings-02.json"
+    },
+    {
+      "category": "updates-privacy",
+      "count": 11,
+      "first_id": "V112",
+      "last_id": "V478",
+      "markdown": "updates-privacy-01.md",
+      "json": "updates-privacy-01.json"
+    },
+    {
+      "category": "platform",
+      "count": 17,
+      "first_id": "V119",
+      "last_id": "V490",
+      "markdown": "platform-01.md",
+      "json": "platform-01.json"
+    },
+    {
+      "category": "models",
+      "count": 25,
+      "first_id": "V124",
+      "last_id": "V148",
+      "markdown": "models-01.md",
+      "json": "models-01.json"
+    },
+    {
+      "category": "models",
+      "count": 4,
+      "first_id": "V149",
+      "last_id": "V152",
+      "markdown": "models-02.md",
+      "json": "models-02.json"
+    },
+    {
+      "category": "resources",
+      "count": 21,
+      "first_id": "V213",
+      "last_id": "V233",
+      "markdown": "resources-01.md",
+      "json": "resources-01.json"
+    },
+    {
+      "category": "mcp",
+      "count": 22,
+      "first_id": "V234",
+      "last_id": "V475",
+      "markdown": "mcp-01.md",
+      "json": "mcp-01.json"
+    },
+    {
+      "category": "bug-report",
+      "count": 9,
+      "first_id": "V253",
+      "last_id": "V477",
+      "markdown": "bug-report-01.md",
+      "json": "bug-report-01.json"
+    },
+    {
+      "category": "usage",
+      "count": 25,
+      "first_id": "V260",
+      "last_id": "V284",
+      "markdown": "usage-01.md",
+      "json": "usage-01.json"
+    },
+    {
+      "category": "usage",
+      "count": 20,
+      "first_id": "V285",
+      "last_id": "V304",
+      "markdown": "usage-02.md",
+      "json": "usage-02.json"
+    },
+    {
+      "category": "git",
+      "count": 25,
+      "first_id": "V305",
+      "last_id": "V329",
+      "markdown": "git-01.md",
+      "json": "git-01.json"
+    },
+    {
+      "category": "git",
+      "count": 15,
+      "first_id": "V330",
+      "last_id": "V344",
+      "markdown": "git-02.md",
+      "json": "git-02.json"
+    },
+    {
+      "category": "github",
+      "count": 25,
+      "first_id": "V345",
+      "last_id": "V369",
+      "markdown": "github-01.md",
+      "json": "github-01.json"
+    },
+    {
+      "category": "github",
+      "count": 8,
+      "first_id": "V370",
+      "last_id": "V377",
+      "markdown": "github-02.md",
+      "json": "github-02.json"
+    },
+    {
+      "category": "review",
+      "count": 23,
+      "first_id": "V378",
+      "last_id": "V400",
+      "markdown": "review-01.md",
+      "json": "review-01.json"
+    },
+    {
+      "category": "files",
+      "count": 25,
+      "first_id": "V401",
+      "last_id": "V425",
+      "markdown": "files-01.md",
+      "json": "files-01.json"
+    },
+    {
+      "category": "files",
+      "count": 5,
+      "first_id": "V426",
+      "last_id": "V430",
+      "markdown": "files-02.md",
+      "json": "files-02.json"
+    },
+    {
+      "category": "worktrees",
+      "count": 23,
+      "first_id": "V431",
+      "last_id": "V453",
+      "markdown": "worktrees-01.md",
+      "json": "worktrees-01.json"
+    },
+    {
+      "category": "terminal",
+      "count": 13,
+      "first_id": "V454",
+      "last_id": "V466",
+      "markdown": "terminal-01.md",
+      "json": "terminal-01.json"
+    }
+  ],
+  "crosswalk": "feature-crosswalk.json",
+  "fixture": "fixture.json",
+  "source_hashes": {
+    "crates/orbit-pi/src/app/bug_report_ui.rs": "a7517c4e1939dc87338b2fe16e8045147942b94e757a2e1dff4b544c006f6070",
+    "crates/orbit-pi/src/app/composer_ops.rs": "f10d337621ac8b99639d9e90aeddbe800e0fb167fe2265f46c7e18da0ffca9b6",
+    "crates/orbit-pi/src/app/dialogs.rs": "b1d82744d0b22e1523a7d6b75c8222c9a4b710b1552320792b8c37cbd00505f3",
+    "crates/orbit-pi/src/app/mcp_ui.rs": "5ffaf6561e68b97b6edb1b22d4873675c27cebe26a54d7102a1570ac522afb5a",
+    "crates/orbit-pi/src/app/open_in.rs": "a8b2cae4611ac9c6aafdd47670d15abed85869df15645b0efb1d686be4c74d8d",
+    "crates/orbit-pi/src/app/session.rs": "cf72d80f84631413eb78ea665c85a8844af8c912c69c2407316e8a535f361571",
+    "crates/orbit-pi/src/app/settings.rs": "49869d298e1c75f70b6a406d52cb1e9b6cf4deaa1c1c1e6829d69bb94f992873",
+    "crates/orbit-pi/src/app/sidebar.rs": "8cecce9f400dd451d7176d767ac12abcc7df417e25c37348385a6a5c77d86691",
+    "crates/orbit-pi/src/app/skills_ui.rs": "53ca9668f4ec83b9a10f8edad06506b4d6b1a3b1bc03c31cf7c52bb53053a9d9",
+    "crates/orbit-pi/src/app/temp_ui.rs": "3c7884f667d0dd8a0c6355f88ebefb191f4f5f90e9bc8b6ec4054c7c91adcce3",
+    "crates/orbit-pi/src/app/toast_ui.rs": "4acdc110ac402e2b61a7fcab5d8fb6555624c6255c939afb9c76fb31c23ecd51",
+    "crates/orbit-pi/src/app/updater_ui.rs": "61eb8355b261c6ae3bc19fbefea3fa4da2b5feb6ebdbab1f6138f6a89ca5f54b",
+    "crates/orbit-pi/src/app/view.rs": "f41cd25e968924879063ef980e7e3b6f6d1f70f1020c1e721451da038cf49d99",
+    "crates/orbit-pi/src/app/worktrees.rs": "d1356c0e03fd33a79875605c0e1ef1816f6533be836d6f40ed52db279a756872",
+    "crates/orbit-pi/src/branch_picker.rs": "9029b0aeb674fc6066041a178ac56f277b7d6dde8867297772c2577c3fea8436",
+    "crates/orbit-pi/src/command_palette.rs": "54348a449e3cc2f771a7e2aed70b11005b345d15c241e9f5349a1db98f5b99eb",
+    "crates/orbit-pi/src/custom_ui.rs": "1826c6b1647afc93f8a67f6e1aeeab37513c810009b46be8e9d9efe9be9eb3dd",
+    "crates/orbit-pi/src/dialog.rs": "8e529beb1aa1d4f08eb6d1d49cfa2b60e91a5ff57ec7126199732115f99759af",
+    "crates/orbit-pi/src/explorer/panel.rs": "639197ef161a18c751342b69edecea954648b0e87ea138c1760cb5ea644d5923",
+    "crates/orbit-pi/src/explorer/viewer.rs": "1d6c4f1101c630c07ac64c9de39b3b88f5cded877acc91002469cd1fef66d109",
+    "crates/orbit-pi/src/git_panel/mod.rs": "bbfc71243ee6d2f93eb9cddf3dc8bb0749b677244f478cdce69f2c836bcfef85",
+    "crates/orbit-pi/src/main.rs": "c2bb2822b166904cc1cedbdbf17a21152d9fe95a0713dfccfd1ffa9d9adab225",
+    "crates/orbit-pi/src/main_window.rs": "05d9e13b4afd0489a910908e2a5f526c85997c0f45fb42beec958cfa6cca17c5",
+    "crates/orbit-pi/src/model_selector.rs": "2fcd44bdfee668e453a6778555671ccd995df383be90d17ef2935b393058be3a",
+    "crates/orbit-pi/src/notifications.rs": "44e5ace7551522e6468a9d680f5811f4d007f9f95233e795e42db26c4b03780b",
+    "crates/orbit-pi/src/sidepane.rs": "322dc72cc897a3c35f845654d74df7e2de209dc09906d119256cbfa2b1560bd0",
+    "crates/orbit-pi/src/terminal.rs": "8b845ebef76b1142d4dbd9d5d22a77986e38e10f59219458d8bb8b63cca6957e",
+    "crates/orbit-pi/src/transcript_view.rs": "cf06a57001b3fddcdf4d6eaca5f13814b4262a070c2b093fa0469e56a10f7abc",
+    "crates/orbit-pi/src/usage/chart.rs": "96efbbb05ecafdba4b2703d86a071af1307d184c1bc4e7a089a6706f1c4d9e13",
+    "crates/orbit-pi/src/usage/filters.rs": "8c3d338230662e320a231c98dd4b566c9c182ad449be926c3a821d80c69e3a7f",
+    "crates/orbit-pi/src/usage/heatmap.rs": "f7dc308de1b1e0545c8697d6914285dad5ad63d1977bed4fad7b79f773e8c738",
+    "crates/orbit-pi/src/usage/page.rs": "1a5ca8e0960e345e7cd7c146841d6993f455f6f8176280cdbbcdf782a419e24e",
+    "crates/orbit-pi/src/usage/table.rs": "4525d6279ac9bdb2ca2b03f226e72530b17013585c59e5185de148ee4610daf2",
+    "crates/orbit-pi/src/usage/view.rs": "3a8620f8c55d9e3a053bda4bc789acc7a80fe2af4e45886a47278bb89e5772af",
+    "crates/orbit-pi/src/workspace_picker.rs": "1df8c189f09130b26c11f295857bcc866216399c379b04e6efe484fd9a5ecba5"
+  },
+  "candidate_case_count": 490,
+  "planned_image_count_provisional": true,
+  "state_validity_totals": {
+    "VALID_SOURCE_BRANCH": 73,
+    "NOT_REVIEWED": 413,
+    "UNREACHABLE_SOURCE_PRODUCTION": 1,
+    "NEEDS_SPLIT": 2,
+    "INVALID_COMBINATION": 1
+  },
+  "verification_stage_counts": {
+    "source_paths_and_handlers_verified": 490,
+    "source_state_branches_independently_reviewed_valid": 73,
+    "fixtures_executed_and_fully_verified": 0,
+    "actual_images_captured": 4,
+    "same_geometry_diagnostic_pairs": 2,
+    "valid_matching_pairs_captured": 0,
+    "diagnostic_pairs_compared": 2,
+    "pairs_passed": 0,
+    "actual_rendered_cases_observed": 2
+  },
+  "state_validation_warning": "Source-state review does not mean fixture execution. Four actual images and two raw same-geometry comparisons exist; strict font/clock/animation metadata is missing, so fully validated matching pairs and visual passes remain zero.",
+  "unassigned_source_discoveries": [
+    {
+      "name": "Usage first-load scan error",
+      "source": "usage/view.rs635\u2013658",
+      "expected": "index=None; injected scan error; Unable to load usage data; Try again",
+      "status": "INJECTABLE_RENDER_BRANCH_ONLY_PRODUCTION_UNREACHABLE",
+      "reachability_note": "view.rs635 branch exists, but production scanner cannot set index=None plus error=Some. Do not treat injected renderer fixture as a naturally reachable screen."
+    },
+    {
+      "name": "Usage undersampled latency",
+      "source": "usage/view.rs1584",
+      "expected": "Average selected; percentile controls disabled below20 timed samples",
+      "status": "AWAITING_STABLE_ID_AFTER_CANDIDATE_REVIEW"
+    },
+    {
+      "name": "Usage entirely unpriced cost",
+      "source": "usage/view.rs1550/1678/5151",
+      "expected": "Cost disabled; Not shown reason; distinct from partially priced subtotal",
+      "status": "AWAITING_STABLE_ID_AFTER_CANDIDATE_REVIEW"
+    },
+    {
+      "name": "Running session with >1 thinking level: existing model/thinking chips are dimmed and locked. Distinct from V152 absent thinking chip.",
+      "source": "model-visual-source-review.json",
+      "status": "INDEPENDENT_REVIEW_DISCOVERY_NOT_YET_A_CAPTURE_RECIPE"
+    },
+    {
+      "name": "Model picker with truly empty catalog and no query: same no-match entry but no providers and no favorite-current chip; V146 is nonempty catalog filtered to zero.",
+      "source": "model-visual-source-review.json",
+      "status": "INDEPENDENT_REVIEW_DISCOVERY_NOT_YET_A_CAPTURE_RECIPE"
+    },
+    {
+      "name": "More than six rows or many scope chips: vertical/horizontal scroll and edge clipping require dedicated captures; not implied by short baseline.",
+      "source": "model-visual-source-review.json",
+      "status": "INDEPENDENT_REVIEW_DISCOVERY_NOT_YET_A_CAPTURE_RECIPE"
+    },
+    {
+      "name": "Model picker row secondary fallbacks: context window, then nonblank ID in code font, then provider name if both absent. V141 with only context-bearing rows does not cover fallback pixels.",
+      "source": "model-visual-source-review.json",
+      "status": "INDEPENDENT_REVIEW_DISCOVERY_NOT_YET_A_CAPTURE_RECIPE"
+    },
+    {
+      "name": "Provider mark aliases/known brand/unknown custom cloud and thinking icon aliases/unknown fallback are separate icon variants, not all shown by V149.",
+      "source": "model-visual-source-review.json",
+      "status": "INDEPENDENT_REVIEW_DISCOVERY_NOT_YET_A_CAPTURE_RECIPE"
+    },
+    {
+      "name": "Settings provider select absent with one provider. V125 covers zero providers only.",
+      "source": "model-visual-source-review.json",
+      "status": "INDEPENDENT_REVIEW_DISCOVERY_NOT_YET_A_CAPTURE_RECIPE"
+    }
+  ],
+  "planned_image_count_note": "980 is an arithmetic upper placeholder for490 candidates, not a finalized screenshot requirement. Invalid/unreachable candidates must not be captured as source parity; combined candidates need split review and discoveries await IDs.",
+  "additional_required_candidate_review": "../usage-visual-source-review.json contains14 missing/split candidate families; ../model-visual-source-review.json contains6 further branch families. They remain explicit discoveries while candidate count is frozen, not proven coverage."
+}

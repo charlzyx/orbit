@@ -1,0 +1,720 @@
+{
+  "schema_version": 1,
+  "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "reviewed_case_count": 29,
+  "reviewed_ids": [
+    "V124",
+    "V125",
+    "V126",
+    "V127",
+    "V128",
+    "V129",
+    "V130",
+    "V131",
+    "V132",
+    "V133",
+    "V134",
+    "V135",
+    "V136",
+    "V137",
+    "V138",
+    "V139",
+    "V140",
+    "V141",
+    "V142",
+    "V143",
+    "V144",
+    "V145",
+    "V146",
+    "V147",
+    "V148",
+    "V149",
+    "V150",
+    "V151",
+    "V152"
+  ],
+  "method": "Read concrete render conditions and generated children, not handler registration alone. Inventory files left to auditor; no IDs renumbered.",
+  "fixture_contract": "visual/fixture.json",
+  "fixture_kind": "Explicit synthetic disposable catalog; never live catalog facts or product fallback entries.",
+  "shared_fixture": {
+    "catalog": [
+      {
+        "provider": "first",
+        "id": "alpha",
+        "name": "Alpha",
+        "contextWindow": 128000,
+        "reasoning": false
+      },
+      {
+        "provider": "second",
+        "id": "same",
+        "name": "Second Same",
+        "contextWindow": 200000,
+        "reasoning": true
+      },
+      {
+        "provider": "first",
+        "id": "beta",
+        "name": "Beta",
+        "contextWindow": 1000000,
+        "reasoning": true,
+        "thinkingLevelMap": {
+          "off": null,
+          "minimal": null,
+          "low": "low",
+          "medium": null,
+          "high": "high",
+          "max": "max"
+        }
+      },
+      {
+        "provider": "first",
+        "id": "same",
+        "name": "First Same",
+        "reasoning": true
+      },
+      {
+        "provider": "second",
+        "id": "delta",
+        "name": "Delta",
+        "contextWindow": 64000,
+        "reasoning": false
+      }
+    ],
+    "current_model": [
+      "second",
+      "same"
+    ],
+    "levels": [
+      "off",
+      "low",
+      "high"
+    ],
+    "current_level": "high",
+    "favorites": [],
+    "recents": [],
+    "models_query": "",
+    "provider_filter": null,
+    "favorites_only": false,
+    "running": false,
+    "refreshing": false,
+    "default_model": null,
+    "default_thinking": null,
+    "title_model": null,
+    "auto_title_enabled": true
+  },
+  "source_hashes": [
+    {
+      "path": "crates/orbit-pi/locales/en.yml",
+      "sha256": "d9b654a62da1fb65534f5bb2ba817f77e27b66985c8ca1a950bd74b5716ccd78",
+      "working_tree_matches_frozen": true
+    },
+    {
+      "path": "crates/orbit-pi/src/app.rs",
+      "sha256": "080e5e76268a8cac8424e3250f7068b967ec117ee61b78364b58f07ea0df0dcf",
+      "working_tree_matches_frozen": true
+    },
+    {
+      "path": "crates/orbit-pi/src/app/settings.rs",
+      "sha256": "49869d298e1c75f70b6a406d52cb1e9b6cf4deaa1c1c1e6829d69bb94f992873",
+      "working_tree_matches_frozen": true
+    },
+    {
+      "path": "crates/orbit-pi/src/app/view.rs",
+      "sha256": "f41cd25e968924879063ef980e7e3b6f6d1f70f1020c1e721451da038cf49d99",
+      "working_tree_matches_frozen": true
+    },
+    {
+      "path": "crates/orbit-pi/src/model_selector.rs",
+      "sha256": "2fcd44bdfee668e453a6778555671ccd995df383be90d17ef2935b393058be3a",
+      "working_tree_matches_frozen": true
+    },
+    {
+      "path": "crates/orbit-pi/src/theme/tokens.rs",
+      "sha256": "189c201bec5f416bfb49403e2e864e592982cf2ff87667276318c256c849e304",
+      "working_tree_matches_frozen": true
+    }
+  ],
+  "cases": [
+    {
+      "id": "V124",
+      "render_branch": "crates/orbit-pi/src/app/settings.rs:1082-1363,1433-1740",
+      "fixture_overrides": {
+        "surface": "Settings > Models"
+      },
+      "visible_controls": [
+        "Search models\u2026",
+        "5 models \u00b7 0 favorite(s)",
+        "All providers dropdown",
+        "Update model list",
+        "Favorites toggle",
+        "Active model board with Second \u00b7 Second Same",
+        "First provider heading and three cards",
+        "Second provider heading and two cards",
+        "Current card Active badge",
+        "Optional context badges; no context badge on First Same"
+      ],
+      "review_finding": "Source-render branch exists. Concrete fixture specified; actual paired capture still unverified."
+    },
+    {
+      "id": "V125",
+      "render_branch": "crates/orbit-pi/src/app/settings.rs:1439-1446,1082-1237",
+      "fixture_overrides": {
+        "surface": "Settings > Models",
+        "catalog": []
+      },
+      "visible_controls": [
+        "Search models\u2026",
+        "No models reported count and empty card",
+        "No models reported hint",
+        "Update model list",
+        "Favorites"
+      ],
+      "review_finding": "There is NO active-model board and NO provider dropdown for empty catalog. Source does not show a loading spinner on this page unless catalog update is running; Go distinct loading/disconnected messaging is additional error/readiness handling."
+    },
+    {
+      "id": "V126",
+      "render_branch": "crates/orbit-pi/src/app/settings.rs:1450-1538,8212-8231",
+      "fixture_overrides": {
+        "surface": "Settings > Models",
+        "models_query": "  BeTa  "
+      },
+      "visible_controls": [
+        "Typed query",
+        "1 of 5 count",
+        "Active model board unchanged",
+        "First heading with one Beta card"
+      ],
+      "review_finding": "Source-render branch exists. Concrete fixture specified; actual paired capture still unverified."
+    },
+    {
+      "id": "V127",
+      "render_branch": "crates/orbit-pi/src/app/settings.rs:1117-1158,1450-1538",
+      "fixture_overrides": {
+        "surface": "Settings > Models",
+        "favorites": [
+          [
+            "first",
+            "beta"
+          ],
+          [
+            "second",
+            "same"
+          ]
+        ],
+        "favorites_only": true
+      },
+      "visible_controls": [
+        "Selected Favorites toggle",
+        "2 of 5 count and two favorites",
+        "First/Beta and Second/Second Same cards only",
+        "Active board"
+      ],
+      "review_finding": "Source-render branch exists. Concrete fixture specified; actual paired capture still unverified."
+    },
+    {
+      "id": "V128",
+      "render_branch": "crates/orbit-pi/src/app/settings.rs:1276-1310,1450-1538",
+      "fixture_overrides": {
+        "surface": "Settings > Models",
+        "provider_filter": "second"
+      },
+      "visible_controls": [
+        "Second provider dropdown label",
+        "2 of 5 count",
+        "Second heading and two cards",
+        "Active board"
+      ],
+      "review_finding": "Source-render branch exists. Concrete fixture specified; actual paired capture still unverified."
+    },
+    {
+      "id": "V129",
+      "render_branch": "crates/orbit-pi/src/app/settings.rs:1462-1465,1540-1556",
+      "fixture_overrides": {
+        "surface": "Settings > Models",
+        "models_query": "zzz-no-match",
+        "favorites": [
+          [
+            "first",
+            "beta"
+          ]
+        ],
+        "favorites_only": true,
+        "provider_filter": "second"
+      },
+      "visible_controls": [
+        "Query and active filter controls",
+        "0 of 5 count",
+        "Active model board only below toolbar"
+      ],
+      "review_finding": "Source sections starts with active_model_row, so sections.is_empty is unreachable: do not invent a Rust no-matches card. Go intentionally adds a clearer no-matches notice, which is an explicit visual delta."
+    },
+    {
+      "id": "V130",
+      "render_branch": "crates/orbit-pi/src/app/settings.rs:1163-1195,1369-1415",
+      "fixture_overrides": {
+        "surface": "Settings > Models",
+        "refreshing": true,
+        "animation_phase": "accent refresh SVG rotation fixed at 0 degrees; reduce-motion freezes at this phase"
+      },
+      "visible_controls": [
+        "Unchanged Update model list label",
+        "Accent refresh SVG rotating at a700ms period, captured at frozen phase",
+        "Update button opacity 0.6",
+        "Unchanged catalog"
+      ],
+      "review_finding": "Duplicate requests are ignored in handler, not a distinct disabled-button render branch; original pointer/handler remain. Do not label it Updating or claim one screenshot verifies duplicate gating."
+    },
+    {
+      "id": "V131",
+      "render_branch": "crates/orbit-pi/src/app/settings.rs:1394-1410",
+      "fixture_overrides": {
+        "surface": "Settings > Models",
+        "catalog_update_result": {
+          "exit_code": 1,
+          "stderr": "fixture catalog update failure"
+        },
+        "toast_elapsed_ms": 0
+      },
+      "visible_controls": [
+        "Could not update the model list: fixture catalog update failure error toast",
+        "Update model list returned to normal opacity",
+        "Last catalog still visible"
+      ],
+      "review_finding": "Source error is a toast, not an inline catalog error card. Go also retains error detail inline; document that as a robustness delta, not source pixels."
+    },
+    {
+      "id": "V132",
+      "render_branch": "crates/orbit-pi/src/app/settings.rs:1560-1740",
+      "fixture_overrides": {
+        "surface": "Settings > Models",
+        "pointer": "center of inactive First/Alpha card"
+      },
+      "visible_controls": [
+        "Alpha name",
+        "alpha ID",
+        "Favorite star",
+        "128k context badge",
+        "Set active footer revealed",
+        "Current Second Same retains Active badge"
+      ],
+      "review_finding": "Remove invented input/output/cost metadata. These are not rendered by model_card. Context-window presence is the only card capability metadata."
+    },
+    {
+      "id": "V133",
+      "render_branch": "crates/orbit-pi/src/app/settings.rs:1276-1310,6897-7105",
+      "fixture_overrides": {
+        "surface": "Settings > Models",
+        "catalog": "Ten one-model providers provider-00 through provider-09, name Model 00 through Model 09, id model-00 through model-09, in numeric order",
+        "provider_filter": "provider-05",
+        "open_control": "All providers"
+      },
+      "visible_controls": [
+        "Search filter with focus",
+        "Flat provider-name options with chosen Provider 05 check",
+        "Keyboard wash on selected row",
+        "List viewport capped at 220px"
+      ],
+      "review_finding": "Use enough providers to reach the scroll limit. All providers sentinel is first but may be outside the centered visible viewport; do not claim it is simultaneously visible with every provider."
+    },
+    {
+      "id": "V134",
+      "render_branch": "crates/orbit-pi/src/app/settings.rs:1315-1363,6897-7105",
+      "fixture_overrides": {
+        "surface": "Settings > Models",
+        "open_control": "Active model"
+      },
+      "visible_controls": [
+        "Search filter",
+        "Five flat Provider \u00b7 Name choices in catalog order",
+        "Check on Second \u00b7 Second Same",
+        "Selected and keyboard wash"
+      ],
+      "review_finding": "No provider-group headers in settings selects."
+    },
+    {
+      "id": "V135",
+      "render_branch": "crates/orbit-pi/src/app/settings.rs:5404-5443,6897-7105",
+      "fixture_overrides": {
+        "surface": "Settings > Agent",
+        "default_model": [
+          "first",
+          "beta"
+        ],
+        "open_control": "Default model"
+      },
+      "visible_controls": [
+        "pi default sentinel",
+        "Five flat Provider \u00b7 Name options in catalog order",
+        "Check on First \u00b7 Beta"
+      ],
+      "review_finding": "Remove invented provider-grouped options. Current selection means saved default, not live current model. List is flat."
+    },
+    {
+      "id": "V136",
+      "render_branch": "crates/orbit-pi/src/app/settings.rs:5450-5469",
+      "fixture_overrides": {
+        "surface": "Settings > Agent",
+        "default_model": null
+      },
+      "visible_controls": [
+        "Default model chip pi default",
+        "Default thinking noninteractive pi default chip"
+      ],
+      "review_finding": "No popup, caret, or fabricated thinking ladder. A stale unmatched default model follows the same render branch."
+    },
+    {
+      "id": "V137",
+      "render_branch": "crates/orbit-pi/src/app/settings.rs:5450-5496",
+      "fixture_overrides": {
+        "surface": "Settings > Agent",
+        "default_model": [
+          "first",
+          "beta"
+        ],
+        "default_thinking": "high",
+        "open_control": "Default thinking"
+      },
+      "visible_controls": [
+        "pi default sentinel",
+        "Low, High, Max rows from Beta capability map",
+        "Check on High"
+      ],
+      "review_finding": "Use Beta explicit null map to suppress off/minimal/medium; max is present because explicitly mapped. Do not substitute the live session ladder."
+    },
+    {
+      "id": "V138",
+      "render_branch": "crates/orbit-pi/src/app/settings.rs:5360-5398",
+      "fixture_overrides": {
+        "surface": "Settings > Agent",
+        "title_model": [
+          "first",
+          "alpha"
+        ],
+        "open_control": "Title model"
+      },
+      "visible_controls": [
+        "Active session model sentinel",
+        "Five flat Provider \u00b7 Name options",
+        "Check on First \u00b7 Alpha"
+      ],
+      "review_finding": "Replace inaccurate Session default with exact Active session model; it uses live session model, not session birth default."
+    },
+    {
+      "id": "V139",
+      "render_branch": "crates/orbit-pi/src/app/settings.rs:6897-7105,7108-7150",
+      "fixture_overrides": {
+        "surface": "Settings > Agent",
+        "open_control": "Default model",
+        "dropdown_query": "First",
+        "keys": [
+          "ArrowDown"
+        ]
+      },
+      "visible_controls": [
+        "Typed First query",
+        "Three First provider options only",
+        "Keyboard-highlighted Alpha row",
+        "No sentinel because it does not match"
+      ],
+      "review_finding": "Search retains original catalog indices; choose a saved default outside the filter to distinguish keyboard highlight from selected check."
+    },
+    {
+      "id": "V140",
+      "render_branch": "crates/orbit-pi/src/app/settings.rs:6942-6955",
+      "fixture_overrides": {
+        "surface": "Settings > Models",
+        "open_control": "Active model",
+        "dropdown_query": "zzz-no-match"
+      },
+      "visible_controls": [
+        "Typed unmatched query",
+        "One muted No matches entry"
+      ],
+      "review_finding": "The explicit No matches text is rendered; an empty blank popup is not source parity. Enter sends nothing."
+    },
+    {
+      "id": "V141",
+      "render_branch": "crates/orbit-pi/src/model_selector.rs:309-496,885-1011,1418-1480",
+      "fixture_overrides": {
+        "surface": "Composer",
+        "catalog_subset": [
+          0,
+          1,
+          2
+        ],
+        "recents": [
+          [
+            "first",
+            "beta"
+          ]
+        ],
+        "favorites": [
+          [
+            "first",
+            "alpha"
+          ]
+        ],
+        "picker": "Model",
+        "scope": "All"
+      },
+      "visible_controls": [
+        "Recents heading and Beta",
+        "Favorites heading and Alpha",
+        "Second provider heading and current Second Same check",
+        "Search, scope row and footer count3"
+      ],
+      "review_finding": "Three models make all three sections fit simultaneously inside six-row-equivalent viewport. Larger catalogs require separate scrolled captures to claim all groups visible."
+    },
+    {
+      "id": "V142",
+      "render_branch": "crates/orbit-pi/src/model_selector.rs:344-368",
+      "fixture_overrides": {
+        "surface": "Composer",
+        "recents": [
+          [
+            "first",
+            "beta"
+          ],
+          [
+            "second",
+            "same"
+          ],
+          [
+            "first",
+            "alpha"
+          ]
+        ],
+        "picker": "Model",
+        "scope": "Recents"
+      },
+      "visible_controls": [
+        "Selected Recents scope",
+        "Flat Beta, Second Same, Alpha rows in MRU order",
+        "Current check",
+        "3 recent footer"
+      ],
+      "review_finding": "No Recents header in dedicated Recents scope."
+    },
+    {
+      "id": "V143",
+      "render_branch": "crates/orbit-pi/src/model_selector.rs:370-496",
+      "fixture_overrides": {
+        "surface": "Composer",
+        "favorites": [
+          [
+            "second",
+            "same"
+          ],
+          [
+            "first",
+            "beta"
+          ],
+          [
+            "first",
+            "alpha"
+          ]
+        ],
+        "picker": "Model",
+        "scope": "Favorites"
+      },
+      "visible_controls": [
+        "Selected Favorites scope",
+        "Flat Alpha, Beta, Second Same rows",
+        "Accent stars",
+        "Current check",
+        "3 favorites footer"
+      ],
+      "review_finding": "Order is provider-grouped catalog traversal, not order in favorites.json. No Favorites group header in this dedicated scope."
+    },
+    {
+      "id": "V144",
+      "render_branch": "crates/orbit-pi/src/model_selector.rs:392-428,464-496",
+      "fixture_overrides": {
+        "surface": "Composer",
+        "recents": [
+          [
+            "first",
+            "beta"
+          ],
+          [
+            "first",
+            "alpha"
+          ]
+        ],
+        "picker": "Model",
+        "scope": "provider:first"
+      },
+      "visible_controls": [
+        "Selected First scope",
+        "Recents heading with Alpha then Beta in catalog order",
+        "First Same below recent rows without provider header",
+        "3 models footer"
+      ],
+      "review_finding": "Provider-scope recents differ from MRU ordering; no redundant provider group heading."
+    },
+    {
+      "id": "V145",
+      "render_branch": "crates/orbit-pi/src/model_selector.rs:309-496,885-921,1418-1592",
+      "fixture_overrides": {
+        "surface": "Composer",
+        "picker": "Model",
+        "picker_query": "same"
+      },
+      "visible_controls": [
+        "Typed same query",
+        "Second Same with actual current check",
+        "First Same row",
+        "After ArrowDown keyboard highlight on First Same, distinct from current check"
+      ],
+      "review_finding": "Use both equal-ID providers, not a single matching row, to visibly prove provider identity and independent keyboard highlight."
+    },
+    {
+      "id": "V146",
+      "render_branch": "crates/orbit-pi/src/model_selector.rs:1007-1011,1302-1345",
+      "fixture_overrides": {
+        "surface": "Composer",
+        "picker": "Model",
+        "picker_query": "zzz-no-match"
+      },
+      "visible_controls": [
+        "No matching models title",
+        "Try a provider, model or id hint",
+        "Zero model count footer",
+        "Search/scope controls remain"
+      ],
+      "review_finding": "Explicit two-line no-match entry is rendered, not blank empty results."
+    },
+    {
+      "id": "V147",
+      "render_branch": "crates/orbit-pi/src/model_selector.rs:538-651",
+      "fixture_overrides": {
+        "surface": "Composer",
+        "catalog_subset": [
+          1
+        ],
+        "favorites": [],
+        "recents": [],
+        "picker": "Model",
+        "scope_scroll_x": 0
+      },
+      "visible_controls": [
+        "All scope",
+        "Second scope",
+        "Full Favorite current star/text chip",
+        "Current model row"
+      ],
+      "review_finding": "Use one short provider so full label fits. For larger catalogs this is a horizontal-scroll row; clipping at right does not justify replacing label with an icon-only action. Separate scroll regression proves reachability."
+    },
+    {
+      "id": "V148",
+      "render_branch": "crates/orbit-pi/src/model_selector.rs:1234-1267,1418-1592",
+      "fixture_overrides": {
+        "surface": "Composer",
+        "catalog_subset": [
+          0,
+          1
+        ],
+        "favorites": [
+          [
+            "second",
+            "same"
+          ]
+        ],
+        "picker": "Model",
+        "pointer": "First/Alpha row after 400ms hover guard"
+      },
+      "visible_controls": [
+        "Unfavorited Alpha star revealed",
+        "Second Same favorite star remains accent",
+        "Second Same current check remains"
+      ],
+      "review_finding": "Hover must follow guard expiration and real pointer movement; stationary pointer after scroll is not a highlight event."
+    },
+    {
+      "id": "V149",
+      "render_branch": "crates/orbit-pi/src/model_selector.rs:326-343,885-1011,1519-1537",
+      "fixture_overrides": {
+        "surface": "Composer",
+        "picker": "Thinking",
+        "levels": [
+          "off",
+          "low",
+          "medium",
+          "high",
+          "max"
+        ],
+        "current_level": "high"
+      },
+      "visible_controls": [
+        "Flat Off, Low, Medium, High, Max icon/label/hint rows",
+        "Current High check",
+        "Search and5 levels footer",
+        "No scope row"
+      ],
+      "review_finding": "Only reported levels are rendered; five rows fit. This does not cover every possible icon alias or unknown-level fallback."
+    },
+    {
+      "id": "V150",
+      "render_branch": "crates/orbit-pi/src/model_selector.rs:326-343,885-921",
+      "fixture_overrides": {
+        "surface": "Composer",
+        "picker": "Thinking",
+        "picker_query": "high"
+      },
+      "visible_controls": [
+        "Typed high query",
+        "Only High label/hint row",
+        "Current check",
+        "1 levels footer"
+      ],
+      "review_finding": "Source-render branch exists. Concrete fixture specified; actual paired capture still unverified."
+    },
+    {
+      "id": "V151",
+      "render_branch": "crates/orbit-pi/src/model_selector.rs:1007-1011,1302-1345",
+      "fixture_overrides": {
+        "surface": "Composer",
+        "picker": "Thinking",
+        "picker_query": "zzz-no-match"
+      },
+      "visible_controls": [
+        "No matching levels title",
+        "Try a reasoning level hint",
+        "Zero levels footer"
+      ],
+      "review_finding": "Explicit no-match entry is rendered; no invented choice."
+    },
+    {
+      "id": "V152",
+      "render_branch": "crates/orbit-pi/src/app/view.rs:1437,2193-2203",
+      "fixture_overrides": {
+        "surface": "Composer",
+        "levels": [
+          "off"
+        ],
+        "current_level": "off",
+        "picker": null
+      },
+      "visible_controls": [
+        "Model chip remains",
+        "No thinking chip and no thinking popup"
+      ],
+      "review_finding": "Zero levels and one level share the same absent branch. A disabled Thinking chip is invented in this state; running with a multi-level ladder is a distinct disabled-chip branch."
+    }
+  ],
+  "additional_distinct_render_branches_not_proven_by_these_29": [
+    "Running session with >1 thinking level: existing model/thinking chips are dimmed and locked. Distinct from V152 absent thinking chip.",
+    "Model picker with truly empty catalog and no query: same no-match entry but no providers and no favorite-current chip; V146 is nonempty catalog filtered to zero.",
+    "More than six rows or many scope chips: vertical/horizontal scroll and edge clipping require dedicated captures; not implied by short baseline.",
+    "Model picker row secondary fallbacks: context window, then nonblank ID in code font, then provider name if both absent. V141 with only context-bearing rows does not cover fallback pixels.",
+    "Provider mark aliases/known brand/unknown custom cloud and thinking icon aliases/unknown fallback are separate icon variants, not all shown by V149.",
+    "Settings provider select absent with one provider. V125 covers zero providers only."
+  ],
+  "verdict": {
+    "source_branch_review": "COMPLETE_SCOPED_29_IDS",
+    "actual_paired_capture": "NOT_ESTABLISHED",
+    "native_os": "NOT_ESTABLISHED",
+    "all_branch_exhaustiveness": "NOT_CLAIMED"
+  }
+}

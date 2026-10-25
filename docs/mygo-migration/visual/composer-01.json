@@ -1,0 +1,1605 @@
+{
+  "schema_version": 1,
+  "category": "composer",
+  "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "fixture_contract": "fixture.json",
+  "cases": [
+    {
+      "category": "composer",
+      "slug": "composer-idle-multiline-draft",
+      "feature_ids": [
+        "C01",
+        "C02",
+        "C18"
+      ],
+      "expected_controls": [
+        "Composer idle multiline draft",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "handler": "composer_row",
+          "line": 1414,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/view.rs#L1414"
+        }
+      ],
+      "id": "V030",
+      "title": "Composer idle multiline draft",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated composer surface in fixture.json.",
+        "Configure the named source state: Composer idle multiline draft.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "cmd/orbit/main.go",
+        "internal/agent",
+        "internal/pirpc",
+        "internal/ui"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V030/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V030/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "composer",
+      "slug": "composer-running-steer-followup-primary-alternate",
+      "feature_ids": [
+        "C01",
+        "C02",
+        "C18"
+      ],
+      "expected_controls": [
+        "Composer running steer followup primary alternate",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "handler": "composer_row",
+          "line": 1414,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/view.rs#L1414"
+        }
+      ],
+      "id": "V031",
+      "title": "Composer running steer followup primary alternate",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated composer surface in fixture.json.",
+        "Configure the named source state: Composer running steer followup primary alternate.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "cmd/orbit/main.go",
+        "internal/agent",
+        "internal/pirpc",
+        "internal/ui"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V031/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V031/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "composer",
+      "slug": "composer-access-mode-menu",
+      "feature_ids": [
+        "C01",
+        "C02",
+        "C18"
+      ],
+      "expected_controls": [
+        "Composer access mode menu",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "handler": "composer_row",
+          "line": 1414,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/view.rs#L1414"
+        }
+      ],
+      "id": "V032",
+      "title": "Composer access mode menu",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated composer surface in fixture.json.",
+        "Configure the named source state: Composer access mode menu.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "cmd/orbit/main.go",
+        "internal/agent",
+        "internal/pirpc",
+        "internal/ui"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V032/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V032/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "composer",
+      "slug": "composer-workflow-build-plan-ask-menu",
+      "feature_ids": [
+        "C01",
+        "C02",
+        "C18"
+      ],
+      "expected_controls": [
+        "Composer workflow build plan ask menu",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "handler": "composer_row",
+          "line": 1414,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/view.rs#L1414"
+        }
+      ],
+      "id": "V033",
+      "title": "Composer workflow build plan ask menu",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated composer surface in fixture.json.",
+        "Configure the named source state: Composer workflow build plan ask menu.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "cmd/orbit/main.go",
+        "internal/agent",
+        "internal/pirpc",
+        "internal/ui"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V033/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V033/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "composer",
+      "slug": "composer-queued-steering-and-followup-messages",
+      "feature_ids": [
+        "C03"
+      ],
+      "expected_controls": [
+        "Composer queued steering and followup messages",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "handler": "composer_row",
+          "line": 1414,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/view.rs#L1414"
+        }
+      ],
+      "id": "V034",
+      "title": "Composer queued steering and followup messages",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated composer surface in fixture.json.",
+        "Configure the named source state: Composer queued steering and followup messages.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/agent",
+        "internal/pirpc"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V034/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V034/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "composer",
+      "slug": "composer-queued-message-edit-remove",
+      "feature_ids": [
+        "C03"
+      ],
+      "expected_controls": [
+        "Composer queued message edit remove",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "handler": "composer_row",
+          "line": 1414,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/view.rs#L1414"
+        }
+      ],
+      "id": "V035",
+      "title": "Composer queued message edit remove",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated composer surface in fixture.json.",
+        "Configure the named source state: Composer queued message edit remove.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/agent",
+        "internal/pirpc"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V035/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V035/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "composer",
+      "slug": "composer-leading-slash-command-popup",
+      "feature_ids": [
+        "C04"
+      ],
+      "expected_controls": [
+        "Composer leading slash command popup",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/composer_ops.rs",
+          "handler": "autocomplete_popup",
+          "line": 147,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/composer_ops.rs#L147"
+        }
+      ],
+      "id": "V036",
+      "title": "Composer leading slash command popup",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated composer surface in fixture.json.",
+        "Configure the named source state: Composer leading slash command popup.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "cmd/orbit/main.go",
+        "internal/ui"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V036/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V036/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "composer",
+      "slug": "composer-skill-command-with-description",
+      "feature_ids": [
+        "C04"
+      ],
+      "expected_controls": [
+        "Composer skill command with description",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/composer_ops.rs",
+          "handler": "autocomplete_popup",
+          "line": 147,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/composer_ops.rs#L147"
+        }
+      ],
+      "id": "V037",
+      "title": "Composer skill command with description",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated composer surface in fixture.json.",
+        "Configure the named source state: Composer skill command with description.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "cmd/orbit/main.go",
+        "internal/ui"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V037/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V037/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "composer",
+      "slug": "composer-file-mention-popup",
+      "feature_ids": [
+        "C04"
+      ],
+      "expected_controls": [
+        "Composer file mention popup",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/composer_ops.rs",
+          "handler": "autocomplete_popup",
+          "line": 147,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/composer_ops.rs#L147"
+        }
+      ],
+      "id": "V038",
+      "title": "Composer file mention popup",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated composer surface in fixture.json.",
+        "Configure the named source state: Composer file mention popup.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "cmd/orbit/main.go",
+        "internal/ui"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V038/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V038/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "composer",
+      "slug": "composer-autocomplete-zero-results",
+      "feature_ids": [
+        "C04"
+      ],
+      "expected_controls": [
+        "Unmatched slash/file-mention draft remains in the normal composer",
+        "No autocomplete overlay or empty-results panel: autocomplete_popup returns None when count is zero or entries are empty"
+      ],
+      "scope": "canonical",
+      "note": "Independently challenged by host owner: pinned app/composer_ops.rs:147\u2013159 suppresses the popup entirely. This is an absence-state capture, not a fake empty popup.",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/composer_ops.rs",
+          "handler": "autocomplete_popup",
+          "line": 147,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/composer_ops.rs#L147"
+        }
+      ],
+      "id": "V039",
+      "title": "Composer autocomplete zero results",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated composer surface in fixture.json.",
+        "Configure the named source state: Composer autocomplete zero results.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "cmd/orbit/main.go",
+        "internal/ui"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V039/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V039/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent host source reviewer",
+        "evidence": "autocomplete_popup returns None for zero count/empty entries, composer_ops.rs147\u2013159. Expected absence of overlay corrected."
+      }
+    },
+    {
+      "category": "composer",
+      "slug": "composer-image-attachment-strip",
+      "feature_ids": [
+        "C05"
+      ],
+      "expected_controls": [
+        "Composer image attachment strip",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "handler": "composer_row",
+          "line": 1414,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/view.rs#L1414"
+        }
+      ],
+      "id": "V040",
+      "title": "Composer image attachment strip",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated composer surface in fixture.json.",
+        "Configure the named source state: Composer image attachment strip.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "cmd/orbit/main.go",
+        "internal/ui"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V040/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V040/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "composer",
+      "slug": "composer-image-preview-modal",
+      "feature_ids": [
+        "C05"
+      ],
+      "expected_controls": [
+        "Composer image preview modal",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "handler": "composer_row",
+          "line": 1414,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/view.rs#L1414"
+        }
+      ],
+      "id": "V041",
+      "title": "Composer image preview modal",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated composer surface in fixture.json.",
+        "Configure the named source state: Composer image preview modal.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "cmd/orbit/main.go",
+        "internal/ui"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V041/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V041/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "composer",
+      "slug": "composer-drag-over-highlight",
+      "feature_ids": [
+        "C05"
+      ],
+      "expected_controls": [
+        "Composer drag over highlight",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "handler": "composer_row",
+          "line": 1414,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/view.rs#L1414"
+        }
+      ],
+      "id": "V042",
+      "title": "Composer drag over highlight",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated composer surface in fixture.json.",
+        "Configure the named source state: Composer drag over highlight.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "cmd/orbit/main.go",
+        "internal/ui"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V042/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V042/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "composer",
+      "slug": "composer-partial-attachment-failure",
+      "feature_ids": [
+        "C05"
+      ],
+      "expected_controls": [
+        "Composer partial attachment failure",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "handler": "composer_row",
+          "line": 1414,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/view.rs#L1414"
+        }
+      ],
+      "id": "V043",
+      "title": "Composer partial attachment failure",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated composer surface in fixture.json.",
+        "Configure the named source state: Composer partial attachment failure.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "cmd/orbit/main.go",
+        "internal/ui"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V043/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V043/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "composer",
+      "slug": "context-meter-known-usage-cost",
+      "feature_ids": [
+        "C15",
+        "P09"
+      ],
+      "expected_controls": [
+        "Context meter known usage cost",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "handler": "render",
+          "line": 166,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/view.rs#L166"
+        }
+      ],
+      "id": "V053",
+      "title": "Context meter known usage cost",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated composer surface in fixture.json.",
+        "Configure the named source state: Context meter known usage cost.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "cmd/orbit/main.go",
+        "internal/native",
+        "internal/preferences",
+        "internal/ui",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V053/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V053/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "composer",
+      "slug": "context-meter-unknown-after-compaction",
+      "feature_ids": [
+        "C15",
+        "P09"
+      ],
+      "expected_controls": [
+        "Context meter unknown after compaction",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "handler": "render",
+          "line": 166,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/view.rs#L166"
+        }
+      ],
+      "id": "V054",
+      "title": "Context meter unknown after compaction",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated composer surface in fixture.json.",
+        "Configure the named source state: Context meter unknown after compaction.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "cmd/orbit/main.go",
+        "internal/native",
+        "internal/preferences",
+        "internal/ui",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V054/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V054/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "composer",
+      "slug": "quota-popup-reports-windows-balances-reset",
+      "feature_ids": [
+        "C15",
+        "P09"
+      ],
+      "expected_controls": [
+        "Quota popup reports windows balances reset",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "handler": "render",
+          "line": 166,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/view.rs#L166"
+        }
+      ],
+      "id": "V055",
+      "title": "Quota popup reports windows balances reset",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated composer surface in fixture.json.",
+        "Configure the named source state: Quota popup reports windows balances reset.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "cmd/orbit/main.go",
+        "internal/native",
+        "internal/preferences",
+        "internal/ui",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V055/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V055/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "composer",
+      "slug": "quota-popup-loading-unsupported-error",
+      "feature_ids": [
+        "C15",
+        "P09"
+      ],
+      "expected_controls": [
+        "Quota popup loading unsupported error",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "handler": "render",
+          "line": 166,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/view.rs#L166"
+        }
+      ],
+      "id": "V056",
+      "title": "Quota popup loading unsupported error",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated composer surface in fixture.json.",
+        "Configure the named source state: Quota popup loading unsupported error.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "cmd/orbit/main.go",
+        "internal/native",
+        "internal/preferences",
+        "internal/ui",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V056/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V056/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    }
+  ]
+}

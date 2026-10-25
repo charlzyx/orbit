@@ -1,0 +1,2083 @@
+{
+  "schema_version": 1,
+  "category": "review",
+  "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "fixture_contract": "fixture.json",
+  "cases": [
+    {
+      "category": "review",
+      "slug": "review-docked-unified",
+      "feature_ids": [
+        "W01",
+        "W03",
+        "W31",
+        "W34",
+        "W36"
+      ],
+      "expected_controls": [
+        "Docked diff",
+        " File tree",
+        " Old/new gutters",
+        " Addition/deletion/context colors"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "render_diff",
+          "line": 1404,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L1404"
+        }
+      ],
+      "id": "V378",
+      "title": "Review docked unified",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated review surface in fixture.json.",
+        "Configure the named source state: Review docked unified.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "cmd/orbit/main.go",
+        "internal/agent/manager.go",
+        "internal/gitworkbench/embedded_diff.go",
+        "internal/highlight",
+        "internal/native",
+        "internal/preferences",
+        "internal/ui",
+        "internal/ui/review.go",
+        "internal/workbench",
+        "internal/workspace/checkpoint.go",
+        "internal/workspace/review.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V378/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V378/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "review",
+      "slug": "review-full-width",
+      "feature_ids": [
+        "W01",
+        "W03",
+        "W36"
+      ],
+      "expected_controls": [
+        "Full-width Review",
+        " Sessions sidebar",
+        " Restore-dock control"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "render_diff",
+          "line": 1404,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L1404"
+        }
+      ],
+      "id": "V379",
+      "title": "Review full width",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated review surface in fixture.json.",
+        "Configure the named source state: Review full width.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "cmd/orbit/main.go",
+        "internal/agent/manager.go",
+        "internal/native",
+        "internal/preferences",
+        "internal/ui",
+        "internal/ui/review.go",
+        "internal/workbench",
+        "internal/workspace/checkpoint.go",
+        "internal/workspace/review.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V379/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V379/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "review",
+      "slug": "review-source-menu",
+      "feature_ids": [
+        "W31"
+      ],
+      "expected_controls": [
+        "Last Turn",
+        " Uncommitted",
+        " Unstaged",
+        " Staged",
+        " Committed",
+        " Branch"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "source_menu",
+          "line": 2113,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L2113"
+        }
+      ],
+      "id": "V380",
+      "title": "Review source menu",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated review surface in fixture.json.",
+        "Configure the named source state: Review source menu.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/agent/manager.go",
+        "internal/ui/review.go",
+        "internal/workspace/checkpoint.go",
+        "internal/workspace/review.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V380/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V380/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "review",
+      "slug": "review-last-turn-disabled",
+      "feature_ids": [
+        "W31",
+        "W32"
+      ],
+      "expected_controls": [
+        "No completed turn",
+        " Last Turn disabled"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "source_menu",
+          "line": 2113,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L2113"
+        }
+      ],
+      "id": "V381",
+      "title": "Review last turn disabled",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated review surface in fixture.json.",
+        "Configure the named source state: Review last turn disabled.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/agent/manager.go",
+        "internal/ui/review.go",
+        "internal/workspace/checkpoint.go",
+        "internal/workspace/review.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V381/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V381/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "review",
+      "slug": "review-historical-turn-selected",
+      "feature_ids": [
+        "W31",
+        "W32",
+        "W33"
+      ],
+      "expected_controls": [
+        "Concrete Turn N label",
+        " Selected completed diff remains pinned"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "render_content",
+          "line": 1345,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L1345"
+        }
+      ],
+      "id": "V382",
+      "title": "Review historical turn selected",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated review surface in fixture.json.",
+        "Configure the named source state: Review historical turn selected.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/agent/manager.go",
+        "internal/ui/review.go",
+        "internal/workspace/checkpoint.go",
+        "internal/workspace/review.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V382/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V382/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "review",
+      "slug": "review-staged-unstaged-sections",
+      "feature_ids": [
+        "W08",
+        "W34"
+      ],
+      "expected_controls": [
+        "Section headers",
+        " Per-file stage/unstage",
+        " Section actions"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "render_diff",
+          "line": 1404,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L1404"
+        }
+      ],
+      "id": "V383",
+      "title": "Review staged unstaged sections",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated review surface in fixture.json.",
+        "Configure the named source state: Review staged unstaged sections.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/agent/manager.go",
+        "internal/gitworkbench/embedded_diff.go",
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/templates.go",
+        "internal/gitworkbench/view.go",
+        "internal/highlight",
+        "internal/ui/review.go",
+        "internal/workspace/checkpoint.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/workspace/github_templates.go",
+        "internal/workspace/review.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V383/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V383/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "review",
+      "slug": "review-split-diff",
+      "feature_ids": [
+        "W34",
+        "W36"
+      ],
+      "expected_controls": [
+        "Old/new side-by-side columns",
+        " Matched line rows",
+        " Separate gutters"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "render_diff",
+          "line": 1404,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L1404"
+        }
+      ],
+      "id": "V384",
+      "title": "Review split diff",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated review surface in fixture.json.",
+        "Configure the named source state: Review split diff.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/agent/manager.go",
+        "internal/gitworkbench/embedded_diff.go",
+        "internal/highlight",
+        "internal/ui/review.go",
+        "internal/workspace/checkpoint.go",
+        "internal/workspace/review.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V384/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V384/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "review",
+      "slug": "review-wrapped-long-lines",
+      "feature_ids": [
+        "W36"
+      ],
+      "expected_controls": [
+        "Long text wraps",
+        " Correct gutters and row heights"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "render_diff_line",
+          "line": 1681,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L1681"
+        }
+      ],
+      "id": "V385",
+      "title": "Review wrapped long lines",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated review surface in fixture.json.",
+        "Configure the named source state: Review wrapped long lines.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/agent/manager.go",
+        "internal/ui/review.go",
+        "internal/workspace/checkpoint.go",
+        "internal/workspace/review.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V385/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V385/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "review",
+      "slug": "review-unwrapped-horizontal-pan",
+      "feature_ids": [
+        "W36"
+      ],
+      "expected_controls": [
+        "Horizontal offset",
+        " Pinned header/gutter",
+        " No clipping mismatch"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "render_diff_line",
+          "line": 1681,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L1681"
+        }
+      ],
+      "id": "V386",
+      "title": "Review unwrapped horizontal pan",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated review surface in fixture.json.",
+        "Configure the named source state: Review unwrapped horizontal pan.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/agent/manager.go",
+        "internal/ui/review.go",
+        "internal/workspace/checkpoint.go",
+        "internal/workspace/review.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V386/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V386/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "review",
+      "slug": "review-files-collapsed",
+      "feature_ids": [
+        "W36"
+      ],
+      "expected_controls": [
+        "All file headers collapsed",
+        " Counts retained"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "render_diff",
+          "line": 1404,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L1404"
+        }
+      ],
+      "id": "V387",
+      "title": "Review files collapsed",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated review surface in fixture.json.",
+        "Configure the named source state: Review files collapsed.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/agent/manager.go",
+        "internal/ui/review.go",
+        "internal/workspace/checkpoint.go",
+        "internal/workspace/review.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V387/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V387/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "review",
+      "slug": "review-sticky-header-scroll",
+      "feature_ids": [
+        "W36"
+      ],
+      "expected_controls": [
+        "Scrolled file/section header pinned correctly"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "render_sticky_header",
+          "line": 1488,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L1488"
+        }
+      ],
+      "id": "V388",
+      "title": "Review sticky header scroll",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated review surface in fixture.json.",
+        "Configure the named source state: Review sticky header scroll.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/agent/manager.go",
+        "internal/ui/review.go",
+        "internal/workspace/checkpoint.go",
+        "internal/workspace/review.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V388/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V388/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "review",
+      "slug": "review-tree-filtered",
+      "feature_ids": [
+        "W37"
+      ],
+      "expected_controls": [
+        "Directory tree",
+        " Query",
+        " Matching subtree and active file"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "render_tree",
+          "line": 1874,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L1874"
+        }
+      ],
+      "id": "V389",
+      "title": "Review tree filtered",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated review surface in fixture.json.",
+        "Configure the named source state: Review tree filtered.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/agent/manager.go",
+        "internal/ui/review.go",
+        "internal/workspace/checkpoint.go",
+        "internal/workspace/review.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V389/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V389/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "review",
+      "slug": "review-tree-no-match",
+      "feature_ids": [
+        "W37"
+      ],
+      "expected_controls": [
+        "Unmatched query",
+        " Empty tree result"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "render_tree",
+          "line": 1874,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L1874"
+        }
+      ],
+      "id": "V390",
+      "title": "Review tree no match",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated review surface in fixture.json.",
+        "Configure the named source state: Review tree no match.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/agent/manager.go",
+        "internal/ui/review.go",
+        "internal/workspace/checkpoint.go",
+        "internal/workspace/review.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V390/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V390/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "review",
+      "slug": "review-tree-keyboard-cursor",
+      "feature_ids": [
+        "W38"
+      ],
+      "expected_controls": [
+        "Keyboard cursor distinct from active file",
+        " Selected hunk visible"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "render_tree_row",
+          "line": 1944,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L1944"
+        }
+      ],
+      "id": "V391",
+      "title": "Review tree keyboard cursor",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated review surface in fixture.json.",
+        "Configure the named source state: Review tree keyboard cursor.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/agent/manager.go",
+        "internal/ui/review.go",
+        "internal/workspace/checkpoint.go",
+        "internal/workspace/review.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V391/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V391/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "review",
+      "slug": "review-context-gap-collapsed",
+      "feature_ids": [
+        "W35"
+      ],
+      "expected_controls": [
+        "Hidden unchanged-line count",
+        " Up/down/both/all controls"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "render_gap",
+          "line": 1751,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L1751"
+        }
+      ],
+      "id": "V392",
+      "title": "Review context gap collapsed",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated review surface in fixture.json.",
+        "Configure the named source state: Review context gap collapsed.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/agent/manager.go",
+        "internal/ui/review.go",
+        "internal/workspace/checkpoint.go",
+        "internal/workspace/review.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V392/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V392/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "review",
+      "slug": "review-context-gap-expanded-edge",
+      "feature_ids": [
+        "W35"
+      ],
+      "expected_controls": [
+        "One expanded edge",
+        " Remaining gap count"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "render_gap",
+          "line": 1751,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L1751"
+        }
+      ],
+      "id": "V393",
+      "title": "Review context gap expanded edge",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated review surface in fixture.json.",
+        "Configure the named source state: Review context gap expanded edge.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/agent/manager.go",
+        "internal/ui/review.go",
+        "internal/workspace/checkpoint.go",
+        "internal/workspace/review.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V393/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V393/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "review",
+      "slug": "review-context-all-expanded",
+      "feature_ids": [
+        "W35"
+      ],
+      "expected_controls": [
+        "Full retained context",
+        " Source line numbers"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "render_diff",
+          "line": 1404,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L1404"
+        }
+      ],
+      "id": "V394",
+      "title": "Review context all expanded",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated review surface in fixture.json.",
+        "Configure the named source state: Review context all expanded.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/agent/manager.go",
+        "internal/ui/review.go",
+        "internal/workspace/checkpoint.go",
+        "internal/workspace/review.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V394/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V394/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "review",
+      "slug": "review-binary-renamed-deleted",
+      "feature_ids": [
+        "W34"
+      ],
+      "expected_controls": [
+        "Binary row",
+        " Rename paths",
+        " Deleted-file header metadata"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "render_diff_line",
+          "line": 1681,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L1681"
+        }
+      ],
+      "id": "V395",
+      "title": "Review binary renamed deleted",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated review surface in fixture.json.",
+        "Configure the named source state: Review binary renamed deleted.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/agent/manager.go",
+        "internal/gitworkbench/embedded_diff.go",
+        "internal/highlight",
+        "internal/ui/review.go",
+        "internal/workspace/checkpoint.go",
+        "internal/workspace/review.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V395/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V395/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "review",
+      "slug": "review-syntax-multiline",
+      "feature_ids": [
+        "W34"
+      ],
+      "expected_controls": [
+        "Paint-only syntax spans across multiline tokens",
+        " Red/green backgrounds unchanged"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "render_diff_line",
+          "line": 1681,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L1681"
+        }
+      ],
+      "id": "V396",
+      "title": "Review syntax multiline",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated review surface in fixture.json.",
+        "Configure the named source state: Review syntax multiline.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/agent/manager.go",
+        "internal/gitworkbench/embedded_diff.go",
+        "internal/highlight",
+        "internal/ui/review.go",
+        "internal/workspace/checkpoint.go",
+        "internal/workspace/review.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V396/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V396/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "review",
+      "slug": "review-loading",
+      "feature_ids": [
+        "W39"
+      ],
+      "expected_controls": [
+        "Immediate loading state",
+        " Selected source label retained"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "render_content",
+          "line": 1345,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L1345"
+        }
+      ],
+      "id": "V397",
+      "title": "Review loading",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated review surface in fixture.json.",
+        "Configure the named source state: Review loading.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/agent/manager.go",
+        "internal/ui/review.go",
+        "internal/workspace/checkpoint.go",
+        "internal/workspace/review.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V397/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V397/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "review",
+      "slug": "review-refresh-feedback",
+      "feature_ids": [
+        "W39"
+      ],
+      "expected_controls": [
+        "Manual refresh spinner at frozen300ms within650ms floor"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "render_content",
+          "line": 1345,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L1345"
+        }
+      ],
+      "id": "V398",
+      "title": "Review refresh feedback",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated review surface in fixture.json.",
+        "Configure the named source state: Review refresh feedback.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/agent/manager.go",
+        "internal/ui/review.go",
+        "internal/workspace/checkpoint.go",
+        "internal/workspace/review.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V398/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V398/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "review",
+      "slug": "review-source-empty",
+      "feature_ids": [
+        "W31",
+        "W39"
+      ],
+      "expected_controls": [
+        "Selected source-specific empty text",
+        " No stale diff"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "render_content",
+          "line": 1345,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L1345"
+        }
+      ],
+      "id": "V399",
+      "title": "Review source empty",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated review surface in fixture.json.",
+        "Configure the named source state: Review source empty.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/agent/manager.go",
+        "internal/ui/review.go",
+        "internal/workspace/checkpoint.go",
+        "internal/workspace/review.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V399/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V399/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "review",
+      "slug": "review-load-error",
+      "feature_ids": [
+        "W39"
+      ],
+      "expected_controls": [
+        "Source-specific error",
+        " Retry",
+        " No stale unrelated diff"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/sidepane.rs",
+          "handler": "render_content",
+          "line": 1345,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/sidepane.rs#L1345"
+        }
+      ],
+      "id": "V400",
+      "title": "Review load error",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated review surface in fixture.json.",
+        "Configure the named source state: Review load error.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/agent/manager.go",
+        "internal/ui/review.go",
+        "internal/workspace/checkpoint.go",
+        "internal/workspace/review.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V400/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V400/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    }
+  ]
+}

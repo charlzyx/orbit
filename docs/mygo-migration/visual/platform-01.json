@@ -1,0 +1,1576 @@
+{
+  "schema_version": 1,
+  "category": "platform",
+  "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "fixture_contract": "fixture.json",
+  "cases": [
+    {
+      "category": "platform",
+      "slug": "macos-parked-window-dock-reopen",
+      "feature_ids": [
+        "S01",
+        "W69",
+        "W70"
+      ],
+      "expected_controls": [
+        "Macos parked window dock reopen",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "native-os",
+      "note": "Platform gate; screenshot inventory is not proof these actual OS states executed.",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/main_window.rs",
+          "handler": "open",
+          "line": 77,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/main_window.rs#L77"
+        }
+      ],
+      "id": "V119",
+      "title": "Macos parked window dock reopen",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated platform surface in fixture.json.",
+        "Configure the named source state: Macos parked window dock reopen.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "cmd/orbit/main.go",
+        "internal/native",
+        "internal/preferences",
+        "internal/ui",
+        "internal/workbench"
+      ],
+      "status": "BLOCKED",
+      "blocker": "Actual native OS menu/dialog/notification execution not yet captured; headless CPU descriptors are insufficient.",
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V119/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V119/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "BLOCKED",
+      "native_os_verdict": "BLOCKED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "platform",
+      "slug": "os-folder-picker",
+      "feature_ids": [
+        "S01",
+        "W69"
+      ],
+      "expected_controls": [
+        "Os folder picker",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "native-os",
+      "note": "Platform gate; screenshot inventory is not proof these actual OS states executed.",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/session.rs",
+          "handler": "browse_for_folder",
+          "line": 724,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/session.rs#L724"
+        }
+      ],
+      "id": "V120",
+      "title": "Os folder picker",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated platform surface in fixture.json.",
+        "Configure the named source state: Os folder picker.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "cmd/orbit/main.go",
+        "internal/native",
+        "internal/preferences",
+        "internal/ui",
+        "internal/workbench"
+      ],
+      "status": "BLOCKED",
+      "blocker": "Actual native OS menu/dialog/notification execution not yet captured; headless CPU descriptors are insufficient.",
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V120/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V120/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "BLOCKED",
+      "native_os_verdict": "BLOCKED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "platform",
+      "slug": "os-attachment-picker",
+      "feature_ids": [
+        "S01",
+        "W69"
+      ],
+      "expected_controls": [
+        "Os attachment picker",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "native-os",
+      "note": "Platform gate; screenshot inventory is not proof these actual OS states executed.",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/composer_ops.rs",
+          "handler": "attach_image",
+          "line": 435,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/composer_ops.rs#L435"
+        }
+      ],
+      "id": "V121",
+      "title": "Os attachment picker",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated platform surface in fixture.json.",
+        "Configure the named source state: Os attachment picker.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "cmd/orbit/main.go",
+        "internal/native",
+        "internal/preferences",
+        "internal/ui",
+        "internal/workbench"
+      ],
+      "status": "BLOCKED",
+      "blocker": "Actual native OS menu/dialog/notification execution not yet captured; headless CPU descriptors are insufficient.",
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V121/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V121/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "BLOCKED",
+      "native_os_verdict": "BLOCKED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "platform",
+      "slug": "os-export-save-dialog",
+      "feature_ids": [
+        "U04",
+        "W69"
+      ],
+      "expected_controls": [
+        "Os export save dialog",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "native-os",
+      "note": "Platform gate; screenshot inventory is not proof these actual OS states executed.",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/page.rs",
+          "handler": "export",
+          "line": 2457,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/usage/page.rs#L2457"
+        }
+      ],
+      "id": "V122",
+      "title": "Os export save dialog",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated platform surface in fixture.json.",
+        "Configure the named source state: Os export save dialog.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "BLOCKED",
+      "blocker": "Actual native OS menu/dialog/notification execution not yet captured; headless CPU descriptors are insufficient.",
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V122/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V122/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "BLOCKED",
+      "native_os_verdict": "BLOCKED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "platform",
+      "slug": "os-notification-banner",
+      "feature_ids": [
+        "U05",
+        "W69"
+      ],
+      "expected_controls": [
+        "Os notification banner",
+        " Source labels, icons, selected and disabled states visible",
+        " No unrelated dialog or stale response"
+      ],
+      "scope": "native-os",
+      "note": "Platform gate; screenshot inventory is not proof these actual OS states executed.",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/notifications.rs",
+          "handler": "notify",
+          "line": 182,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/notifications.rs#L182"
+        }
+      ],
+      "id": "V123",
+      "title": "Os notification banner",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated platform surface in fixture.json.",
+        "Configure the named source state: Os notification banner.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "BLOCKED",
+      "blocker": "Actual native OS menu/dialog/notification execution not yet captured; headless CPU descriptors are insufficient.",
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V123/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V123/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "BLOCKED",
+      "native_os_verdict": "BLOCKED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "platform",
+      "slug": "native-linux-app-menu",
+      "feature_ids": [
+        "S01",
+        "S03",
+        "W70",
+        "W71"
+      ],
+      "expected_controls": [
+        "App menu open",
+        " Source menu items and separators",
+        " Correct shortcuts and enabled states"
+      ],
+      "scope": "native-os",
+      "note": "Actual linux native menu required. CPU descriptor capture does not paint this menu.",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/main.rs",
+          "handler": "app_menus",
+          "line": 574,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/main.rs#L574"
+        }
+      ],
+      "id": "V479",
+      "title": "Native linux app menu",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated platform surface in fixture.json.",
+        "Configure the named source state: Native linux app menu.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "cmd/orbit/main.go",
+        "internal/native",
+        "internal/preferences",
+        "internal/ui",
+        "internal/workbench"
+      ],
+      "status": "BLOCKED",
+      "blocker": "Actual native OS menu/dialog/notification execution not yet captured; headless CPU descriptors are insufficient.",
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V479/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V479/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "BLOCKED",
+      "native_os_verdict": "BLOCKED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "platform",
+      "slug": "native-linux-file-menu",
+      "feature_ids": [
+        "S01",
+        "S03",
+        "W70",
+        "W71"
+      ],
+      "expected_controls": [
+        "File menu open",
+        " Source menu items and separators",
+        " Correct shortcuts and enabled states"
+      ],
+      "scope": "native-os",
+      "note": "Actual linux native menu required. CPU descriptor capture does not paint this menu.",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/main.rs",
+          "handler": "app_menus",
+          "line": 574,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/main.rs#L574"
+        }
+      ],
+      "id": "V480",
+      "title": "Native linux file menu",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated platform surface in fixture.json.",
+        "Configure the named source state: Native linux file menu.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "cmd/orbit/main.go",
+        "internal/native",
+        "internal/preferences",
+        "internal/ui",
+        "internal/workbench"
+      ],
+      "status": "BLOCKED",
+      "blocker": "Actual native OS menu/dialog/notification execution not yet captured; headless CPU descriptors are insufficient.",
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V480/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V480/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "BLOCKED",
+      "native_os_verdict": "BLOCKED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "platform",
+      "slug": "native-linux-edit-menu",
+      "feature_ids": [
+        "S01",
+        "S03",
+        "W70",
+        "W71"
+      ],
+      "expected_controls": [
+        "Edit menu open",
+        " Source menu items and separators",
+        " Correct shortcuts and enabled states"
+      ],
+      "scope": "native-os",
+      "note": "Actual linux native menu required. CPU descriptor capture does not paint this menu.",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/main.rs",
+          "handler": "app_menus",
+          "line": 574,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/main.rs#L574"
+        }
+      ],
+      "id": "V481",
+      "title": "Native linux edit menu",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated platform surface in fixture.json.",
+        "Configure the named source state: Native linux edit menu.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "cmd/orbit/main.go",
+        "internal/native",
+        "internal/preferences",
+        "internal/ui",
+        "internal/workbench"
+      ],
+      "status": "BLOCKED",
+      "blocker": "Actual native OS menu/dialog/notification execution not yet captured; headless CPU descriptors are insufficient.",
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V481/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V481/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "BLOCKED",
+      "native_os_verdict": "BLOCKED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "platform",
+      "slug": "native-linux-view-menu",
+      "feature_ids": [
+        "S01",
+        "S03",
+        "W70",
+        "W71"
+      ],
+      "expected_controls": [
+        "View menu open",
+        " Source menu items and separators",
+        " Correct shortcuts and enabled states"
+      ],
+      "scope": "native-os",
+      "note": "Actual linux native menu required. CPU descriptor capture does not paint this menu.",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/main.rs",
+          "handler": "app_menus",
+          "line": 574,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/main.rs#L574"
+        }
+      ],
+      "id": "V482",
+      "title": "Native linux view menu",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated platform surface in fixture.json.",
+        "Configure the named source state: Native linux view menu.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "cmd/orbit/main.go",
+        "internal/native",
+        "internal/preferences",
+        "internal/ui",
+        "internal/workbench"
+      ],
+      "status": "BLOCKED",
+      "blocker": "Actual native OS menu/dialog/notification execution not yet captured; headless CPU descriptors are insufficient.",
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V482/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V482/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "BLOCKED",
+      "native_os_verdict": "BLOCKED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "platform",
+      "slug": "native-windows-app-menu",
+      "feature_ids": [
+        "S01",
+        "S03",
+        "W70",
+        "W71"
+      ],
+      "expected_controls": [
+        "App menu open",
+        " Source menu items and separators",
+        " Correct shortcuts and enabled states"
+      ],
+      "scope": "native-os",
+      "note": "Actual windows native menu required. CPU descriptor capture does not paint this menu.",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/main.rs",
+          "handler": "app_menus",
+          "line": 574,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/main.rs#L574"
+        }
+      ],
+      "id": "V483",
+      "title": "Native windows app menu",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated platform surface in fixture.json.",
+        "Configure the named source state: Native windows app menu.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "cmd/orbit/main.go",
+        "internal/native",
+        "internal/preferences",
+        "internal/ui",
+        "internal/workbench"
+      ],
+      "status": "BLOCKED",
+      "blocker": "Actual native OS menu/dialog/notification execution not yet captured; headless CPU descriptors are insufficient.",
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V483/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V483/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "BLOCKED",
+      "native_os_verdict": "BLOCKED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "platform",
+      "slug": "native-windows-file-menu",
+      "feature_ids": [
+        "S01",
+        "S03",
+        "W70",
+        "W71"
+      ],
+      "expected_controls": [
+        "File menu open",
+        " Source menu items and separators",
+        " Correct shortcuts and enabled states"
+      ],
+      "scope": "native-os",
+      "note": "Actual windows native menu required. CPU descriptor capture does not paint this menu.",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/main.rs",
+          "handler": "app_menus",
+          "line": 574,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/main.rs#L574"
+        }
+      ],
+      "id": "V484",
+      "title": "Native windows file menu",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated platform surface in fixture.json.",
+        "Configure the named source state: Native windows file menu.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "cmd/orbit/main.go",
+        "internal/native",
+        "internal/preferences",
+        "internal/ui",
+        "internal/workbench"
+      ],
+      "status": "BLOCKED",
+      "blocker": "Actual native OS menu/dialog/notification execution not yet captured; headless CPU descriptors are insufficient.",
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V484/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V484/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "BLOCKED",
+      "native_os_verdict": "BLOCKED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "platform",
+      "slug": "native-windows-edit-menu",
+      "feature_ids": [
+        "S01",
+        "S03",
+        "W70",
+        "W71"
+      ],
+      "expected_controls": [
+        "Edit menu open",
+        " Source menu items and separators",
+        " Correct shortcuts and enabled states"
+      ],
+      "scope": "native-os",
+      "note": "Actual windows native menu required. CPU descriptor capture does not paint this menu.",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/main.rs",
+          "handler": "app_menus",
+          "line": 574,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/main.rs#L574"
+        }
+      ],
+      "id": "V485",
+      "title": "Native windows edit menu",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated platform surface in fixture.json.",
+        "Configure the named source state: Native windows edit menu.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "cmd/orbit/main.go",
+        "internal/native",
+        "internal/preferences",
+        "internal/ui",
+        "internal/workbench"
+      ],
+      "status": "BLOCKED",
+      "blocker": "Actual native OS menu/dialog/notification execution not yet captured; headless CPU descriptors are insufficient.",
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V485/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V485/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "BLOCKED",
+      "native_os_verdict": "BLOCKED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "platform",
+      "slug": "native-windows-view-menu",
+      "feature_ids": [
+        "S01",
+        "S03",
+        "W70",
+        "W71"
+      ],
+      "expected_controls": [
+        "View menu open",
+        " Source menu items and separators",
+        " Correct shortcuts and enabled states"
+      ],
+      "scope": "native-os",
+      "note": "Actual windows native menu required. CPU descriptor capture does not paint this menu.",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/main.rs",
+          "handler": "app_menus",
+          "line": 574,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/main.rs#L574"
+        }
+      ],
+      "id": "V486",
+      "title": "Native windows view menu",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated platform surface in fixture.json.",
+        "Configure the named source state: Native windows view menu.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "cmd/orbit/main.go",
+        "internal/native",
+        "internal/preferences",
+        "internal/ui",
+        "internal/workbench"
+      ],
+      "status": "BLOCKED",
+      "blocker": "Actual native OS menu/dialog/notification execution not yet captured; headless CPU descriptors are insufficient.",
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V486/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V486/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "BLOCKED",
+      "native_os_verdict": "BLOCKED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "platform",
+      "slug": "native-macos-app-menu",
+      "feature_ids": [
+        "S01",
+        "S03",
+        "W70",
+        "W71"
+      ],
+      "expected_controls": [
+        "App menu open",
+        " Source menu items and separators",
+        " Correct shortcuts and enabled states"
+      ],
+      "scope": "native-os",
+      "note": "Actual macos native menu required. CPU descriptor capture does not paint this menu.",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/main.rs",
+          "handler": "app_menus",
+          "line": 574,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/main.rs#L574"
+        }
+      ],
+      "id": "V487",
+      "title": "Native macos app menu",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated platform surface in fixture.json.",
+        "Configure the named source state: Native macos app menu.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "cmd/orbit/main.go",
+        "internal/native",
+        "internal/preferences",
+        "internal/ui",
+        "internal/workbench"
+      ],
+      "status": "BLOCKED",
+      "blocker": "Actual native OS menu/dialog/notification execution not yet captured; headless CPU descriptors are insufficient.",
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V487/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V487/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "BLOCKED",
+      "native_os_verdict": "BLOCKED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "platform",
+      "slug": "native-macos-file-menu",
+      "feature_ids": [
+        "S01",
+        "S03",
+        "W70",
+        "W71"
+      ],
+      "expected_controls": [
+        "File menu open",
+        " Source menu items and separators",
+        " Correct shortcuts and enabled states"
+      ],
+      "scope": "native-os",
+      "note": "Actual macos native menu required. CPU descriptor capture does not paint this menu.",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/main.rs",
+          "handler": "app_menus",
+          "line": 574,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/main.rs#L574"
+        }
+      ],
+      "id": "V488",
+      "title": "Native macos file menu",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated platform surface in fixture.json.",
+        "Configure the named source state: Native macos file menu.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "cmd/orbit/main.go",
+        "internal/native",
+        "internal/preferences",
+        "internal/ui",
+        "internal/workbench"
+      ],
+      "status": "BLOCKED",
+      "blocker": "Actual native OS menu/dialog/notification execution not yet captured; headless CPU descriptors are insufficient.",
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V488/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V488/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "BLOCKED",
+      "native_os_verdict": "BLOCKED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "platform",
+      "slug": "native-macos-edit-menu",
+      "feature_ids": [
+        "S01",
+        "S03",
+        "W70",
+        "W71"
+      ],
+      "expected_controls": [
+        "Edit menu open",
+        " Source menu items and separators",
+        " Correct shortcuts and enabled states"
+      ],
+      "scope": "native-os",
+      "note": "Actual macos native menu required. CPU descriptor capture does not paint this menu.",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/main.rs",
+          "handler": "app_menus",
+          "line": 574,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/main.rs#L574"
+        }
+      ],
+      "id": "V489",
+      "title": "Native macos edit menu",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated platform surface in fixture.json.",
+        "Configure the named source state: Native macos edit menu.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "cmd/orbit/main.go",
+        "internal/native",
+        "internal/preferences",
+        "internal/ui",
+        "internal/workbench"
+      ],
+      "status": "BLOCKED",
+      "blocker": "Actual native OS menu/dialog/notification execution not yet captured; headless CPU descriptors are insufficient.",
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V489/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V489/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "BLOCKED",
+      "native_os_verdict": "BLOCKED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "platform",
+      "slug": "native-macos-view-menu",
+      "feature_ids": [
+        "S01",
+        "S03",
+        "W70",
+        "W71"
+      ],
+      "expected_controls": [
+        "View menu open",
+        " Source menu items and separators",
+        " Correct shortcuts and enabled states"
+      ],
+      "scope": "native-os",
+      "note": "Actual macos native menu required. CPU descriptor capture does not paint this menu.",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/main.rs",
+          "handler": "app_menus",
+          "line": 574,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/main.rs#L574"
+        }
+      ],
+      "id": "V490",
+      "title": "Native macos view menu",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated platform surface in fixture.json.",
+        "Configure the named source state: Native macos view menu.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "cmd/orbit/main.go",
+        "internal/native",
+        "internal/preferences",
+        "internal/ui",
+        "internal/workbench"
+      ],
+      "status": "BLOCKED",
+      "blocker": "Actual native OS menu/dialog/notification execution not yet captured; headless CPU descriptors are insufficient.",
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V490/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V490/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "BLOCKED",
+      "native_os_verdict": "BLOCKED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    }
+  ]
+}

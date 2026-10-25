@@ -1,0 +1,2330 @@
+{
+  "schema_version": 1,
+  "category": "github",
+  "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "fixture_contract": "fixture.json",
+  "cases": [
+    {
+      "category": "github",
+      "slug": "github-gh-missing",
+      "feature_ids": [
+        "W20"
+      ],
+      "expected_controls": [
+        "gh unavailable setup instructions",
+        " No fabricated remote rows"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "gh_setup_tab",
+          "line": 6406,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L6406"
+        }
+      ],
+      "id": "V345",
+      "title": "Github gh missing",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated github surface in fixture.json.",
+        "Configure the named source state: Github gh missing.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/templates.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/workspace/github_templates.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V345/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V345/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "github",
+      "slug": "github-signed-out",
+      "feature_ids": [
+        "W20"
+      ],
+      "expected_controls": [
+        "Sign-in required",
+        " Interactive authentication action"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "gh_setup_tab",
+          "line": 6406,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L6406"
+        }
+      ],
+      "id": "V346",
+      "title": "Github signed out",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated github surface in fixture.json.",
+        "Configure the named source state: Github signed out.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/templates.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/workspace/github_templates.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": "Real authentication remains unverified; only deterministic noncredential visual fixtures are permitted without the relevant authorization.",
+      "rust_image": {
+        "planned_path": "../probes/visual/V346/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V346/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "github",
+      "slug": "github-issues-list",
+      "feature_ids": [
+        "W21"
+      ],
+      "expected_controls": [
+        "Issue number/title/state/author/labels/comments",
+        " Fixed50 limit"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "issues_list_view",
+          "line": 4947,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L4947"
+        }
+      ],
+      "id": "V347",
+      "title": "Github issues list",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated github surface in fixture.json.",
+        "Configure the named source state: Github issues list.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/templates.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/workspace/github_templates.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V347/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V347/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "github",
+      "slug": "github-issues-empty",
+      "feature_ids": [
+        "W21"
+      ],
+      "expected_controls": [
+        "No issues",
+        " New issue action"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "issues_list_view",
+          "line": 4947,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L4947"
+        }
+      ],
+      "id": "V348",
+      "title": "Github issues empty",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated github surface in fixture.json.",
+        "Configure the named source state: Github issues empty.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/templates.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/workspace/github_templates.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V348/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V348/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "github",
+      "slug": "github-issues-filtered",
+      "feature_ids": [
+        "W21"
+      ],
+      "expected_controls": [
+        "State and label filters",
+        " Query",
+        " Active choices"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "issue_filter_bar",
+          "line": 4839,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L4839"
+        }
+      ],
+      "id": "V349",
+      "title": "Github issues filtered",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated github surface in fixture.json.",
+        "Configure the named source state: Github issues filtered.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/templates.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/workspace/github_templates.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V349/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V349/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "github",
+      "slug": "github-issues-label-menu",
+      "feature_ids": [
+        "W21",
+        "W23"
+      ],
+      "expected_controls": [
+        "Label choices and colors",
+        " Current selection"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "label_popup",
+          "line": 5456,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L5456"
+        }
+      ],
+      "id": "V350",
+      "title": "Github issues label menu",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated github surface in fixture.json.",
+        "Configure the named source state: Github issues label menu.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/templates.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/workspace/github_templates.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V350/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V350/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "github",
+      "slug": "github-issues-loading",
+      "feature_ids": [
+        "W21"
+      ],
+      "expected_controls": [
+        "Fetching state",
+        " No fake list"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "issues_tab",
+          "line": 4822,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L4822"
+        }
+      ],
+      "id": "V351",
+      "title": "Github issues loading",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated github surface in fixture.json.",
+        "Configure the named source state: Github issues loading.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/templates.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/workspace/github_templates.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V351/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V351/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "github",
+      "slug": "github-issues-fetch-error",
+      "feature_ids": [
+        "W21"
+      ],
+      "expected_controls": [
+        "gh failure",
+        " Retry",
+        " No false empty-success"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "issues_tab",
+          "line": 4822,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L4822"
+        }
+      ],
+      "id": "V352",
+      "title": "Github issues fetch error",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated github surface in fixture.json.",
+        "Configure the named source state: Github issues fetch error.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/templates.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/workspace/github_templates.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V352/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V352/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "github",
+      "slug": "github-issue-detail",
+      "feature_ids": [
+        "W22"
+      ],
+      "expected_controls": [
+        "Title/body/labels/assignees/author",
+        " Comment timeline",
+        " Browser link"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "issue_detail_view",
+          "line": 5001,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L5001"
+        }
+      ],
+      "id": "V353",
+      "title": "Github issue detail",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated github surface in fixture.json.",
+        "Configure the named source state: Github issue detail.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/templates.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/workspace/github_templates.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V353/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V353/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "github",
+      "slug": "github-issue-comment-draft",
+      "feature_ids": [
+        "W23"
+      ],
+      "expected_controls": [
+        "Comment draft",
+        " Submit",
+        " Existing timeline"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "issue_detail_view",
+          "line": 5001,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L5001"
+        }
+      ],
+      "id": "V354",
+      "title": "Github issue comment draft",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated github surface in fixture.json.",
+        "Configure the named source state: Github issue comment draft.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/templates.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/workspace/github_templates.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V354/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V354/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "github",
+      "slug": "github-issue-closed-reopen",
+      "feature_ids": [
+        "W23"
+      ],
+      "expected_controls": [
+        "Closed state",
+        " Reopen action"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "issue_detail_view",
+          "line": 5001,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L5001"
+        }
+      ],
+      "id": "V355",
+      "title": "Github issue closed reopen",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated github surface in fixture.json.",
+        "Configure the named source state: Github issue closed reopen.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/templates.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/workspace/github_templates.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V355/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V355/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "github",
+      "slug": "github-new-issue",
+      "feature_ids": [
+        "W24",
+        "W29"
+      ],
+      "expected_controls": [
+        "Title/body/notes",
+        " Template selector",
+        " Generate",
+        " Submit/Cancel"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "issue_new_view",
+          "line": 5319,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L5319"
+        }
+      ],
+      "id": "V356",
+      "title": "Github new issue",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated github surface in fixture.json.",
+        "Configure the named source state: Github new issue.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/templates.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/workspace/github_templates.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V356/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V356/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "github",
+      "slug": "github-issue-template-menu",
+      "feature_ids": [
+        "W24"
+      ],
+      "expected_controls": [
+        "None and discovered Markdown templates",
+        " Selected template"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "template_picker_popup",
+          "line": 1479,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L1479"
+        }
+      ],
+      "id": "V357",
+      "title": "Github issue template menu",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated github surface in fixture.json.",
+        "Configure the named source state: Github issue template menu.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/templates.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/workspace/github_templates.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V357/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V357/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "github",
+      "slug": "github-issue-generated-draft",
+      "feature_ids": [
+        "W24",
+        "W29"
+      ],
+      "expected_controls": [
+        "Generated draft",
+        " Template prefix/body structure retained"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "issue_new_view",
+          "line": 5319,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L5319"
+        }
+      ],
+      "id": "V358",
+      "title": "Github issue generated draft",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated github surface in fixture.json.",
+        "Configure the named source state: Github issue generated draft.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/templates.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/workspace/github_templates.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V358/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V358/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "github",
+      "slug": "github-issue-submit-error",
+      "feature_ids": [
+        "W24"
+      ],
+      "expected_controls": [
+        "Failed create keeps form/draft open",
+        " Error message"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "issue_new_view",
+          "line": 5319,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L5319"
+        }
+      ],
+      "id": "V359",
+      "title": "Github issue submit error",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated github surface in fixture.json.",
+        "Configure the named source state: Github issue submit error.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/templates.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/workspace/github_templates.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V359/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V359/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "github",
+      "slug": "github-pulls-list",
+      "feature_ids": [
+        "W25"
+      ],
+      "expected_controls": [
+        "Title/number/state/draft/ref/review/check metadata"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "pulls_list_view",
+          "line": 5632,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L5632"
+        }
+      ],
+      "id": "V360",
+      "title": "Github pulls list",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated github surface in fixture.json.",
+        "Configure the named source state: Github pulls list.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/templates.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/workspace/github_templates.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V360/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V360/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "github",
+      "slug": "github-pulls-empty",
+      "feature_ids": [
+        "W25"
+      ],
+      "expected_controls": [
+        "No matching pull requests",
+        " New pull action"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "pulls_list_view",
+          "line": 5632,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L5632"
+        }
+      ],
+      "id": "V361",
+      "title": "Github pulls empty",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated github surface in fixture.json.",
+        "Configure the named source state: Github pulls empty.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/templates.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/workspace/github_templates.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V361/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V361/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "github",
+      "slug": "github-pulls-filtered",
+      "feature_ids": [
+        "W25"
+      ],
+      "expected_controls": [
+        "Source state filter",
+        " Query",
+        " No invented pagination"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "pr_filter_bar",
+          "line": 5548,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L5548"
+        }
+      ],
+      "id": "V362",
+      "title": "Github pulls filtered",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated github surface in fixture.json.",
+        "Configure the named source state: Github pulls filtered.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/templates.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/workspace/github_templates.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V362/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V362/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "github",
+      "slug": "github-pulls-loading-error",
+      "feature_ids": [
+        "W25"
+      ],
+      "expected_controls": [
+        "Fetch failure after loading",
+        " Retry affordance"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "pulls_tab",
+          "line": 5535,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L5535"
+        }
+      ],
+      "id": "V363",
+      "title": "Github pulls loading error",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated github surface in fixture.json.",
+        "Configure the named source state: Github pulls loading error.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/templates.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/workspace/github_templates.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V363/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V363/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "github",
+      "slug": "github-pull-detail-overview",
+      "feature_ids": [
+        "W26"
+      ],
+      "expected_controls": [
+        "Body",
+        " Head/base refs",
+        " Review status",
+        " Additions/deletions"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "pr_detail_view",
+          "line": 5686,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L5686"
+        }
+      ],
+      "id": "V364",
+      "title": "Github pull detail overview",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated github surface in fixture.json.",
+        "Configure the named source state: Github pull detail overview.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/templates.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/workspace/github_templates.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V364/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V364/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "github",
+      "slug": "github-pull-detail-files",
+      "feature_ids": [
+        "W26",
+        "W30"
+      ],
+      "expected_controls": [
+        "Scrolled Files section",
+        " File stats",
+        " Open Review links"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "pr_detail_view",
+          "line": 5686,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L5686"
+        }
+      ],
+      "id": "V365",
+      "title": "Github pull detail files",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated github surface in fixture.json.",
+        "Configure the named source state: Github pull detail files.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/agent/manager.go",
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/templates.go",
+        "internal/gitworkbench/view.go",
+        "internal/ui/review.go",
+        "internal/workspace/checkpoint.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/workspace/github_templates.go",
+        "internal/workspace/review.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V365/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V365/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "github",
+      "slug": "github-pull-detail-commits-checks",
+      "feature_ids": [
+        "W26"
+      ],
+      "expected_controls": [
+        "Commit list",
+        " Check statuses",
+        " External links"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "pr_detail_view",
+          "line": 5686,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L5686"
+        }
+      ],
+      "id": "V366",
+      "title": "Github pull detail commits checks",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated github surface in fixture.json.",
+        "Configure the named source state: Github pull detail commits checks.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/templates.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/workspace/github_templates.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V366/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V366/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "github",
+      "slug": "github-pull-detail-reviews-comments",
+      "feature_ids": [
+        "W26"
+      ],
+      "expected_controls": [
+        "Review cards",
+        " Comment timeline",
+        " Reviewer identity"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "pr_detail_view",
+          "line": 5686,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L5686"
+        }
+      ],
+      "id": "V367",
+      "title": "Github pull detail reviews comments",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated github surface in fixture.json.",
+        "Configure the named source state: Github pull detail reviews comments.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/templates.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/workspace/github_templates.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V367/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V367/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "github",
+      "slug": "github-pull-review-draft",
+      "feature_ids": [
+        "W27"
+      ],
+      "expected_controls": [
+        "Approve/Request changes",
+        " Review body",
+        " Submit state"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "pr_detail_view",
+          "line": 5686,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L5686"
+        }
+      ],
+      "id": "V368",
+      "title": "Github pull review draft",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated github surface in fixture.json.",
+        "Configure the named source state: Github pull review draft.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/templates.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/workspace/github_templates.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V368/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V368/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    },
+    {
+      "category": "github",
+      "slug": "github-pull-merge-confirm",
+      "feature_ids": [
+        "W27"
+      ],
+      "expected_controls": [
+        "Named PR",
+        " Merge/squash/rebase method",
+        " Delete head option",
+        " Confirm"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/git_panel/mod.rs",
+          "handler": "confirm_popup",
+          "line": 6983,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/git_panel/mod.rs#L6983"
+        }
+      ],
+      "id": "V369",
+      "title": "Github pull merge confirm",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated github surface in fixture.json.",
+        "Configure the named source state: Github pull merge confirm.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/gitworkbench/state.go",
+        "internal/gitworkbench/templates.go",
+        "internal/gitworkbench/view.go",
+        "internal/workspace/generation.go",
+        "internal/workspace/git.go",
+        "internal/workspace/git_ops.go",
+        "internal/workspace/github.go",
+        "internal/workspace/github_templates.go"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V369/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V369/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "NOT_REVIEWED",
+        "actual_state_verified": false,
+        "reviewer": null,
+        "evidence": null
+      }
+    }
+  ]
+}

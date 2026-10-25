@@ -1,0 +1,2982 @@
+{
+  "schema_version": 1,
+  "category": "usage",
+  "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "fixture_contract": "fixture.json",
+  "cases": [
+    {
+      "category": "usage",
+      "slug": "usage-simple-top",
+      "feature_ids": [
+        "U01",
+        "U02"
+      ],
+      "expected_controls": [
+        "Header Export and Refresh",
+        "Range, Workspace, Provider, Model controls",
+        "Simple selected",
+        "Daily activity heatmap",
+        "Summary board: Requests, Total tokens, Cache hit rate, Avg response",
+        "Summary secondary strip"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "handler": "body",
+          "line": 622,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/usage/view.rs#L622"
+        }
+      ],
+      "id": "V260",
+      "title": "Usage simple top",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open Usage, Simple, Last 7 days; keep scroll at top.",
+        "Capture full client; do not claim trend if below viewport."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V260/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V260/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Usage source reviewer",
+        "evidence": "Complete domain fixture, capture steps, forbidden claims and exact Rust lines in usage-visual-source-review.json. Source branch reviewed; actual fixture/capture not executed."
+      },
+      "concrete_fixture_reference": "../usage-visual-source-review.json",
+      "independent_source_review": {
+        "id": "V260",
+        "verdict": "KEEP_WITH_RECIPE",
+        "fixture": "core",
+        "capture_steps": [
+          "Open Usage, Simple, Last 7 days; keep scroll at top.",
+          "Capture full client; do not claim trend if below viewport."
+        ],
+        "expected_visible": [
+          "Header Export and Refresh",
+          "Range, Workspace, Provider, Model controls",
+          "Simple selected",
+          "Daily activity heatmap",
+          "Summary board: Requests, Total tokens, Cache hit rate, Avg response",
+          "Summary secondary strip"
+        ],
+        "must_not_claim": [
+          "All lower cards simultaneously visible"
+        ],
+        "source": [
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 212
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 300
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 700
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 1284
+          }
+        ]
+      }
+    },
+    {
+      "category": "usage",
+      "slug": "usage-simple-lower-health",
+      "feature_ids": [
+        "U02"
+      ],
+      "expected_controls": [
+        "Source-generated insight rows",
+        "Input/output/cache-read/cache-write composition",
+        "Cache hit-rate details and Show cached only",
+        "Hit-rate trend when at least two readable buckets"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "handler": "body",
+          "line": 622,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/usage/view.rs#L622"
+        }
+      ],
+      "id": "V261",
+      "title": "Usage simple lower health",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Simple, Last 7 days.",
+        "Scroll so Signals and Token health are visible; if their complete bounds exceed client height use separate appended capture."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V261/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V261/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Usage source reviewer",
+        "evidence": "Complete domain fixture, capture steps, forbidden claims and exact Rust lines in usage-visual-source-review.json. Source branch reviewed; actual fixture/capture not executed."
+      },
+      "concrete_fixture_reference": "../usage-visual-source-review.json",
+      "independent_source_review": {
+        "id": "V261",
+        "verdict": "KEEP_WITH_RECIPE",
+        "fixture": "comparison",
+        "capture_steps": [
+          "Simple, Last 7 days.",
+          "Scroll so Signals and Token health are visible; if their complete bounds exceed client height use separate appended capture."
+        ],
+        "expected_visible": [
+          "Source-generated insight rows",
+          "Input/output/cache-read/cache-write composition",
+          "Cache hit-rate details and Show cached only",
+          "Hit-rate trend when at least two readable buckets"
+        ],
+        "must_not_claim": [
+          "Signals for arbitrary data: conditional on insights",
+          "Always-present token health: conditional on tokens/cache"
+        ],
+        "source": [
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 700
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 1511
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 2926
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 3072
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 3206
+          }
+        ]
+      }
+    },
+    {
+      "category": "usage",
+      "slug": "usage-details-models",
+      "feature_ids": [
+        "U02"
+      ],
+      "expected_controls": [
+        "Models selected among Models/Workspaces/Providers/Tools",
+        "Ranked model bars",
+        "Search and Columns",
+        "Model rows, totals and paging"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "handler": "body",
+          "line": 622,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/usage/view.rs#L622"
+        }
+      ],
+      "id": "V262",
+      "title": "Usage details models",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Details; Breakdown Models.",
+        "Scroll to Breakdown heading."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V262/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V262/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Usage source reviewer",
+        "evidence": "Complete domain fixture, capture steps, forbidden claims and exact Rust lines in usage-visual-source-review.json. Source branch reviewed; actual fixture/capture not executed."
+      },
+      "concrete_fixture_reference": "../usage-visual-source-review.json",
+      "independent_source_review": {
+        "id": "V262",
+        "verdict": "KEEP_WITH_RECIPE",
+        "fixture": "core",
+        "capture_steps": [
+          "Details; Breakdown Models.",
+          "Scroll to Breakdown heading."
+        ],
+        "expected_visible": [
+          "Models selected among Models/Workspaces/Providers/Tools",
+          "Ranked model bars",
+          "Search and Columns",
+          "Model rows, totals and paging"
+        ],
+        "must_not_claim": [
+          "Every optional column at every width"
+        ],
+        "source": [
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 2307
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 2582
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 3672
+          }
+        ]
+      }
+    },
+    {
+      "category": "usage",
+      "slug": "usage-details-workspaces",
+      "feature_ids": [
+        "U02"
+      ],
+      "expected_controls": [
+        "Workspaces selected",
+        "Ranked workspace bars",
+        "Search, Columns, table, totals, paging"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "handler": "body",
+          "line": 622,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/usage/view.rs#L622"
+        }
+      ],
+      "id": "V263",
+      "title": "Usage details workspaces",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Details; Breakdown Workspaces.",
+        "Scroll to Breakdown heading."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V263/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V263/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Usage source reviewer",
+        "evidence": "Complete domain fixture, capture steps, forbidden claims and exact Rust lines in usage-visual-source-review.json. Source branch reviewed; actual fixture/capture not executed."
+      },
+      "concrete_fixture_reference": "../usage-visual-source-review.json",
+      "independent_source_review": {
+        "id": "V263",
+        "verdict": "KEEP_WITH_RECIPE",
+        "fixture": "core",
+        "capture_steps": [
+          "Details; Breakdown Workspaces.",
+          "Scroll to Breakdown heading."
+        ],
+        "expected_visible": [
+          "Workspaces selected",
+          "Ranked workspace bars",
+          "Search, Columns, table, totals, paging"
+        ],
+        "must_not_claim": [],
+        "source": [
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 2307
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 2702
+          }
+        ]
+      }
+    },
+    {
+      "category": "usage",
+      "slug": "usage-details-providers",
+      "feature_ids": [
+        "U02"
+      ],
+      "expected_controls": [
+        "Providers selected",
+        "Ranked provider bars",
+        "Search, Columns, table, totals, paging"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "handler": "body",
+          "line": 622,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/usage/view.rs#L622"
+        }
+      ],
+      "id": "V264",
+      "title": "Usage details providers",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Details; Breakdown Providers.",
+        "Scroll to Breakdown heading."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V264/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V264/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Usage source reviewer",
+        "evidence": "Complete domain fixture, capture steps, forbidden claims and exact Rust lines in usage-visual-source-review.json. Source branch reviewed; actual fixture/capture not executed."
+      },
+      "concrete_fixture_reference": "../usage-visual-source-review.json",
+      "independent_source_review": {
+        "id": "V264",
+        "verdict": "KEEP_WITH_RECIPE",
+        "fixture": "core",
+        "capture_steps": [
+          "Details; Breakdown Providers.",
+          "Scroll to Breakdown heading."
+        ],
+        "expected_visible": [
+          "Providers selected",
+          "Ranked provider bars",
+          "Search, Columns, table, totals, paging"
+        ],
+        "must_not_claim": [],
+        "source": [
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 2307
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 2702
+          }
+        ]
+      }
+    },
+    {
+      "category": "usage",
+      "slug": "usage-details-tools",
+      "feature_ids": [
+        "U02"
+      ],
+      "expected_controls": [
+        "Tools selected",
+        "Ranked tool call bars",
+        "Search, Columns, tool-specific columns, totals, paging"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "handler": "body",
+          "line": 622,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/usage/view.rs#L622"
+        }
+      ],
+      "id": "V265",
+      "title": "Usage details tools",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Details; Breakdown Tools.",
+        "Scroll to Breakdown heading."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V265/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V265/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Usage source reviewer",
+        "evidence": "Complete domain fixture, capture steps, forbidden claims and exact Rust lines in usage-visual-source-review.json. Source branch reviewed; actual fixture/capture not executed."
+      },
+      "concrete_fixture_reference": "../usage-visual-source-review.json",
+      "independent_source_review": {
+        "id": "V265",
+        "verdict": "KEEP_WITH_RECIPE",
+        "fixture": "core",
+        "capture_steps": [
+          "Details; Breakdown Tools.",
+          "Scroll to Breakdown heading."
+        ],
+        "expected_visible": [
+          "Tools selected",
+          "Ranked tool call bars",
+          "Search, Columns, tool-specific columns, totals, paging"
+        ],
+        "must_not_claim": [
+          "Reuse request/token columns as tool schema"
+        ],
+        "source": [
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 2307
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 2765
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 2819
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 3729
+          }
+        ]
+      }
+    },
+    {
+      "category": "usage",
+      "slug": "usage-records-sessions",
+      "feature_ids": [
+        "U02",
+        "U04"
+      ],
+      "expected_controls": [
+        "Sessions selected",
+        "Search, Columns",
+        "Responsive source column plan including trailing Open",
+        "Totals distinguish filtered set and current page",
+        "Page-size and navigation controls"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "handler": "body",
+          "line": 622,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/usage/view.rs#L622"
+        }
+      ],
+      "id": "V266",
+      "title": "Usage records sessions",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Details; Records Sessions.",
+        "Scroll Records heading to top of content."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V266/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V266/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Usage source reviewer",
+        "evidence": "Complete domain fixture, capture steps, forbidden claims and exact Rust lines in usage-visual-source-review.json. Source branch reviewed; actual fixture/capture not executed."
+      },
+      "concrete_fixture_reference": "../usage-visual-source-review.json",
+      "independent_source_review": {
+        "id": "V266",
+        "verdict": "KEEP_WITH_RECIPE",
+        "fixture": "core",
+        "capture_steps": [
+          "Details; Records Sessions.",
+          "Scroll Records heading to top of content."
+        ],
+        "expected_visible": [
+          "Sessions selected",
+          "Search, Columns",
+          "Responsive source column plan including trailing Open",
+          "Totals distinguish filtered set and current page",
+          "Page-size and navigation controls"
+        ],
+        "must_not_claim": [
+          "All 13 enum columns forced visible: responsive plan has 12 named columns plus Open; Tools enum not admitted"
+        ],
+        "source": [
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 3296
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 3453
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 3583
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 4171
+          }
+        ]
+      }
+    },
+    {
+      "category": "usage",
+      "slug": "usage-records-daily",
+      "feature_ids": [
+        "U02",
+        "U04"
+      ],
+      "expected_controls": [
+        "Daily selected",
+        "Date/day bucket schema",
+        "Independent search, Columns, totals, page-size and pager"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "handler": "body",
+          "line": 622,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/usage/view.rs#L622"
+        }
+      ],
+      "id": "V267",
+      "title": "Usage records daily",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Details; Records Daily; Last 7 days.",
+        "Scroll Records heading to top."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V267/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V267/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Usage source reviewer",
+        "evidence": "Complete domain fixture, capture steps, forbidden claims and exact Rust lines in usage-visual-source-review.json. Source branch reviewed; actual fixture/capture not executed."
+      },
+      "concrete_fixture_reference": "../usage-visual-source-review.json",
+      "independent_source_review": {
+        "id": "V267",
+        "verdict": "KEEP_WITH_RECIPE",
+        "fixture": "core",
+        "capture_steps": [
+          "Details; Records Daily; Last 7 days.",
+          "Scroll Records heading to top."
+        ],
+        "expected_visible": [
+          "Daily selected",
+          "Date/day bucket schema",
+          "Independent search, Columns, totals, page-size and pager"
+        ],
+        "must_not_claim": [
+          "All-time necessarily daily: granularity adapts to range"
+        ],
+        "source": [
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 3296
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 3498
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 3757
+          }
+        ]
+      }
+    },
+    {
+      "category": "usage",
+      "slug": "usage-records-failures",
+      "feature_ids": [
+        "U02",
+        "U04"
+      ],
+      "expected_controls": [
+        "Failures selected",
+        "Provider/tool/stopped metadata",
+        "When/session/provider/model/type/message source columns",
+        "Search, Columns, totals, pager and retry explanation"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "handler": "body",
+          "line": 622,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/usage/view.rs#L622"
+        }
+      ],
+      "id": "V268",
+      "title": "Usage records failures",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Details; Records Failures.",
+        "Scroll Records heading to top."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V268/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V268/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Usage source reviewer",
+        "evidence": "Complete domain fixture, capture steps, forbidden claims and exact Rust lines in usage-visual-source-review.json. Source branch reviewed; actual fixture/capture not executed."
+      },
+      "concrete_fixture_reference": "../usage-visual-source-review.json",
+      "independent_source_review": {
+        "id": "V268",
+        "verdict": "KEEP_WITH_RECIPE",
+        "fixture": "core",
+        "capture_steps": [
+          "Details; Records Failures.",
+          "Scroll Records heading to top."
+        ],
+        "expected_visible": [
+          "Failures selected",
+          "Provider/tool/stopped metadata",
+          "When/session/provider/model/type/message source columns",
+          "Search, Columns, totals, pager and retry explanation"
+        ],
+        "must_not_claim": [
+          "Failure-row detail modal: no source click handler"
+        ],
+        "source": [
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 3296
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 3539
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 3848
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 4030
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 4914
+          }
+        ]
+      }
+    },
+    {
+      "category": "usage",
+      "slug": "usage-loading-first",
+      "feature_ids": [
+        "U02"
+      ],
+      "expected_controls": [
+        "Source skeleton cards",
+        "Header and range/mode controls",
+        "Disabled export"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "handler": "body",
+          "line": 622,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/usage/view.rs#L622"
+        }
+      ],
+      "id": "V269",
+      "title": "Usage loading first",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Hold initial scan result before publication; open Usage Simple.",
+        "Capture before first index arrives."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V269/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V269/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Usage source reviewer",
+        "evidence": "Complete domain fixture, capture steps, forbidden claims and exact Rust lines in usage-visual-source-review.json. Source branch reviewed; actual fixture/capture not executed."
+      },
+      "concrete_fixture_reference": "../usage-visual-source-review.json",
+      "independent_source_review": {
+        "id": "V269",
+        "verdict": "KEEP_WITH_RECIPE",
+        "fixture": "delayed-first-index",
+        "capture_steps": [
+          "Hold initial scan result before publication; open Usage Simple.",
+          "Capture before first index arrives."
+        ],
+        "expected_visible": [
+          "Source skeleton cards",
+          "Header and range/mode controls",
+          "Disabled export"
+        ],
+        "must_not_claim": [
+          "Fabricated numeric data"
+        ],
+        "source": [
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 622
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 911
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 212
+          }
+        ]
+      }
+    },
+    {
+      "category": "usage",
+      "slug": "usage-empty-store",
+      "feature_ids": [
+        "U02"
+      ],
+      "expected_controls": [
+        "No usage data yet",
+        "Hint names isolated store",
+        "Disabled export"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "handler": "body",
+          "line": 622,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/usage/view.rs#L622"
+        }
+      ],
+      "id": "V270",
+      "title": "Usage empty store",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Scan empty isolated session directory successfully; open Usage."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V270/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V270/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Usage source reviewer",
+        "evidence": "Complete domain fixture, capture steps, forbidden claims and exact Rust lines in usage-visual-source-review.json. Source branch reviewed; actual fixture/capture not executed."
+      },
+      "concrete_fixture_reference": "../usage-visual-source-review.json",
+      "independent_source_review": {
+        "id": "V270",
+        "verdict": "KEEP_WITH_RECIPE",
+        "fixture": "empty-readable-store",
+        "capture_steps": [
+          "Scan empty isolated session directory successfully; open Usage."
+        ],
+        "expected_visible": [
+          "No usage data yet",
+          "Hint names isolated store",
+          "Disabled export"
+        ],
+        "must_not_claim": [
+          "Numeric zeros pretending observed usage",
+          "Body retry"
+        ],
+        "source": [
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 679
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 1098
+          }
+        ]
+      }
+    },
+    {
+      "category": "usage",
+      "slug": "usage-unreadable-store",
+      "feature_ids": [
+        "U02"
+      ],
+      "expected_controls": [
+        "Unable to read usage data",
+        "Unreadable count and store hint",
+        "Header Refresh"
+      ],
+      "scope": "canonical",
+      "note": "Independent source challenge corrected first-pass expectations; no image comparison has run.",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "handler": "body",
+          "line": 622,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/usage/view.rs#L622"
+        }
+      ],
+      "id": "V271",
+      "title": "Usage unreadable store",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Publish empty index with unreadable_files=2, representing two malformed/unreadable fixture files."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V271/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V271/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Usage source reviewer",
+        "evidence": "Complete domain fixture, capture steps, forbidden claims and exact Rust lines in usage-visual-source-review.json. Source branch reviewed; actual fixture/capture not executed."
+      },
+      "concrete_fixture_reference": "../usage-visual-source-review.json",
+      "independent_source_review": {
+        "id": "V271",
+        "verdict": "CORRECT",
+        "fixture": "all-unreadable",
+        "capture_steps": [
+          "Publish empty index with unreadable_files=2, representing two malformed/unreadable fixture files."
+        ],
+        "expected_visible": [
+          "Unable to read usage data",
+          "Unreadable count and store hint",
+          "Header Refresh"
+        ],
+        "must_not_claim": [
+          "Body Retry/Try again: not rendered here",
+          "First-load scan-error branch"
+        ],
+        "source": [
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 665
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 212
+          }
+        ]
+      }
+    },
+    {
+      "category": "usage",
+      "slug": "usage-filtered-empty",
+      "feature_ids": [
+        "U03"
+      ],
+      "expected_controls": [
+        "No usage matches these filters",
+        "Active narrowing chips retained",
+        "Clear filters action",
+        "Disabled export"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "handler": "body",
+          "line": 622,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/usage/view.rs#L622"
+        }
+      ],
+      "id": "V272",
+      "title": "Usage filtered empty",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Select provider A and workspace B that have no intersection, but each exists globally."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V272/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V272/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Usage source reviewer",
+        "evidence": "Complete domain fixture, capture steps, forbidden claims and exact Rust lines in usage-visual-source-review.json. Source branch reviewed; actual fixture/capture not executed."
+      },
+      "concrete_fixture_reference": "../usage-visual-source-review.json",
+      "independent_source_review": {
+        "id": "V272",
+        "verdict": "KEEP_WITH_RECIPE",
+        "fixture": "core",
+        "capture_steps": [
+          "Select provider A and workspace B that have no intersection, but each exists globally."
+        ],
+        "expected_visible": [
+          "No usage matches these filters",
+          "Active narrowing chips retained",
+          "Clear filters action",
+          "Disabled export"
+        ],
+        "must_not_claim": [
+          "No usage data yet"
+        ],
+        "source": [
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 682
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 479
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 886
+          }
+        ]
+      }
+    },
+    {
+      "category": "usage",
+      "slug": "usage-refresh-prior-data",
+      "feature_ids": [
+        "U02"
+      ],
+      "expected_controls": [
+        "Previous statistics remain",
+        "Header Refreshing status and button",
+        "Existing filters and chart remain"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "handler": "body",
+          "line": 622,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/usage/view.rs#L622"
+        }
+      ],
+      "id": "V273",
+      "title": "Usage refresh prior data",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "First publish core index; request refresh and hold next scan result."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V273/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V273/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Usage source reviewer",
+        "evidence": "Complete domain fixture, capture steps, forbidden claims and exact Rust lines in usage-visual-source-review.json. Source branch reviewed; actual fixture/capture not executed."
+      },
+      "concrete_fixture_reference": "../usage-visual-source-review.json",
+      "independent_source_review": {
+        "id": "V273",
+        "verdict": "KEEP_WITH_RECIPE",
+        "fixture": "delayed-refresh",
+        "capture_steps": [
+          "First publish core index; request refresh and hold next scan result."
+        ],
+        "expected_visible": [
+          "Previous statistics remain",
+          "Header Refreshing status and button",
+          "Existing filters and chart remain"
+        ],
+        "must_not_claim": [
+          "First-load skeleton replacing prior data"
+        ],
+        "source": [
+          {
+            "path": "crates/orbit-pi/src/usage/page.rs",
+            "line": 1235
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 212
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 622
+          }
+        ]
+      }
+    },
+    {
+      "category": "usage",
+      "slug": "usage-refresh-error",
+      "feature_ids": [
+        "U02"
+      ],
+      "expected_controls": [
+        "NOT A REACHABLE PRODUCTION RUST STATE",
+        "The scanner sends UsageIndex, not Result; no previous-data refresh-failure branch with Retry exists"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "handler": "body",
+          "line": 622,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/usage/view.rs#L622"
+        }
+      ],
+      "id": "V274",
+      "title": "Usage refresh error",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated usage surface in fixture.json.",
+        "Configure the named source state: Usage refresh error.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "BLOCKED",
+      "blocker": "Excluded from source-parity capture until repurposed or superseded: source production state is unreachable; Go-only extra UI cannot establish Rust parity.",
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V274/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V274/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "BLOCKED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "UNREACHABLE_SOURCE_PRODUCTION",
+        "actual_state_verified": false,
+        "reviewer": "Independent Usage source reviewer",
+        "evidence": "usage/collect.rs83\u2013146 and page.rs1206: source scanner cannot produce the proposed prior-data error state."
+      },
+      "concrete_fixture_reference": "../usage-visual-source-review.json",
+      "independent_source_review": {
+        "id": "V274",
+        "verdict": "EXCLUDE_UNREACHABLE_INVENTED_COMBINATION",
+        "fixture": "none",
+        "capture_steps": [
+          "Do not manufacture a Rust baseline for previous-data plus refresh-error plus retry.",
+          "Scanner delivers UsageIndex only, not Result; page.error is only assigned when a new empty unreadable index arrives."
+        ],
+        "expected_visible": [
+          "No reachable source state established"
+        ],
+        "must_not_claim": [
+          "Refresh failure banner while prior data remains",
+          "Retry button alongside existing data"
+        ],
+        "source": [
+          {
+            "path": "crates/orbit-pi/src/usage/collect.rs",
+            "line": 83
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/page.rs",
+            "line": 1200
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/page.rs",
+            "line": 1235
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 622
+          }
+        ]
+      }
+    },
+    {
+      "category": "usage",
+      "slug": "usage-removed-session-notice",
+      "feature_ids": [
+        "U04"
+      ],
+      "expected_controls": [
+        "Header: That session is no longer in the store \u2014 scope cleared",
+        "Session chip removed",
+        "Remaining usage shown"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "handler": "body",
+          "line": 622,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/usage/view.rs#L622"
+        }
+      ],
+      "id": "V275",
+      "title": "Usage removed session notice",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Scope last session in index; remove that session from isolated store; refresh.",
+        "Capture within six seconds after new index publishes; keep other sessions present."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V275/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V275/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Usage source reviewer",
+        "evidence": "Complete domain fixture, capture steps, forbidden claims and exact Rust lines in usage-visual-source-review.json. Source branch reviewed; actual fixture/capture not executed."
+      },
+      "concrete_fixture_reference": "../usage-visual-source-review.json",
+      "independent_source_review": {
+        "id": "V275",
+        "verdict": "CORRECT",
+        "fixture": "core-plus-removal",
+        "capture_steps": [
+          "Scope last session in index; remove that session from isolated store; refresh.",
+          "Capture within six seconds after new index publishes; keep other sessions present."
+        ],
+        "expected_visible": [
+          "Header: That session is no longer in the store \u2014 scope cleared",
+          "Session chip removed",
+          "Remaining usage shown"
+        ],
+        "must_not_claim": [
+          "Missing-session modal",
+          "Open-session error fabricated by this Usage handler"
+        ],
+        "source": [
+          {
+            "path": "crates/orbit-pi/src/usage/page.rs",
+            "line": 1250
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/page.rs",
+            "line": 1224
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 212
+          }
+        ]
+      }
+    },
+    {
+      "category": "usage",
+      "slug": "usage-active-filter-chips",
+      "feature_ids": [
+        "U03"
+      ],
+      "expected_controls": [
+        "Provider, model, workspace removable chips",
+        "Separate time-focus removable chip",
+        "Clear all",
+        "Range selector remains above"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "handler": "body",
+          "line": 622,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/usage/view.rs#L622"
+        }
+      ],
+      "id": "V276",
+      "title": "Usage active filter chips",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Select matching provider/model/workspace values and click a populated trend bucket.",
+        "Keep active chips near viewport top."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V276/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V276/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Usage source reviewer",
+        "evidence": "Complete domain fixture, capture steps, forbidden claims and exact Rust lines in usage-visual-source-review.json. Source branch reviewed; actual fixture/capture not executed."
+      },
+      "concrete_fixture_reference": "../usage-visual-source-review.json",
+      "independent_source_review": {
+        "id": "V276",
+        "verdict": "CORRECT",
+        "fixture": "core",
+        "capture_steps": [
+          "Select matching provider/model/workspace values and click a populated trend bucket.",
+          "Keep active chips near viewport top."
+        ],
+        "expected_visible": [
+          "Provider, model, workspace removable chips",
+          "Separate time-focus removable chip",
+          "Clear all",
+          "Range selector remains above"
+        ],
+        "must_not_claim": [
+          "Ordinary range is a removable date chip",
+          "Error and cache chips simultaneously"
+        ],
+        "source": [
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 479
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 300
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/page.rs",
+            "line": 1870
+          }
+        ]
+      }
+    },
+    {
+      "category": "usage",
+      "slug": "usage-error-only",
+      "feature_ids": [
+        "U03"
+      ],
+      "expected_controls": [
+        "Failed requests chip",
+        "Error-scoped values",
+        "No Cached only chip"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "handler": "body",
+          "line": 622,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/usage/view.rs#L622"
+        }
+      ],
+      "id": "V277",
+      "title": "Usage error only",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Click failed-request action in Summary secondary strip; keep active filters visible."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V277/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V277/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Usage source reviewer",
+        "evidence": "Complete domain fixture, capture steps, forbidden claims and exact Rust lines in usage-visual-source-review.json. Source branch reviewed; actual fixture/capture not executed."
+      },
+      "concrete_fixture_reference": "../usage-visual-source-review.json",
+      "independent_source_review": {
+        "id": "V277",
+        "verdict": "CORRECT",
+        "fixture": "core",
+        "capture_steps": [
+          "Click failed-request action in Summary secondary strip; keep active filters visible."
+        ],
+        "expected_visible": [
+          "Failed requests chip",
+          "Error-scoped values",
+          "No Cached only chip"
+        ],
+        "must_not_claim": [
+          "Generic Filters checkbox menu absent from Rust"
+        ],
+        "source": [
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 1365
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 479
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/page.rs",
+            "line": 1869
+          }
+        ]
+      }
+    },
+    {
+      "category": "usage",
+      "slug": "usage-cache-only",
+      "feature_ids": [
+        "U03"
+      ],
+      "expected_controls": [
+        "Cached only chip",
+        "No Failed requests chip",
+        "When health action visible it reads Show all requests"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "handler": "body",
+          "line": 622,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/usage/view.rs#L622"
+        }
+      ],
+      "id": "V278",
+      "title": "Usage cache only",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "In Token health click Show cached only; capture active-filter region, or separately append health action view."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V278/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V278/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Usage source reviewer",
+        "evidence": "Complete domain fixture, capture steps, forbidden claims and exact Rust lines in usage-visual-source-review.json. Source branch reviewed; actual fixture/capture not executed."
+      },
+      "concrete_fixture_reference": "../usage-visual-source-review.json",
+      "independent_source_review": {
+        "id": "V278",
+        "verdict": "CORRECT",
+        "fixture": "core",
+        "capture_steps": [
+          "In Token health click Show cached only; capture active-filter region, or separately append health action view."
+        ],
+        "expected_visible": [
+          "Cached only chip",
+          "No Failed requests chip",
+          "When health action visible it reads Show all requests"
+        ],
+        "must_not_claim": [
+          "Generic Filters menu",
+          "Active chip and distant health action guaranteed in same viewport"
+        ],
+        "source": [
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 3072
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 479
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/page.rs",
+            "line": 1878
+          }
+        ]
+      }
+    },
+    {
+      "category": "usage",
+      "slug": "usage-export-menu",
+      "feature_ids": [
+        "U04"
+      ],
+      "expected_controls": [
+        "CSV filtered requests action plus explanatory subtitle",
+        "JSON current view action plus explanatory subtitle"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "handler": "body",
+          "line": 622,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/usage/view.rs#L622"
+        }
+      ],
+      "id": "V279",
+      "title": "Usage export menu",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Click header Export, leave popover open."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V279/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V279/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Usage source reviewer",
+        "evidence": "Complete domain fixture, capture steps, forbidden claims and exact Rust lines in usage-visual-source-review.json. Source branch reviewed; actual fixture/capture not executed."
+      },
+      "concrete_fixture_reference": "../usage-visual-source-review.json",
+      "independent_source_review": {
+        "id": "V279",
+        "verdict": "KEEP_WITH_RECIPE",
+        "fixture": "core",
+        "capture_steps": [
+          "Click header Export, leave popover open."
+        ],
+        "expected_visible": [
+          "CSV filtered requests action plus explanatory subtitle",
+          "JSON current view action plus explanatory subtitle"
+        ],
+        "must_not_claim": [
+          "Native save dialog already opened"
+        ],
+        "source": [
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 266
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/filters.rs",
+            "line": 455
+          }
+        ]
+      }
+    },
+    {
+      "category": "usage",
+      "slug": "usage-session-context-menu",
+      "feature_ids": [
+        "U04"
+      ],
+      "expected_controls": [
+        "Open session",
+        "Scope to session",
+        "Copy session ID",
+        "Filter by provider",
+        "Filter by model",
+        "Filter by workspace",
+        "Source separators"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "handler": "body",
+          "line": 622,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/usage/view.rs#L622"
+        }
+      ],
+      "id": "V280",
+      "title": "Usage session context menu",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Details Sessions; right-click an unscoped session with a known model; do not left-click first."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V280/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V280/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Usage source reviewer",
+        "evidence": "Complete domain fixture, capture steps, forbidden claims and exact Rust lines in usage-visual-source-review.json. Source branch reviewed; actual fixture/capture not executed."
+      },
+      "concrete_fixture_reference": "../usage-visual-source-review.json",
+      "independent_source_review": {
+        "id": "V280",
+        "verdict": "CORRECT",
+        "fixture": "core",
+        "capture_steps": [
+          "Details Sessions; right-click an unscoped session with a known model; do not left-click first."
+        ],
+        "expected_visible": [
+          "Open session",
+          "Scope to session",
+          "Copy session ID",
+          "Filter by provider",
+          "Filter by model",
+          "Filter by workspace",
+          "Source separators"
+        ],
+        "must_not_claim": [
+          "Right-click automatically selects/scopes session"
+        ],
+        "source": [
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 3920
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/view.rs",
+            "line": 4373
+          }
+        ]
+      }
+    },
+    {
+      "category": "usage",
+      "slug": "usage-date-preset-menu",
+      "feature_ids": [
+        "U03"
+      ],
+      "expected_controls": [
+        "Today, Yesterday, Last 7 days, Last 14 days, Last 30 days, This week, This month, Previous month, Custom, All time",
+        "Current selection mark",
+        "Source comparison hints"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/filters.rs",
+          "handler": "range_menu",
+          "line": 863,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/usage/filters.rs#L863"
+        }
+      ],
+      "id": "V281",
+      "title": "Usage date preset menu",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Click date range selector with Last 7 days current."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V281/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V281/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Usage source reviewer",
+        "evidence": "Complete domain fixture, capture steps, forbidden claims and exact Rust lines in usage-visual-source-review.json. Source branch reviewed; actual fixture/capture not executed."
+      },
+      "concrete_fixture_reference": "../usage-visual-source-review.json",
+      "independent_source_review": {
+        "id": "V281",
+        "verdict": "KEEP_WITH_RECIPE",
+        "fixture": "core",
+        "capture_steps": [
+          "Click date range selector with Last 7 days current."
+        ],
+        "expected_visible": [
+          "Today, Yesterday, Last 7 days, Last 14 days, Last 30 days, This week, This month, Previous month, Custom, All time",
+          "Current selection mark",
+          "Source comparison hints"
+        ],
+        "must_not_claim": [
+          "Calendar shown before Custom chosen"
+        ],
+        "source": [
+          {
+            "path": "crates/orbit-pi/src/usage/filters.rs",
+            "line": 863
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/model.rs",
+            "line": 90
+          }
+        ]
+      }
+    },
+    {
+      "category": "usage",
+      "slug": "usage-custom-calendar-start",
+      "feature_ids": [
+        "U03"
+      ],
+      "expected_controls": [
+        "Preset list remains",
+        "Month previous/next",
+        "Monday-first weekday row",
+        "Day12 selected, no end",
+        "Pick the end date"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/filters.rs",
+          "handler": "calendar",
+          "line": 921,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/usage/filters.rs#L921"
+        }
+      ],
+      "id": "V282",
+      "title": "Usage custom calendar start",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open range, Custom; navigate to October2026; click day12 once."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V282/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V282/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Usage source reviewer",
+        "evidence": "Complete domain fixture, capture steps, forbidden claims and exact Rust lines in usage-visual-source-review.json. Source branch reviewed; actual fixture/capture not executed."
+      },
+      "concrete_fixture_reference": "../usage-visual-source-review.json",
+      "independent_source_review": {
+        "id": "V282",
+        "verdict": "KEEP_WITH_RECIPE",
+        "fixture": "core",
+        "capture_steps": [
+          "Open range, Custom; navigate to October2026; click day12 once."
+        ],
+        "expected_visible": [
+          "Preset list remains",
+          "Month previous/next",
+          "Monday-first weekday row",
+          "Day12 selected, no end",
+          "Pick the end date"
+        ],
+        "must_not_claim": [
+          "Separate modal",
+          "Apply or Clear controls"
+        ],
+        "source": [
+          {
+            "path": "crates/orbit-pi/src/usage/filters.rs",
+            "line": 863
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/filters.rs",
+            "line": 921
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/page.rs",
+            "line": 1719
+          }
+        ]
+      }
+    },
+    {
+      "category": "usage",
+      "slug": "usage-custom-calendar-range",
+      "feature_ids": [
+        "U03"
+      ],
+      "expected_controls": [
+        "Start/end day fills",
+        "In-range shading",
+        "Selected range label footer",
+        "Month navigation"
+      ],
+      "scope": "canonical",
+      "note": "Independent source challenge corrected first-pass expectations; no image comparison has run.",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/filters.rs",
+          "handler": "calendar",
+          "line": 921,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/usage/filters.rs#L921"
+        }
+      ],
+      "id": "V283",
+      "title": "Usage custom calendar range",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Choose October12 then October18: second click auto-applies and closes.",
+        "Reopen range and Custom to capture completed range."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V283/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V283/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Usage source reviewer",
+        "evidence": "Complete domain fixture, capture steps, forbidden claims and exact Rust lines in usage-visual-source-review.json. Source branch reviewed; actual fixture/capture not executed."
+      },
+      "concrete_fixture_reference": "../usage-visual-source-review.json",
+      "independent_source_review": {
+        "id": "V283",
+        "verdict": "CORRECT",
+        "fixture": "core",
+        "capture_steps": [
+          "Choose October12 then October18: second click auto-applies and closes.",
+          "Reopen range and Custom to capture completed range."
+        ],
+        "expected_visible": [
+          "Start/end day fills",
+          "In-range shading",
+          "Selected range label footer",
+          "Month navigation"
+        ],
+        "must_not_claim": [
+          "Open pending Apply state immediately after second click",
+          "Apply/Clear footer buttons"
+        ],
+        "source": [
+          {
+            "path": "crates/orbit-pi/src/usage/page.rs",
+            "line": 1697
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/page.rs",
+            "line": 1719
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/page.rs",
+            "line": 1744
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/filters.rs",
+            "line": 1080
+          }
+        ]
+      }
+    },
+    {
+      "category": "usage",
+      "slug": "usage-provider-filter-popup",
+      "feature_ids": [
+        "U03"
+      ],
+      "expected_controls": [
+        "Focused search",
+        "All row",
+        "Provider rows with checks and keyboard highlight",
+        "Select all and Clear footer"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/filters.rs",
+          "handler": "multi_menu",
+          "line": 353,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/usage/filters.rs#L353"
+        }
+      ],
+      "id": "V284",
+      "title": "Usage provider filter popup",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open Provider; select provider A; leave menu open and focus a list row with ArrowDown."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V284/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V284/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Usage source reviewer",
+        "evidence": "Complete domain fixture, capture steps, forbidden claims and exact Rust lines in usage-visual-source-review.json. Source branch reviewed; actual fixture/capture not executed."
+      },
+      "concrete_fixture_reference": "../usage-visual-source-review.json",
+      "independent_source_review": {
+        "id": "V284",
+        "verdict": "KEEP_WITH_RECIPE",
+        "fixture": "core",
+        "capture_steps": [
+          "Open Provider; select provider A; leave menu open and focus a list row with ArrowDown."
+        ],
+        "expected_visible": [
+          "Focused search",
+          "All row",
+          "Provider rows with checks and keyboard highlight",
+          "Select all and Clear footer"
+        ],
+        "must_not_claim": [
+          "Exclusive single-select behavior"
+        ],
+        "source": [
+          {
+            "path": "crates/orbit-pi/src/usage/filters.rs",
+            "line": 353
+          },
+          {
+            "path": "crates/orbit-pi/src/usage/page.rs",
+            "line": 1626
+          }
+        ]
+      }
+    }
+  ]
+}

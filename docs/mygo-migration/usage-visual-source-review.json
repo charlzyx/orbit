@@ -1,0 +1,1430 @@
+{
+  "schema_version": 1,
+  "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "reviewed_at": "2026-10-25T06:23:00Z",
+  "scope": "Independent source challenge of original V260–V304. Does not mark any case visually passed. Auditor owns stable ID changes.",
+  "shared_capture_contract": "Use visual/fixture.json full1470x922 client, UTC clock, en/dark, actual font hashes. No scaling. Menu+scroll views need actual bounds verified. Source branch inventory is not screenshot evidence.",
+  "fixtures": {
+    "core": "Isolated sessions: s-alpha (title Alpha, workspaceA, providerA/shared-model), s-beta (Beta, workspaceB, providerB/shared-model), s-gamma (Gamma, workspaceA, providerA/model-x), s-removable last. Fixed UTC2026-10-25T12:00Z. At least one request per day Oct19–25 and earlier Oct12–18. Explicit input/output/cacheRead/cacheWrite tokens, known prices on most requests, positive timestamp-gap duration on measured requests. One provider error, one tool failure, one abort, two named tools. Preserve genuine absence of other fields. Requests/providers/models/workspaces interned from actual JSONL; do not fake screen labels.",
+    "comparison": "core plus previous Oct12–18 tokens materially lower than Oct19–25 and one provider dominant; ensure compute produces source insight rows rather than directly inserting display strings.",
+    "fully-priced": "core with every request explicitly cost-bearing; no invented coverage badge.",
+    "partly-priced": "core with only some requests explicitly cost-bearing; retain unpriced request counts, no zero-cost imputation.",
+    "latency-20": "At least20 timed requests in displayed window AND in selected plotted buckets for genuine per-bucket p95; durations1s through20s, source nearest-rank p95=19s. Include source measured metadata.",
+    "many-sessions": "31 distinct sessions s01–s31, titles Session01–Session31 and distinct totals for deterministic token-desc order; page size10; Last7 and no narrowing.",
+    "core-plus-removal": "core; scope last session then remove only that fixture session before scan, leaving globally valid providers/models/workspaces and remaining data.",
+    "empty-readable-store": "Empty isolated directory scanned successfully.",
+    "all-unreadable": "Two isolated session files unparseable/unreadable under scanner semantics, index empty/unreadable_files=2. Fixture harness must validate result rather than assume arbitrary malformed JSON counts.",
+    "delayed-first-index": "Scanner seam holds initial UsageIndex delivery, no prior index. Freeze animation phase explicitly.",
+    "delayed-refresh": "Publish core then hold next UsageIndex delivery after Refresh. Keep previous index untouched.",
+    "none": "No source fixture can produce claimed combination; do not create fake screenshot."
+  },
+  "cases": [
+    {
+      "id": "V260",
+      "verdict": "KEEP_WITH_RECIPE",
+      "fixture": "core",
+      "capture_steps": [
+        "Open Usage, Simple, Last 7 days; keep scroll at top.",
+        "Capture full client; do not claim trend if below viewport."
+      ],
+      "expected_visible": [
+        "Header Export and Refresh",
+        "Range, Workspace, Provider, Model controls",
+        "Simple selected",
+        "Daily activity heatmap",
+        "Summary board: Requests, Total tokens, Cache hit rate, Avg response",
+        "Summary secondary strip"
+      ],
+      "must_not_claim": [
+        "All lower cards simultaneously visible"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 212
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 300
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 700
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 1284
+        }
+      ]
+    },
+    {
+      "id": "V261",
+      "verdict": "KEEP_WITH_RECIPE",
+      "fixture": "comparison",
+      "capture_steps": [
+        "Simple, Last 7 days.",
+        "Scroll so Signals and Token health are visible; if their complete bounds exceed client height use separate appended capture."
+      ],
+      "expected_visible": [
+        "Source-generated insight rows",
+        "Input/output/cache-read/cache-write composition",
+        "Cache hit-rate details and Show cached only",
+        "Hit-rate trend when at least two readable buckets"
+      ],
+      "must_not_claim": [
+        "Signals for arbitrary data: conditional on insights",
+        "Always-present token health: conditional on tokens/cache"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 700
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 1511
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 2926
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 3072
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 3206
+        }
+      ]
+    },
+    {
+      "id": "V262",
+      "verdict": "KEEP_WITH_RECIPE",
+      "fixture": "core",
+      "capture_steps": [
+        "Details; Breakdown Models.",
+        "Scroll to Breakdown heading."
+      ],
+      "expected_visible": [
+        "Models selected among Models/Workspaces/Providers/Tools",
+        "Ranked model bars",
+        "Search and Columns",
+        "Model rows, totals and paging"
+      ],
+      "must_not_claim": [
+        "Every optional column at every width"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 2307
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 2582
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 3672
+        }
+      ]
+    },
+    {
+      "id": "V263",
+      "verdict": "KEEP_WITH_RECIPE",
+      "fixture": "core",
+      "capture_steps": [
+        "Details; Breakdown Workspaces.",
+        "Scroll to Breakdown heading."
+      ],
+      "expected_visible": [
+        "Workspaces selected",
+        "Ranked workspace bars",
+        "Search, Columns, table, totals, paging"
+      ],
+      "must_not_claim": [],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 2307
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 2702
+        }
+      ]
+    },
+    {
+      "id": "V264",
+      "verdict": "KEEP_WITH_RECIPE",
+      "fixture": "core",
+      "capture_steps": [
+        "Details; Breakdown Providers.",
+        "Scroll to Breakdown heading."
+      ],
+      "expected_visible": [
+        "Providers selected",
+        "Ranked provider bars",
+        "Search, Columns, table, totals, paging"
+      ],
+      "must_not_claim": [],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 2307
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 2702
+        }
+      ]
+    },
+    {
+      "id": "V265",
+      "verdict": "KEEP_WITH_RECIPE",
+      "fixture": "core",
+      "capture_steps": [
+        "Details; Breakdown Tools.",
+        "Scroll to Breakdown heading."
+      ],
+      "expected_visible": [
+        "Tools selected",
+        "Ranked tool call bars",
+        "Search, Columns, tool-specific columns, totals, paging"
+      ],
+      "must_not_claim": [
+        "Reuse request/token columns as tool schema"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 2307
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 2765
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 2819
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 3729
+        }
+      ]
+    },
+    {
+      "id": "V266",
+      "verdict": "KEEP_WITH_RECIPE",
+      "fixture": "core",
+      "capture_steps": [
+        "Details; Records Sessions.",
+        "Scroll Records heading to top of content."
+      ],
+      "expected_visible": [
+        "Sessions selected",
+        "Search, Columns",
+        "Responsive source column plan including trailing Open",
+        "Totals distinguish filtered set and current page",
+        "Page-size and navigation controls"
+      ],
+      "must_not_claim": [
+        "All 13 enum columns forced visible: responsive plan has 12 named columns plus Open; Tools enum not admitted"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 3296
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 3453
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 3583
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 4171
+        }
+      ]
+    },
+    {
+      "id": "V267",
+      "verdict": "KEEP_WITH_RECIPE",
+      "fixture": "core",
+      "capture_steps": [
+        "Details; Records Daily; Last 7 days.",
+        "Scroll Records heading to top."
+      ],
+      "expected_visible": [
+        "Daily selected",
+        "Date/day bucket schema",
+        "Independent search, Columns, totals, page-size and pager"
+      ],
+      "must_not_claim": [
+        "All-time necessarily daily: granularity adapts to range"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 3296
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 3498
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 3757
+        }
+      ]
+    },
+    {
+      "id": "V268",
+      "verdict": "KEEP_WITH_RECIPE",
+      "fixture": "core",
+      "capture_steps": [
+        "Details; Records Failures.",
+        "Scroll Records heading to top."
+      ],
+      "expected_visible": [
+        "Failures selected",
+        "Provider/tool/stopped metadata",
+        "When/session/provider/model/type/message source columns",
+        "Search, Columns, totals, pager and retry explanation"
+      ],
+      "must_not_claim": [
+        "Failure-row detail modal: no source click handler"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 3296
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 3539
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 3848
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 4030
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 4914
+        }
+      ]
+    },
+    {
+      "id": "V269",
+      "verdict": "KEEP_WITH_RECIPE",
+      "fixture": "delayed-first-index",
+      "capture_steps": [
+        "Hold initial scan result before publication; open Usage Simple.",
+        "Capture before first index arrives."
+      ],
+      "expected_visible": [
+        "Source skeleton cards",
+        "Header and range/mode controls",
+        "Disabled export"
+      ],
+      "must_not_claim": [
+        "Fabricated numeric data"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 622
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 911
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 212
+        }
+      ]
+    },
+    {
+      "id": "V270",
+      "verdict": "KEEP_WITH_RECIPE",
+      "fixture": "empty-readable-store",
+      "capture_steps": [
+        "Scan empty isolated session directory successfully; open Usage."
+      ],
+      "expected_visible": [
+        "No usage data yet",
+        "Hint names isolated store",
+        "Disabled export"
+      ],
+      "must_not_claim": [
+        "Numeric zeros pretending observed usage",
+        "Body retry"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 679
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 1098
+        }
+      ]
+    },
+    {
+      "id": "V271",
+      "verdict": "CORRECT",
+      "fixture": "all-unreadable",
+      "capture_steps": [
+        "Publish empty index with unreadable_files=2, representing two malformed/unreadable fixture files."
+      ],
+      "expected_visible": [
+        "Unable to read usage data",
+        "Unreadable count and store hint",
+        "Header Refresh"
+      ],
+      "must_not_claim": [
+        "Body Retry/Try again: not rendered here",
+        "First-load scan-error branch"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 665
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 212
+        }
+      ]
+    },
+    {
+      "id": "V272",
+      "verdict": "KEEP_WITH_RECIPE",
+      "fixture": "core",
+      "capture_steps": [
+        "Select provider A and workspace B that have no intersection, but each exists globally."
+      ],
+      "expected_visible": [
+        "No usage matches these filters",
+        "Active narrowing chips retained",
+        "Clear filters action",
+        "Disabled export"
+      ],
+      "must_not_claim": [
+        "No usage data yet"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 682
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 479
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 886
+        }
+      ]
+    },
+    {
+      "id": "V273",
+      "verdict": "KEEP_WITH_RECIPE",
+      "fixture": "delayed-refresh",
+      "capture_steps": [
+        "First publish core index; request refresh and hold next scan result."
+      ],
+      "expected_visible": [
+        "Previous statistics remain",
+        "Header Refreshing status and button",
+        "Existing filters and chart remain"
+      ],
+      "must_not_claim": [
+        "First-load skeleton replacing prior data"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/page.rs",
+          "line": 1235
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 212
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 622
+        }
+      ]
+    },
+    {
+      "id": "V274",
+      "verdict": "EXCLUDE_UNREACHABLE_INVENTED_COMBINATION",
+      "fixture": "none",
+      "capture_steps": [
+        "Do not manufacture a Rust baseline for previous-data plus refresh-error plus retry.",
+        "Scanner delivers UsageIndex only, not Result; page.error is only assigned when a new empty unreadable index arrives."
+      ],
+      "expected_visible": [
+        "No reachable source state established"
+      ],
+      "must_not_claim": [
+        "Refresh failure banner while prior data remains",
+        "Retry button alongside existing data"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/collect.rs",
+          "line": 83
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/page.rs",
+          "line": 1200
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/page.rs",
+          "line": 1235
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 622
+        }
+      ]
+    },
+    {
+      "id": "V275",
+      "verdict": "CORRECT",
+      "fixture": "core-plus-removal",
+      "capture_steps": [
+        "Scope last session in index; remove that session from isolated store; refresh.",
+        "Capture within six seconds after new index publishes; keep other sessions present."
+      ],
+      "expected_visible": [
+        "Header: That session is no longer in the store — scope cleared",
+        "Session chip removed",
+        "Remaining usage shown"
+      ],
+      "must_not_claim": [
+        "Missing-session modal",
+        "Open-session error fabricated by this Usage handler"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/page.rs",
+          "line": 1250
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/page.rs",
+          "line": 1224
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 212
+        }
+      ]
+    },
+    {
+      "id": "V276",
+      "verdict": "CORRECT",
+      "fixture": "core",
+      "capture_steps": [
+        "Select matching provider/model/workspace values and click a populated trend bucket.",
+        "Keep active chips near viewport top."
+      ],
+      "expected_visible": [
+        "Provider, model, workspace removable chips",
+        "Separate time-focus removable chip",
+        "Clear all",
+        "Range selector remains above"
+      ],
+      "must_not_claim": [
+        "Ordinary range is a removable date chip",
+        "Error and cache chips simultaneously"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 479
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 300
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/page.rs",
+          "line": 1870
+        }
+      ]
+    },
+    {
+      "id": "V277",
+      "verdict": "CORRECT",
+      "fixture": "core",
+      "capture_steps": [
+        "Click failed-request action in Summary secondary strip; keep active filters visible."
+      ],
+      "expected_visible": [
+        "Failed requests chip",
+        "Error-scoped values",
+        "No Cached only chip"
+      ],
+      "must_not_claim": [
+        "Generic Filters checkbox menu absent from Rust"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 1365
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 479
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/page.rs",
+          "line": 1869
+        }
+      ]
+    },
+    {
+      "id": "V278",
+      "verdict": "CORRECT",
+      "fixture": "core",
+      "capture_steps": [
+        "In Token health click Show cached only; capture active-filter region, or separately append health action view."
+      ],
+      "expected_visible": [
+        "Cached only chip",
+        "No Failed requests chip",
+        "When health action visible it reads Show all requests"
+      ],
+      "must_not_claim": [
+        "Generic Filters menu",
+        "Active chip and distant health action guaranteed in same viewport"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 3072
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 479
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/page.rs",
+          "line": 1878
+        }
+      ]
+    },
+    {
+      "id": "V279",
+      "verdict": "KEEP_WITH_RECIPE",
+      "fixture": "core",
+      "capture_steps": [
+        "Click header Export, leave popover open."
+      ],
+      "expected_visible": [
+        "CSV filtered requests action plus explanatory subtitle",
+        "JSON current view action plus explanatory subtitle"
+      ],
+      "must_not_claim": [
+        "Native save dialog already opened"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 266
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/filters.rs",
+          "line": 455
+        }
+      ]
+    },
+    {
+      "id": "V280",
+      "verdict": "CORRECT",
+      "fixture": "core",
+      "capture_steps": [
+        "Details Sessions; right-click an unscoped session with a known model; do not left-click first."
+      ],
+      "expected_visible": [
+        "Open session",
+        "Scope to session",
+        "Copy session ID",
+        "Filter by provider",
+        "Filter by model",
+        "Filter by workspace",
+        "Source separators"
+      ],
+      "must_not_claim": [
+        "Right-click automatically selects/scopes session"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 3920
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 4373
+        }
+      ]
+    },
+    {
+      "id": "V281",
+      "verdict": "KEEP_WITH_RECIPE",
+      "fixture": "core",
+      "capture_steps": [
+        "Click date range selector with Last 7 days current."
+      ],
+      "expected_visible": [
+        "Today, Yesterday, Last 7 days, Last 14 days, Last 30 days, This week, This month, Previous month, Custom, All time",
+        "Current selection mark",
+        "Source comparison hints"
+      ],
+      "must_not_claim": [
+        "Calendar shown before Custom chosen"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/filters.rs",
+          "line": 863
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/model.rs",
+          "line": 90
+        }
+      ]
+    },
+    {
+      "id": "V282",
+      "verdict": "KEEP_WITH_RECIPE",
+      "fixture": "core",
+      "capture_steps": [
+        "Open range, Custom; navigate to October2026; click day12 once."
+      ],
+      "expected_visible": [
+        "Preset list remains",
+        "Month previous/next",
+        "Monday-first weekday row",
+        "Day12 selected, no end",
+        "Pick the end date"
+      ],
+      "must_not_claim": [
+        "Separate modal",
+        "Apply or Clear controls"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/filters.rs",
+          "line": 863
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/filters.rs",
+          "line": 921
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/page.rs",
+          "line": 1719
+        }
+      ]
+    },
+    {
+      "id": "V283",
+      "verdict": "CORRECT",
+      "fixture": "core",
+      "capture_steps": [
+        "Choose October12 then October18: second click auto-applies and closes.",
+        "Reopen range and Custom to capture completed range."
+      ],
+      "expected_visible": [
+        "Start/end day fills",
+        "In-range shading",
+        "Selected range label footer",
+        "Month navigation"
+      ],
+      "must_not_claim": [
+        "Open pending Apply state immediately after second click",
+        "Apply/Clear footer buttons"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/page.rs",
+          "line": 1697
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/page.rs",
+          "line": 1719
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/page.rs",
+          "line": 1744
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/filters.rs",
+          "line": 1080
+        }
+      ]
+    },
+    {
+      "id": "V284",
+      "verdict": "KEEP_WITH_RECIPE",
+      "fixture": "core",
+      "capture_steps": [
+        "Open Provider; select provider A; leave menu open and focus a list row with ArrowDown."
+      ],
+      "expected_visible": [
+        "Focused search",
+        "All row",
+        "Provider rows with checks and keyboard highlight",
+        "Select all and Clear footer"
+      ],
+      "must_not_claim": [
+        "Exclusive single-select behavior"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/filters.rs",
+          "line": 353
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/page.rs",
+          "line": 1626
+        }
+      ]
+    },
+    {
+      "id": "V285",
+      "verdict": "KEEP_WITH_RECIPE",
+      "fixture": "core",
+      "capture_steps": [
+        "Open Model; select providerA/shared-model, not providerB/shared-model."
+      ],
+      "expected_visible": [
+        "Search, All, Select all, Clear",
+        "Duplicate model IDs distinguishable by provider subtitle",
+        "Only selected pair checked"
+      ],
+      "must_not_claim": [
+        "Raw model ID conflates providers"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/filters.rs",
+          "line": 353
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/filters.rs",
+          "line": 1200
+        }
+      ]
+    },
+    {
+      "id": "V286",
+      "verdict": "KEEP_WITH_RECIPE",
+      "fixture": "core",
+      "capture_steps": [
+        "Open Workspace; select workspace A, leave popup open."
+      ],
+      "expected_visible": [
+        "Search, All, workspace rows, checkmarks",
+        "Select all and Clear"
+      ],
+      "must_not_claim": [],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/filters.rs",
+          "line": 353
+        }
+      ]
+    },
+    {
+      "id": "V287",
+      "verdict": "KEEP_WITH_RECIPE",
+      "fixture": "core",
+      "capture_steps": [
+        "Select provider A; open Provider and type zz-no-match."
+      ],
+      "expected_visible": [
+        "Query retained",
+        "All row remains",
+        "No match for “zz-no-match”",
+        "Select all and Clear footer",
+        "Underlying selected chip persists"
+      ],
+      "must_not_claim": [
+        "All options including All disappear",
+        "Selection lost because search has no results"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/filters.rs",
+          "line": 353
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/filters.rs",
+          "line": 413
+        }
+      ]
+    },
+    {
+      "id": "V288",
+      "verdict": "KEEP_WITH_RECIPE",
+      "fixture": "core",
+      "capture_steps": [
+        "Simple; scroll to Trend; choose Tokens."
+      ],
+      "expected_visible": [
+        "Tokens active in eight-way segmented selector",
+        "Source five y labels and adaptive x labels",
+        "Filled area and straight stroke",
+        "Latency response line when timed data exists"
+      ],
+      "must_not_claim": [],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 1550
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/chart.rs",
+          "line": 103
+        }
+      ]
+    },
+    {
+      "id": "V289",
+      "verdict": "KEEP_WITH_RECIPE",
+      "fixture": "core",
+      "capture_steps": [
+        "Simple; scroll to Trend; choose Requests."
+      ],
+      "expected_visible": [
+        "Requests active in eight-way segmented selector",
+        "Source five y labels and adaptive x labels",
+        "Filled area and straight stroke",
+        "Latency response line when timed data exists"
+      ],
+      "must_not_claim": [],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 1550
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/chart.rs",
+          "line": 103
+        }
+      ]
+    },
+    {
+      "id": "V290",
+      "verdict": "SPLIT",
+      "fixture": "core",
+      "capture_steps": [
+        "Simple; scroll to Trend; choose Input."
+      ],
+      "expected_visible": [
+        "Input active in eight-way segmented selector",
+        "Source five y labels and adaptive x labels",
+        "Filled area and straight stroke",
+        "Latency response line when timed data exists"
+      ],
+      "must_not_claim": [
+        "Output and Cached simultaneously active; append separate cases"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 1550
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/chart.rs",
+          "line": 103
+        }
+      ]
+    },
+    {
+      "id": "V291",
+      "verdict": "KEEP_WITH_RECIPE",
+      "fixture": "fully-priced",
+      "capture_steps": [
+        "Simple; scroll to Trend; choose Cost."
+      ],
+      "expected_visible": [
+        "Cost active in eight-way segmented selector",
+        "Source five y labels and adaptive x labels",
+        "Filled area and straight stroke",
+        "Latency response line when timed data exists"
+      ],
+      "must_not_claim": [
+        "Partial/complete coverage badge"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 1550
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/chart.rs",
+          "line": 103
+        }
+      ]
+    },
+    {
+      "id": "V292",
+      "verdict": "CORRECT",
+      "fixture": "partly-priced",
+      "capture_steps": [
+        "Simple Trend; choose Cost with one priced and one unpriced request in same window."
+      ],
+      "expected_visible": [
+        "Cost selectable because priced_requests>0",
+        "Only known cost subtotal plotted"
+      ],
+      "must_not_claim": [
+        "Partial-pricing warning/badge: not rendered",
+        "Fully unavailable Cost is this same state"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 1550
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 1678
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 5151
+        }
+      ]
+    },
+    {
+      "id": "V293",
+      "verdict": "KEEP_WITH_RECIPE",
+      "fixture": "core",
+      "capture_steps": [
+        "Simple; scroll to Trend; choose Latency."
+      ],
+      "expected_visible": [
+        "Latency active in eight-way segmented selector",
+        "Source five y labels and adaptive x labels",
+        "Filled area and straight stroke",
+        "Latency response line when timed data exists"
+      ],
+      "must_not_claim": [],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 1550
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/chart.rs",
+          "line": 103
+        }
+      ]
+    },
+    {
+      "id": "V294",
+      "verdict": "CORRECT",
+      "fixture": "latency-20",
+      "capture_steps": [
+        "Simple Trend; choose Latency, then p95 in inline selector."
+      ],
+      "expected_visible": [
+        "Average, p50, p95, p99 segments",
+        "p95 selected",
+        "Duration axis",
+        "Measured-response summary"
+      ],
+      "must_not_claim": [
+        "Dropdown popup",
+        "Percentiles enabled with fewer than20 samples"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 1584
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 2246
+        }
+      ]
+    },
+    {
+      "id": "V295",
+      "verdict": "KEEP_WITH_RECIPE",
+      "fixture": "core",
+      "capture_steps": [
+        "Simple; scroll to Trend; choose Errors."
+      ],
+      "expected_visible": [
+        "Errors active in eight-way segmented selector",
+        "Source five y labels and adaptive x labels",
+        "Filled area and straight stroke",
+        "Latency response line when timed data exists"
+      ],
+      "must_not_claim": [],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 1550
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/chart.rs",
+          "line": 103
+        }
+      ]
+    },
+    {
+      "id": "V296",
+      "verdict": "CORRECT",
+      "fixture": "core",
+      "capture_steps": [
+        "Simple Trend Tokens; click bucket October22, leave pointer over same bucket."
+      ],
+      "expected_visible": [
+        "Selected time-focus band",
+        "Hover marker and readout card",
+        "Exact bucket readout",
+        "Focus chip above if viewport permits"
+      ],
+      "must_not_claim": [
+        "Rust keyboard-selected band: timeline has only mouse handlers"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/chart.rs",
+          "line": 175
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/chart.rs",
+          "line": 103
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 1626
+        }
+      ]
+    },
+    {
+      "id": "V297",
+      "verdict": "KEEP_WITH_RECIPE",
+      "fixture": "core",
+      "capture_steps": [
+        "Hover then click active heatmap day October22; leave pointer there."
+      ],
+      "expected_visible": [
+        "Day selected outline",
+        "Day tooltip and metric readout",
+        "Monday-first grid, month labels",
+        "Padding outside calendar has no fabricated activity"
+      ],
+      "must_not_claim": [
+        "Keyboard heatmap navigation as Rust baseline"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/heatmap.rs",
+          "line": 130
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 1700
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/page.rs",
+          "line": 1758
+        }
+      ]
+    },
+    {
+      "id": "V298",
+      "verdict": "KEEP_WITH_RECIPE",
+      "fixture": "core",
+      "capture_steps": [
+        "Details Sessions; type Alpha in session search; scroll table into view."
+      ],
+      "expected_visible": [
+        "Query Alpha",
+        "Only matching sessions",
+        "Matched/total count",
+        "Filtered totals and pager reset to page1"
+      ],
+      "must_not_claim": [
+        "Global filter changed by table search"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 3296
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/page.rs",
+          "line": 79
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 4135
+        }
+      ]
+    },
+    {
+      "id": "V299",
+      "verdict": "KEEP_WITH_RECIPE",
+      "fixture": "core",
+      "capture_steps": [
+        "Details Sessions; type zz-no-match; scroll table into view."
+      ],
+      "expected_visible": [
+        "Query retained",
+        "No sessions match search in table viewport",
+        "No matching rows",
+        "Pagination/metadata appropriate to zero results"
+      ],
+      "must_not_claim": [
+        "Whole-page filtered-empty message replacing table"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 3453
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 3296
+        }
+      ]
+    },
+    {
+      "id": "V300",
+      "verdict": "SPLIT",
+      "fixture": "core",
+      "capture_steps": [
+        "Details Sessions; click Title header from default Tokens descending once."
+      ],
+      "expected_visible": [
+        "Title ascending caret",
+        "Title-ascending rows",
+        "Other headers neutral"
+      ],
+      "must_not_claim": [
+        "Ascending/descending/default active simultaneously; append Title descending and default-reset captures"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/table.rs",
+          "line": 54
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 3453
+        }
+      ]
+    },
+    {
+      "id": "V301",
+      "verdict": "KEEP_WITH_RECIPE",
+      "fixture": "core",
+      "capture_steps": [
+        "Details Sessions; click Columns; keep native/source popup visible."
+      ],
+      "expected_visible": [
+        "Source Sessions column titles",
+        "Shown checkmarks",
+        "Reset columns action"
+      ],
+      "must_not_claim": [
+        "Headless MyGoTester Menu() metadata counts as painted native popup"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 4096
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/filters.rs",
+          "line": 523
+        }
+      ]
+    },
+    {
+      "id": "V302",
+      "verdict": "KEEP_WITH_RECIPE",
+      "fixture": "core",
+      "capture_steps": [
+        "Details Sessions; hide Workspace via Columns and dismiss; drag Provider divider to156px.",
+        "Ensure enough width for Provider in source responsive plan."
+      ],
+      "expected_visible": [
+        "Workspace header/cells absent",
+        "Provider width override156px",
+        "Aligned cells and remaining headers"
+      ],
+      "must_not_claim": [
+        "Hidden column still consumes width",
+        "Resize state proves persistence without reload test"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 3583
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/table.rs",
+          "line": 273
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/page.rs",
+          "line": 2228
+        }
+      ]
+    },
+    {
+      "id": "V303",
+      "verdict": "KEEP_WITH_RECIPE",
+      "fixture": "many-sessions",
+      "capture_steps": [
+        "Details Sessions; current page size10; click rows-per-page trigger."
+      ],
+      "expected_visible": [
+        "10,25,50,100 options",
+        "10 checked",
+        "Associated table footer"
+      ],
+      "must_not_claim": [
+        "All five independent table menus covered by this single capture"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/filters.rs",
+          "line": 494
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 4171
+        }
+      ]
+    },
+    {
+      "id": "V304",
+      "verdict": "CORRECT",
+      "fixture": "many-sessions",
+      "capture_steps": [
+        "Details Sessions; page size10, no scope; click Next once; do not select row."
+      ],
+      "expected_visible": [
+        "Page2 rows11–20",
+        "Previous enabled, Next enabled with31 sessions",
+        "No session-scope chip or selected scoped row"
+      ],
+      "must_not_claim": [
+        "Selected scoped session on page2: row click filters and resets page1; append separate selected-page1 case"
+      ],
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 4171
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/view.rs",
+          "line": 3920
+        },
+        {
+          "path": "crates/orbit-pi/src/usage/page.rs",
+          "line": 1580
+        }
+      ]
+    }
+  ],
+  "additional_required_candidates": [
+    {
+      "slug": "usage-first-load-error-branch",
+      "reason": "view.rs635 offers Try again when indexNone/errorSome, but no production setter found: collect only returns UsageIndex and page.error is set alongside Some(index). Render-harness-only branch, not validated reachable native workflow."
+    },
+    {
+      "slug": "usage-chart-output",
+      "reason": "Split V290; Output selected."
+    },
+    {
+      "slug": "usage-chart-cache",
+      "reason": "Split V290; Cached selected."
+    },
+    {
+      "slug": "usage-chart-cost-unavailable",
+      "reason": "All requests lack cost; Cost disabled, unavailable reason; do not fake selectedCost on invalid fixture."
+    },
+    {
+      "slug": "usage-chart-latency-undersampled",
+      "reason": "1–19 timed requests; Average active and p50/p95/p99 disabled."
+    },
+    {
+      "slug": "usage-table-sort-descending",
+      "reason": "Title second click; only Title descending active."
+    },
+    {
+      "slug": "usage-table-sort-default-reset",
+      "reason": "Title third click returns Tokens descending default, NOT all headers neutral."
+    },
+    {
+      "slug": "usage-session-scoped-selected-row",
+      "reason": "Single click session row yields session chip and selected row on page1."
+    },
+    {
+      "slug": "usage-trend-view-data",
+      "reason": "view.rs1761 independent series data table not covered by Records Daily. Needs actual metric/time schema, search, Columns, totals/pager."
+    },
+    {
+      "slug": "usage-token-health-unavailable-cache",
+      "reason": "Tokens>0 but no reported cache; no fabricated0 hit rate. Body is visible because tokens exist."
+    },
+    {
+      "slug": "usage-export-success-status",
+      "reason": "page.rs2482 transient header status after successful isolated export; capture within6s."
+    },
+    {
+      "slug": "usage-export-failed-status",
+      "reason": "page.rs2482 transient header write error after selected unwritable isolated destination; no fabricated modal."
+    },
+    {
+      "slug": "usage-empty-failures-table",
+      "reason": "Nonempty index with no failure events; details Failures has table-specific empty state, not whole-page empty."
+    },
+    {
+      "slug": "usage-independent-table-control-variants",
+      "reason": "Series/Buckets/Failures/Breakdown each have source-specific Columns/page menus and search-empty text; not identical to Sessions. Enumerator should add concrete cases if exact all state requirement applies."
+    }
+  ],
+  "source_hashes": {
+    "crates/orbit-pi/src/usage/model.rs": "a7b84cd748e2971d399c94dc43a10b5e00ef3632a0edadc20b4b28b3cf760b3f",
+    "crates/orbit-pi/src/usage/heatmap.rs": "f7dc308de1b1e0545c8697d6914285dad5ad63d1977bed4fad7b79f773e8c738",
+    "crates/orbit-pi/src/usage/mod.rs": "629f8cc69f7aa1e01d0667de605927a6c8e8e27fb61ef7f35f3d7952a8d89429",
+    "crates/orbit-pi/src/usage/filters.rs": "8c3d338230662e320a231c98dd4b566c9c182ad449be926c3a821d80c69e3a7f",
+    "crates/orbit-pi/src/usage/format.rs": "794f28416c2747239d4bd3ae548c991acdbe577e18836b4b5caf03829d97bf8c",
+    "crates/orbit-pi/src/usage/aggregate.rs": "8012398f96d0828a627aaafff8e804801429895299da02c431621a659d62e62c",
+    "crates/orbit-pi/src/usage/view.rs": "3a8620f8c55d9e3a053bda4bc789acc7a80fe2af4e45886a47278bb89e5772af",
+    "crates/orbit-pi/src/usage/table.rs": "4525d6279ac9bdb2ca2b03f226e72530b17013585c59e5185de148ee4610daf2",
+    "crates/orbit-pi/src/usage/tests.rs": "08f1071e4c565157996ed098b5e087fa0b2307130fc65ea4c13356967981a32c",
+    "crates/orbit-pi/src/usage/tooltip.rs": "b6af865a95674dca277d5f4c2e7aa34413fd3c8ab3f38536334adf4fe02b1433",
+    "crates/orbit-pi/src/usage/page.rs": "1a5ca8e0960e345e7cd7c146841d6993f455f6f8176280cdbbcdf782a419e24e",
+    "crates/orbit-pi/src/usage/chart.rs": "96efbbb05ecafdba4b2703d86a071af1307d184c1bc4e7a089a6706f1c4d9e13",
+    "crates/orbit-pi/src/usage/collect.rs": "cac36e4b181153dd0c4fc59f4c2f807ce17799126dc5fd48d7c52968d3f0225d"
+  }
+}

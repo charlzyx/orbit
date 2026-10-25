@@ -1,0 +1,14 @@
+{
+  "language": "en",
+  "theme": "dark/orbit-azure",
+  "ui_scale_percent": 100,
+  "client_width_px": 1470,
+  "client_height_px": 922,
+  "dpi": 96,
+  "clock": "2026-10-25T12:00:00Z",
+  "timezone": "UTC",
+  "animation_phase": "Freeze explicitly per case; no image warping or screenshot scaling",
+  "fonts": "Source bundled defaults; capture records must include actual resolved font names and file hashes",
+  "identity": "Isolated disposable home, workspace and session store; no user credentials",
+  "network": "Deterministic recorded/fake responses unless a separately authorized real-OS gate is required"
+}

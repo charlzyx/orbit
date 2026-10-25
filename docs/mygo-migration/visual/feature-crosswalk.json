@@ -1,0 +1,2295 @@
+[
+  {
+    "feature_id": "C01",
+    "feature": "Native multiline text editing",
+    "visual_cases": [
+      "V030",
+      "V031",
+      "V032",
+      "V033"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "C02",
+    "feature": "Prompt, steer and follow-up policy",
+    "visual_cases": [
+      "V030",
+      "V031",
+      "V032",
+      "V033"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "C03",
+    "feature": "Queue visualization and delivery",
+    "visual_cases": [
+      "V034",
+      "V035"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "C04",
+    "feature": "Slash commands and file mentions",
+    "visual_cases": [
+      "V036",
+      "V037",
+      "V038",
+      "V039"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "C05",
+    "feature": "Image attachments and drag/paste",
+    "visual_cases": [
+      "V040",
+      "V041",
+      "V042",
+      "V043",
+      "V153"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "C06",
+    "feature": "Model and thinking selectors",
+    "visual_cases": [
+      "V141",
+      "V142",
+      "V143",
+      "V144",
+      "V145",
+      "V146",
+      "V147",
+      "V148",
+      "V149",
+      "V150",
+      "V151",
+      "V152"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "C07",
+    "feature": "Stream reducer and snapshot equivalence",
+    "visual_cases": [
+      "V044",
+      "V045",
+      "V046",
+      "V153"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "C08",
+    "feature": "Virtualized scrolling and navigation rail",
+    "visual_cases": [
+      "V044",
+      "V045",
+      "V046",
+      "V163",
+      "V212"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "C09",
+    "feature": "Rich transcript text and code",
+    "visual_cases": [
+      "V047",
+      "V048",
+      "V153",
+      "V154",
+      "V155",
+      "V205",
+      "V206",
+      "V207"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "C10",
+    "feature": "Transcript selection and context menu",
+    "visual_cases": [
+      "V208",
+      "V209",
+      "V210",
+      "V211",
+      "V212"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "C11",
+    "feature": "Thinking/tool activity and details",
+    "visual_cases": [
+      "V156",
+      "V157",
+      "V158",
+      "V159",
+      "V160",
+      "V161",
+      "V162",
+      "V163",
+      "V166",
+      "V167",
+      "V168",
+      "V169",
+      "V170",
+      "V171",
+      "V172",
+      "V173",
+      "V174",
+      "V175",
+      "V176",
+      "V177",
+      "V178",
+      "V179",
+      "V180",
+      "V181",
+      "V182",
+      "V183",
+      "V184",
+      "V185",
+      "V186",
+      "V187",
+      "V188"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "C12",
+    "feature": "Turn summaries and metrics",
+    "visual_cases": [
+      "V156",
+      "V157",
+      "V158",
+      "V159",
+      "V193",
+      "V194",
+      "V195",
+      "V196",
+      "V197",
+      "V198",
+      "V199",
+      "V200",
+      "V201",
+      "V202",
+      "V203",
+      "V204"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "C13",
+    "feature": "In-transcript find",
+    "visual_cases": [
+      "V049",
+      "V050"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "C14",
+    "feature": "Stop, retry and compact states",
+    "visual_cases": [
+      "V051",
+      "V052",
+      "V164",
+      "V165",
+      "V193",
+      "V194"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "C15",
+    "feature": "Context/cost meter",
+    "visual_cases": [
+      "V053",
+      "V054",
+      "V055",
+      "V056"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "C16",
+    "feature": "Blocking extension dialogs",
+    "visual_cases": [
+      "V057",
+      "V058",
+      "V059",
+      "V060",
+      "V061"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "C17",
+    "feature": "Inline permission approval",
+    "visual_cases": [
+      "V062"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "C18",
+    "feature": "Plan/Build/Ask workflow",
+    "visual_cases": [
+      "V030",
+      "V031",
+      "V032",
+      "V033"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "C19",
+    "feature": "Structured ask questionnaire",
+    "visual_cases": [
+      "V063",
+      "V064",
+      "V065",
+      "V189",
+      "V190",
+      "V191",
+      "V192"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "C20",
+    "feature": "Extension widgets and custom UI",
+    "visual_cases": [
+      "V066",
+      "V067",
+      "V068",
+      "V069"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "P01",
+    "feature": "Settings hub and search",
+    "visual_cases": [
+      "V070",
+      "V071",
+      "V072",
+      "V073",
+      "V074",
+      "V075",
+      "V076",
+      "V077",
+      "V078",
+      "V079",
+      "V080",
+      "V081",
+      "V082",
+      "V083",
+      "V084",
+      "V085",
+      "V086",
+      "V087",
+      "V100",
+      "V101",
+      "V102",
+      "V103",
+      "V104",
+      "V105",
+      "V106",
+      "V107",
+      "V108",
+      "V109",
+      "V110",
+      "V111",
+      "V124",
+      "V213",
+      "V222",
+      "V234",
+      "V253"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "P02",
+    "feature": "General and runtime inspection",
+    "visual_cases": [
+      "V070",
+      "V074",
+      "V081",
+      "V082",
+      "V083",
+      "V084",
+      "V085",
+      "V086",
+      "V087"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "P03",
+    "feature": "First-run dependency setup",
+    "visual_cases": [
+      "V004",
+      "V005",
+      "V006",
+      "V007"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "P04",
+    "feature": "Agent defaults and titles",
+    "visual_cases": [
+      "V075",
+      "V134",
+      "V135",
+      "V136",
+      "V137",
+      "V138",
+      "V139",
+      "V140"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "P05",
+    "feature": "Provider catalog and filtering",
+    "visual_cases": [
+      "V077",
+      "V088",
+      "V089",
+      "V090",
+      "V091",
+      "V092",
+      "V093",
+      "V094",
+      "V095",
+      "V096",
+      "V097",
+      "V098",
+      "V099"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "P06",
+    "feature": "API credentials and custom providers",
+    "visual_cases": [
+      "V077",
+      "V088",
+      "V089",
+      "V090",
+      "V091",
+      "V092",
+      "V093",
+      "V094",
+      "V095",
+      "V096",
+      "V097",
+      "V098",
+      "V099"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "P07",
+    "feature": "Provider OAuth lifecycle",
+    "visual_cases": [
+      "V077",
+      "V088",
+      "V089",
+      "V090",
+      "V091",
+      "V092",
+      "V093",
+      "V094",
+      "V095",
+      "V096",
+      "V097",
+      "V098",
+      "V099"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "P08",
+    "feature": "Models catalog page",
+    "visual_cases": [
+      "V124",
+      "V125",
+      "V126",
+      "V127",
+      "V128",
+      "V129",
+      "V130",
+      "V131",
+      "V132",
+      "V133",
+      "V134",
+      "V139",
+      "V140"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "P09",
+    "feature": "Quota headline and provider cards",
+    "visual_cases": [
+      "V053",
+      "V054",
+      "V055",
+      "V056",
+      "V077",
+      "V088",
+      "V089",
+      "V090",
+      "V091",
+      "V092",
+      "V093",
+      "V094",
+      "V095",
+      "V096",
+      "V097",
+      "V098",
+      "V099"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "P10",
+    "feature": "Skills discovery and master/detail",
+    "visual_cases": [
+      "V213",
+      "V214",
+      "V215",
+      "V216",
+      "V217",
+      "V218"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "P11",
+    "feature": "Skill enable/disable/delete",
+    "visual_cases": [
+      "V219",
+      "V220",
+      "V221"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "P12",
+    "feature": "Plugin package management",
+    "visual_cases": [
+      "V222",
+      "V223",
+      "V224",
+      "V225",
+      "V226",
+      "V227",
+      "V228",
+      "V229"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "P13",
+    "feature": "Plugin update offers",
+    "visual_cases": [
+      "V230",
+      "V231",
+      "V232",
+      "V233"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "P14",
+    "feature": "MCP manager and server table",
+    "visual_cases": [
+      "V234",
+      "V235",
+      "V236",
+      "V237",
+      "V238",
+      "V244",
+      "V251",
+      "V252",
+      "V473",
+      "V474",
+      "V475"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "P15",
+    "feature": "MCP add/edit fields and exposure",
+    "visual_cases": [
+      "V239",
+      "V240",
+      "V241",
+      "V242",
+      "V243",
+      "V475"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "P16",
+    "feature": "MCP secrets and auth",
+    "visual_cases": [
+      "V239",
+      "V240",
+      "V241",
+      "V247",
+      "V248",
+      "V474"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "P17",
+    "feature": "MCP apply/reconnect lifecycle",
+    "visual_cases": [
+      "V245",
+      "V246",
+      "V249",
+      "V250",
+      "V251",
+      "V473"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "P18",
+    "feature": "Appearance and typography",
+    "visual_cases": [
+      "V071",
+      "V100",
+      "V101",
+      "V102",
+      "V103",
+      "V104",
+      "V105",
+      "V106",
+      "V107"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "P19",
+    "feature": "Backdrop customization",
+    "visual_cases": [
+      "V071",
+      "V100",
+      "V101",
+      "V102",
+      "V103",
+      "V104",
+      "V105",
+      "V106",
+      "V107"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "P20",
+    "feature": "Localization and shortcuts reference",
+    "visual_cases": [
+      "V071",
+      "V072",
+      "V100",
+      "V101",
+      "V102",
+      "V103",
+      "V104",
+      "V105",
+      "V106",
+      "V107"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "S01",
+    "feature": "Native shell and one-window lifetime",
+    "visual_cases": [
+      "V001",
+      "V002",
+      "V003",
+      "V119",
+      "V120",
+      "V121",
+      "V479",
+      "V480",
+      "V481",
+      "V482",
+      "V483",
+      "V484",
+      "V485",
+      "V486",
+      "V487",
+      "V488",
+      "V489",
+      "V490"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "S02",
+    "feature": "Resizable workbench geometry",
+    "visual_cases": [
+      "V001",
+      "V002",
+      "V003",
+      "V467"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "S03",
+    "feature": "Global command/action registry",
+    "visual_cases": [
+      "V072",
+      "V479",
+      "V480",
+      "V481",
+      "V482",
+      "V483",
+      "V484",
+      "V485",
+      "V486",
+      "V487",
+      "V488",
+      "V489",
+      "V490"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "S04",
+    "feature": "Command palette versus transcript search",
+    "visual_cases": [
+      "V018",
+      "V019",
+      "V020"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "S05",
+    "feature": "Keyboard surface traversal",
+    "visual_cases": [
+      "V072",
+      "V469"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "S06",
+    "feature": "Read and watch shared pi session store",
+    "visual_cases": [
+      "V008",
+      "V009",
+      "V010",
+      "V011"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "S07",
+    "feature": "New task and workspace selection",
+    "visual_cases": [
+      "V001",
+      "V002",
+      "V003",
+      "V021",
+      "V022",
+      "V023",
+      "V026",
+      "V027"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "S08",
+    "feature": "Switch/resume and parallel sessions",
+    "visual_cases": [
+      "V008",
+      "V009",
+      "V010",
+      "V011"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "S09",
+    "feature": "Session navigation",
+    "visual_cases": [],
+    "classification": "BEHAVIOR_ONLY_NO_INDEPENDENT_RENDERER",
+    "backend_only_reason": "Session previous/next/slot dispatch changes selected session but has no independent renderer. Reuse shell session baseline after each action; test navigation separately.",
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "S10",
+    "feature": "Session metadata and title controls",
+    "visual_cases": [
+      "V024",
+      "V025"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "S11",
+    "feature": "Pin, archive and delete sessions",
+    "visual_cases": [
+      "V012",
+      "V013",
+      "V014",
+      "V015",
+      "V016",
+      "V017"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "S12",
+    "feature": "Workspace sidebar organization",
+    "visual_cases": [
+      "V008",
+      "V009",
+      "V010",
+      "V011",
+      "V012",
+      "V013",
+      "V014",
+      "V015",
+      "V016",
+      "V017"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "S13",
+    "feature": "Workspace management and appearance",
+    "visual_cases": [
+      "V012",
+      "V013",
+      "V014",
+      "V015",
+      "V016",
+      "V017"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "S14",
+    "feature": "Refresh fan-out",
+    "visual_cases": [],
+    "classification": "BEHAVIOR_ONLY_NO_INDEPENDENT_RENDERER",
+    "backend_only_reason": "Refresh fan-out is event dispatch and I/O. Existing loading/result cases show effects but cannot prove every subscriber refreshed.",
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "U01",
+    "feature": "Usage data/accounting",
+    "visual_cases": [
+      "V260"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "U02",
+    "feature": "Usage overview/detail surfaces",
+    "visual_cases": [
+      "V260",
+      "V261",
+      "V262",
+      "V263",
+      "V264",
+      "V265",
+      "V266",
+      "V267",
+      "V268",
+      "V269",
+      "V270",
+      "V271",
+      "V273",
+      "V274",
+      "V288",
+      "V289",
+      "V290",
+      "V291",
+      "V292",
+      "V293",
+      "V294",
+      "V295",
+      "V296",
+      "V297"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "U03",
+    "feature": "Usage filters and drill-down",
+    "visual_cases": [
+      "V272",
+      "V276",
+      "V277",
+      "V278",
+      "V281",
+      "V282",
+      "V283",
+      "V284",
+      "V285",
+      "V286",
+      "V287",
+      "V296",
+      "V297"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "U04",
+    "feature": "Usage tables and export",
+    "visual_cases": [
+      "V122",
+      "V266",
+      "V267",
+      "V268",
+      "V275",
+      "V279",
+      "V280",
+      "V298",
+      "V299",
+      "V300",
+      "V301",
+      "V302",
+      "V303",
+      "V304"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "U05",
+    "feature": "Notifications and toasts",
+    "visual_cases": [
+      "V070",
+      "V081",
+      "V082",
+      "V123",
+      "V233"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "U06",
+    "feature": "Session retention and privacy controls",
+    "visual_cases": [
+      "V073",
+      "V108"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "U07",
+    "feature": "Temporary file cleanup",
+    "visual_cases": [
+      "V073",
+      "V109",
+      "V110",
+      "V111"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "U08",
+    "feature": "Signed Orbit app updater",
+    "visual_cases": [
+      "V078",
+      "V112",
+      "V113",
+      "V114",
+      "V115",
+      "V116",
+      "V117",
+      "V118",
+      "V478"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "U09",
+    "feature": "Platform update installation safety",
+    "visual_cases": [
+      "V112",
+      "V113",
+      "V114",
+      "V115",
+      "V116",
+      "V117",
+      "V118",
+      "V478"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "U10",
+    "feature": "Pi update/install management",
+    "visual_cases": [
+      "V078",
+      "V470",
+      "V471",
+      "V472"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "U11",
+    "feature": "Automatic RPC patches",
+    "visual_cases": [
+      "V074",
+      "V083",
+      "V084",
+      "V085",
+      "V086",
+      "V087"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "U12",
+    "feature": "Bug/feature reporting",
+    "visual_cases": [
+      "V253",
+      "V254",
+      "V255",
+      "V256",
+      "V257",
+      "V258",
+      "V259",
+      "V476",
+      "V477"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "U13",
+    "feature": "Privacy and network boundaries",
+    "visual_cases": [
+      "V073"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "U14",
+    "feature": "Packaging and platform identity",
+    "visual_cases": [
+      "V078"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W01",
+    "feature": "One main-area feature surface at a time: Files opens while closing Settings/Git/Usage/Worktrees; return-to-chat preserves the file entity. Docked Review and Explorer are mutually exclusive. Full-width Review keeps/restores a dock width and opens the sessions sidebar.",
+    "visual_cases": [
+      "V378",
+      "V379",
+      "V401",
+      "V454",
+      "V467",
+      "V468"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W02",
+    "feature": "Workspace edits from agent, user, editor or Git refresh docked Review, visible Git status, Explorer, active Files tab, branch status and visible Worktrees list.",
+    "visual_cases": [],
+    "classification": "BEHAVIOR_ONLY_NO_INDEPENDENT_RENDERER",
+    "backend_only_reason": "Filesystem watch invalidation and stale-response ordering are behavioral obligations. No unique screenshot proves watcher correctness.",
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W03",
+    "feature": "Resizable sidebar, Review, Explorer and terminal dimensions survive relaunch.",
+    "visual_cases": [
+      "V378",
+      "V379",
+      "V454",
+      "V464",
+      "V467",
+      "V468"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W04",
+    "feature": "Git has six tabs: Changes, History, Graph, Stashes, Issues and Pull requests. Header/back, branch row, refresh, contextual busy/empty/error states and shortcuts invoke controllers.",
+    "visual_cases": [
+      "V305",
+      "V306",
+      "V307",
+      "V310",
+      "V311"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W05",
+    "feature": "Git branch/status discovery includes staged and unstaged status columns, original rename path, per-side additions/deletions, untracked counts, ahead/behind and unborn/detached conditions.",
+    "visual_cases": [
+      "V305",
+      "V306",
+      "V308",
+      "V309"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W06",
+    "feature": "Branch picker searches and groups current/recent/local/remote refs; checkout local or create/check out a local tracking branch for remote. Recent selection is derived from HEAD reflog.",
+    "visual_cases": [
+      "V026",
+      "V027"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W07",
+    "feature": "New branch, rename current branch, safe branch delete; branch merge/rebase ref picker includes local/remote/tag refs. Merge offers normal fast-forward-permitted, no-ff and squash modes. Dirty rebase uses autostash.",
+    "visual_cases": [
+      "V312",
+      "V313",
+      "V314",
+      "V315",
+      "V316",
+      "V317",
+      "V318",
+      "V319"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W08",
+    "feature": "Changes uses grouped staged/unstaged Review sections with per-file Stage/Unstage and bulk Stage all/Unstage all; counts and action availability follow actual status.",
+    "visual_cases": [
+      "V305",
+      "V383"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W09",
+    "feature": "Discard individual unstaged path or all unstaged changes through explicit confirmation; staged changes are intended to remain.",
+    "visual_cases": [
+      "V320",
+      "V321"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W10",
+    "feature": "Commit bar has editable message, include-unstaged checkbox, Commit and Commit-and-push, blank-message generation, and state-driven Push/Publish/Pull/Merge/up-to-date actions.",
+    "visual_cases": [
+      "V308",
+      "V322",
+      "V325"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W11",
+    "feature": "Generate conventional commit message from staged diff, optional unstaged context, original files, branch/repo and recent repository/user commit style. Generate can ask Stage all versus use already-staged content; blank-message commit chains generation into commit.",
+    "visual_cases": [
+      "V323",
+      "V324"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W12",
+    "feature": "Fetch, push/publish with upstream creation, ff-only pull, merge upstream, rebase upstream with autostash, Sync and force-with-lease. Sync fetches, pulls/merges when behind, then pushes when ahead.",
+    "visual_cases": [
+      "V312",
+      "V325",
+      "V326",
+      "V327"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W13",
+    "feature": "Persistent copyable Git failure banner classifies push rejection/divergence/conflicts/dirty-overwrite/auth/network/no-upstream, secret scanning, file-size/LFS/protected-branch/hooks, missing remote/repository and unknown failures. Offers only matching recovery.",
+    "visual_cases": [
+      "V328",
+      "V329",
+      "V330",
+      "V331"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W14",
+    "feature": "Detect and display in-progress merge/rebase/cherry-pick/revert/bisect, conflict count and up to eight file links. Open conflicts in Files; continue once no conflicts; skip only rebase/cherry-pick; confirm abort.",
+    "visual_cases": [
+      "V332",
+      "V333",
+      "V334"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W15",
+    "feature": "Stashes tab lists newest first; create stash including untracked, pop, apply without removal and drop.",
+    "visual_cases": [
+      "V335",
+      "V336"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W16",
+    "feature": "History shows current branch commit list, optional all-refs filter, author filtering by author interaction, path/file history with follow-renames, removable filter chips and Load more.",
+    "visual_cases": [
+      "V337",
+      "V338",
+      "V339"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W17",
+    "feature": "Expand/collapse commit detail with subject/body/hash/author/committer/parents/refs and changed-file statistics; copy/open external commit links. File menu opens current file, current uncommitted diff, OS reveal, path copy or follow-renames history.",
+    "visual_cases": [
+      "V340",
+      "V341"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W18",
+    "feature": "Graph draws branch lanes, merge edges, refs and commit metadata; all-refs option includes remote-only commits and Load more deepens history.",
+    "visual_cases": [
+      "V342",
+      "V343"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W19",
+    "feature": "Git author avatars resolve from email-to-login override, GitHub noreply address, then handle-shaped name; fallback is stable colored initials. GitHub signed-in account chip shows current gh identity.",
+    "visual_cases": [
+      "V337",
+      "V344"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W20",
+    "feature": "GitHub integration probes gh availability/auth/version and shows honest setup states on Issues/Pulls when absent or signed out. Refresh retries probe; CLI path can be overridden by `GH_BIN`.",
+    "visual_cases": [
+      "V344",
+      "V345",
+      "V346"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W21",
+    "feature": "Issue list has Open/Closed/All, search, label filter, clear filters, status/author/label/time/comment metadata and detail selection.",
+    "visual_cases": [
+      "V347",
+      "V348",
+      "V349",
+      "V350",
+      "V351",
+      "V352"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W22",
+    "feature": "Issue detail renders Markdown body/comments and metadata; send comment, toggle labels, close/reopen, open on GitHub, return to list.",
+    "visual_cases": [
+      "V353"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W23",
+    "feature": "New issue form has title/body/notes, repository template selector and generation, submit, cancel/back. Requires nonblank title; selected template labels pass to create. Successful creation clears fields, reloads list and opens resulting issue number.",
+    "visual_cases": [
+      "V350",
+      "V354",
+      "V355"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W24",
+    "feature": "Repository issue/PR templates follow `.github/*_TEMPLATE/` directory then legacy single-file lookup. Markdown frontmatter supplies name/about/title/labels; YAML issue forms flatten to Markdown; config.yml excluded.",
+    "visual_cases": [
+      "V356",
+      "V357",
+      "V358",
+      "V359"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W25",
+    "feature": "Pull request list has Open/Closed/Merged/All, search, clear filters, draft/author/labels/ref/diffstat/review/check summary and detail selection.",
+    "visual_cases": [
+      "V360",
+      "V361",
+      "V362",
+      "V363"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W26",
+    "feature": "PR detail renders Markdown description, comments, reviews, commits, changed files, CI checks with links, draft/ref/state metadata and additions/deletions.",
+    "visual_cases": [
+      "V364",
+      "V365",
+      "V366",
+      "V367"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W27",
+    "feature": "PR comment, approve/request changes, close/reopen, checkout, merge by merge/squash/rebase and optional delete-head-branch. Merge requires confirmation showing method.",
+    "visual_cases": [
+      "V368",
+      "V369",
+      "V370",
+      "V371"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W28",
+    "feature": "New PR form has title/body/notes, draft toggle, base-branch picker, template selection, generation, submit/cancel. Base picker is anchored in form; default prefers main/master then available branch.",
+    "visual_cases": [
+      "V372",
+      "V373",
+      "V374",
+      "V375",
+      "V377"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W29",
+    "feature": "AI issue/PR draft uses optional user notes, branch commits/diff and chosen template; preserves template prefix/body structure.",
+    "visual_cases": [
+      "V356",
+      "V358",
+      "V372",
+      "V376"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W30",
+    "feature": "Review can open from toolbar diffstat, transcript per-turn summary, command/palette, Git file callback; select desired file after load. Separate embedded instance supplies Changes overview.",
+    "visual_cases": [
+      "V197",
+      "V198",
+      "V199",
+      "V200",
+      "V201",
+      "V305",
+      "V365"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W31",
+    "feature": "Review sources: Last Turn, Uncommitted, Unstaged, Staged, Committed and Branch. Comparisons respectively use turn refs; HEAD\u2192worktree; index\u2192worktree; HEAD\u2192index; branch base\u2192HEAD; branch base\u2192worktree.",
+    "visual_cases": [
+      "V378",
+      "V380",
+      "V381",
+      "V382",
+      "V399"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W32",
+    "feature": "Snapshot tracked and untracked files at turn start/end into session-keyed `refs/orbit/session-\u2026` checkpoint commits; recover latest completed turn after restart and continue numbering.",
+    "visual_cases": [
+      "V381",
+      "V382"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W33",
+    "feature": "Last Turn attribution handles branch switches during or between turns and dirty files on target branch; starting metadata retains HEAD, branch and repository refs.",
+    "visual_cases": [
+      "V382"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W34",
+    "feature": "Review parses file/hunk/section headers, added/deleted/context/meta lines, old/new line numbers, binary rows, totals and paint-only syntax. Diff/stat reads are off-thread.",
+    "visual_cases": [
+      "V378",
+      "V383",
+      "V384",
+      "V395",
+      "V396"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W35",
+    "feature": "Long unchanged context collapses around changes; directional expand from either edge, both edges/count, or all reveals retained lines.",
+    "visual_cases": [
+      "V392",
+      "V393",
+      "V394"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W36",
+    "feature": "Review wrap/no-wrap, unified/split diff, per-file and all-file collapse/expand, sticky file/section headers, horizontal pan with pinned header, dock resize and full-width toggle.",
+    "visual_cases": [
+      "V378",
+      "V379",
+      "V384",
+      "V385",
+      "V386",
+      "V387",
+      "V388"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W37",
+    "feature": "Changed-files tree groups folders, expands/collapses directories, case-insensitive filter, selection/highlight, jump to file and autoexpansion of new directories.",
+    "visual_cases": [
+      "V389",
+      "V390"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W38",
+    "feature": "Review keyboard context: Up/Down tree cursor, Enter/Space toggle/open, n/p next/previous file, ]/[ next/previous hunk, e/c expand/collapse all, Escape returns to composer/closes Review rather than aborting agent.",
+    "visual_cases": [
+      "V391"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W39",
+    "feature": "Review loading starts immediately, stale invalidation reloads when visible, generation rejects older source requests, manual refresh feedback minimum 650 ms, source-specific empty/error states.",
+    "visual_cases": [
+      "V397",
+      "V398",
+      "V399",
+      "V400"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W40",
+    "feature": "Worktrees page lists Git-discovered main/linked/external worktrees with independent name/path/branch, active/bare/detached/locked/prunable markers and reasons.",
+    "visual_cases": [
+      "V431",
+      "V432"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W41",
+    "feature": "Create worktree from existing local/remote branch or a new branch with optional start point; separate editable display/directory name and branch name, auto-derived new branch until user edits it; quick-create suggests unused branch slug plus suffix.",
+    "visual_cases": [
+      "V438",
+      "V439",
+      "V440",
+      "V447"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W42",
+    "feature": "Worktree validation rejects empty/dot/parent/separator names, root escape, existing paths, missing repo and branch conflict. Creation errors keep actionable context rather than pretending success.",
+    "visual_cases": [
+      "V441",
+      "V447"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W43",
+    "feature": "Settings configure worktree root, setup-script path, run-setup automatically and open-after-create. Repository `.orbit/worktree.json` overrides root/script, not global booleans.",
+    "visual_cases": [
+      "V076"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W44",
+    "feature": "First setup-script run per repository requires explicit AllowSetup dialog; create dialog can disable setup for that worktree.",
+    "visual_cases": [
+      "V442"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W45",
+    "feature": "Setup runs after successful Git creation and before automatic opening; expandable captured stdout/stderr/exit result, success/warning toasts, retry, dismiss and manual open.",
+    "visual_cases": [
+      "V443",
+      "V444",
+      "V445"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W46",
+    "feature": "Open worktree adds workspace, persists current directory and synchronizes Review/Git/Explorer/new-terminal context; historical sessions retain their recorded workspace. Missing cold-session cwd shows unavailable dialog with locate/worktrees action, no silent substitution for a deleted directory.",
+    "visual_cases": [
+      "V446"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W47",
+    "feature": "Rename worktree directory under configured root or move to explicit resolved destination, preserving branch; reject blank/existing/no-op target. Active selected workspace follows moved path.",
+    "visual_cases": [
+      "V448",
+      "V449"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W48",
+    "feature": "Remove worktree asks explicit clean/dirty confirmation after reading dirty state; dirty confirmation uses `--force`; branch is never deleted. Main/unknown/locked worktrees refused by backend.",
+    "visual_cases": [
+      "V450",
+      "V451"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W49",
+    "feature": "Lock/unlock, prune stale administrative entries, repair metadata after manual move, reveal and copy path. Worktree row click opens; right-click and ellipsis menus share actions.",
+    "visual_cases": [
+      "V437"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W50",
+    "feature": "Status \u201cWork in\u201d picker has Local/main, linked worktrees and New; Up/Down wrap selection, Enter chooses, Escape closes/restores composer focus; mutually excludes overlapping popovers.",
+    "visual_cases": [
+      "V452",
+      "V453"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W51",
+    "feature": "Worktrees refresh/busy/error/empty UI, setup banner and dismissible introductory guide. External changes trigger throttled list refresh while page visible.",
+    "visual_cases": [
+      "V431",
+      "V433",
+      "V434",
+      "V435",
+      "V436"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W52",
+    "feature": "Explorer scans workspace with nested/global Git ignores and `.ignore`, keeps empty directories, directories-first case-insensitive order, hidden-files toggle, Git status badges and dirty-ancestor markings, filter including matching subtree/ancestors.",
+    "visual_cases": [
+      "V401",
+      "V402",
+      "V403",
+      "V404",
+      "V413"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W53",
+    "feature": "Explorer virtualized rows, active-file highlight/reveal and ancestor expansion; mouse activate expands folder or opens file. Up/Down/Home/End, Left/Right folder collapse/expand, platform+Left/Right all collapse/expand, Enter/Space activate.",
+    "visual_cases": [
+      "V401",
+      "V405"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W54",
+    "feature": "Explorer row context menu at pointer, viewport-flipping: folder expand/collapse, New File/Folder, Rename/Delete; file Open/Rename/Delete; both default-app open, reveal, copy absolute and relative path. Header has creation/refresh/collapse/hidden controls.",
+    "visual_cases": [
+      "V406",
+      "V407"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W55",
+    "feature": "New file/folder inline name field in selected folder/root, Enter confirm/Escape cancel. File creation opens new editable tab; folder creation refreshes tree; success toast/error strip.",
+    "visual_cases": [
+      "V408",
+      "V409",
+      "V412"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W56",
+    "feature": "Rename file/folder within parent with open-tab subtree reconciliation; Delete confirms before dispatch, closes affected tabs without writing, refreshes tree.",
+    "visual_cases": [
+      "V410",
+      "V411",
+      "V412"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W57",
+    "feature": "Files has multi-tab editor, existing-tab activation preserves buffer, scrolling tab strip, close tab selects neighbor; last close exits Files. Hide preserves tabs and flushes dirty edits.",
+    "visual_cases": [
+      "V414",
+      "V415"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W58",
+    "feature": "Code/text editing reuses ComposerInput with syntax paint, gutter, no wrap, fill-area layout; selection/navigation, cut/copy/paste, undo/redo, newlines and save shortcuts work in Editor context without sending chat.",
+    "visual_cases": [
+      "V414",
+      "V416",
+      "V417",
+      "V423"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W59",
+    "feature": "Autosave 500 ms debounce flushes ALL dirty tabs; manual save does same. Status chips show saved/unsaved/saving/failed/changed-on-disk. Watch reload updates clean buffer; dirty buffer retained and conflict flag shown; self-save echo preserves caret/scroll.",
+    "visual_cases": [
+      "V418",
+      "V419",
+      "V420",
+      "V421"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W60",
+    "feature": "Markdown rendered preview/source toggle uses live edited buffer; image preview for PNG/JPEG/GIF/WebP/BMP/TIFF/SVG; code/text read-only fallback for lossy/truncated content; binary/too-large/read-error honest states. Toolbar shows relative path, byte size/lines/truncation/save status.",
+    "visual_cases": [
+      "V422",
+      "V423",
+      "V424",
+      "V425",
+      "V426",
+      "V427",
+      "V428",
+      "V429",
+      "V430"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W61",
+    "feature": "Integrated bottom terminal owns one real alacritty PTY/shell per tab. New tab uses current workspace; old tabs keep original shells/cwd across workspace/session switch and hidden panel. Toggle focuses shell; close tab ends that shell; closing last tab closes panel.",
+    "visual_cases": [
+      "V454",
+      "V455"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W62",
+    "feature": "Terminal renders real VT grid on canvas: ANSI/indexed/truecolor, attributes, wide cells, selections, cursor shapes/focus, scrollback indicator and resizing.",
+    "visual_cases": [
+      "V458",
+      "V459",
+      "V460",
+      "V461",
+      "V462",
+      "V463",
+      "V464"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W63",
+    "feature": "Terminal translates Enter/backspace/tab/shift-tab/arrows/home/end/page/insert/delete/F1\u2013F12, application-cursor mode, C0 control keys and Alt/meta; app-platform shortcuts not sent to shell. Escape specifically goes to terminal so vim/less can exit, not global AbortRun.",
+    "visual_cases": [],
+    "classification": "BEHAVIOR_ONLY_NO_INDEPENDENT_RENDERER",
+    "backend_only_reason": "PTY keyboard byte encodings and app-shortcut routing require process/input assertions, not another static screenshot.",
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W64",
+    "feature": "Mouse drag simple text selection, precise left-side cell boundary, copy selection and clipboard paste with bracketed-paste framing when enabled; smooth pixel/line scroll accumulator.",
+    "visual_cases": [
+      "V462",
+      "V463"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W65",
+    "feature": "Terminal tabs display login-shell icon, OSC title or folder fallback, own cwd tooltip; tab strip scrolls; next/previous wrap; resize height; restart only active tab in original cwd, preserving others; exited overlay and startup error state.",
+    "visual_cases": [
+      "V455",
+      "V456",
+      "V457",
+      "V465",
+      "V466"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W66",
+    "feature": "Open-in discovers installed editors/terminals/file manager once off-thread with real app icons. macOS catalog VS Code/Cursor/Zed/Finder/Terminal/Termy/iTerm2/Kitty/Ghostty/Warp/Xcode/Rider/Android Studio; Windows catalog VS Code/Cursor/Zed/Explorer/Windows Terminal/Rider/Android Studio.",
+    "visual_cases": [
+      "V028",
+      "V029"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W67",
+    "feature": "Split open-in control: preferred app primary action and searchable installed-app menu; selecting app opens current workspace and remembers choice. Primary fallback opening does not overwrite unavailable preference.",
+    "visual_cases": [
+      "V028",
+      "V029"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W68",
+    "feature": "Open-in preference resolution: workspace-specific choice, legacy global fallback, platform file manager, then first installed app. Temporarily unavailable saved app stays remembered for reinstall.",
+    "visual_cases": [
+      "V028",
+      "V029"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W69",
+    "feature": "Platform helpers reveal files, default-open paths, launch interactive external terminal commands, open browser links and find home directory.",
+    "visual_cases": [
+      "V119",
+      "V120",
+      "V121",
+      "V122",
+      "V123"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W70",
+    "feature": "One shell entity survives closing and reopening main window (macOS Dock reopen); main window opens maximized with screen-relative restore size/minimum 960\u00d7640. Background heartbeat continues windowless. Windows/Linux have own minimize/maximize/restore/close/drag behavior; macOS native traffic-light chrome.",
+    "visual_cases": [
+      "V119",
+      "V479",
+      "V480",
+      "V481",
+      "V482",
+      "V483",
+      "V484",
+      "V485",
+      "V486",
+      "V487",
+      "V488",
+      "V489",
+      "V490"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  },
+  {
+    "feature_id": "W71",
+    "feature": "Keyboard commands, menu/palette actions and UI buttons share registered actions; Git tab shortcuts are actually platform+Alt+1\u20266, not stale prose saying Cmd+1\u20266.",
+    "visual_cases": [
+      "V072",
+      "V469",
+      "V479",
+      "V480",
+      "V481",
+      "V482",
+      "V483",
+      "V484",
+      "V485",
+      "V486",
+      "V487",
+      "V488",
+      "V489",
+      "V490"
+    ],
+    "classification": "VISUAL_STATES_ENUMERATED",
+    "backend_only_reason": null,
+    "functional_checklist": "../acceptance-checklist.md",
+    "visual_full_scope_verified": false,
+    "native_os_full_scope_verified": false
+  }
+]

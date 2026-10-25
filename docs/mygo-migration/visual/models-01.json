@@ -1,0 +1,2474 @@
+{
+  "schema_version": 1,
+  "category": "models",
+  "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "fixture_contract": "fixture.json",
+  "cases": [
+    {
+      "category": "models",
+      "slug": "settings-models-baseline",
+      "feature_ids": [
+        "P01",
+        "P08"
+      ],
+      "expected_controls": [
+        "Search models\u2026",
+        "5 model(s)",
+        "All providers dropdown",
+        "Update model list",
+        "Favorites toggle",
+        "Active model board with Second \u00b7 Second Same",
+        "First provider heading and three cards",
+        "Second provider heading and two cards",
+        "Current card Active badge",
+        "Optional context badges; no context badge on First Same"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "model_rows",
+          "line": 1433,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L1433"
+        }
+      ],
+      "id": "V124",
+      "title": "Settings models baseline",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated models surface in fixture.json.",
+        "Configure the named source state: Settings models baseline.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V124/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V124/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Models source reviewer",
+        "evidence": "Source-render branch exists. Concrete fixture specified; actual paired capture still unverified. Exact fixture and source ranges: model-visual-source-review.json."
+      },
+      "concrete_fixture_reference": "../model-visual-source-review.json",
+      "fixture_overrides": {
+        "surface": "Settings > Models"
+      }
+    },
+    {
+      "category": "models",
+      "slug": "models-empty-catalog",
+      "feature_ids": [
+        "P08"
+      ],
+      "expected_controls": [
+        "Search models\u2026",
+        "No models reported count and empty card",
+        "No models reported hint",
+        "Update model list",
+        "Favorites"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "model_rows",
+          "line": 1433,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L1433"
+        }
+      ],
+      "id": "V125",
+      "title": "Models empty catalog",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated models surface in fixture.json.",
+        "Configure the named source state: Models empty catalog.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V125/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V125/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Models source reviewer",
+        "evidence": "There is NO active-model board and NO provider dropdown for empty catalog. Source does not show a loading spinner on this page unless catalog update is running; Go distinct loading/disconnected messaging is additional error/readiness handling. Exact fixture and source ranges: model-visual-source-review.json."
+      },
+      "concrete_fixture_reference": "../model-visual-source-review.json",
+      "fixture_overrides": {
+        "surface": "Settings > Models",
+        "catalog": []
+      }
+    },
+    {
+      "category": "models",
+      "slug": "models-query-filtered",
+      "feature_ids": [
+        "P08"
+      ],
+      "expected_controls": [
+        "Typed query",
+        "1 of 5 count",
+        "Active model board unchanged",
+        "First heading with one Beta card"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "model_rows",
+          "line": 1433,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L1433"
+        }
+      ],
+      "id": "V126",
+      "title": "Models query filtered",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated models surface in fixture.json.",
+        "Configure the named source state: Models query filtered.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V126/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V126/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Models source reviewer",
+        "evidence": "Source-render branch exists. Concrete fixture specified; actual paired capture still unverified. Exact fixture and source ranges: model-visual-source-review.json."
+      },
+      "concrete_fixture_reference": "../model-visual-source-review.json",
+      "fixture_overrides": {
+        "surface": "Settings > Models",
+        "models_query": "  BeTa  "
+      }
+    },
+    {
+      "category": "models",
+      "slug": "models-favorites-only",
+      "feature_ids": [
+        "P08"
+      ],
+      "expected_controls": [
+        "Selected Favorites toggle",
+        "2 of 5 count and two favorites",
+        "First/Beta and Second/Second Same cards only",
+        "Active board"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "model_rows",
+          "line": 1433,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L1433"
+        }
+      ],
+      "id": "V127",
+      "title": "Models favorites only",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated models surface in fixture.json.",
+        "Configure the named source state: Models favorites only.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V127/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V127/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Models source reviewer",
+        "evidence": "Source-render branch exists. Concrete fixture specified; actual paired capture still unverified. Exact fixture and source ranges: model-visual-source-review.json."
+      },
+      "concrete_fixture_reference": "../model-visual-source-review.json",
+      "fixture_overrides": {
+        "surface": "Settings > Models",
+        "favorites": [
+          [
+            "first",
+            "beta"
+          ],
+          [
+            "second",
+            "same"
+          ]
+        ],
+        "favorites_only": true
+      }
+    },
+    {
+      "category": "models",
+      "slug": "models-provider-filtered",
+      "feature_ids": [
+        "P08"
+      ],
+      "expected_controls": [
+        "Second provider dropdown label",
+        "2 of 5 count",
+        "Second heading and two cards",
+        "Active board"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "model_rows",
+          "line": 1433,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L1433"
+        }
+      ],
+      "id": "V128",
+      "title": "Models provider filtered",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated models surface in fixture.json.",
+        "Configure the named source state: Models provider filtered.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V128/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V128/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Models source reviewer",
+        "evidence": "Source-render branch exists. Concrete fixture specified; actual paired capture still unverified. Exact fixture and source ranges: model-visual-source-review.json."
+      },
+      "concrete_fixture_reference": "../model-visual-source-review.json",
+      "fixture_overrides": {
+        "surface": "Settings > Models",
+        "provider_filter": "second"
+      }
+    },
+    {
+      "category": "models",
+      "slug": "models-combined-no-matches",
+      "feature_ids": [
+        "P08"
+      ],
+      "expected_controls": [
+        "Query and active filter controls",
+        "0 of 5 count",
+        "Active model board only below toolbar"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "model_rows",
+          "line": 1433,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L1433"
+        }
+      ],
+      "id": "V129",
+      "title": "Models combined no matches",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated models surface in fixture.json.",
+        "Configure the named source state: Models combined no matches.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V129/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V129/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Models source reviewer",
+        "evidence": "Source sections starts with active_model_row, so sections.is_empty is unreachable: do not invent a Rust no-matches card. Go intentionally adds a clearer no-matches notice, which is an explicit visual delta. Exact fixture and source ranges: model-visual-source-review.json."
+      },
+      "concrete_fixture_reference": "../model-visual-source-review.json",
+      "fixture_overrides": {
+        "surface": "Settings > Models",
+        "models_query": "zzz-no-match",
+        "favorites": [
+          [
+            "first",
+            "beta"
+          ]
+        ],
+        "favorites_only": true,
+        "provider_filter": "second"
+      }
+    },
+    {
+      "category": "models",
+      "slug": "models-updating",
+      "feature_ids": [
+        "P08"
+      ],
+      "expected_controls": [
+        "Unchanged Update model list label",
+        "Accent refresh SVG rotating at a700ms period, captured at frozen phase",
+        "Update button opacity 0.6",
+        "Unchanged catalog"
+      ],
+      "scope": "canonical",
+      "note": "Independent source challenge corrected first-pass expectations; no image comparison has run.",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "model_toolbar",
+          "line": 1082,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L1082"
+        }
+      ],
+      "id": "V130",
+      "title": "Models updating",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated models surface in fixture.json.",
+        "Configure the named source state: Models updating.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V130/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V130/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Models source reviewer",
+        "evidence": "Duplicate requests are ignored in handler, not a distinct disabled-button render branch; original pointer/handler remain. Do not label it Updating or claim one screenshot verifies duplicate gating. Exact fixture and source ranges: model-visual-source-review.json."
+      },
+      "concrete_fixture_reference": "../model-visual-source-review.json",
+      "fixture_overrides": {
+        "surface": "Settings > Models",
+        "refreshing": true,
+        "animation_phase": "accent refresh SVG rotation fixed at 0 degrees; reduce-motion freezes at this phase"
+      }
+    },
+    {
+      "category": "models",
+      "slug": "models-update-error",
+      "feature_ids": [
+        "P08"
+      ],
+      "expected_controls": [
+        "Could not update the model list: fixture catalog update failure error toast",
+        "Update model list returned to normal opacity",
+        "Last catalog still visible"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "model_toolbar",
+          "line": 1082,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L1082"
+        }
+      ],
+      "id": "V131",
+      "title": "Models update error",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated models surface in fixture.json.",
+        "Configure the named source state: Models update error.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V131/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V131/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Models source reviewer",
+        "evidence": "Source error is a toast, not an inline catalog error card. Go also retains error detail inline; document that as a robustness delta, not source pixels. Exact fixture and source ranges: model-visual-source-review.json."
+      },
+      "concrete_fixture_reference": "../model-visual-source-review.json",
+      "fixture_overrides": {
+        "surface": "Settings > Models",
+        "catalog_update_result": {
+          "exit_code": 1,
+          "stderr": "fixture catalog update failure"
+        },
+        "toast_elapsed_ms": 0
+      }
+    },
+    {
+      "category": "models",
+      "slug": "models-card-hover",
+      "feature_ids": [
+        "P08"
+      ],
+      "expected_controls": [
+        "Alpha name",
+        "alpha ID",
+        "Favorite star",
+        "128k context badge",
+        "Set active footer revealed",
+        "Current Second Same retains Active badge"
+      ],
+      "scope": "canonical",
+      "note": "Independent source challenge corrected first-pass expectations; no image comparison has run.",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "model_card",
+          "line": 1561,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L1561"
+        }
+      ],
+      "id": "V132",
+      "title": "Models card hover",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated models surface in fixture.json.",
+        "Configure the named source state: Models card hover.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V132/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V132/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Models source reviewer",
+        "evidence": "Remove invented input/output/cost metadata. These are not rendered by model_card. Context-window presence is the only card capability metadata. Exact fixture and source ranges: model-visual-source-review.json."
+      },
+      "concrete_fixture_reference": "../model-visual-source-review.json",
+      "fixture_overrides": {
+        "surface": "Settings > Models",
+        "pointer": "center of inactive First/Alpha card"
+      }
+    },
+    {
+      "category": "models",
+      "slug": "models-provider-filter-dropdown",
+      "feature_ids": [
+        "P08"
+      ],
+      "expected_controls": [
+        "Search filter with focus",
+        "Flat provider-name options with chosen Provider 05 check",
+        "Keyboard wash on selected row",
+        "List viewport capped at 220px"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "model_provider_select",
+          "line": 1282,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L1282"
+        }
+      ],
+      "id": "V133",
+      "title": "Models provider filter dropdown",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated models surface in fixture.json.",
+        "Configure the named source state: Models provider filter dropdown.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V133/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V133/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Models source reviewer",
+        "evidence": "Use enough providers to reach the scroll limit. All providers sentinel is first but may be outside the centered visible viewport; do not claim it is simultaneously visible with every provider. Exact fixture and source ranges: model-visual-source-review.json."
+      },
+      "concrete_fixture_reference": "../model-visual-source-review.json",
+      "fixture_overrides": {
+        "surface": "Settings > Models",
+        "catalog": "Ten one-model providers provider-00 through provider-09, name Model 00 through Model 09, id model-00 through model-09, in numeric order",
+        "provider_filter": "provider-05",
+        "open_control": "All providers"
+      }
+    },
+    {
+      "category": "models",
+      "slug": "settings-active-model-dropdown",
+      "feature_ids": [
+        "P04",
+        "P08"
+      ],
+      "expected_controls": [
+        "Search filter",
+        "Five flat Provider \u00b7 Name choices in catalog order",
+        "Check on Second \u00b7 Second Same",
+        "Selected and keyboard wash"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "active_model_select",
+          "line": 1317,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L1317"
+        }
+      ],
+      "id": "V134",
+      "title": "Settings active model dropdown",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated models surface in fixture.json.",
+        "Configure the named source state: Settings active model dropdown.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V134/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V134/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Models source reviewer",
+        "evidence": "No provider-group headers in settings selects. Exact fixture and source ranges: model-visual-source-review.json."
+      },
+      "concrete_fixture_reference": "../model-visual-source-review.json",
+      "fixture_overrides": {
+        "surface": "Settings > Models",
+        "open_control": "Active model"
+      }
+    },
+    {
+      "category": "models",
+      "slug": "settings-default-model-dropdown",
+      "feature_ids": [
+        "P04"
+      ],
+      "expected_controls": [
+        "pi default sentinel",
+        "Five flat Provider \u00b7 Name options in catalog order",
+        "Check on First \u00b7 Beta"
+      ],
+      "scope": "canonical",
+      "note": "Independent source challenge corrected first-pass expectations; no image comparison has run.",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "settings_select_popup",
+          "line": 6907,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L6907"
+        }
+      ],
+      "id": "V135",
+      "title": "Settings default model dropdown",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated models surface in fixture.json.",
+        "Configure the named source state: Settings default model dropdown.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V135/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V135/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Models source reviewer",
+        "evidence": "Remove invented provider-grouped options. Current selection means saved default, not live current model. List is flat. Exact fixture and source ranges: model-visual-source-review.json."
+      },
+      "concrete_fixture_reference": "../model-visual-source-review.json",
+      "fixture_overrides": {
+        "surface": "Settings > Agent",
+        "default_model": [
+          "first",
+          "beta"
+        ],
+        "open_control": "Default model"
+      }
+    },
+    {
+      "category": "models",
+      "slug": "settings-default-thinking-disabled",
+      "feature_ids": [
+        "P04"
+      ],
+      "expected_controls": [
+        "Default model chip pi default",
+        "Default thinking noninteractive pi default chip"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "settings_rows",
+          "line": 932,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L932"
+        }
+      ],
+      "id": "V136",
+      "title": "Settings default thinking disabled",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated models surface in fixture.json.",
+        "Configure the named source state: Settings default thinking disabled.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V136/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V136/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Models source reviewer",
+        "evidence": "No popup, caret, or fabricated thinking ladder. A stale unmatched default model follows the same render branch. Exact fixture and source ranges: model-visual-source-review.json."
+      },
+      "concrete_fixture_reference": "../model-visual-source-review.json",
+      "fixture_overrides": {
+        "surface": "Settings > Agent",
+        "default_model": null
+      }
+    },
+    {
+      "category": "models",
+      "slug": "settings-default-thinking-dropdown",
+      "feature_ids": [
+        "P04"
+      ],
+      "expected_controls": [
+        "pi default sentinel",
+        "Low, High, Max rows from Beta capability map",
+        "Check on High"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "settings_select_popup",
+          "line": 6907,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L6907"
+        }
+      ],
+      "id": "V137",
+      "title": "Settings default thinking dropdown",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated models surface in fixture.json.",
+        "Configure the named source state: Settings default thinking dropdown.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V137/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V137/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Models source reviewer",
+        "evidence": "Use Beta explicit null map to suppress off/minimal/medium; max is present because explicitly mapped. Do not substitute the live session ladder. Exact fixture and source ranges: model-visual-source-review.json."
+      },
+      "concrete_fixture_reference": "../model-visual-source-review.json",
+      "fixture_overrides": {
+        "surface": "Settings > Agent",
+        "default_model": [
+          "first",
+          "beta"
+        ],
+        "default_thinking": "high",
+        "open_control": "Default thinking"
+      }
+    },
+    {
+      "category": "models",
+      "slug": "settings-title-model-dropdown",
+      "feature_ids": [
+        "P04"
+      ],
+      "expected_controls": [
+        "Active session model sentinel",
+        "Five flat Provider \u00b7 Name options",
+        "Check on First \u00b7 Alpha"
+      ],
+      "scope": "canonical",
+      "note": "Independent source challenge corrected first-pass expectations; no image comparison has run.",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "settings_select_popup",
+          "line": 6907,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L6907"
+        }
+      ],
+      "id": "V138",
+      "title": "Settings title model dropdown",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated models surface in fixture.json.",
+        "Configure the named source state: Settings title model dropdown.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V138/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V138/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Models source reviewer",
+        "evidence": "Replace inaccurate Session default with exact Active session model; it uses live session model, not session birth default. Exact fixture and source ranges: model-visual-source-review.json."
+      },
+      "concrete_fixture_reference": "../model-visual-source-review.json",
+      "fixture_overrides": {
+        "surface": "Settings > Agent",
+        "title_model": [
+          "first",
+          "alpha"
+        ],
+        "open_control": "Title model"
+      }
+    },
+    {
+      "category": "models",
+      "slug": "settings-model-dropdown-filtered",
+      "feature_ids": [
+        "P04",
+        "P08"
+      ],
+      "expected_controls": [
+        "Typed First query",
+        "Three First provider options only",
+        "Keyboard-highlighted Alpha row",
+        "No sentinel because it does not match"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "settings_select_popup",
+          "line": 6907,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L6907"
+        }
+      ],
+      "id": "V139",
+      "title": "Settings model dropdown filtered",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated models surface in fixture.json.",
+        "Configure the named source state: Settings model dropdown filtered.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V139/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V139/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Models source reviewer",
+        "evidence": "Search retains original catalog indices; choose a saved default outside the filter to distinguish keyboard highlight from selected check. Exact fixture and source ranges: model-visual-source-review.json."
+      },
+      "concrete_fixture_reference": "../model-visual-source-review.json",
+      "fixture_overrides": {
+        "surface": "Settings > Agent",
+        "open_control": "Default model",
+        "dropdown_query": "First",
+        "keys": [
+          "ArrowDown"
+        ]
+      }
+    },
+    {
+      "category": "models",
+      "slug": "settings-model-dropdown-no-matches",
+      "feature_ids": [
+        "P04",
+        "P08"
+      ],
+      "expected_controls": [
+        "Typed unmatched query",
+        "One muted No matches entry"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/app/settings.rs",
+          "handler": "settings_select_popup",
+          "line": 6907,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/app/settings.rs#L6907"
+        }
+      ],
+      "id": "V140",
+      "title": "Settings model dropdown no matches",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated models surface in fixture.json.",
+        "Configure the named source state: Settings model dropdown no matches.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/native",
+        "internal/preferences",
+        "internal/workbench"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V140/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V140/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Models source reviewer",
+        "evidence": "The explicit No matches text is rendered; an empty blank popup is not source parity. Enter sends nothing. Exact fixture and source ranges: model-visual-source-review.json."
+      },
+      "concrete_fixture_reference": "../model-visual-source-review.json",
+      "fixture_overrides": {
+        "surface": "Settings > Models",
+        "open_control": "Active model",
+        "dropdown_query": "zzz-no-match"
+      }
+    },
+    {
+      "category": "models",
+      "slug": "composer-model-all-groups",
+      "feature_ids": [
+        "C06"
+      ],
+      "expected_controls": [
+        "Recents heading and Beta",
+        "Favorites heading and Alpha",
+        "Second provider heading and current Second Same check",
+        "Search, scope row and footer count3"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/model_selector.rs",
+          "handler": "render",
+          "line": 885,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/model_selector.rs#L885"
+        }
+      ],
+      "id": "V141",
+      "title": "Composer model all groups",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated models surface in fixture.json.",
+        "Configure the named source state: Composer model all groups.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/agent",
+        "internal/pirpc"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V141/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V141/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Models source reviewer",
+        "evidence": "Three models make all three sections fit simultaneously inside six-row-equivalent viewport. Larger catalogs require separate scrolled captures to claim all groups visible. Exact fixture and source ranges: model-visual-source-review.json."
+      },
+      "concrete_fixture_reference": "../model-visual-source-review.json",
+      "fixture_overrides": {
+        "surface": "Composer",
+        "catalog_subset": [
+          0,
+          1,
+          2
+        ],
+        "recents": [
+          [
+            "first",
+            "beta"
+          ]
+        ],
+        "favorites": [
+          [
+            "first",
+            "alpha"
+          ]
+        ],
+        "picker": "Model",
+        "scope": "All"
+      }
+    },
+    {
+      "category": "models",
+      "slug": "composer-model-recents",
+      "feature_ids": [
+        "C06"
+      ],
+      "expected_controls": [
+        "Selected Recents scope",
+        "Flat Beta, Second Same, Alpha rows in MRU order",
+        "Current check",
+        "3 recent footer"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/model_selector.rs",
+          "handler": "render",
+          "line": 885,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/model_selector.rs#L885"
+        }
+      ],
+      "id": "V142",
+      "title": "Composer model recents",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated models surface in fixture.json.",
+        "Configure the named source state: Composer model recents.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/agent",
+        "internal/pirpc"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V142/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V142/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Models source reviewer",
+        "evidence": "No Recents header in dedicated Recents scope. Exact fixture and source ranges: model-visual-source-review.json."
+      },
+      "concrete_fixture_reference": "../model-visual-source-review.json",
+      "fixture_overrides": {
+        "surface": "Composer",
+        "recents": [
+          [
+            "first",
+            "beta"
+          ],
+          [
+            "second",
+            "same"
+          ],
+          [
+            "first",
+            "alpha"
+          ]
+        ],
+        "picker": "Model",
+        "scope": "Recents"
+      }
+    },
+    {
+      "category": "models",
+      "slug": "composer-model-favorites",
+      "feature_ids": [
+        "C06"
+      ],
+      "expected_controls": [
+        "Selected Favorites scope",
+        "Flat Alpha, Beta, Second Same rows",
+        "Accent stars",
+        "Current check",
+        "3 favorites footer"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/model_selector.rs",
+          "handler": "render",
+          "line": 885,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/model_selector.rs#L885"
+        }
+      ],
+      "id": "V143",
+      "title": "Composer model favorites",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated models surface in fixture.json.",
+        "Configure the named source state: Composer model favorites.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/agent",
+        "internal/pirpc"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V143/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V143/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Models source reviewer",
+        "evidence": "Order is provider-grouped catalog traversal, not order in favorites.json. No Favorites group header in this dedicated scope. Exact fixture and source ranges: model-visual-source-review.json."
+      },
+      "concrete_fixture_reference": "../model-visual-source-review.json",
+      "fixture_overrides": {
+        "surface": "Composer",
+        "favorites": [
+          [
+            "second",
+            "same"
+          ],
+          [
+            "first",
+            "beta"
+          ],
+          [
+            "first",
+            "alpha"
+          ]
+        ],
+        "picker": "Model",
+        "scope": "Favorites"
+      }
+    },
+    {
+      "category": "models",
+      "slug": "composer-model-provider",
+      "feature_ids": [
+        "C06"
+      ],
+      "expected_controls": [
+        "Selected First scope",
+        "Recents heading with Alpha then Beta in catalog order",
+        "First Same below recent rows without provider header",
+        "3 models footer"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/model_selector.rs",
+          "handler": "render",
+          "line": 885,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/model_selector.rs#L885"
+        }
+      ],
+      "id": "V144",
+      "title": "Composer model provider",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated models surface in fixture.json.",
+        "Configure the named source state: Composer model provider.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/agent",
+        "internal/pirpc"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V144/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V144/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Models source reviewer",
+        "evidence": "Provider-scope recents differ from MRU ordering; no redundant provider group heading. Exact fixture and source ranges: model-visual-source-review.json."
+      },
+      "concrete_fixture_reference": "../model-visual-source-review.json",
+      "fixture_overrides": {
+        "surface": "Composer",
+        "recents": [
+          [
+            "first",
+            "beta"
+          ],
+          [
+            "first",
+            "alpha"
+          ]
+        ],
+        "picker": "Model",
+        "scope": "provider:first"
+      }
+    },
+    {
+      "category": "models",
+      "slug": "composer-model-filtered",
+      "feature_ids": [
+        "C06"
+      ],
+      "expected_controls": [
+        "Typed same query",
+        "Second Same with actual current check",
+        "First Same row",
+        "After ArrowDown keyboard highlight on First Same, distinct from current check"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/model_selector.rs",
+          "handler": "render",
+          "line": 885,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/model_selector.rs#L885"
+        }
+      ],
+      "id": "V145",
+      "title": "Composer model filtered",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated models surface in fixture.json.",
+        "Configure the named source state: Composer model filtered.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/agent",
+        "internal/pirpc"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V145/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V145/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Models source reviewer",
+        "evidence": "Use both equal-ID providers, not a single matching row, to visibly prove provider identity and independent keyboard highlight. Exact fixture and source ranges: model-visual-source-review.json."
+      },
+      "concrete_fixture_reference": "../model-visual-source-review.json",
+      "fixture_overrides": {
+        "surface": "Composer",
+        "picker": "Model",
+        "picker_query": "same"
+      }
+    },
+    {
+      "category": "models",
+      "slug": "composer-model-no-matches",
+      "feature_ids": [
+        "C06"
+      ],
+      "expected_controls": [
+        "No matching models title",
+        "Try a provider, model or id hint",
+        "Zero model count footer",
+        "Search/scope controls remain"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/model_selector.rs",
+          "handler": "render",
+          "line": 885,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/model_selector.rs#L885"
+        }
+      ],
+      "id": "V146",
+      "title": "Composer model no matches",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated models surface in fixture.json.",
+        "Configure the named source state: Composer model no matches.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/agent",
+        "internal/pirpc"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V146/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V146/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Models source reviewer",
+        "evidence": "Explicit two-line no-match entry is rendered, not blank empty results. Exact fixture and source ranges: model-visual-source-review.json."
+      },
+      "concrete_fixture_reference": "../model-visual-source-review.json",
+      "fixture_overrides": {
+        "surface": "Composer",
+        "picker": "Model",
+        "picker_query": "zzz-no-match"
+      }
+    },
+    {
+      "category": "models",
+      "slug": "composer-model-favorite-current-chip",
+      "feature_ids": [
+        "C06"
+      ],
+      "expected_controls": [
+        "All scope",
+        "Second scope",
+        "Full Favorite current star/text chip",
+        "Current model row"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/model_selector.rs",
+          "handler": "render",
+          "line": 885,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/model_selector.rs#L885"
+        }
+      ],
+      "id": "V147",
+      "title": "Composer model favorite current chip",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated models surface in fixture.json.",
+        "Configure the named source state: Composer model favorite current chip.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/agent",
+        "internal/pirpc"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V147/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V147/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Models source reviewer",
+        "evidence": "Use one short provider so full label fits. For larger catalogs this is a horizontal-scroll row; clipping at right does not justify replacing label with an icon-only action. Separate scroll regression proves reachability. Exact fixture and source ranges: model-visual-source-review.json."
+      },
+      "concrete_fixture_reference": "../model-visual-source-review.json",
+      "fixture_overrides": {
+        "surface": "Composer",
+        "catalog_subset": [
+          1
+        ],
+        "favorites": [],
+        "recents": [],
+        "picker": "Model",
+        "scope_scroll_x": 0
+      }
+    },
+    {
+      "category": "models",
+      "slug": "composer-model-row-hover",
+      "feature_ids": [
+        "C06"
+      ],
+      "expected_controls": [
+        "Unfavorited Alpha star revealed",
+        "Second Same favorite star remains accent",
+        "Second Same current check remains"
+      ],
+      "scope": "canonical",
+      "note": "",
+      "source": [
+        {
+          "path": "crates/orbit-pi/src/model_selector.rs",
+          "handler": "render",
+          "line": 885,
+          "url": "https://github.com/imrj05/orbit/blob/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac/crates/orbit-pi/src/model_selector.rs#L885"
+        }
+      ],
+      "id": "V148",
+      "title": "Composer model row hover",
+      "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+      "source_version": "0.2.12",
+      "source_evidence_level": "PINNED_PATH_AND_HANDLER_VERIFIED_ONLY",
+      "fixture_contract": "fixture.json",
+      "fixture_setup": [
+        "Open the isolated models surface in fixture.json.",
+        "Configure the named source state: Composer model row hover.",
+        "Use the smallest deterministic data set that makes every expected control visible; scroll to the relevant region without changing client size.",
+        "Freeze clock/animation and capture the complete client at1470x922. If controls cannot coexist visibly, append another stable case instead of claiming this image covers hidden controls."
+      ],
+      "fixture_readiness": "NOT_IMPLEMENTED_OR_NOT_VALIDATED",
+      "go_mapping": [
+        "internal/agent",
+        "internal/pirpc"
+      ],
+      "status": "UNTESTED",
+      "blocker": null,
+      "auth_gate": null,
+      "rust_image": {
+        "planned_path": "../probes/visual/V148/rust.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "go_image": {
+        "planned_path": "../probes/visual/V148/go.png",
+        "actual_path": null,
+        "sha256": null,
+        "capture_commit": null,
+        "client_bounds": null,
+        "font_manifest": null
+      },
+      "comparison": {
+        "valid_matching_pair": false,
+        "pixel_equal": null,
+        "differing_pixels": null,
+        "max_channel_delta": null,
+        "mean_absolute_channel_error": null,
+        "ssim": null,
+        "geometry_deltas": null,
+        "text_clipping": null,
+        "diff_image": null,
+        "masks": [],
+        "rule": "No PASS without matching fixture, client geometry, font manifest, actual images, metrics and human review. Never hide mismatches with resizing or an undeclared mask."
+      },
+      "manual_review": {
+        "status": "NOT_REVIEWED",
+        "reviewer": null,
+        "checked_at": null,
+        "finding": null
+      },
+      "functional_verdict": "NOT_ESTABLISHED_BY_SCREENSHOT",
+      "visual_verdict": "UNTESTED",
+      "native_os_verdict": "UNTESTED",
+      "last_verified_go_sha": null,
+      "state_validity": {
+        "status": "VALID_SOURCE_BRANCH",
+        "actual_state_verified": true,
+        "reviewer": "Independent Models source reviewer",
+        "evidence": "Hover must follow guard expiration and real pointer movement; stationary pointer after scroll is not a highlight event. Exact fixture and source ranges: model-visual-source-review.json."
+      },
+      "concrete_fixture_reference": "../model-visual-source-review.json",
+      "fixture_overrides": {
+        "surface": "Composer",
+        "catalog_subset": [
+          0,
+          1
+        ],
+        "favorites": [
+          [
+            "second",
+            "same"
+          ]
+        ],
+        "picker": "Model",
+        "pointer": "First/Alpha row after 400ms hover guard"
+      }
+    }
+  ]
+}
