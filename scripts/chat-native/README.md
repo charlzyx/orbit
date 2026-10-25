@@ -138,4 +138,30 @@ proc task-children support fails in GitHub or with ORBIT_REQUIRE_PROC_CHILDREN=1
 local sandboxes lacking the file explicitly skip this one real-process test.
 Deterministic proc fixtures test identity churn, wrong parent/CLI, vanished task,
 and fanout rejection but do not substitute for the required hosted proof.
-No automatic rerun or new one-shot marker is introduced here.
+The scanner change itself introduced no automatic rerun or new one-shot marker.
+
+
+## Second bounded one-shot after verified threaded ownership
+
+The first `1305b509b4973e5b80fdb7323e1705d3a670a270` run stopped both
+renderers in STARTUP with **zero Chat input events**; no Ctrl+1 or Ctrl+Up was
+sent. Existing Settings/Usage/Workbench output is not Chat acceptance.
+On published wave5 `a5c40cc2f85b57b94c1e2027d5cfc690b8692a49`, actual Ubuntu
+`proc-guard-regression` job `121267814330` completed **two tests PASS, no skip**.
+That establishes the controlled threaded-child regression, not application
+pixel parity or a blanket claim about the first artifact's root cause.
+
+This isolated test-only increment admits one new push only when `before` is
+exactly `a5c40cc2f85b57b94c1e2027d5cfc690b8692a49` and the head commit message
+is exactly `Capture static Chat stage 1 after verified threaded ownership`.
+Manual boolean dispatch stays unchanged; ordinary pushes/PRs and the expired
+first marker remain off. Both native jobs still depend on the required real
+proc regression job and retain all RPC/window/identity/image/input guards.
+
+Scope remains two persisted synthetic states (tail and PrevTurn). Context is
+BLOCKED; no provider inference, credentials, hover, selection or stage2 RPC
+inputs are added. No uncertain input is resent. After this single new run,
+record its actual URL/outcome and remove the push disjunct in the next ordinary
+source commit. The same event matrix continues passing with manual-only
+restored and then requires the formerly matching second push to be off too.
+This local diff does not publish or dispatch the run.
