@@ -1,0 +1,168 @@
+{
+  "runtime": "@earendil-works/pi-coding-agent@1.4.0",
+  "expectation": "stock",
+  "node": "v24.22.1",
+  "arguments": [
+    "--mode",
+    "rpc",
+    "--no-session",
+    "--no-approve",
+    "--offline",
+    "--no-extensions",
+    "--no-skills",
+    "--no-prompt-templates",
+    "--no-context-files",
+    "--no-tools"
+  ],
+  "credential_environment_inherited": false,
+  "external_automatic_network_disabled": true,
+  "commands": [
+    "get_state",
+    "get_available_models",
+    "abort",
+    "get_available_thinking_levels",
+    "get_messages",
+    "get_session_stats",
+    "get_entries",
+    "get_commands",
+    "auth.list",
+    "quota.list"
+  ],
+  "responses": [
+    {
+      "id": "contract-1",
+      "type": "response",
+      "command": "get_state",
+      "success": true,
+      "data": {
+        "model": {
+          "id": "unknown",
+          "name": "unknown",
+          "api": "unknown",
+          "provider": "unknown",
+          "baseUrl": "",
+          "reasoning": false,
+          "input": [],
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0
+          },
+          "contextWindow": 0,
+          "maxTokens": 0
+        },
+        "thinkingLevel": "off",
+        "isStreaming": false,
+        "isCompacting": false,
+        "steeringMode": "one-at-a-time",
+        "followUpMode": "one-at-a-time",
+        "sessionId": "01a1711d-32e4-74e1-b53e-4850984a589b",
+        "autoCompactionEnabled": true,
+        "messageCount": 0,
+        "pendingMessageCount": 0
+      }
+    },
+    {
+      "id": "contract-2",
+      "type": "response",
+      "command": "get_available_models",
+      "success": true,
+      "data": {
+        "models": []
+      }
+    },
+    {
+      "id": "contract-4",
+      "type": "response",
+      "command": "get_available_thinking_levels",
+      "success": true,
+      "data": {
+        "levels": [
+          "off"
+        ]
+      }
+    },
+    {
+      "id": "contract-5",
+      "type": "response",
+      "command": "get_messages",
+      "success": true,
+      "data": {
+        "messages": []
+      }
+    },
+    {
+      "id": "contract-6",
+      "type": "response",
+      "command": "get_session_stats",
+      "success": true,
+      "data": {
+        "sessionId": "01a1711d-32e4-74e1-b53e-4850984a589b",
+        "userMessages": 0,
+        "assistantMessages": 0,
+        "toolCalls": 0,
+        "toolResults": 0,
+        "totalMessages": 0,
+        "tokens": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "cost": 0
+      }
+    },
+    {
+      "id": "contract-7",
+      "type": "response",
+      "command": "get_entries",
+      "success": true,
+      "data": {
+        "entries": [
+          {
+            "type": "thinking_level_change",
+            "id": "ff310263",
+            "parentId": null,
+            "timestamp": "2026-10-25T03:31:41.496Z",
+            "thinkingLevel": "off"
+          }
+        ],
+        "leafId": "ff310263"
+      }
+    },
+    {
+      "id": "contract-8",
+      "type": "response",
+      "command": "get_commands",
+      "success": true,
+      "data": {
+        "commands": []
+      }
+    },
+    {
+      "id": "contract-9",
+      "type": "response",
+      "command": "auth.list",
+      "success": false,
+      "error": "Unknown command: auth.list"
+    },
+    {
+      "id": "contract-10",
+      "type": "response",
+      "command": "quota.list",
+      "success": false,
+      "error": "Unknown command: quota.list"
+    },
+    {
+      "id": "contract-3",
+      "type": "response",
+      "command": "abort",
+      "success": true
+    }
+  ],
+  "stderr": [],
+  "exit_code": 0,
+  "model_or_tool_start_events": 0
+}

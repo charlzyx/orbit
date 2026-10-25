@@ -1,0 +1,23 @@
+package main
+
+import (
+ "image/png"
+ "os"
+ "path/filepath"
+ "testing"
+ "time"
+
+ "github.com/egoist/mygo/ui"
+)
+
+func TestOrbitInspectionSnapshots(t *testing.T) {
+ for _, page := range []string{"overview", "list", "markdown"} {
+  g := &gallery{router: ui.NewRouter("/"+page), notify: true, plan: "Personal", volume: 60, size: "Medium", name: "Ada", bio: "This is a text area.\nTry a few lines, or paste a paragraph.", picked: -1, tree: map[string]bool{}, starred: map[int]bool{}, now: time.Date(2026, 10, 25, 0, 0, 0, 0, time.UTC), period: 1, copies: 1, split: 240, sectionsOpen: [2]bool{true, true}, sections: [3]bool{true}, fruit: "Apple", font: "System", tags: []string{"Go", "MyGo"}, notes: 3, notifyMail: true, notifyCalendar: true, priceLow: 20, priceHigh: 80}
+  g.router.Transition = ui.TransitionNone
+  tt := ui.NewTester(g.view, 980, 720)
+  p := filepath.Join(os.Getenv("MYGO_INSPECTION_OUTPUT"), "mygo-gallery-"+page+"-linux-cpu-1x.png")
+  f,err:=os.Create(p); if err != nil {t.Fatal(err)}
+  err=png.Encode(f,tt.Image()); closeErr:=f.Close(); if err != nil {t.Fatal(err)}; if closeErr != nil {t.Fatal(closeErr)}
+  t.Log(p)
+ }
+}

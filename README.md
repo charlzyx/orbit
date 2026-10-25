@@ -1,4 +1,13 @@
-# Orbit
+# Orbit: Go + MyGo reconstruction (in progress)
+
+This fork is migrating the complete Orbit v0.2.12 workbench to Go and MyGo native UI, using Pi JSONL RPC. It is **not yet a feature-complete or pixel-perfect replacement**. The Rust tree and upstream screenshots below are retained as reference, not as the new implementation.
+
+- Run the new native app: `go run ./cmd/orbit` (Go 1.27.3; Pi 1.4.0 must be installed separately).
+- Verify: `go test ./...`; see [migration evidence and limitations](docs/mygo-migration/README.md) and the [full source-derived acceptance matrix](docs/mygo-migration/feature-parity.md).
+- Native UI uses MyGo directly, without a browser, webview, cgo or Rust sidecar. Desktop graphics libraries and the pinned Ghostty terminal runtime are platform dependencies.
+- No releases, production update feed, signing, upstream merges or deployments are configured by this migration.
+
+## Original Orbit reference
 
 [![CI](https://github.com/imrj05/orbit/actions/workflows/ci.yml/badge.svg)](https://github.com/imrj05/orbit/actions/workflows/ci.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)

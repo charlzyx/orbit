@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### In progress
+
+- Full native Go + MyGo reconstruction on `redesign/mygo-rpc`, preserving the original Rust source as a reference only. Adds actual Pi RPC process/session management, native shell, Git/worktree/file/terminal domains, preferences and source-derived parity tests. This checkpoint is not a completed parity claim.
+- Pinned baseline inventory, reproducible native CPU captures and a hosted native-reference capture workflow. Desktop visual, cross-platform and remaining interaction acceptance gates are tracked explicitly in `docs/mygo-migration/feature-parity.md`.
+
 ## [0.2.12] - 2026-10-24
 
 ### Added

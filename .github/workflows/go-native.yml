@@ -1,0 +1,67 @@
+name: Go native migration
+
+on:
+  push:
+    branches: ["redesign/mygo-rpc"]
+  pull_request:
+    paths: ["**/*.go", "go.mod", "go.sum", "scripts/capture-native-reference.sh", ".github/workflows/go-native.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16
+        with:
+          go-version: '1.27.3'
+      - name: Native text raster dependencies
+        run: sudo apt-get update && sudo apt-get install -y libpango-1.0-0 libcairo2 libfontconfig1
+      - name: Install pinned Pi for credential-free protocol integration
+        run: npm install --prefix /tmp/orbit-pi-runtime @earendil-works/pi-coding-agent@1.4.0
+      - run: go vet ./...
+      - run: go test -race ./...
+        env:
+          ORBIT_PI_INTEGRATION_BIN: /tmp/orbit-pi-runtime/node_modules/.bin/pi
+          ORBIT_TERMINAL_TEST: "1"
+      - name: Reproducible CPU captures (not desktop integration)
+        run: ORBIT_CAPTURE_DIR="$PWD/capture/native-cpu" go test ./internal/ui -run '^TestNativeCapture$' -count=1
+      - name: No-cgo cross compilation
+        run: |
+          for target in linux/amd64 linux/arm64 darwin/amd64 darwin/arm64 windows/amd64 windows/arm64; do
+            GOOS=${target%/*} GOARCH=${target#*/} CGO_ENABLED=0 go build ./...
+          done
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: native-cpu-captures
+          path: capture/
+
+  reference-desktop:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Reference renderer and isolated display dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake pkg-config libfontconfig-dev libvulkan1 mesa-vulkan-drivers libwayland-dev libx11-xcb-dev libxi-dev libxtst-dev libxkbcommon-x11-dev libssl-dev xvfb openbox xdotool imagemagick
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
+        with:
+          toolchain: '1.94.0'
+      - name: Build pinned original source (reference only)
+        run: |
+          git worktree add --detach /tmp/orbit-reference 299a32bc87fe3d4851bdb902d9c03dcf9bf99cac
+          cargo build --locked --manifest-path /tmp/orbit-reference/Cargo.toml -p orbit-pi
+      - name: Install pinned Pi without credentials or inference
+        run: npm install --prefix /tmp/orbit-pi-runtime @earendil-works/pi-coding-agent@1.4.0
+      - name: Capture actual original native window
+        run: scripts/capture-native-reference.sh /tmp/orbit-reference/target/debug/orbit-pi "$PWD/capture/reference-desktop"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: pinned-reference-desktop
+          path: capture/

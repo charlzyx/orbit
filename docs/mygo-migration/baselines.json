@@ -1,0 +1,197 @@
+{
+  "orbit": {
+    "repository": "https://github.com/imrj05/orbit",
+    "sha": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+    "version": "0.2.12",
+    "license": "Apache-2.0"
+  },
+  "mygo": {
+    "repository": "https://github.com/egoist/mygo",
+    "sha": "9c69cf829ece196c5b3a3601f1c7bbe70526376f",
+    "go": "1.27.3",
+    "license": "MIT"
+  },
+  "screenshots": [
+    {
+      "path": "marketing/public/screens/agent-light.png",
+      "sha256": "4d07afbb475d15c01e316422710513fab8ca4c9cf7bddabca0d99ffa6fa2020a",
+      "width": 3164,
+      "height": 2068
+    },
+    {
+      "path": "marketing/public/screens/agent.png",
+      "sha256": "d3b471967d586487b4cba1799151b993910883ff61c9ee51e32e51498f26d41d",
+      "width": 3164,
+      "height": 2068
+    },
+    {
+      "path": "marketing/public/screens/appearance-light.png",
+      "sha256": "206902800269803d6ac7f1f2bb71e26d32ac09bbd89c4c915d1bffa8dedd9321",
+      "width": 3164,
+      "height": 2068
+    },
+    {
+      "path": "marketing/public/screens/appearance.png",
+      "sha256": "da7036c61f47d408e7e877bccf2e1d88c4e7b923b96a08ac0832ba4de5aa2bc4",
+      "width": 3164,
+      "height": 2068
+    },
+    {
+      "path": "marketing/public/screens/general-light.png",
+      "sha256": "407a365b76e439cb88f6599af0d25ed7b4f3b2bf203449361529fff1c89100c0",
+      "width": 3164,
+      "height": 2068
+    },
+    {
+      "path": "marketing/public/screens/general.png",
+      "sha256": "df23a79f29742dbdcc623b59606b7585be6754ce06619ac98e3509573140d7a7",
+      "width": 3164,
+      "height": 2068
+    },
+    {
+      "path": "marketing/public/screens/git-light.png",
+      "sha256": "baefdd95893410e6a25a4a4baf0e9d2832a5d71bef113e6145c1b43de7151ace",
+      "width": 3164,
+      "height": 2068
+    },
+    {
+      "path": "marketing/public/screens/git.png",
+      "sha256": "c73a20cffb2f819cb1f2afe6eeba091dc0ea1fc716823a363be3c4e56cbc8a64",
+      "width": 3164,
+      "height": 2068
+    },
+    {
+      "path": "marketing/public/screens/mcp-light.png",
+      "sha256": "864c1ebc2bdaa5d9f380b742e83f1d0605d1ef676eceabd029174efda115931e",
+      "width": 3164,
+      "height": 2068
+    },
+    {
+      "path": "marketing/public/screens/mcp.png",
+      "sha256": "49d6fc035e5d8271f22647ce8713c84f84047b1ea14eb05f7ba8947c93f96f8e",
+      "width": 3164,
+      "height": 2068
+    },
+    {
+      "path": "marketing/public/screens/models-light.png",
+      "sha256": "7cb289c82c03f99b8059c7b15b721666c24a7b9e26cc9033ac8e1b32baefd881",
+      "width": 3164,
+      "height": 2068
+    },
+    {
+      "path": "marketing/public/screens/models.png",
+      "sha256": "015e91b2dd9bde1937de2bfd8a35a3317a85c6287b54a9d3fd4bc3b0f9ee320b",
+      "width": 3164,
+      "height": 2068
+    },
+    {
+      "path": "marketing/public/screens/new-task-light.png",
+      "sha256": "2a3f202f7bc358c26a1f8dea8aa3e7afc1d646c6fab5a2cbfd9ed911ddeb5b2d",
+      "width": 3164,
+      "height": 2068
+    },
+    {
+      "path": "marketing/public/screens/new-task.png",
+      "sha256": "f338960b255cc86088c7e55d51e0e4480d8b0e9776089dc2b56d8e1e8be612d7",
+      "width": 3164,
+      "height": 2068
+    },
+    {
+      "path": "marketing/public/screens/plugins-light.png",
+      "sha256": "cf987963f2236a2dfc844b57b70b90763e433944a917763993fd8ed76046601b",
+      "width": 3164,
+      "height": 2068
+    },
+    {
+      "path": "marketing/public/screens/plugins.png",
+      "sha256": "f982be6d616db39096c1b642a20dc766af421a625b8b6a4d87274db00df00cf0",
+      "width": 3164,
+      "height": 2068
+    },
+    {
+      "path": "marketing/public/screens/providers-light.png",
+      "sha256": "7d0df25244c426e0a0b6b28d9b656e8dc40694ea7077444175f3c80024523cc0",
+      "width": 3164,
+      "height": 2068
+    },
+    {
+      "path": "marketing/public/screens/providers-usage.png",
+      "sha256": "3ca3d70ddb139510b1d3064f65c4f026d4f6904c5247d301dcaf345699b256d5",
+      "width": 3164,
+      "height": 2068
+    },
+    {
+      "path": "marketing/public/screens/providers.png",
+      "sha256": "12306968d05ea187e28241631ed9f4a24168c28dc009ab6c9729d33680bbcdab",
+      "width": 3164,
+      "height": 2068
+    },
+    {
+      "path": "marketing/public/screens/review-light.png",
+      "sha256": "d8e43a963edc6fd985a8c8363a9482d872bdb8d4e40bca86d417cf58fa007523",
+      "width": 3164,
+      "height": 2068
+    },
+    {
+      "path": "marketing/public/screens/review.png",
+      "sha256": "e9ad87f592961a92c06edd2108c21ad23c2f6664e41981dcb7d8aecbc4153b0f",
+      "width": 3164,
+      "height": 2068
+    },
+    {
+      "path": "marketing/public/screens/runtime.png",
+      "sha256": "1c1c294a115a1e25d889cae47a45ef227e14d8b841237739e6ab7c73ef51e35c",
+      "width": 3164,
+      "height": 2068
+    },
+    {
+      "path": "marketing/public/screens/session-light.png",
+      "sha256": "50941f5edee21e6d3967f95ef29f63e80f5995d620a14d9b193cb0b0d045b98a",
+      "width": 3164,
+      "height": 2068
+    },
+    {
+      "path": "marketing/public/screens/session.png",
+      "sha256": "82eb8b3ab930eedf4a76e4d1014fef0b0d391e1cfd59d41f390d36b83825dabc",
+      "width": 3164,
+      "height": 2068
+    },
+    {
+      "path": "marketing/public/screens/shortcuts-light.png",
+      "sha256": "bfcc15a6d6719e7fc3bede4682ad1668e024d6308529eacef705714b5466c20a",
+      "width": 3164,
+      "height": 2068
+    },
+    {
+      "path": "marketing/public/screens/shortcuts.png",
+      "sha256": "af3ca846273c49b2b287500137352f199525d03c82bb0e03a9f75ffde0efab77",
+      "width": 3164,
+      "height": 2068
+    },
+    {
+      "path": "marketing/public/screens/skills-light.png",
+      "sha256": "fe5f1425d96cbb64090fab1e2a979c84ceaaa2b57a254efa10ce770ab9e87c2a",
+      "width": 3164,
+      "height": 2068
+    },
+    {
+      "path": "marketing/public/screens/skills.png",
+      "sha256": "81dbff82f27385e4f11303dc5dd1d0b7ea8de99f701fd70e8055306dea3d4cd1",
+      "width": 3164,
+      "height": 2068
+    },
+    {
+      "path": "marketing/public/screens/usage-light.png",
+      "sha256": "b80efd6e5eebc8c811e2bc478715438791268b61098e4d9a187b93ec39f298f8",
+      "width": 3164,
+      "height": 2068
+    },
+    {
+      "path": "marketing/public/screens/usage.png",
+      "sha256": "5fa3eb4ae7fe72dd4cdfa6ad700149248475726dc71be981945fb48e51ba8569",
+      "width": 3164,
+      "height": 2068
+    }
+  ],
+  "warning": "Marketing screenshots are older than the source baseline (General shows v0.2.5). They are reference assets, not verified v0.2.12 runtime captures."
+}

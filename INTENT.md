@@ -21,6 +21,29 @@ the same architecture as Waku, scoped to pi only — with **every current featur
 
 ## Decisions
 
+### D15 — Fork target: Go + MyGo native reconstruction (in progress)
+
+This fork's requested implementation is **Go**, with MyGo's native GPU UI, not a
+Rust reskin, Rust backend sidecar, HTML/DOM app, or webview. The upstream Rust tree
+at `299a32bc87fe3d4851bdb902d9c03dcf9bf99cac` is retained as the behavioral and
+visual reference while the Go application is built under `cmd/orbit` and
+`internal/`. It is not the delivered migration application.
+
+MyGo is pinned to `9c69cf829ece196c5b3a3601f1c7bbe70526376f` (Go 1.27.3).
+Pi remains a separate `pi --mode rpc` child process. All existing Orbit behavior,
+including extensions, dialogs, state files, keyboard navigation, Git/worktrees,
+editor, terminal, providers, MCP, privacy and native lifecycle, is in scope.
+The source-derived contract and evidence live in `docs/mygo-migration/`.
+
+This decision supersedes the Rust/GPUI-only implementation constraint for the
+new Go application; it does not weaken the no-webview, real-runtime, no-telemetry,
+nonblocking rendering, or complete-parity requirements. Baseline checks and a
+rendered shell are not proof of a completed migration. Each acceptance row must
+record actual Go implementation and tests before it can be marked complete.
+
+No release, default-branch replacement, upstream merge, signing identity, or
+deployment is authorized or performed as part of this work-in-progress branch.
+
 ### D1 — Transport: pi CLI RPC over stdio (replaces the Node daemon + SSE)
 **Choice:** spawn `pi --mode rpc` as a child process per open session; JSONL commands on stdin,
 JSONL events on stdout. Retire `agent/` (pi-coding-agent SDK daemon) and the SSE surface.

@@ -1,0 +1,759 @@
+{
+  "runtime": "@earendil-works/pi-coding-agent@1.4.0",
+  "expectation": "patched",
+  "node": "v24.22.1",
+  "arguments": [
+    "--mode",
+    "rpc",
+    "--no-session",
+    "--no-approve",
+    "--offline",
+    "--no-extensions",
+    "--no-skills",
+    "--no-prompt-templates",
+    "--no-context-files",
+    "--no-tools"
+  ],
+  "credential_environment_inherited": false,
+  "external_automatic_network_disabled": true,
+  "commands": [
+    "get_state",
+    "get_available_models",
+    "abort",
+    "get_available_thinking_levels",
+    "get_messages",
+    "get_session_stats",
+    "get_entries",
+    "get_commands",
+    "auth.list",
+    "quota.list"
+  ],
+  "responses": [
+    {
+      "id": "contract-1",
+      "type": "response",
+      "command": "get_state",
+      "success": true,
+      "data": {
+        "model": {
+          "id": "unknown",
+          "name": "unknown",
+          "api": "unknown",
+          "provider": "unknown",
+          "baseUrl": "",
+          "reasoning": false,
+          "input": [],
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0
+          },
+          "contextWindow": 0,
+          "maxTokens": 0
+        },
+        "thinkingLevel": "off",
+        "isStreaming": false,
+        "isCompacting": false,
+        "steeringMode": "one-at-a-time",
+        "followUpMode": "one-at-a-time",
+        "sessionId": "01a1711d-3a87-773c-99c6-f8fea8b86d02",
+        "autoCompactionEnabled": true,
+        "messageCount": 0,
+        "pendingMessageCount": 0,
+        "capabilities": {
+          "extension_ui": [
+            "select",
+            "confirm",
+            "input",
+            "editor",
+            "notify",
+            "setStatus",
+            "setWidget",
+            "setTitle",
+            "set_editor_text",
+            "custom"
+          ]
+        }
+      }
+    },
+    {
+      "id": "contract-2",
+      "type": "response",
+      "command": "get_available_models",
+      "success": true,
+      "data": {
+        "models": []
+      }
+    },
+    {
+      "id": "contract-4",
+      "type": "response",
+      "command": "get_available_thinking_levels",
+      "success": true,
+      "data": {
+        "levels": [
+          "off"
+        ]
+      }
+    },
+    {
+      "id": "contract-5",
+      "type": "response",
+      "command": "get_messages",
+      "success": true,
+      "data": {
+        "messages": []
+      }
+    },
+    {
+      "id": "contract-6",
+      "type": "response",
+      "command": "get_session_stats",
+      "success": true,
+      "data": {
+        "sessionId": "01a1711d-3a87-773c-99c6-f8fea8b86d02",
+        "userMessages": 0,
+        "assistantMessages": 0,
+        "toolCalls": 0,
+        "toolResults": 0,
+        "totalMessages": 0,
+        "tokens": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "cost": 0
+      }
+    },
+    {
+      "id": "contract-7",
+      "type": "response",
+      "command": "get_entries",
+      "success": true,
+      "data": {
+        "entries": [
+          {
+            "type": "thinking_level_change",
+            "id": "f7eef957",
+            "parentId": null,
+            "timestamp": "2026-10-25T03:31:43.430Z",
+            "thinkingLevel": "off"
+          }
+        ],
+        "leafId": "f7eef957"
+      }
+    },
+    {
+      "id": "contract-8",
+      "type": "response",
+      "command": "get_commands",
+      "success": true,
+      "data": {
+        "commands": []
+      }
+    },
+    {
+      "id": "contract-3",
+      "type": "response",
+      "command": "abort",
+      "success": true
+    },
+    {
+      "id": "contract-9",
+      "type": "response",
+      "command": "auth.list",
+      "success": true,
+      "data": {
+        "providers": [
+          {
+            "id": "amazon-bedrock",
+            "name": "Amazon Bedrock",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "api_key",
+                "label": "AWS credentials or bearer token"
+              }
+            ]
+          },
+          {
+            "id": "ant-ling",
+            "name": "Ant Ling",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "api_key",
+                "label": "Ant Ling API key"
+              }
+            ]
+          },
+          {
+            "id": "anthropic",
+            "name": "Anthropic",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "browser",
+                "label": "Anthropic (Claude Pro/Max)"
+              },
+              {
+                "id": "device_code",
+                "label": "Use a device code"
+              },
+              {
+                "id": "api_key",
+                "label": "Anthropic API key"
+              }
+            ]
+          },
+          {
+            "id": "azure",
+            "name": "Azure",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "api_key",
+                "label": "Azure OpenAI API key"
+              }
+            ]
+          },
+          {
+            "id": "baseten",
+            "name": "Baseten",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "api_key",
+                "label": "Baseten API key"
+              }
+            ]
+          },
+          {
+            "id": "cerebras",
+            "name": "Cerebras",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "api_key",
+                "label": "Cerebras API key"
+              }
+            ]
+          },
+          {
+            "id": "cloudflare-ai-gateway",
+            "name": "Cloudflare AI Gateway",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "api_key",
+                "label": "Cloudflare API key"
+              }
+            ]
+          },
+          {
+            "id": "cloudflare-workers-ai",
+            "name": "Cloudflare Workers AI",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "api_key",
+                "label": "Cloudflare API key"
+              }
+            ]
+          },
+          {
+            "id": "deepseek",
+            "name": "DeepSeek",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "api_key",
+                "label": "DeepSeek API key"
+              }
+            ]
+          },
+          {
+            "id": "fireworks",
+            "name": "Fireworks",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "api_key",
+                "label": "Fireworks API key"
+              }
+            ]
+          },
+          {
+            "id": "github-copilot",
+            "name": "GitHub Copilot",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "browser",
+                "label": "GitHub Copilot"
+              },
+              {
+                "id": "device_code",
+                "label": "Use a device code"
+              },
+              {
+                "id": "api_key",
+                "label": "GitHub Copilot token"
+              }
+            ]
+          },
+          {
+            "id": "google",
+            "name": "Google",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "api_key",
+                "label": "Gemini API key"
+              }
+            ]
+          },
+          {
+            "id": "google-vertex",
+            "name": "Google Vertex AI",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "api_key",
+                "label": "Google Cloud credentials"
+              }
+            ]
+          },
+          {
+            "id": "groq",
+            "name": "Groq",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "api_key",
+                "label": "Groq API key"
+              }
+            ]
+          },
+          {
+            "id": "huggingface",
+            "name": "Hugging Face",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "api_key",
+                "label": "Hugging Face token"
+              }
+            ]
+          },
+          {
+            "id": "kimi-coding",
+            "name": "Kimi For Coding",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "browser",
+                "label": "Sign in with Kimi Code"
+              },
+              {
+                "id": "device_code",
+                "label": "Use a device code"
+              },
+              {
+                "id": "api_key",
+                "label": "Kimi API key"
+              }
+            ]
+          },
+          {
+            "id": "meta",
+            "name": "Meta",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "browser",
+                "label": "Sign in with Meta"
+              },
+              {
+                "id": "device_code",
+                "label": "Use a device code"
+              },
+              {
+                "id": "api_key",
+                "label": "Meta Model API key"
+              }
+            ]
+          },
+          {
+            "id": "minimax",
+            "name": "MiniMax",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "api_key",
+                "label": "MiniMax API key"
+              }
+            ]
+          },
+          {
+            "id": "minimax-cn",
+            "name": "MiniMax CN",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "api_key",
+                "label": "MiniMax CN API key"
+              }
+            ]
+          },
+          {
+            "id": "mistral",
+            "name": "Mistral",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "api_key",
+                "label": "Mistral API key"
+              }
+            ]
+          },
+          {
+            "id": "moonshotai",
+            "name": "Moonshot AI",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "api_key",
+                "label": "Moonshot AI API key"
+              }
+            ]
+          },
+          {
+            "id": "moonshotai-cn",
+            "name": "Moonshot AI CN",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "api_key",
+                "label": "Moonshot AI API key"
+              }
+            ]
+          },
+          {
+            "id": "nvidia",
+            "name": "NVIDIA",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "api_key",
+                "label": "NVIDIA API key"
+              }
+            ]
+          },
+          {
+            "id": "openai",
+            "name": "OpenAI",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "browser",
+                "label": "Sign in with ChatGPT"
+              },
+              {
+                "id": "device_code",
+                "label": "Use a device code"
+              },
+              {
+                "id": "api_key",
+                "label": "OpenAI API key"
+              }
+            ]
+          },
+          {
+            "id": "openai-codex",
+            "name": "OpenAI Codex (legacy)",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "browser",
+                "label": "OpenAI (ChatGPT Plus/Pro)"
+              },
+              {
+                "id": "device_code",
+                "label": "Use a device code"
+              }
+            ]
+          },
+          {
+            "id": "opencode",
+            "name": "OpenCode Zen",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "api_key",
+                "label": "OpenCode API key"
+              }
+            ]
+          },
+          {
+            "id": "opencode-go",
+            "name": "OpenCode Go",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "api_key",
+                "label": "OpenCode API key"
+              }
+            ]
+          },
+          {
+            "id": "openrouter",
+            "name": "OpenRouter",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "browser",
+                "label": "Sign in with OpenRouter"
+              },
+              {
+                "id": "device_code",
+                "label": "Use a device code"
+              },
+              {
+                "id": "api_key",
+                "label": "OpenRouter API key"
+              }
+            ]
+          },
+          {
+            "id": "qwen-token-plan",
+            "name": "Qwen Token Plan",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "api_key",
+                "label": "Qwen Token Plan API key"
+              }
+            ]
+          },
+          {
+            "id": "qwen-token-plan-cn",
+            "name": "Qwen Token Plan CN",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "api_key",
+                "label": "Qwen Token Plan CN API key"
+              }
+            ]
+          },
+          {
+            "id": "qwen-token-plan-individual",
+            "name": "Qwen Token Plan Individual",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "api_key",
+                "label": "Qwen Token Plan Individual API key"
+              }
+            ]
+          },
+          {
+            "id": "radius",
+            "name": "Radius",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "browser",
+                "label": "Radius"
+              },
+              {
+                "id": "device_code",
+                "label": "Use a device code"
+              },
+              {
+                "id": "api_key",
+                "label": "Radius API key"
+              }
+            ]
+          },
+          {
+            "id": "together",
+            "name": "Together",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "api_key",
+                "label": "Together API key"
+              }
+            ]
+          },
+          {
+            "id": "typesafe",
+            "name": "TypeSafe",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "api_key",
+                "label": "TypeSafe API key"
+              }
+            ]
+          },
+          {
+            "id": "vercel-ai-gateway",
+            "name": "Vercel AI Gateway",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "api_key",
+                "label": "Vercel AI Gateway API key"
+              }
+            ]
+          },
+          {
+            "id": "xai",
+            "name": "xAI",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "browser",
+                "label": "Sign in with SuperGrok or X Premium"
+              },
+              {
+                "id": "device_code",
+                "label": "Use a device code"
+              },
+              {
+                "id": "api_key",
+                "label": "xAI API key"
+              }
+            ]
+          },
+          {
+            "id": "xiaomi",
+            "name": "Xiaomi",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "api_key",
+                "label": "Xiaomi API key"
+              }
+            ]
+          },
+          {
+            "id": "xiaomi-token-plan-ams",
+            "name": "Xiaomi Token Plan AMS",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "api_key",
+                "label": "Xiaomi Token Plan AMS API key"
+              }
+            ]
+          },
+          {
+            "id": "xiaomi-token-plan-cn",
+            "name": "Xiaomi Token Plan CN",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "api_key",
+                "label": "Xiaomi Token Plan CN API key"
+              }
+            ]
+          },
+          {
+            "id": "xiaomi-token-plan-sgp",
+            "name": "Xiaomi Token Plan SGP",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "api_key",
+                "label": "Xiaomi Token Plan SGP API key"
+              }
+            ]
+          },
+          {
+            "id": "zai",
+            "name": "Z.AI",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "api_key",
+                "label": "Z.AI API key"
+              }
+            ]
+          },
+          {
+            "id": "zai-coding-cn",
+            "name": "Z.AI Coding CN",
+            "credential": "none",
+            "authenticated": false,
+            "methods": [
+              {
+                "id": "api_key",
+                "label": "Z.AI Coding CN API key"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "contract-10",
+      "type": "response",
+      "command": "quota.list",
+      "success": true,
+      "data": {
+        "providers": []
+      }
+    }
+  ],
+  "stderr": [],
+  "exit_code": 0,
+  "model_or_tool_start_events": 0
+}
