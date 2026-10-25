@@ -3,10 +3,15 @@ name: Go native migration
 on:
   push:
     branches: ["redesign/mygo-rpc"]
-    paths: ["**/*.go", "**/*.go.txt", "**/go.mod", "**/go.sum", "scripts/go-native*", "scripts/capture-native-reference.sh", "scripts/usage-native/**", "testdata/usage-native/**", "scripts/workbench-native/**", "testdata/workbench-native/**", "third_party/mygo-composer/**", "third_party/mygo-selection/**", "assets/**", ".github/workflows/go-native.yml"]
+    paths: ["**/*.go", "**/*.go.txt", "**/go.mod", "**/go.sum", "scripts/go-native*", "scripts/capture-native-reference.sh", "scripts/usage-native/**", "testdata/usage-native/**", "scripts/chat-native/**", "testdata/chat-native/**", "scripts/workbench-native/**", "testdata/workbench-native/**", "third_party/mygo-composer/**", "third_party/mygo-selection/**", "assets/**", ".github/workflows/go-native.yml"]
   pull_request:
-    paths: ["**/*.go", "**/*.go.txt", "**/go.mod", "**/go.sum", "scripts/go-native*", "scripts/capture-native-reference.sh", "scripts/usage-native/**", "testdata/usage-native/**", "scripts/workbench-native/**", "testdata/workbench-native/**", "third_party/mygo-composer/**", "third_party/mygo-selection/**", "assets/**", ".github/workflows/go-native.yml"]
+    paths: ["**/*.go", "**/*.go.txt", "**/go.mod", "**/go.sum", "scripts/go-native*", "scripts/capture-native-reference.sh", "scripts/usage-native/**", "testdata/usage-native/**", "scripts/chat-native/**", "testdata/chat-native/**", "scripts/workbench-native/**", "testdata/workbench-native/**", "third_party/mygo-composer/**", "third_party/mygo-selection/**", "assets/**", ".github/workflows/go-native.yml"]
   workflow_dispatch:
+    inputs:
+      capture_chat_stage1:
+        description: 'Capture two static Chat states; Context remains BLOCKED'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -42,6 +47,9 @@ jobs:
         run: |
           python3 -m unittest discover -s scripts/workbench-native -p 'test_*.py'
           python3 -m unittest discover -s scripts/usage-native -p 'test_*.py'
+          python3 -m unittest discover -s scripts/chat-native -p 'test_*.py'
+        env:
+          ORBIT_PI_INTEGRATION_BIN: /tmp/orbit-pi-runtime/node_modules/.bin/pi
       - name: Terminal compatibility module regressions
         run: |
           if [ -f third_party/mygo-terminal/go.mod ]; then
@@ -91,6 +99,8 @@ jobs:
       - name: Install pinned Pi without credentials or inference
         run: npm install --prefix /tmp/orbit-pi-runtime @earendil-works/pi-coding-agent@1.4.0
       - name: Capture actual original native window
+        env:
+          ORBIT_CAPTURE_CHAT_STAGE1: ${{ github.event_name == 'workflow_dispatch' && inputs.capture_chat_stage1 && '1' || '0' }}
         run: ORBIT_CAPTURE_USAGE=1 ORBIT_CAPTURE_WORKBENCH=1 scripts/capture-native-reference.sh /tmp/orbit-reference/target/debug/orbit-pi "$PWD/capture/reference-desktop" reference /tmp/orbit-reference
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
@@ -118,6 +128,8 @@ jobs:
           CGO_ENABLED=0 scripts/go-native.sh build -o /tmp/orbit-go-native ./cmd/orbit
           npm install --prefix /tmp/orbit-pi-runtime @earendil-works/pi-coding-agent@1.4.0
       - name: Capture real Go native desktop window
+        env:
+          ORBIT_CAPTURE_CHAT_STAGE1: ${{ github.event_name == 'workflow_dispatch' && inputs.capture_chat_stage1 && '1' || '0' }}
         run: ORBIT_CAPTURE_USAGE=1 ORBIT_CAPTURE_WORKBENCH=1 scripts/capture-native-reference.sh /tmp/orbit-go-native "$PWD/capture/go-desktop" go
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()

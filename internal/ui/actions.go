@@ -57,6 +57,9 @@ func (a *App) shortcuts(c *ui.Context) {
 	if a.modalOpen() {
 		return
 	}
+	if a.surfaceTraversal(c) {
+		return
+	}
 	if a.sidebarShortcut(c) {
 		return
 	}

@@ -10,6 +10,9 @@ import (
 
 // GitHub-style alerts are Orbit syntax, not a default MyGo extension.
 func (a *App) markdownBlock(c *ui.Context, d *parser.Document, i int) bool {
+	if a.markdownImageBlock(c, d, i) {
+		return true
+	}
 	b := d.Block(i)
 	if b.Kind != parser.Quote {
 		return false

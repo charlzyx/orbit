@@ -12,6 +12,7 @@ import (
 	orbitassets "github.com/charlzyx/orbit"
 	"github.com/charlzyx/orbit/internal/agent"
 	"github.com/charlzyx/orbit/internal/composerui"
+	"github.com/charlzyx/orbit/internal/markdownimage"
 	"github.com/charlzyx/orbit/internal/modelui"
 	"github.com/charlzyx/orbit/internal/native"
 	"github.com/charlzyx/orbit/internal/preferences"
@@ -139,11 +140,12 @@ type Notice struct {
 	Until time.Time
 }
 type App struct {
-	navigation        navigationState
-	transcriptScroll  ui.ScrollState
-	railHintDismissed bool
-	railHintSaving    bool
-	railHintAt        time.Time
+	pendingAttachmentPaths []attachmentPathInsertion
+	navigation             navigationState
+	transcriptScroll       ui.ScrollState
+	railHintDismissed      bool
+	railHintSaving         bool
+	railHintAt             time.Time
 
 	retryStatusAt                                                   time.Time
 	retryFeedbackNow                                                func() time.Time
@@ -198,6 +200,7 @@ type App struct {
 	commandCursor, searchCursor                                     int
 	modelCursor                                                     int
 	modelList                                                       ui.ListState
+	surfaceFocus                                                    workbenchFocusState
 	composer                                                        ui.Handle
 	searchInput                                                     ui.Handle
 	searchLastQuery                                                 string
@@ -207,6 +210,7 @@ type App struct {
 	sidebarState                                                    sidebarState
 	collapsedMessages                                               map[string]bool
 	md                                                              markdown.Options
+	markdownImages                                                  *markdownimage.Cache
 	access, workflow                                                string
 	dialogValue                                                     string
 	dialogID                                                        string
@@ -284,6 +288,7 @@ func New(o Options) *App {
 	a.md.ShareSelection = true
 	a.md.Block = a.markdownBlock
 	a.md.LoadImage = markdown.FileImages(o.Workspace)
+	a.markdownImages = markdownimage.New()
 	a.md.Reveal = &markdown.Reveal{Unit: markdown.AtOnce, Fade: -1}
 	a.md.OnLink = func(s string) { a.Dispatch(Action{Kind: "OpenLink", Value: s}) }
 	a.loadUsagePrefs()
@@ -307,6 +312,9 @@ func (a *App) text(key, fallback string) string {
 	return s
 }
 func (a *App) SetSnapshot(s Snapshot) {
+	if s.RuntimeID != a.Model.RuntimeID || s.SessionID != a.Model.SessionID || s.SessionPath != a.Model.SessionPath || s.Workspace != a.Model.Workspace {
+		a.resetMarkdownImageOwner()
+	}
 	a.invalidateWorkspaceMenu(s.Workspace)
 	oldID, oldLatest := a.Model.SessionID, a.Model.LatestTurn
 	a.transcriptUI.Session(s.SessionID)
@@ -344,6 +352,7 @@ func (a *App) SetSnapshot(s Snapshot) {
 		s.Error = orbitassets.Translate(a.catalog, a.english, "events.auto_retry_failed", map[string]string{"error": message})
 	}
 	a.Model = s
+	a.pruneAttachmentPaths()
 	a.syncExtensionUI(s)
 	a.syncModelCatalog()
 	if a.reviewState.source == workspace.ReviewLastTurn {
@@ -432,6 +441,7 @@ func (a *App) flushFilesOnLeave(next string) {
 func (a *App) View(c *ui.Context) {
 	a.workspaceActions.rendered = false
 	a.drainUpdates()
+	a.pruneAttachmentPaths()
 	if target := a.workspaceActions.target; a.workspaceActions.open && (target == nil || a.workspaceEntry(target.Path) != target) {
 		a.workspaceActions.open = false
 	}
@@ -553,7 +563,11 @@ func (a *App) line(c *ui.Context) {
 }
 func (a *App) sidebar(c *ui.Context) {
 	t := a.Theme
-	ui.Column(c.Key("sessions-sidebar")).Fill().Width(a.SidebarWidth).Shrink(0).MinWidth(SidebarMinWidth).LineHeight(sourceDefaultLineHeight).Background(t.Surface).Children(func() {
+	sidebar := ui.Column(c.Key("sessions-sidebar")).Bind(&a.surfaceFocus.emptySidebar).Fill().Width(a.SidebarWidth).Shrink(0).MinWidth(SidebarMinWidth).LineHeight(sourceDefaultLineHeight).Background(t.Surface)
+	if len(a.sidebarRows()) == 0 {
+		sidebar.Focusable()
+	}
+	sidebar.Children(func() {
 		ui.Row(c).DragWindow().Height(HeaderHeight).PaddingX(12).Gap(8).AlignItems(ui.Center).Children(func() {
 			ui.Spacer(c)
 			if a.iconButton(c, "Toggle sidebar", "icons/layout-left.svg").Clicked() {
@@ -612,6 +626,7 @@ func (a *App) sidebar(c *ui.Context) {
 			})
 		})
 		rows := a.sidebarRows()
+		sticky := a.prepareSidebarSticky(c, rows)
 		if len(rows) == 0 {
 			a.emptySidebar(c)
 		}
@@ -622,7 +637,7 @@ func (a *App) sidebar(c *ui.Context) {
 			r := rows[i]
 			c.Key(r.key)
 			if r.group {
-				a.workspaceHeader(c, r)
+				a.workspaceHeader(c, r, false, sticky.index != i)
 				return
 			}
 			if r.more > 0 || r.less {
@@ -649,7 +664,11 @@ func (a *App) sidebar(c *ui.Context) {
 				a.activateSidebarRow(r)
 			}
 			b.ContextMenu(func(m *ui.Menu) { a.sessionRowMenu(m, s) })
-		}).Grow(1).MinHeight(0)
+		}).Grow(1).MinHeight(0).Bind(&a.sidebarState.sticky.viewport).Label("Sidebar session viewport").TrackScroll(&a.sidebarState.sticky.scroll).ScrollbarInsets(0, sidebarResizeGripWidth, 0, 0).Children(func() { a.renderSidebarSticky(c, rows, sticky) })
+		if a.sidebarState.sticky.scroll.Y != a.sidebarState.sticky.lastY {
+			a.sidebarState.sticky.lastY = a.sidebarState.sticky.scroll.Y
+			c.AnimationFrame()
+		}
 		if len(rows) == 0 {
 			list.Grow(0).Height(0)
 		}
@@ -952,7 +971,7 @@ func (a *App) terminal(c *ui.Context) {
 			}
 		})
 		ui.Box(c.Key("terminal-content")).Grow(1).MinHeight(0).Children(func() {
-			orbiterm.View(c, p).Fill()
+			orbiterm.View(c, p).Bind(&a.surfaceFocus.terminal).Fill()
 			if hasActive && (active.Exited || active.Error != "") {
 				ui.Box(c.Key("terminal-exited-overlay")).Absolute().Top(0).Bottom(0).Left(0).Right(0).Center().Children(func() {
 					ui.Column(c).AlignItems(ui.Center).MaxWidth(540).Padding(t.Space(12), t.Space(16)).Gap(t.Space(8)).Radius(t.Px(12)).Background(t.Elevated).Border(1, t.Border).Children(func() {
@@ -964,7 +983,11 @@ func (a *App) terminal(c *ui.Context) {
 						if active.Error != "" {
 							ui.Text(c, active.Error).FontSize(t.Px(12)).TextColor(t.Error).MaxLines(4)
 						}
-						if a.button(c, a.text("terminal.restart", "Restart"), "icons/refresh.svg", true).Label("Restart shell").Disabled(active.Loading).Clicked() {
+						restart := a.button(c, a.text("terminal.restart", "Restart"), "icons/refresh.svg", true).Bind(&a.surfaceFocus.terminalRestart).Label("Restart shell").Disabled(active.Loading)
+						if active.Exited && a.surfaceFocus.terminal.FocusWithin(c) {
+							restart.Focus()
+						}
+						if restart.Clicked() {
 							a.save(p.Restart())
 						}
 					})

@@ -785,7 +785,7 @@ func (a *App) fileEditorContent(c *ui.Context) {
 	st.Theme = t.Code()
 	st.ReadOnly = !d.Content.Editable() || s.mutating
 	st.SoftWrap = s.wrap
-	view := editor.View(c.Key(d.Content.Path), st).Label("File editor").Grow(1).FillWidth()
+	view := editor.View(c.Key(d.Content.Path), st).Bind(&a.surfaceFocus.editor).Label("File editor").Grow(1).FillWidth()
 	if s.focusPending == d.Content.Path {
 		view.Focus()
 		s.focusPending = ""

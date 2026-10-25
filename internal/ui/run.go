@@ -376,6 +376,9 @@ func (x *Controller) SetWorkspace(path string) {
 	x.diagnostics.Record(diagnosticlog.EventWorkspaceSelect, result, time.Since(started))
 }
 func (x *Controller) changeWorkspaceServices(path string) {
+	if path != x.workspace || path != x.UI.Model.Workspace {
+		x.UI.resetMarkdownImageOwner()
+	}
 	x.workspaceBrowse.epoch++
 	x.workspace = path
 	x.UI.invalidateWorkspaceMenu(path)
@@ -414,6 +417,7 @@ func (x *Controller) Close() {
 		x.UI.autocomplete.Close()
 		x.UI.Models.Close()
 		x.UI.closeBackground()
+		x.UI.markdownImages.Close()
 		x.Worktrees.Close()
 		x.Agent.Close()
 		x.Terminal.Close()
@@ -720,6 +724,8 @@ func (x *Controller) Action(a Action) {
 		x.exportUsageDialog(a)
 	case "BrowseBackground":
 		x.browseBackgroundDialog()
+	case "BrowseImage":
+		x.browseImageDialog()
 	case "BrowseAttachments":
 		x.browseAttachmentsDialog()
 	case "PasteImage":

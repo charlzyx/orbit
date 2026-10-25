@@ -183,6 +183,9 @@ func (a *App) composerView(c *ui.Context) {
 					Field, Session, Workspace string
 					ComposerEpoch             uint64
 				}{"draft", a.Model.SessionID, a.Model.Workspace, a.extensionUI.composerEpoch}), &a.Draft).Bind(&a.composer).Label("Message").Placeholder(a.text("composer.placeholder", "Describe the task…")).Lines(1, 8).AlignSelf(ui.Stretch).OnTextKey(func(k ui.TextKey) bool {
+					if a.flushAttachmentPathKey(k) {
+						return true
+					}
 					if a.autocomplete.HandleKey(k) {
 						return true
 					}
@@ -221,16 +224,10 @@ func (a *App) composerView(c *ui.Context) {
 				}
 				a.retainReviewComposer(c, input)
 				a.trackExtensionComposer(c, input)
+				a.flushAttachmentPathInput(c, input)
 				composerui.PaintMentions(input, a.Draft, style)
 				ui.Row(c).AlignSelf(ui.Stretch).AlignItems(ui.Center).Gap(8).Children(func() {
-					a.composerChip(c, "Add attachment", "", "icons/plus.svg", false, 0).Menu(func(m *ui.Menu) {
-						if m.Item("Attach files…").Chosen() {
-							a.Dispatch(Action{Kind: "BrowseAttachments"})
-						}
-						if m.Item("Paste image").Chosen() {
-							a.Dispatch(Action{Kind: "PasteImage"})
-						}
-					})
+					a.composerAddMenu(c)
 					compact := anchor.Bounds().W > 0 && anchor.Bounds().W < 600
 					if !compact {
 						accessLabels := map[string]string{"supervised": "Supervised", "auto-accept-edits": "Auto-accept edits", "full": "Full access", "full-access": "Full access"}
@@ -361,6 +358,10 @@ func titleCase(s string) string {
 	return strings.ToUpper(s[:1]) + s[1:]
 }
 func (a *App) submit(text, mode string) bool {
+	// Never send a pre-insertion draft while a queued native edit waits for IME.
+	if len(a.pendingAttachmentPaths) != 0 {
+		return false
+	}
 	text = strings.TrimSpace(text)
 	if text == "" && len(a.attachments) == 0 {
 		return false

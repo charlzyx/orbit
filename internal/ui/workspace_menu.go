@@ -67,7 +67,7 @@ func (a *App) workspaceTint(tint string) ui.Color {
 	}
 	return t.TextMuted
 }
-func (a *App) workspaceHeader(c *ui.Context, r sidebarRow) {
+func (a *App) workspaceHeader(c *ui.Context, r sidebarRow, sticky, ownsActions bool) {
 	w := a.workspaceEntry(r.path)
 	if w == nil {
 		return
@@ -76,8 +76,19 @@ func (a *App) workspaceHeader(c *ui.Context, r sidebarRow) {
 	// The public button identity owns native-menu delivery, including A→B→A.
 	ctx := c.Key(fmt.Sprintf("workspace-menu:%d:%s:%p:%d", s.epoch, r.path, w, w.AddedAt))
 	icon, ink := a.workspaceMark(*w)
-	ui.Row(ctx).AlignSelf(ui.Stretch).MarginX(8).AlignItems(ui.Center).Children(func() {
-		b := ui.ButtonBase(c.Key("header")).Label(r.label).Grow(1).MinWidth(0).Padding(6, 8).Gap(6).AlignItems(ui.Center)
+	// Keep the menu button left of the inset native scrollbar and resize grip.
+	row := ui.Row(ctx).AlignSelf(ui.Stretch).Margin(0, sidebarScrollbarGutter(c), 0, 8).AlignItems(ui.Center)
+	if !sticky {
+		row.Bind(a.sidebarHeaderHandle(r.path)).Label("Sidebar workspace header " + r.path)
+	}
+	row.Children(func() {
+		var b ui.Element
+		if ownsActions {
+			b = ui.ButtonBase(c.Key("header")).Label(r.label)
+		} else {
+			b = ui.Row(c.Key("header-presentation"))
+		}
+		b = b.Grow(1).MinWidth(0).Padding(6, 8).Gap(6).AlignItems(ui.Center)
 		b.Children(func() {
 			chevron := "icons/chevron-down.svg"
 			if r.collapsed {
@@ -87,7 +98,7 @@ func (a *App) workspaceHeader(c *ui.Context, r sidebarRow) {
 			a.icon(c, icon, 16, ink)
 			ui.Text(c, r.label).MaxLines(1).Grow(1)
 		})
-		if b.Clicked() {
+		if ownsActions && b.Clicked() {
 			a.activateSidebarRow(r)
 		}
 		menu := func(m *ui.Menu) {
@@ -113,9 +124,13 @@ func (a *App) workspaceHeader(c *ui.Context, r sidebarRow) {
 				a.Dispatch(Action{Kind: "RevealPath", Value: r.path})
 			}
 		}
-		b.ContextMenu(menu)
-		a.iconButton(c.Key("actions"), "Workspace actions "+r.path, "icons/more.svg").Size(20, 20).Menu(menu)
-		if s.open && s.target == w {
+		if ownsActions {
+			b.ContextMenu(menu)
+			a.iconButton(c.Key("actions"), "Workspace actions "+r.path, "icons/more.svg").Size(20, 20).Menu(menu)
+		} else {
+			ui.Box(c.Key("actions-presentation")).Size(20, 20).Center().Children(func() { a.icon(c, "icons/more.svg", a.Theme.Px(16), a.Theme.TextSecondary) })
+		}
+		if ownsActions && s.open && s.target == w {
 			a.workspaceAppearance(c, b, w)
 		}
 	})

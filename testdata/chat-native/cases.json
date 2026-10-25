@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "suite": "static-native-chat-stage1",
+  "referenceSource": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "viewport": [
+    1470,
+    922
+  ],
+  "settle": {
+    "consecutiveSamples": 3,
+    "pollSeconds": 1,
+    "timeoutSeconds": 45
+  },
+  "cases": [
+    {
+      "id": "CHAT01",
+      "image": "chat-tail.png",
+      "state": "Loaded persisted transcript at tail, no inference",
+      "actions": [
+        {
+          "key": "ctrl+1"
+        }
+      ],
+      "require": [
+        "CHAT TAIL READY"
+      ]
+    },
+    {
+      "id": "CHAT02",
+      "image": "chat-previous-turn.png",
+      "state": "Previous user turn from live edge via native shortcut",
+      "actions": [
+        {
+          "key": "ctrl+Up"
+        }
+      ],
+      "require": [
+        "PROMPT ELEVEN",
+        "RESPONSE NUMBER 11"
+      ]
+    }
+  ],
+  "blockedCases": [
+    {
+      "id": "CHAT03",
+      "feature": "C15 read-only context details",
+      "status": "BLOCKED_NO_VERIFIED_TARGET",
+      "reason": "Real Pi1.4 requires configured provider auth to restore model; isolated credential-free session returns unknown model and no contextUsage. No guessed ring coordinates or model/auth actions authorized."
+    }
+  ]
+}

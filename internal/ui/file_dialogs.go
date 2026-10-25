@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"errors"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/charlzyx/orbit/internal/agent"
 	"github.com/charlzyx/orbit/internal/native"
 	"github.com/charlzyx/orbit/internal/workbench"
+
 	"github.com/egoist/mygo"
 )
 
@@ -16,6 +18,7 @@ type nativeFileDialogState struct {
 	pending     bool
 	background  func(mygo.OpenDialogOptions) ([]string, error)
 	attachments func(*mygo.Window, string) ([]string, error)
+	image       func(*mygo.Window, string) ([]string, error)
 	save        func(*mygo.Window, string, string, []mygo.FileFilter) (string, error)
 }
 
@@ -84,6 +87,48 @@ func (x *Controller) browseAttachmentsDialog() {
 			return
 		}
 		x.UI.AddPaths(paths)
+	})
+}
+
+// Rust Attachment::from_path accepts only these six file suffixes; SVG/TIFF
+// passthrough applies to clipboard images, not this file-picker entry.
+func imagePickerPathSupported(path string) bool {
+	switch strings.ToLower(filepath.Ext(path)) {
+	case ".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp":
+		return true
+	}
+	return false
+}
+func (x *Controller) browseImageDialog() {
+	target := x.dialogTarget()
+	if !x.dialogAlive(target) {
+		return
+	}
+	if len(x.UI.attachments) >= 8 {
+		x.UI.Notify("Maximum 8 attachments per message", true)
+		return
+	}
+	open := x.fileDialogs.image
+	if open == nil {
+		open = native.BrowseImage
+	}
+	x.fileDialog(target, func() ([]string, error) { return open(target.parent, target.workspace) }, func(paths []string, err error) {
+		if !x.dialogTaskCurrent(target) {
+			return
+		}
+		if err != nil {
+			x.UI.save(err)
+			return
+		}
+		if len(paths) == 0 || paths[0] == "" {
+			return
+		}
+		// Never turn an unexpected non-image selection into prompt text.
+		if !imagePickerPathSupported(paths[0]) {
+			x.UI.save(errors.New("Unsupported image format"))
+			return
+		}
+		x.UI.AddPaths(paths[:1])
 	})
 }
 func (x *Controller) saveDialog(target nativeDialogTarget, title, path string, filters []mygo.FileFilter, apply func(string, error)) {

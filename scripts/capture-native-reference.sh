@@ -160,5 +160,16 @@ PY
 if [[ "${ORBIT_CAPTURE_WORKBENCH:-0}" == 1 ]]; then
   kill "$app_pid" 2>/dev/null || true
   wait "$app_pid" 2>/dev/null || true
+  app_pid=
   bash "$repo_root/scripts/workbench-native/capture.sh" "$binary" "$output/workbench" "$kind" "$source_root" "$capture_source_head" "$capture_source_dirty" "$source_sha"
+fi
+
+# Default off, independent fresh HOME/process; keep parent Settings/Usage counts.
+if [[ "${ORBIT_CAPTURE_CHAT_STAGE1:-0}" == 1 ]]; then
+  if [[ -n "${app_pid:-}" ]]; then
+    kill "$app_pid" 2>/dev/null || true
+    wait "$app_pid" 2>/dev/null || true
+    app_pid=
+  fi
+  bash "$repo_root/scripts/chat-native/capture.sh" "$binary" "$output/chat" "$kind" "$source_root" "$capture_source_head" "$capture_source_dirty" "$source_sha"
 fi

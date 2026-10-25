@@ -11,6 +11,7 @@ import (
 	"github.com/charlzyx/orbit/internal/agent"
 	"github.com/charlzyx/orbit/internal/workbench"
 	"github.com/egoist/mygo"
+	"github.com/egoist/mygo/ui"
 )
 
 func holdFileDialog(t *testing.T, x *Controller, action Action, paths []string, err error) func() {
@@ -26,6 +27,7 @@ func holdFileDialog(t *testing.T, x *Controller, action Action, paths []string, 
 	t.Cleanup(unblock)
 	wait := func() { close(started); <-release }
 	x.fileDialogs.attachments = func(*mygo.Window, string) ([]string, error) { wait(); return paths, err }
+	x.fileDialogs.image = x.fileDialogs.attachments
 	x.fileDialogs.save = func(*mygo.Window, string, string, []mygo.FileFilter) (string, error) {
 		wait()
 		if len(paths) == 0 {
@@ -63,6 +65,7 @@ func TestNativeFileDialogAsyncSingletonAndAttachmentOwnership(t *testing.T) {
 	}
 	release()
 	drainControllerDialogUpdates(t, x, func() bool { return !x.fileDialogs.pending })
+	ui.NewTester(x.UI.View, 1200, 800).Frame()
 	if x.UI.Draft != path+" " {
 		t.Fatal("path not applied on UI queue", x.UI.Draft)
 	}

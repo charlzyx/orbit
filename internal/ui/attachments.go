@@ -84,7 +84,7 @@ func (a *App) addPaths(paths []string, read func(string) ([]byte, string, error)
 	}
 	for _, p := range paths {
 		if !workspace.IsImage(p) {
-			a.Draft += p + " "
+			a.queueAttachmentPath(owner, p+" ")
 			continue
 		}
 		a.Async(func() func() {

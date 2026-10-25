@@ -18,6 +18,14 @@ func BrowseWorkspace(parent *mygo.Window, current string) (string, error) {
 func BrowseAttachments(parent *mygo.Window, current string) ([]string, error) {
 	return mygo.Dialog.Open(mygo.OpenDialogOptions{Parent: parent, Title: "Attach files", DefaultPath: current, Multiple: true})
 }
+
+// Mirrors Rust attach_image: one image, not the general multi-file chooser.
+func imageDialogOptions(parent *mygo.Window, current string) mygo.OpenDialogOptions {
+	return mygo.OpenDialogOptions{Parent: parent, Title: "Attach image", DefaultPath: current, Filters: []mygo.FileFilter{{Name: "Image", Extensions: []string{"png", "jpg", "jpeg", "webp", "gif", "bmp"}}}}
+}
+func BrowseImage(parent *mygo.Window, current string) ([]string, error) {
+	return mygo.Dialog.Open(imageDialogOptions(parent, current))
+}
 func SaveFile(parent *mygo.Window, title, path string, filters []mygo.FileFilter) (string, error) {
 	return mygo.Dialog.Save(mygo.SaveDialogOptions{Parent: parent, Title: title, DefaultPath: path, Filters: filters, CreateDirectories: true})
 }

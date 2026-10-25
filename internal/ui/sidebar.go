@@ -17,6 +17,7 @@ import (
 const sidebarGroupSessionsVisible = 3
 
 type sidebarState struct {
+	sticky              sidebarStickyState
 	collapsedWorkspaces map[string]bool
 	expandedWorkspaces  map[string]bool
 	extraSessions       map[string]int
@@ -341,7 +342,7 @@ func (a *App) focusSidebarSessions() {
 }
 
 func (a *App) sidebarShortcut(c *ui.Context) bool {
-	if a.SidebarVisible && a.sessionList.Handle.FocusWithin(c) && c.Shortcut(0, ui.KeyEscape) {
+	if a.SidebarVisible && (a.sessionList.Handle.FocusWithin(c) || a.surfaceFocus.emptySidebar.Focused(c)) && c.Shortcut(0, ui.KeyEscape) {
 		a.sessionCursor = -1
 		a.composer.Focus()
 		return true
