@@ -45,3 +45,13 @@ Prioritize real functions: choose/open workspace; open two files, edit/save/reop
 - Aggregate job FAILED at `TestAbortPendingRestorationCancelledByExplicitClear`, abort_pipeline_test.go:138, after six seconds without draining workers. Successful capture jobs do not override that failure. Investigation is separate; whole workflow is not PASS.
 
 Minimal badge correction and MCP/terminal-host patches require final-source gates and fresh native images. None changes downloaded `.4`.
+
+## ecba1eb badge correction: actual frame and conservative click gate
+
+Run40203054192 Go artifact12602855942 ZIP SHA256 `b73765ab71213b49657766c03a4e08cd1358fb2d1cdd55114a1a1537dc3b223f` contains a fresh full-window Explorer frame. Direct visual review confirms GO/TXT now centered inside their own badge; this is bounded evidence of the new fix, not Explorer parity.
+
+Capture stopped before WB03 pointer input: PSM11 recognized exact alpha.go at [1286,190,44,11] but confidence52.055969 was below the unchanged60 gate. No click was sent. A second PSM3 read of that same unmodified whole-window PNG recognized the same exact literal and bbox at80.610741. The follow-up harness permits only this narrowly defined second-pass confirmation, records both raw TSV/hash proofs, and still rejects missing/duplicate literals, mismatched bounds, changed images and confidence below60. No cropping, fuzzy label matching, threshold lowering, or coordinate-only click is allowed. Actual synthetic TSVs and artifact provenance are preserved in scripts/workbench-native/testdata/wb03-go-*; tests cover no-pointer-on-failure.
+
+This harness failure does not establish a runtime regression. The updated harness must still finish a new actual capture on the identical runtime before native acceptance claims.
+
+Safety review additionally tightened exact-literal uniqueness across all in-region OCR candidates, including a second low-confidence duplicate; nonfinite/out-of-range confidence is rejected. This is the same OCR engine with another segmentation mode, not statistically independent recognition. Hash equality proves the saved image is unchanged, not that a dynamic live window cannot change while OCR runs; this harness uses the bounded static synthetic fixture and does not generalize to arbitrary dynamic UI clicking. Local alternate OCR used Tesseract5.5.0; CI must independently pass its own engine and unchanged gate.

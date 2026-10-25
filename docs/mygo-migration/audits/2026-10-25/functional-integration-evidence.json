@@ -41,5 +41,20 @@
     "status": "PASS"
   },
   "nativeFinalSource": "PENDING",
-  "fullParity": false
+  "fullParity": false,
+  "cloudFrozenRuntime": {
+    "commit": "ecba1eb386ba202815c1e9f8d90b76cf4d9c0975",
+    "run": 40203054192,
+    "aggregate": "PASS",
+    "referenceDesktop": "PASS",
+    "goDesktop": "BLOCKED exact target confidence below60; no click sent",
+    "workflowConclusion": "failure"
+  },
+  "harnessFollowup": {
+    "pythonRun": 52,
+    "pythonSkip": 2,
+    "status": "PASS",
+    "runtimeSourceUnchanged": true,
+    "logSHA256": "1693da13838e36348c1432dcd4ab3b967b05b1e4ade0fb9f0aee68ae712071e0"
+  }
 }

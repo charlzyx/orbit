@@ -1,0 +1,32 @@
+{
+  "source": "ecba1eb386ba202815c1e9f8d90b76cf4d9c0975",
+  "run": 40203054192,
+  "artifact": 12602855942,
+  "archiveSHA256": "b73765ab71213b49657766c03a4e08cd1358fb2d1cdd55114a1a1537dc3b223f",
+  "image": "go-desktop/workbench/evidence/WB03-action-1-before.png",
+  "pngSHA256": "b2b1707971a112c1731af98e57d51b1fd0531d7b25b87d5b8da3dab578ad8aa9",
+  "primary": "actual CI tesseract psm11 TSV",
+  "alternate": "tesseract psm3 run locally on exact downloaded unchanged PNG",
+  "files": {
+    "wb03-go-psm11.tsv": "2dc3ebab3dc5d4a504a75327138c4a91454ca23d81bcc743b2a218e1a39780c6",
+    "wb03-go-psm3.tsv": "b057be2175b0e10d8f4eb58959564c09a9fe5adc6e1632220cf7d0d4d2cc1fde"
+  },
+  "imageTransformations": [],
+  "target": "alpha.go",
+  "region": [
+    1100,
+    90,
+    1470,
+    850
+  ],
+  "minimumConfidence": 60,
+  "requiredSameBBox": [
+    1286,
+    190,
+    44,
+    11
+  ],
+  "credentials": false,
+  "inference": false,
+  "alternateTesseractVersion": "5.5.0 (local); CI engine version may differ, must independently satisfy gate"
+}

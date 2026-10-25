@@ -24,3 +24,7 @@ MCP初稿独立复审发现三处组合边界：新编辑覆盖后bootstrap失�
 全仓 `-race -count=1` 完整结束，24包、2361个test/subtest pass event、14 skip、0 fail；vet通过；workbench Python43项、2 skip通过。完整JSON日志每行可解析、所有已启动package均结束，源文件哈希与运行前冻结值一致。数量是测试事件，不是产品功能验收。具体哈希见 [functional-integration-evidence.json](functional-integration-evidence.json)。
 
 提交后的同SHA CI与新native采集仍待完成；本地通过不替代它们。之前17文件批次的toolkit/terminal-module/wrapper和5平台编译证据保持独立，不冒充本次新功能源码的目标平台运行。
+
+## 云端冻结运行时门禁（14:44 UTC）
+
+[ecba1eb run40203054192](https://github.com/charlzyx/orbit/actions/runs/40203054192) 的 aggregate 与 Rust reference-desktop 均通过。aggregate包含全仓race/vet、composer/selection、wrapper、终端模块、CPU采集与Linux/Windows双架构及macOS arm64编译。Go native-desktop在精确OCR点击前因置信不足停止，未发送该点击；该workflow整体仍为失败，不拼成全绿。后续只改harness与证据文档，所有本批runtime/test源文件哈希保持一致，再采集仍待完成。

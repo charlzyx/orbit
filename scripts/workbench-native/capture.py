@@ -33,10 +33,10 @@ def exact_target(rows, label, region):
     matches = []
     for row in rows:
         x, y, w, h = (int(row[k]) for k in ('left', 'top', 'width', 'height'))
-        if row['text'] == label and float(row['conf']) >= 60 and x1 <= x and y1 <= y and x + w <= x2 and y + h <= y2:
+        if row['text'] == label and x1 <= x and y1 <= y and x + w <= x2 and y + h <= y2:
             matches.append(dict(label=label, bbox=[x, y, w, h], confidence=float(row['conf']), center=[x + w // 2, y + h // 2]))
-    if len(matches) != 1:
-        raise ValueError(f'Exact OCR target {label!r}: expected one match in {region}, got {len(matches)}; no click sent')
+    if len(matches) != 1 or not 60 <= matches[0]['confidence'] <= 100:
+        raise ValueError(f'Exact OCR target {label!r}: expected one unambiguous match with confidence >=60 in {region}, got {len(matches)}; no click sent')
     return matches[0]
 
 
@@ -123,6 +123,41 @@ class Capture:
             time.sleep(config['pollSeconds'])
         raise RuntimeError(f'{case["id"]} did not settle: {samples[-1] if samples else "no frame"}')
 
+    def target(self, image, rows, metadata, label, region):
+        try:
+            return exact_target(rows, label, region), dict(metadata, targetOcrPSM=11)
+        except ValueError:
+            # Only recover an already uniquely located exact literal whose
+            # confidence is low. Missing/ambiguous labels are never guessed.
+            x1, y1, x2, y2 = region
+            candidates = []
+            for row in rows:
+                if row['text'] != label:
+                    continue
+                x, y, w, h = (int(row[k]) for k in ('left', 'top', 'width', 'height'))
+                if x1 <= x and y1 <= y and x+w <= x2 and y+h <= y2:
+                    candidates.append((row, [x, y, w, h]))
+            if len(candidates) != 1 or not 0 <= float(candidates[0][0]['conf']) < 60:
+                raise
+        original, bbox = candidates[0]
+        if sha(image) != metadata['pngSha256']:
+            raise ValueError('Target fallback image differs from captured whole native window; no click sent')
+        alternate = run('tesseract', str(image), 'stdout', '--psm', '3', 'tsv')
+        alternate_path = image.with_suffix('.psm3.tsv')
+        alternate_path.write_text(alternate + '\n')
+        if sha(image) != metadata['pngSha256']:
+            raise ValueError('Target OCR modified input image; no click sent')
+        target = exact_target(words(alternate), label, region)
+        if target['bbox'] != bbox:
+            raise ValueError('Second-pass target OCR bounds disagree; no click sent')
+        # No threshold reduction, partial-word match, crop, pixel editing or
+        # coordinate fallback. Both raw passes and the unchanged frame persist.
+        proof = dict(metadata, targetOcrPSM=3, targetOcrPasses=[
+            dict(psm=11, label=label, bbox=bbox, confidence=float(original['conf']),
+                 tsv=str(image.with_suffix('.tsv').relative_to(self.out)), tsvSha256=metadata['ocrSha256']),
+            dict(psm=3, **target, tsv=str(alternate_path.relative_to(self.out)), tsvSha256=sha(alternate_path))])
+        return target, proof
+
     def action(self, case_id, ordinal, action):
         run('xdotool', 'windowactivate', '--sync', self.window)
         event = dict(case=case_id, ordinal=ordinal, requested=action)
@@ -131,7 +166,7 @@ class Capture:
         else:
             path = self.evidence / f'{case_id}-action-{ordinal}-before.png'
             rows, metadata = self.capture(path)
-            target = exact_target(rows, action['clickExactLabel'], action['region'])
+            target, metadata = self.target(path, rows, metadata, action['clickExactLabel'], action['region'])
             event.update(target=target, beforeCapture=str(path.relative_to(self.out)), before=metadata)
             # Log verified target before sending any pointer input.
             self.actions.append(dict(event, outcome='TARGET_VERIFIED_CLICK_PENDING'))
