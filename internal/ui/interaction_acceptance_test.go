@@ -112,7 +112,7 @@ func TestMinimumWindowModalsKeepActionsReachable(t *testing.T) {
 			tt.Frame()
 			label := "Cancel"
 			if mode == "model" {
-				label = "Search models"
+				label = "Model picker search"
 			}
 			r, ok := tt.Find(label)
 			if !ok || r.X < 0 || r.Y < 0 || r.X+r.W > 800 || r.Y+r.H > 560 {

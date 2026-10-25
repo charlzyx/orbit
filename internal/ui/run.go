@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -37,29 +38,30 @@ type RunOptions struct {
 	Offline, NoExtensions              bool
 }
 type Controller struct {
-	UI               *App
-	Agent            *agent.Manager
-	Terminal         *orbiterm.Panel
-	Git              *gitworkbench.State
-	Resources        *resourceui.State
-	MCP              *mcpui.State
-	configApplyAfter time.Time
-	BugReport        *bugreportui.State
-	Worktrees        *worktreeui.State
-	Store            *preferences.Store
-	Notifier         *native.Notifier
-	Updater          *native.Updater
-	window           atomic.Pointer[mygo.Window]
-	close            sync.Once
-	stop             chan struct{}
-	workspace        string
-	watcher          *workspace.Watcher
-	pinned, archived map[string]bool
-	rebuildMenu      func()
-	sessionGate      sync.RWMutex
-	maintenance      atomic.Bool
-	background       context.Context
-	cancelBackground context.CancelFunc
+	catalogRefreshing bool
+	UI                *App
+	Agent             *agent.Manager
+	Terminal          *orbiterm.Panel
+	Git               *gitworkbench.State
+	Resources         *resourceui.State
+	MCP               *mcpui.State
+	configApplyAfter  time.Time
+	BugReport         *bugreportui.State
+	Worktrees         *worktreeui.State
+	Store             *preferences.Store
+	Notifier          *native.Notifier
+	Updater           *native.Updater
+	window            atomic.Pointer[mygo.Window]
+	close             sync.Once
+	stop              chan struct{}
+	workspace         string
+	watcher           *workspace.Watcher
+	pinned, archived  map[string]bool
+	rebuildMenu       func()
+	sessionGate       sync.RWMutex
+	maintenance       atomic.Bool
+	background        context.Context
+	cancelBackground  context.CancelFunc
 }
 
 func NewController(o RunOptions) (*Controller, error) {
@@ -110,6 +112,15 @@ func NewController(o RunOptions) (*Controller, error) {
 	x.Updater = native.NewUpdater(native.UpdaterOptions{Version: o.Version, Layout: layout, OnChange: invalidate})
 	x.Terminal = orbiterm.NewPanel(orbiterm.Options{Workspace: o.Workspace, Height: float32(s.Layout().TerminalHeight), Font: ghostty.Font{Family: s.Fonts().CodeFamily, Size: float32(s.UI().TerminalFontSize), LineHeight: 1, Features: []string{"-calt", "-liga", "-dlig"}}, OnChange: invalidate, OnError: func(e error) { x.enqueue(func() { x.UI.Notify(e.Error(), true) }) }, OpenLink: func(url string) bool { x.enqueue(func() { x.UI.save(native.OpenURL(url)) }); return true }})
 	x.UI = New(Options{BeginRuntimeOperation: x.beginRuntimeOperation, Updater: x.Updater, Version: o.Version, Store: s, Workspace: o.Workspace, PiBinary: o.PiBinary, Terminal: x.Terminal, OnAction: x.Action, Pages: map[string]func(*ui.Context){}})
+	x.UI.Options.RefreshModels = x.refreshModelCatalog
+	x.UI.Options.QueryModelCatalog = func() {
+		if !x.Agent.Snapshot().Connected {
+			return
+		}
+		for _, kind := range []string{pirpc.GetAvailableModels, pirpc.GetAvailableThinkingLevels, pirpc.GetCommands, pirpc.GetState} {
+			x.UI.save(x.Agent.Send(kind, nil))
+		}
+	}
 	x.Notifier.OnToast = func(kind native.ToastKind, title, body string) {
 		x.enqueue(func() { x.UI.toastStack.Push(kind, title, body) })
 	}
@@ -336,6 +347,7 @@ func (x *Controller) Close() {
 		x.MCP.Close()
 		x.Resources.Close()
 		x.UI.autocomplete.Close()
+		x.UI.Models.Close()
 		x.UI.closeBackground()
 		x.Worktrees.Close()
 		x.Agent.Close()
@@ -348,7 +360,7 @@ func (x *Controller) Close() {
 	})
 }
 func adaptSnapshot(s agent.Snapshot, workspacePath string, pinned, archived map[string]bool) Snapshot {
-	v := Snapshot{LatestTurn: s.LatestTurn, CommandsRaw: s.Commands, RawMessages: s.Messages, Turn: s.Turn, Connected: s.Connected, Running: s.Running, Error: s.ConnectionError, Status: s.Status, SessionID: s.ActiveSession.ID, SessionPath: s.ActiveSession.Path, SessionName: s.ActiveSession.Name, Workspace: workspacePath, ModelID: s.Model.ID, ModelProvider: s.Model.Provider, Thinking: s.ThinkingLevel, ThinkingLevels: s.ThinkingLevels, AuthProviders: s.Auth.Providers, AuthURL: s.Auth.URL, AuthStatus: s.Auth.Status, AuthCode: s.Auth.UserCode}
+	v := Snapshot{ModelCatalog: s.Models, CurrentModel: s.Model, LatestTurn: s.LatestTurn, CommandsRaw: s.Commands, RawMessages: s.Messages, Turn: s.Turn, Connected: s.Connected, Running: s.Running, Error: s.ConnectionError, Status: s.Status, SessionID: s.ActiveSession.ID, SessionPath: s.ActiveSession.Path, SessionName: s.ActiveSession.Name, Workspace: workspacePath, ModelID: s.Model.ID, ModelProvider: s.Model.Provider, Thinking: s.ThinkingLevel, ThinkingLevels: s.ThinkingLevels, AuthProviders: s.Auth.Providers, AuthURL: s.Auth.URL, AuthStatus: s.Auth.Status, AuthCode: s.Auth.UserCode}
 	v.Extensions = s.Extensions
 	v.SteeringMode = s.SteeringMode
 	v.FollowUpMode = s.FollowUpMode
@@ -499,7 +511,7 @@ func (x *Controller) Action(a Action) {
 		x.Git.Refresh()
 		x.Worktrees.Refresh()
 	case "RefreshModels":
-		e = m.Send(pirpc.GetAvailableModels, nil)
+		e = x.refreshModelCatalog()
 	case "RefreshProviders":
 		e = m.Send(pirpc.AuthList, nil)
 	case "RefreshQuota":
@@ -661,7 +673,9 @@ func (x *Controller) Action(a Action) {
 		if a.Kind == "ReconnectMcpServers" {
 			x.configApplyAfter = time.Now()
 		}
-	case "AutoTitleChanged", "RuntimeConfigChanged":
+	case "AutoTitleChanged":
+		// The title extension reads its configuration live; no process restart.
+	case "RuntimeConfigChanged":
 		x.configApplyAfter = time.Now().Add(500 * time.Millisecond)
 	case "NotificationsChanged":
 		p := x.Store.Notifications()
@@ -868,5 +882,5 @@ func windowRestoreSize(displayWidth, displayHeight int) (int, int) {
 // The source has no in-window menu bar on Linux. Auto-hide retains native edit
 // roles and accelerators without allocating an unwanted GTK/Windows strip.
 func sourceWindowOptions(width, height int) mygo.WindowOptions {
-	return mygo.WindowOptions{Title: "Orbit", Width: width, Height: height, MinWidth: 960, MinHeight: 640, Maximized: true, AutoHideMenuBar: true, TitleBarStyle: mygo.TitleBarHidden, TitleBarHeight: 44, TrafficLightPosition: &mygo.Point{X: 12, Y: 16}}
+	return mygo.WindowOptions{Title: "Orbit", Width: width, Height: height, MinWidth: 960, MinHeight: 640, Maximized: true, AutoHideMenuBar: true, HideWindowButtons: runtime.GOOS == "linux", TitleBarStyle: mygo.TitleBarHidden, TitleBarHeight: 44, TrafficLightPosition: &mygo.Point{X: 12, Y: 16}}
 }

@@ -1,6 +1,7 @@
 package transcriptui
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/egoist/mygo/transfer"
@@ -50,4 +51,30 @@ func SelectionMenu(c *ui.Context, scope ui.Element, messageText string, o Option
 			}
 		}
 	})
+}
+
+// RetainedSelectionAvailable reports whether the canonical hash-checked MyGo
+// compatibility addition is present. Unpatched standalone tests may still
+// exercise mounted selection, but the application must fail before startup.
+func RetainedSelectionAvailable() bool {
+	_, ok := any(ui.Element{}).(interface{ RetainTextSelection(string) ui.Element })
+	return ok
+}
+
+// RetainSelection enables the source's immutable selection snapshot semantics
+// on the shared transcript scope. identity must be the actual stable session
+// identity, never a row count or latest turn. It must be called every frame.
+func RetainSelection(scope ui.Element, identity string) bool {
+	if patched, ok := any(scope).(interface{ RetainTextSelection(string) ui.Element }); ok {
+		patched.RetainTextSelection(identity)
+		return true
+	}
+	return false
+}
+
+func RequireCompatibility() error {
+	if !RetainedSelectionAvailable() {
+		return fmt.Errorf("Orbit requires its pinned MyGo transcript selection compatibility patch; use scripts/go-native.sh run ./cmd/orbit or scripts/go-native.sh build ./cmd/orbit")
+	}
+	return nil
 }

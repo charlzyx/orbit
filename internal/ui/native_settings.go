@@ -85,18 +85,10 @@ func (a *App) runtimeNative(c *ui.Context) {
 					a.Confirm("Update pi?", "Update the official managed pi installation. Running tasks should finish first.", func() { a.runPiOperation(false, false) })
 				}
 			}
-			if a.button(c, "Refresh model catalog", "icons/refresh.svg", false).Disabled(s.busy).Clicked() {
-				s.busy = true
-				a.Async(func() func() {
-					r, e := native.RefreshPiModelCatalog(context.Background())
-					return func() {
-						s.busy = false
-						s.output = strings.TrimSpace(string(r.Stdout) + "\n" + string(r.Stderr))
-						a.save(e)
-						a.Dispatch(Action{Kind: "RefreshModels"})
-					}
-				})
+			if a.button(c, "Refresh model catalog", "icons/refresh.svg", false).Disabled(a.Models != nil && a.Models.Refreshing).Clicked() {
+				a.Dispatch(Action{Kind: "RefreshModels"})
 			}
+
 		})
 		if s.output != "" {
 			ui.Scroll(c).MaxHeight(240).Children(func() { ui.Text(c, s.output).Font(a.Fonts.CodeFamily).Selectable() })

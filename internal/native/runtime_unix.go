@@ -9,7 +9,10 @@ import (
 )
 
 func runtimeProgram(binary string, args []string) (string, []string, error) { return binary, args, nil }
-func detachRuntimeProcess(cmd *exec.Cmd)                                    { cmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true} }
+func runtimeProgramIn(binary string, args []string, _ []string) (string, []string, error) {
+	return binary, args, nil
+}
+func detachRuntimeProcess(cmd *exec.Cmd) { cmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true} }
 
 // Version probes and update commands may be wrappers which spawn children.
 // Give only our own child a fresh process group/session so cancellation does

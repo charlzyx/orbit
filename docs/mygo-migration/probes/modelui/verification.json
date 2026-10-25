@@ -1,0 +1,285 @@
+{
+  "schema_version": 1,
+  "checked_at_utc": "2026-10-25T06:26:04.663961+00:00",
+  "scope": [
+    "P08",
+    "C06",
+    "model-related S03/S04 settings actions"
+  ],
+  "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "source_hashes": [
+    {
+      "path": "crates/orbit-pi/locales/en.yml",
+      "sha256": "d9b654a62da1fb65534f5bb2ba817f77e27b66985c8ca1a950bd74b5716ccd78",
+      "working_tree_matches_frozen": true
+    },
+    {
+      "path": "crates/orbit-pi/src/app.rs",
+      "sha256": "080e5e76268a8cac8424e3250f7068b967ec117ee61b78364b58f07ea0df0dcf",
+      "working_tree_matches_frozen": true
+    },
+    {
+      "path": "crates/orbit-pi/src/app/composer_ops.rs",
+      "sha256": "f10d337621ac8b99639d9e90aeddbe800e0fb167fe2265f46c7e18da0ffca9b6",
+      "working_tree_matches_frozen": true
+    },
+    {
+      "path": "crates/orbit-pi/src/app/helpers.rs",
+      "sha256": "b37df08990df184a90c25183e97ec285a1b151825adc50e3038abb2b524f76d7",
+      "working_tree_matches_frozen": true
+    },
+    {
+      "path": "crates/orbit-pi/src/app/pickers.rs",
+      "sha256": "e28ab7dfbf844de503b7730f451e6f695a4fb3d7e44c8273e172011ebf48c5a9",
+      "working_tree_matches_frozen": true
+    },
+    {
+      "path": "crates/orbit-pi/src/app/runtime.rs",
+      "sha256": "768589d04107003a16530d66b6e1b026798ee155641b9a35076dbf26f0ffa5ce",
+      "working_tree_matches_frozen": true
+    },
+    {
+      "path": "crates/orbit-pi/src/app/settings.rs",
+      "sha256": "49869d298e1c75f70b6a406d52cb1e9b6cf4deaa1c1c1e6829d69bb94f992873",
+      "working_tree_matches_frozen": true
+    },
+    {
+      "path": "crates/orbit-pi/src/app/view.rs",
+      "sha256": "f41cd25e968924879063ef980e7e3b6f6d1f70f1020c1e721451da038cf49d99",
+      "working_tree_matches_frozen": true
+    },
+    {
+      "path": "crates/orbit-pi/src/favorites.rs",
+      "sha256": "021132a678dede8afd9fa71e9a09a265aa59c62f5c2d23228179ced0d23fed66",
+      "working_tree_matches_frozen": true
+    },
+    {
+      "path": "crates/orbit-pi/src/model_selector.rs",
+      "sha256": "2fcd44bdfee668e453a6778555671ccd995df383be90d17ef2935b393058be3a",
+      "working_tree_matches_frozen": true
+    },
+    {
+      "path": "crates/orbit-pi/src/model_selector_match.rs",
+      "sha256": "b49ca53f7538ed02d672a5f253fef5e610751e6c4933aa231c240377741d9595",
+      "working_tree_matches_frozen": true
+    },
+    {
+      "path": "crates/orbit-pi/src/recent_models.rs",
+      "sha256": "75ce3910631ba706ec98119f0da9dbafbb45f934e6fe9f69a23077de5b412874",
+      "working_tree_matches_frozen": true
+    },
+    {
+      "path": "crates/orbit-pi/src/theme/tokens.rs",
+      "sha256": "189c201bec5f416bfb49403e2e864e592982cf2ff87667276318c256c849e304",
+      "working_tree_matches_frozen": true
+    }
+  ],
+  "toolchain": {
+    "go": "go1.27.3 linux/amd64",
+    "mygo": "v0.6.4-0.20261025001514-9c69cf829ece",
+    "pi": "1.4.0",
+    "canonical_wrapper": "scripts/go-native.sh; temporary verified composer range-edit and selection-retention overlays"
+  },
+  "implementation_files": [
+    {
+      "path": "docs/mygo-migration/model-ui-acceptance.md",
+      "sha256": "b3e9bd6aa31aa95b2a4afbfbc4a27fdb44583f4226904c8ad4f08c183bcf981b"
+    },
+    {
+      "path": "docs/mygo-migration/model-visual-source-review.json",
+      "sha256": "332e517a7ff8c9c68f5b7bec0e24566531eeb1aec2a79af2144d15374979797d"
+    },
+    {
+      "path": "internal/modelui/controls.go",
+      "sha256": "b0e9f10e7cb5bf1c4de89c41811a541d12dd6dcc57062db9b88aacc50ecfce11"
+    },
+    {
+      "path": "internal/modelui/live_test.go",
+      "sha256": "946335f331175ae48f33a4f15353b9a6c3dc892fae860d86716fd0687af3263c"
+    },
+    {
+      "path": "internal/modelui/state.go",
+      "sha256": "c1ec9e03b8115e9219a6c789d45a8ad92111abfdc3fa0ada49bcf8a3c6ccac91"
+    },
+    {
+      "path": "internal/modelui/state_test.go",
+      "sha256": "56db4d10ea6b44377a826ace457c8ad8ef9b43fe6eb4dfbf8b3b397e7e83507c"
+    },
+    {
+      "path": "internal/modelui/view.go",
+      "sha256": "6570b817f6ce1534ef8f97aba0a1d92538b38a7852a265ecf1df7e227eee56a9"
+    },
+    {
+      "path": "internal/modelui/view_test.go",
+      "sha256": "b6a9ccabef81ea13627f4b0d88764687cf8169384a6f4afb4887322003d54ad9"
+    }
+  ],
+  "tests": {
+    "module_command": "ORBIT_PI_INTEGRATION_BIN=<pinned-pi> ORBIT_MODELUI_CAPTURE_DIR=docs/mygo-migration/probes/modelui scripts/go-native.sh test -race ./internal/modelui -count=1 -json",
+    "module_result": [
+      {
+        "Time": "2026-10-25T15:24:51.043816242+09:00",
+        "Action": "pass",
+        "Package": "github.com/charlzyx/orbit/internal/modelui",
+        "Elapsed": 5.322
+      }
+    ],
+    "top_level_passed_count": 30,
+    "passed_including_subtests": [
+      "TestLiveCredentialFreeCatalogProjection",
+      "TestCatalogGroupsFiltersCountsAndExactIdentity",
+      "TestPickerSourceGroupingScopesAndDedup",
+      "TestPickerMatchingNormalizationAndProviderGuard",
+      "TestPickerIdentityOnlyFoldsASCII",
+      "TestPickerKeyboardClampsSkipsHeadersAndUnchangedSnapshot",
+      "TestFavoritesPersistenceFailureAndNoSelection",
+      "TestModelDispatchAndRecentsDoNotFabricateSelection",
+      "TestRecentsCapStaleModelsAndCancellation",
+      "TestThinkingCapabilitiesAndSourceDefaults",
+      "TestDefaultsPersistenceFailureAndTitleSelection",
+      "TestThinkingPickerReportedLevelsAndHintSearch",
+      "TestRefreshLifecycleGateAndSnapshotCopies",
+      "TestSearchableSettingsOriginalIndicesAndClamping",
+      "TestSourceCenteredScrollAccountsForHeadersAndClamps",
+      "TestRunningLocksOnlyComposerPickerAndReloadCapsRecents",
+      "TestNativeStarsNeverSelectOrCloseAndCardsDispatchOnce/models",
+      "TestNativeStarsNeverSelectOrCloseAndCardsDispatchOnce/picker",
+      "TestNativeStarsNeverSelectOrCloseAndCardsDispatchOnce",
+      "TestNativePickerSearchFocusArrowFilterAndEscape",
+      "TestNativeModelsFilterEmptyAndProviderMenuOriginalChoice",
+      "TestNativeDefaultMenusFilteredEnterAndCanceledNoWrite",
+      "TestNativeModelsThreeColumnCardGeometry",
+      "TestNativePickerLongListKeyboardRevealAndThinkingGate",
+      "TestNativeModelLoadingErrorAndEmptyHaveNoFabricatedRows",
+      "TestNativeModelUICaptures",
+      "TestNativeScopeClickKeepsSearchKeyboardOwnership",
+      "TestNativeSettingsNoMatchesAndOutsidePressDoNotSave",
+      "TestNativeStationaryPointerCannotHijackPickerKeyboard",
+      "TestNativeSettingsRepeatedTriggerTogglesWithoutApplying",
+      "TestNativeHorizontalScopesKeepFavoriteCurrentReachable",
+      "TestNativeRefreshGlyphAndReducedMotion/false",
+      "TestNativeRefreshGlyphAndReducedMotion/true",
+      "TestNativeRefreshGlyphAndReducedMotion"
+    ],
+    "failed": [],
+    "vet_command": "scripts/go-native.sh vet ./internal/modelui",
+    "vet_result": "PASS",
+    "cross_package_command": "ORBIT_PI_INTEGRATION_BIN=<pinned-pi> scripts/go-native.sh test -race ./internal/modelui ./internal/ui ./internal/agent -run 'Model|Catalog|Thinking|Picker|Default|AutomaticTitle' -count=1",
+    "cross_package_last_success": {
+      "modelui_seconds": 2.667,
+      "ui_seconds": 9.182,
+      "agent_seconds": 2.092,
+      "timing": "Earlier same task, before concurrently edited host Usage fixture failed compilation"
+    },
+    "cross_package_latest_result": "ok  \tgithub.com/charlzyx/orbit/internal/modelui\t3.084s\nFAIL\tgithub.com/charlzyx/orbit/internal/ui [build failed]\nok  \tgithub.com/charlzyx/orbit/internal/agent\t2.213s\nFAIL\n",
+    "cross_package_latest_compile_diagnostic": "internal/ui/usage_visual_test.go:375:17: a.Prefs.Usage undefined (type preferences.UI has no field or method Usage)",
+    "latest_compile_failure_owner": "Host UI team notified; no edit made outside modelui ownership"
+  },
+  "real_pi_probe": {
+    "passed": true,
+    "disposable_home_workspace_and_pi_dir": true,
+    "offline": true,
+    "commands": [
+      "get_available_models",
+      "get_available_thinking_levels"
+    ],
+    "models_returned": 0,
+    "credentials_used": false,
+    "inference_requested": false,
+    "authentication_requested": false,
+    "network_catalog_refresh_requested": false,
+    "agent_message_tool_start_events": 0
+  },
+  "captures": [
+    {
+      "path": "docs/mygo-migration/probes/modelui/model-picker-favorites-fixture.png",
+      "sha256": "3dac04e1a39b0badf5a01c56fa16f41f23573389c3674c0f61ac31892d97c83e",
+      "width": 1000,
+      "height": 760,
+      "kind": "native CPU component, explicit synthetic fixture",
+      "matched_rust_pair": false,
+      "font_manifest": "not recorded; cannot qualify as canonical pixel comparison"
+    },
+    {
+      "path": "docs/mygo-migration/probes/modelui/model-picker-groups-fixture.png",
+      "sha256": "98bf9c94dd18c83d05e4b736c404cf2f77b4a162e3b6f933b62ea928919be2e7",
+      "width": 1000,
+      "height": 760,
+      "kind": "native CPU component, explicit synthetic fixture",
+      "matched_rust_pair": false,
+      "font_manifest": "not recorded; cannot qualify as canonical pixel comparison"
+    },
+    {
+      "path": "docs/mygo-migration/probes/modelui/models-catalog-fixture.png",
+      "sha256": "e1848d2325a51b0656dc1116ecbd535cea969b65e5e88f0180d29f20bc9e8fc8",
+      "width": 1000,
+      "height": 760,
+      "kind": "native CPU component, explicit synthetic fixture",
+      "matched_rust_pair": false,
+      "font_manifest": "not recorded; cannot qualify as canonical pixel comparison"
+    },
+    {
+      "path": "docs/mygo-migration/probes/modelui/models-favorites-fixture.png",
+      "sha256": "7163e9b7306b80cdc1a4c0226a25b685c97c215adcc9f1d95035f18211fad49d",
+      "width": 1000,
+      "height": 760,
+      "kind": "native CPU component, explicit synthetic fixture",
+      "matched_rust_pair": false,
+      "font_manifest": "not recorded; cannot qualify as canonical pixel comparison"
+    },
+    {
+      "path": "docs/mygo-migration/probes/modelui/models-filter-empty-fixture.png",
+      "sha256": "dc1bab6d2a52159528f1e5b296c903f4fb752614d15a13bab431d1adb7549950",
+      "width": 1000,
+      "height": 760,
+      "kind": "native CPU component, explicit synthetic fixture",
+      "matched_rust_pair": false,
+      "font_manifest": "not recorded; cannot qualify as canonical pixel comparison"
+    },
+    {
+      "path": "docs/mygo-migration/probes/modelui/thinking-picker-fixture.png",
+      "sha256": "0e23ff5abfa4597516103abec86418fde353feae107582d36fd4b7492b097779",
+      "width": 1000,
+      "height": 760,
+      "kind": "native CPU component, explicit synthetic fixture",
+      "matched_rust_pair": false,
+      "font_manifest": "not recorded; cannot qualify as canonical pixel comparison"
+    }
+  ],
+  "inventory_review": {
+    "path": "docs/mygo-migration/model-visual-source-review.json",
+    "ids": "V124\u2013V152",
+    "count": 29,
+    "invented_control_corrections": [
+      "V132: input/output/cost metadata absent",
+      "V135: flat options, not grouped",
+      "V138: Active session model sentinel",
+      "V130: original Update model list label and opacity, duplicate gating is behavioral",
+      "V140/V146/V151: explicit no-match text, not blank popup"
+    ],
+    "additional_render_branches_listed": true
+  },
+  "host_review": {
+    "full_modelchoice_catalog_retained": true,
+    "picker_open_queries_catalog_once": true,
+    "settings_card_not_overblocked_midrun": true,
+    "popup_bottom_left_anchor_and_single_chrome": "Host owner corrected and tested",
+    "automatic_title_does_not_restart_runtime": "Host owner confirmed cache-only callback and persist-only toggle; focused regression passed",
+    "thinking_chip_absent_for_zero_or_one_levels": "Host owner confirmed correction",
+    "reduce_motion_theme_mapping": "Requested from host after adding Theme.ReduceMotion; host owns mapping"
+  },
+  "explicit_deviations": [
+    "Rust filtered-zero Models board-only defect: Go adds clear no-matches notice",
+    "Rust ignores preference write failure: Go preserves confirmed state and reports error",
+    "Go adds distinct loading/disconnected readiness and retained inline errors; Rust catalog update failure is toast only"
+  ],
+  "verdict": {
+    "functional": "PASS_SCOPED_MODULE; latest cross-package host build needs unrelated Usage test correction",
+    "full_row_parity_verified": false,
+    "matched_pixels": false,
+    "actual_os_execution": false,
+    "authenticated_provider_execution": false,
+    "all_visual_states_exhaustive": false
+  },
+  "ownership": "No host/backend/Rust/module-cache/go.mod changes by this component task; coordinator owns publication"
+}

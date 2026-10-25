@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/charlzyx/orbit/internal/agent"
-	"github.com/charlzyx/orbit/internal/preferences"
 	"github.com/egoist/mygo/ui"
 )
 
@@ -186,26 +185,6 @@ func (a *App) agentRuntimeSettings(c *ui.Context) {
 		}
 	})
 	a.section(c, "Automatic title model", func() {
-		title := a.autoTitlePrefs
-		label := a.text("settings.active_session_model", "Active session model")
-		if title.Model != nil {
-			label = title.Model.Provider + " / " + title.Model.ID
-		}
-		ui.MenuButton(c, label, func(m *ui.Menu) {
-			if m.Item(a.text("settings.active_session_model", "Active session model")).Checked(title.Model == nil).Chosen() {
-				title.Model = nil
-				a.autoTitlePrefs = title
-				a.save(a.Options.Store.SaveAutoTitle(title))
-				a.Dispatch(Action{Kind: "AutoTitleChanged"})
-			}
-			for _, model := range a.Model.Models {
-				if m.Item(model.Provider + " / " + model.Name).Checked(title.Model != nil && title.Model.ID == model.ID && title.Model.Provider == model.Provider).Chosen() {
-					title.Model = &preferences.Model{Provider: model.Provider, ID: model.ID}
-					a.autoTitlePrefs = title
-					a.save(a.Options.Store.SaveAutoTitle(title))
-					a.Dispatch(Action{Kind: "AutoTitleChanged"})
-				}
-			}
-		}).Disabled(!title.Enabled)
+		a.Models.TitleModelControl(c)
 	})
 }

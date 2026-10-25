@@ -2,6 +2,7 @@ package orbitui
 
 import (
 	"github.com/egoist/mygo/ui"
+	"math"
 	"path/filepath"
 	"strings"
 )
@@ -13,12 +14,12 @@ func (a *App) sourceSettingsSection(c *ui.Context, title, description string, bo
 	t := a.Theme
 	ui.Column(c).AlignSelf(ui.Stretch).Gap(t.Space(8)).Children(func() {
 		ui.Column(c).AlignSelf(ui.Stretch).PaddingX(t.Space(4)).Gap(t.Space(2)).Children(func() {
-			ui.Text(c, strings.ToUpper(title)).FontSize(t.Px(10)).FontWeight(500).TextColor(t.TextMuted)
+			ui.Text(c, strings.ToUpper(title)).FontSize(t.Px(10)).Height(sourceTextHeight(t.Px(10), sourceDefaultLineHeight)).FontWeight(500).TextColor(t.TextMuted)
 			if description != "" {
 				ui.Text(c, description).FontSize(t.Px(12)).TextColor(t.TextMuted)
 			}
 		})
-		ui.Column(c).AlignSelf(ui.Stretch).Background(t.SurfaceSecondary).Border(1, t.Border).Radius(t.Px(12)).Children(body)
+		ui.Column(c).Label("Settings group "+title).AlignSelf(ui.Stretch).Background(t.SurfaceSecondary).Border(1, t.Border).Radius(t.Px(12)).Children(body)
 	})
 }
 func (a *App) sourceSettingsRow(c *ui.Context, title, description, meta string, control func()) {
@@ -120,3 +121,6 @@ func (a *App) sourceSettingsToggle(c *ui.Context, value *bool, label string) ui.
 	})
 	return sw
 }
+
+// GPUI resolves line boxes to whole logical pixels; MyGo otherwise retains fractions.
+func sourceTextHeight(size, line float32) float32 { return float32(math.Round(float64(size * line))) }

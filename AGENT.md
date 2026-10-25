@@ -24,10 +24,11 @@ local fork; MyGo core and native Ghostty binaries remain pinned upstream.
 Run `scripts/go-native.sh test -race ./...`, `scripts/go-native.sh vet ./...`,
 and `scripts/go-native.sh -C third_party/mygo-terminal test -race ./...`.
 Also run the additive toolkit regressions with
-`scripts/go-native.sh test -race github.com/egoist/mygo/ui -run '^TestOrbitComposer'`.
-The canonical wrapper verifies the pinned module and applies the composer edit
-patch in a temporary copy/modfile/overlay, never in the module cache. Unpatched
-app binaries fail startup deliberately; do not bypass the compatibility guard. The opt-in real Pi tests use
+`scripts/go-native.sh test -race github.com/egoist/mygo/ui -run '^TestOrbit(Composer|Selection)'`.
+The canonical wrapper verifies the pinned module and explicitly hash-listed
+composer edit and transcript selection additions in a temporary copy/modfile/overlay,
+never in the module cache. Both compatibility capabilities are required; unpatched
+app binaries fail startup deliberately. Do not bypass either compatibility guard. The opt-in real Pi tests use
 `ORBIT_PI_INTEGRATION_BIN`; actual disposable PTYs use `ORBIT_TERMINAL_TEST=1`.
 Use isolated homes/configuration, never a user's credentials or session store.
 Cross-build `cmd/orbit` through `scripts/go-native.sh build` with `CGO_ENABLED=0` for Linux/macOS/Windows on both

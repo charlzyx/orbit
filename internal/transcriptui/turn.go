@@ -59,7 +59,7 @@ func (r Row) Parts() []Part {
 					has = has || v.Thinking != "" || len(v.Tools) > 0
 				}
 				if has {
-					parts = append(parts, Part{"work", 0, end, firstAnswer < 0 || i < firstAnswer, r.Streaming && end == len(r.Steps)})
+					parts = append(parts, Part{"work", 0, end, firstAnswer < 0 || i < firstAnswer, r.Streaming && end == len(r.Steps) && strings.TrimSpace(r.Steps[end-1].Text) == ""})
 				}
 			}
 		}
@@ -72,7 +72,7 @@ func (r Row) Parts() []Part {
 				end++
 			}
 			covered = end
-			parts = append(parts, Part{"work", i, end, false, r.Streaming && end == len(r.Steps)})
+			parts = append(parts, Part{"work", i, end, false, r.Streaming && end == len(r.Steps) && strings.TrimSpace(r.Steps[end-1].Text) == ""})
 		}
 	}
 	return parts
@@ -230,6 +230,9 @@ func Turn(c *ui.Context, s *State, row Row, o Options) ui.Element {
 					label = o.tr("transcript_view.working_for", "Working for %{duration}", "duration", workingElapsed(*row.Elapsed))
 					c.After(180 * time.Millisecond)
 				}
+				if rate := row.LiveRate(o.now(c)); rate != "" {
+					label += " · " + rate + " tok/s"
+				}
 				if len(row.Steps) > 0 {
 					if activity := workingActivity(row.Steps[len(row.Steps)-1], o); activity != "" {
 						label = activity + " · " + label
@@ -270,12 +273,20 @@ func activity(c *ui.Context, s *State, rowKey string, all []Step, part Part, o O
 				if step.Thinking != "" {
 					thoughtKey := fmt.Sprintf("%s:thought:%d", rowKey, part.Start+i)
 					ui.Column(sc.Key("thought")).AlignSelf(ui.Stretch).MinWidth(0).Border(1, o.Colors.Border).Radius(8).Padding(8, 12).Children(func() {
-						label := o.tr("transcript.thought", "Thought")
-						if step.Streaming && step.Text == "" && len(step.Tools) == 0 {
-							label = o.tr("transcript.thinking", "Thinking")
-						}
-						if toggle(sc, s, thoughtKey, label, true, o) {
-							ui.Scroll(sc).AlignSelf(ui.Stretch).MaxHeight(260).Children(func() {
+						live := step.Streaming && strings.TrimSpace(step.Text) == "" && len(step.Tools) == 0
+						duration, estimated := StepThinkingDuration(all, part.Start+i)
+						if thinkingHeader(sc, s, thoughtKey, live, duration, estimated, o) {
+							if s.thoughtScrolls == nil {
+								s.thoughtScrolls = map[string]*ui.ScrollState{}
+							}
+							if s.thoughtScrolls[thoughtKey] == nil {
+								s.thoughtScrolls[thoughtKey] = &ui.ScrollState{}
+							}
+							scroll := s.thoughtScrolls[thoughtKey]
+							if step.Streaming && scroll.Y >= scroll.MaxY {
+								scroll.Y = math.MaxFloat32
+							}
+							ui.Scroll(sc).TrackScroll(scroll).AlignSelf(ui.Stretch).MaxHeight(260).Children(func() {
 								ui.Text(sc, capChars(step.Thinking, 40000)).Selectable().Font(o.CodeFont).FontSize(o.CodeSize).TextColor(o.Colors.Muted)
 							})
 						}
@@ -514,4 +525,84 @@ func usageLabel(row Row, o Options) string {
 		label += " · " + o.tr("transcript_view.tps_value", "%{rate} tok/s avg", "rate", rate)
 	}
 	return label
+}
+
+func thinkingHeader(c *ui.Context, state *State, key string, live bool, duration *time.Duration, estimated bool, o Options) bool {
+	label := o.tr("transcript.thought", "Thought")
+	if live {
+		label = o.tr("transcript.thinking", "Thinking")
+	}
+	timing := ""
+	if duration != nil {
+		value := formatDuration(*duration)
+		if live {
+			value = workingElapsed(*duration)
+		}
+		timing = o.tr("transcript.for_duration", "for %{duration}", "duration", value)
+	}
+	accessible := label
+	if timing != "" {
+		accessible += " " + timing
+	}
+	button := ui.ButtonBase(c.Key(key)).AlignSelf(ui.Stretch).Gap(8).Label(accessible)
+	if estimated {
+		button.Tooltip(o.tr("transcript.estimated_thinking_duration", "Estimated from adjacent message timestamps; includes tool execution."))
+	}
+	open := state.Open(key, true)
+	button.Children(func() {
+		tone := o.Colors.Muted
+		if live {
+			tone = o.Colors.Accent
+		}
+		o.icon(c, "icons/tools/thinking.svg", 14, tone)
+		ui.Text(c, label).FontWeight(600).FontSize(o.FontSize).TextColor(o.Colors.Accent)
+		if timing != "" {
+			ui.Text(c, timing).MinWidth(0).TextColor(o.Colors.Muted).FontSize(o.FontSize)
+		}
+		ui.Spacer(c)
+		icon := "icons/chevron-right.svg"
+		if open {
+			icon = "icons/chevron-down.svg"
+		}
+		o.icon(c, icon, 12, o.Colors.Muted)
+	})
+	if button.Clicked() {
+		state.Toggle(key, true)
+		open = !open
+	}
+	return open
+}
+
+// LiveRate uses reported token counts and actual request receive clocks. Unlike
+// the source's unlabelled chars/4 fallback, absent provider output stays absent.
+func (row Row) LiveRate(now time.Time) string {
+	usage := row.Usage()
+	if !row.Streaming || usage == nil || usage.Output == 0 || len(row.Steps) == 0 {
+		return ""
+	}
+	var total time.Duration
+	for i, step := range row.Steps {
+		duration := step.Duration
+		if duration == nil {
+			duration = step.GenerationTime
+		}
+		if i == len(row.Steps)-1 {
+			if step.RequestStartedAt.IsZero() || now.Before(step.RequestStartedAt) {
+				return ""
+			}
+			d := now.Sub(step.RequestStartedAt)
+			duration = &d
+		}
+		if duration != nil {
+			total += *duration
+		}
+	}
+	if total < time.Second {
+		return ""
+	}
+	rate := float64(usage.Output) / total.Seconds()
+	if rate >= 10 {
+		return fmt.Sprintf("%.0f", rate)
+	}
+	return fmt.Sprintf("%.1f", rate)
 }

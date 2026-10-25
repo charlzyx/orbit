@@ -2,16 +2,18 @@
 
 Reference Orbit: `299a32bc87fe3d4851bdb902d9c03dcf9bf99cac`.
 Native dependency: MyGo `9c69cf829ece196c5b3a3601f1c7bbe70526376f`.
-Implementation: `internal/transcriptui`, mounted by `internal/ui/transcript.go`.
-All inputs in this report's tests/captures are explicitly synthetic Pi protocol
-fixtures. They are not model output, live provider usage, or proof that a model
-ran. No Rust sidecar, browser/webview, API credential, paid model call, user Mac,
+Implementation: `internal/transcriptui`, mounted by `internal/ui/chat.go`.
+All rendering inputs in this report's tests/captures are explicitly synthetic
+Pi protocol fixtures. They are not model output, live provider usage, or proof
+that a model ran. A separate credential-free actual Pi transport suite is recorded
+below; it does not request model inference. No Rust sidecar, browser/webview, API credential, paid model call, user Mac,
 GitHub write, or production session was used.
 
 **Verdict:** source-derived implementation and scoped native CPU tests pass.
-**C10/C11/C12 full-row parity is not verified.** The concrete C11 virtualization
-limit below is reproduced, not waived. Pixel equality and actual macOS/Linux/
-Windows native input/lifecycle verdicts remain separate and unexecuted here.
+**C10/C11/C12 full-row parity is not verified.** The concrete upstream C11
+virtualization mismatch is reproduced and closed by the opt-in, hash-verified
+selection addition below. Pixel equality and actual macOS/Linux/Windows native
+input/lifecycle verdicts remain separate and unexecuted here.
 
 ## Source-first findings that change the implementation
 
@@ -38,7 +40,9 @@ Windows native input/lifecycle verdicts remain separate and unexecuted here.
   `Element.Selectable`, `SelectedTexts`, and `CopyData`, plus Markdown
   `Options.ShareSelection`, avoid a core fork for mounted cross-message text.
   Individual Markdown views, including nested alert views, must not establish
-  independent selection scopes.
+  independent selection scopes. The canonical build additionally mounts the
+  attributed `third_party/mygo-selection` snapshot-lifetime addition; ordinary
+  upstream Selectable behavior remains unchanged unless explicitly enabled.
 
 ## Exact behavior cases
 
@@ -87,10 +91,11 @@ Evidence: `TestTypedToolsAndOutputBounds`,
 `TestNativeToolFailureFoldCopyRepeatAndStreaming`,
 `TestStateSessionResetAndIndependentToggles`.
 
-Remaining: full alias permutation, click-through URL OS launch, exact file-type
-devicons, theme/density typography, shimmer, and matched card pixels are not all
-independently verified. Existing native icons and paint-only lexical colors are
-wired, but this is not a pixel-equality claim.
+Remaining: exact file-type devicons and source shimmer are not implemented in
+this component. Full alias permutation, click-through URL OS launch, theme/density
+typography, and matched card pixels are not independently verified. Existing
+semantic SVG icons and paint-only lexical colors are wired, but this is not a
+pixel-equality claim.
 
 ### T03 · Actual errors, partial output, abort, and absence (C10/C12)
 
@@ -164,7 +169,9 @@ Source: `transcript.rs:130::usage`, `:145::generation_time`,
 
 Expected: sum only supplied usage. Cost accepts a scalar or `cost.total` and
 retains sub-cent precision. Cache share uses input+read+write and never rounds
-partial hits to 100%. Rate requires reported output and durationMs >=1 second.
+partial hits to 100%. Settled rate requires reported output and a duration >=1 second: Pi durationMs
+takes precedence over measured local delta time. Live rate sums settled step
+clocks plus the current request receive clock, never the UI heartbeat.
 The live wall clock is measured from observed streaming, includes tool gaps,
 stops at settlement, and is never derived from historical timestamp gaps.
 One fold and one footer per logical turn; source-ordered work groups. The task
@@ -178,43 +185,100 @@ Evidence: `TestObservedWallTimeDoesNotInventReloadTiming`,
 `TestNativeUsageHoverTailOwnsSingleFooter`,
 `TestNativeSummaryAndChangedFileLimits`.
 
-Remaining: source per-step thinking timer/reload-estimate and active-generation
-fallback clocks are not yet ported; no substitute metric is fabricated. Source
-shimmer and the exact all-theme/font-density visual matrix remain open. Awaiting
-first reply tail state and complete navigation-rail behavior are host obligations,
-not established by these component tests.
+Receive-clock implementation: `pirpc.Client.readStdout` timestamps each actual
+record before parsing/enqueue as local-only `Event.ReceivedAt`. Pure ParseEvent
+and reloaded messages have no receive clock. `agent.sessionState.applyAt` keeps
+per-message reasoning and generation clocks, counts only delta gaps <=1s, pauses
+at tool execution, resets on boundaries/cancellation, and preserves measured
+values and real streamed usage when the final snapshot omits them. Snapshot
+cloning also clones optional duration pointers. `turn_start` supplies the actual
+request origin, including prefill; absent clocks are never reconstructed from
+heartbeat batches. Reloaded reasoning uses the source's adjacent timestamp-gap
+estimate only in the reasoning header, with an explicit estimate tooltip that
+notes tool time is included, never as provider telemetry or a rate denominator.
 
-### T07 · Cross-message selection, context menu, and virtualized limit (C11)
+Native thought cards follow appended text only while already at the end; upward
+scroll detaches and reaching the bottom resumes following. Fold state and scroll
+state persist independently and reset with actual session identity. The source's
+unlabelled chars/4 token estimator is deliberately not represented as reported
+usage: without supplied output tokens the live rate remains absent. This truth
+boundary is explicit rather than a fabricated token count or a pixel-parity claim.
+
+Additional evidence: `TestStreamClock*`, `TestEventParseDoesNotInventReceiveTime`,
+`TestReaderStampsArrivalBeforeDelayedDrain`,
+`TestMeasuredAndEstimatedThinkingClocksAndRates`, and
+`TestNativeThinkingTimingAndStreamFollowDetach`. Credential-free actual Pi1.4.0
+protocol integration passed; it submits no prompt/model request and asserts zero
+provider cost/tokens/tool calls.
+
+Remaining: source shimmer and exact all-theme/font-density visual matrix remain
+open. MyGo's ordinary nested scroller hands an already-blocked wheel to the
+parent, but does not forward the unused fraction of a wheel that crosses the
+inner boundary in the same event (`ui/input.go::scrollBy` vs source
+`split_thinking_scroll`). That precise residual-wheel behavior remains a concrete
+interaction gap; no full-row pass is claimed. Awaiting-first-reply tail state and
+complete navigation rail remain host obligations, not established by these tests.
+
+### T07 · Cross-message selection, context menu, and virtualized retention (C11)
 
 Source: `transcript_view.rs:302::TextSelection`, `:518::selected_text`,
-`:912::text_selection_menu`; pinned MyGo `ui/textselection.go`.
+`:827::register_text_selection`, `:912::text_selection_menu`; `app.rs:1333`
+pre-focus copy interceptor; pinned MyGo `ui/textselection.go`.
 
 1. Drag from a Chinese-containing user paragraph through multiple Markdown
    blocks and another mounted message; press Cmd/Ctrl+C.
-2. Append streamed text, reopen the context menu, copy the full clicked message,
-   then dismiss with Escape. Empty selected ranges must not add blank lines.
-3. Repeat across three actual virtualized-list rows, then scroll the selection's
-   endpoints out of the list's mounted range.
+2. Append or replace live text, reopen the context menu over another message,
+   copy the selection/full clicked message, then dismiss without a clipboard write.
+3. Select three virtual-list rows, scroll all selected endpoints away, copy,
+   and scroll back. The selected row nodes must actually unmount; copied text
+   remains immutable and highlights return at source-correct UTF-8 boundaries.
+4. Drag after scrolling new rows into view. Only blocks in the initial mounted
+   snapshot can extend this drag, exactly as Rust `extend_selection` specifies.
+5. Switch actual session identity, remove/disable the scope or its opt-in, click
+   outside, and repeat selection. Verify no stale selection or node retention.
+6. Move focus programmatically to the composer. Source Cmd+C still copies the
+   transcript selection until an outside click clears it; afterward normal input
+   copy resumes. A right-click elsewhere in the transcript preserves selection.
 
-Expected for mounted text: one selection scope, Rune-safe copies, single-newline
-block joining, Copy Selection and Copy Message target the correct content, no
-unselected controls in clipboard, no clipboard mutation on dismissal.
+Expected: shared selection, source single-newline joining with empty ranges
+skipped, correct menu targets, current-layout block-boundary gutter hit testing,
+no unselected controls in clipboard, no write on dismissal, and no virtualization
+bypass. The snapshot contains immutable strings/numeric IDs, never row nodes,
+editors, layouts or callbacks. The initial mounted block count bounds its size.
 
 Evidence: `TestNativeCrossMessageMarkdownSelectionAndMenu`,
-`TestNativeVirtualizedCrossRowSelectionAndEndpointLimit` and separate host tests.
+`TestNativeVirtualizedCrossRowSelectionAndEndpointLimit` (unchanged upstream
+behavior intentionally reproduced), `TestNativeRetainedVirtualizedTranscriptSelection`,
+`TestSelectionCompatibilityGuard`, and `TestOrbitSelection*` in
+`third_party/mygo-selection/orbit_selection_test.go.txt`. Mounted host cases are
+maintained separately in `internal/ui/transcript_integration_test.go`.
 
-**Reproduced mismatch, not a pass:** MyGo `syncTextSelection` clears its selection
-when a selected endpoint is unmounted (`ui/textselection.go:166–173`). Rust keeps
-cloned SelectedBlock text and can copy the existing selection after scrolling
-(`transcript_view.rs:518`). MyGo exposes no public setter/restoration API for a
-container-spanning selection or a virtual-list pin for selected text endpoints.
-Retaining only a clipboard string would risk copying stale selections after
-focus/click changes and would not restore highlight semantics, so no such fake
-fix is installed. Closing this requires a narrowly reviewed upstream/public
-selection-lifetime hook or an app-owned selectable text/layout subsystem; a
-wholesale MyGo core fork was not introduced. Drag gutter hit testing also uses
-MyGo glyph bounds rather than Rust's registered block bounds; exact gutter
-behavior is not claimed. Real OS clipboard, accessibility, and IME remain gates.
+**Why a narrow compatibility addition was required:** MyGo `syncTextSelection`
+clears missing endpoints. Its public API cannot restore a cross-container range.
+The explicit opt-in `Element.RetainTextSelection(sessionIdentity)` preserves Rust's
+cloned block semantics; `internal/transcriptui.RetainSelection` mounts it on the
+actual shared session scope. The canonical wrapper validates original/result
+hashes and loads only five explicitly named selection files into a temporary
+verified dependency copy. No module-cache or go.mod/go.sum changes occur.
+`cmd/orbit` fails before application startup if either composer or selection
+compatibility is absent. A stale clipboard cache is not used as a substitute.
+See `third_party/mygo-selection/README.md` and `baseline.json` for design,
+attribution, file hashes and lifecycle/security regression cases.
+
+Actual OS clipboard, accessibility, IME, and matched visual evidence remain
+separate gates. The full upstream toolkit race suite has one allocation-budget
+failure also reproduced on untouched pinned MyGo: steady-frame 3 and warmed
+scroll-frame 11 allocations versus its expected 2. This is documented as an
+upstream/environment failure, not reported as a full-suite pass.
+
+## Latest integration verification
+
+Canonical `scripts/go-native.sh test -race ./internal/ui ./internal/transcriptui
+./cmd/orbit -count=1` passed on 2026-10-25: host 20.766s, transcript 1.335s, and
+application compiled. This includes the mounted real-session selection scope
+and the actual-receive-clock message projection. Agent/Pi/typed race with the
+credential-free actual Pi executable passed separately (33.519s / 4.977s /
+1.317s). Optional captures were executed explicitly, not counted from skips.
 
 ## Reproduction and artifacts
 
@@ -225,14 +289,18 @@ export PATH=/workspace/shared/orbit-toolchains/go/bin:$PATH
 export GOPATH=/workspace/shared/orbit-toolchains/gopath
 export GOCACHE=/workspace/shared/orbit-toolchains/go-cache
 export XDG_CACHE_HOME=/workspace/shared/orbit-toolchains/cache
-go test -race ./internal/transcriptui -count=1
-go vet ./internal/transcriptui
+scripts/go-native.sh test -race ./internal/transcriptui -count=1
+scripts/go-native.sh vet ./internal/transcriptui
+python3 scripts/test-go-native-overlay.py
+scripts/go-native.sh test -race github.com/egoist/mygo/ui \
+  -run '^(TestOrbitComposer|TestOrbitSelection|TestSelectable)' -count=1
 ORBIT_TRANSCRIPT_CAPTURE_DIR="$PWD/docs/mygo-migration/probes/transcriptui" \
-  go test ./internal/transcriptui -run TestNativeTranscriptCapture -count=1
+  scripts/go-native.sh test ./internal/transcriptui \
+  -run '^TestNative(TranscriptCapture|RetainedSelectionCapture)$' -count=1
 ```
 
-`probes/transcriptui/typed-tools-expanded.png` and `typed-tools-failure.png` are
-native MyGo CPU fixture images reviewed for clipping/content. They are explicitly
+`probes/transcriptui/typed-tools-expanded.png`, `typed-tools-failure.png`, and
+`selection-restored.png` are native MyGo CPU fixture images reviewed for clipping/content. They are explicitly
 labeled in-image. They are **not matched Rust captures** and establish neither
 pixel parity nor a native OS/GPU execution pass. The host owner maintains mounted
 application tests/captures independently. No skipped optional test is counted as

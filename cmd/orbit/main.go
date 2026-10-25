@@ -8,6 +8,7 @@ import (
 
 	"github.com/charlzyx/orbit/internal/composerui"
 	"github.com/charlzyx/orbit/internal/native"
+	"github.com/charlzyx/orbit/internal/transcriptui"
 	orbitui "github.com/charlzyx/orbit/internal/ui"
 )
 
@@ -35,6 +36,10 @@ func main() {
 		o.Workspace = flag.Arg(0)
 	}
 	if err := composerui.RequireCompatibility(); err != nil {
+		fmt.Fprintln(os.Stderr, "Orbit:", err)
+		os.Exit(1)
+	}
+	if err := transcriptui.RequireCompatibility(); err != nil {
 		fmt.Fprintln(os.Stderr, "Orbit:", err)
 		os.Exit(1)
 	}

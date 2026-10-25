@@ -7,7 +7,7 @@ This fork is migrating the complete Orbit v0.2.12 workbench to Go and MyGo nativ
 - Native UI uses MyGo directly, without a browser, webview, cgo or Rust sidecar. Desktop graphics libraries and the pinned Ghostty terminal runtime are platform dependencies.
 - No releases, production update feed, signing, upstream merges or deployments are configured by this migration.
 
-The canonical wrapper verifies the exact MyGo pin and applies the small, attributed composer caret/undo patch in a temporary source copy. It never edits the Go module cache. Plain `go run/build` omits that required patch; the application refuses to start rather than silently ship different undo behavior. On Windows without Bash, use `python scripts/go-native-overlay.py run ./cmd/orbit`. See [compatibility provenance](third_party/mygo-composer/README.md).
+The canonical wrapper verifies the exact MyGo pin and applies the small, attributed composer caret/undo and opt-in transcript selection additions in a temporary source copy. It never edits the Go module cache. Plain `go run/build` omits these required additions; the application refuses to start rather than silently ship different undo or virtualized selection behavior. On Windows without Bash, use `python scripts/go-native-overlay.py run ./cmd/orbit`. See [composer provenance](third_party/mygo-composer/README.md) and [selection provenance](third_party/mygo-selection/README.md).
 
 ## Original Orbit reference
 

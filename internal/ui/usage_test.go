@@ -39,7 +39,7 @@ func fixtureUsageApp(t *testing.T) *App {
 	s.loaded = true
 	s.index = usageFixtureIndex()
 	s.preset = "all"
-	s.filter = workbench.UsageFilter{}
+	s.filter = workbench.UsageFilter{Start: time.UnixMilli(0), End: s.index.ScannedAt.Add(time.Nanosecond)}
 	s.updated = time.Date(2026, 10, 25, 12, 0, 0, 0, time.UTC)
 	s.fixtureNow = s.updated
 	s.revision = 1

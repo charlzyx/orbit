@@ -124,6 +124,68 @@ func usagePointJSON(at time.Time, s UsageSummary, granularity string) map[string
 	return map[string]any{"start_ms": at.UnixMilli(), "label": usageBucketLabel(at, granularity), "requests": s.Requests, "input": s.Tokens.Input, "output": s.Tokens.Output, "cache_read": s.Tokens.CacheRead, "cache_write": s.Tokens.CacheWrite, "total": s.Tokens.Total, "errors": s.Errors, "cost_usd": s.Cost, "avg_duration_ms": usageAverage(s)}
 }
 
+// UsageChartRange reproduces the frozen snapshot's two-stage all-time
+// range: determine the original epoch range's granularity, round the oldest
+// global request to that boundary (normally month), then choose the effective
+// granularity again. The filter itself is unchanged for summary/export schema.
+func (index UsageIndex) UsageChartRange(filter UsageFilter, all bool, location *time.Location, now time.Time) (start, end time.Time, granularity string) {
+	if location == nil {
+		location = time.Local
+	}
+	start, end = filter.Start, filter.End
+	if end.IsZero() {
+		end = now
+		if end.IsZero() {
+			end = index.ScannedAt
+			for _, r := range index.Records {
+				if !r.At.Before(end) {
+					end = r.At.Add(time.Nanosecond)
+				}
+			}
+		}
+	}
+	original := start
+	if original.IsZero() {
+		original = time.UnixMilli(0)
+	}
+	granularity = usageRangeGranularity(original, end)
+	var oldest time.Time
+	for _, r := range index.Records {
+		if oldest.IsZero() || r.At.Before(oldest) {
+			oldest = r.At
+		}
+	}
+	if all {
+		start = original
+		if !oldest.IsZero() {
+			rounded := usageBucketStart(oldest, granularity, location)
+			if rounded.After(start) {
+				start = rounded
+			}
+		}
+	} else if start.IsZero() {
+		start = oldest
+	}
+	if start.IsZero() {
+		start = end
+	}
+	granularity = usageRangeGranularity(start, end)
+	return
+}
+func usageRangeGranularity(start, end time.Time) string {
+	days := max(0, end.Sub(start).Hours()/24)
+	switch {
+	case days <= 2.5:
+		return "hour"
+	case days <= 70:
+		return "day"
+	case days <= 400:
+		return "week"
+	default:
+		return "month"
+	}
+}
+
 // ExportJSON follows the baseline aggregate export schema. All rows obey the
 // shared scope; calendar intentionally ignores the selected date/focus window.
 func (index UsageIndex) ExportJSON(w io.Writer, filter UsageFilter, options UsageExportOptions) error {
@@ -140,6 +202,10 @@ func (index UsageIndex) ExportJSON(w io.Writer, filter UsageFilter, options Usag
 	}
 	if options.Preset == "" {
 		options.Preset = "custom"
+	}
+	chartStart, chartEnd, effectiveGranularity := index.UsageChartRange(filter, options.Preset == "all" || options.Preset == "all_time", options.Location, options.Now)
+	if options.Preset == "all" || options.Preset == "all_time" {
+		options.Granularity = effectiveGranularity
 	}
 	// Mark a detached copy: exports must not race live UI reads of the scanner's
 	// immutable snapshot when a test or caller constructed records directly.
@@ -246,21 +312,7 @@ func (index UsageIndex) ExportJSON(w io.Writer, filter UsageFilter, options Usag
 		at := usageBucketStart(r.At, options.Granularity, options.Location)
 		bucketRecords[at] = append(bucketRecords[at], r)
 	}
-	start, end := filter.Start, filter.End
-	if end.IsZero() {
-		end = options.Now
-	}
-	if start.IsZero() || options.Preset == "all" {
-		start = time.Time{}
-		for _, r := range index.Records {
-			if start.IsZero() || r.At.Before(start) {
-				start = r.At
-			}
-		}
-	}
-	if start.IsZero() {
-		start = end
-	}
+	start, end := chartStart, chartEnd
 	series := make([]map[string]any, 0)
 	for at, n := usageBucketStart(start, options.Granularity, options.Location), 0; at.Before(end) && n < 4000; at, n = usageNextBucket(at, options.Granularity), n+1 {
 		series = append(series, usagePointJSON(at, usageTotals(bucketRecords[at]), options.Granularity))

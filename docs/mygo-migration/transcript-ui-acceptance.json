@@ -9,7 +9,7 @@
       "full_row_parity_verified": false
     },
     "C11": {
-      "functional": "partial_known_virtualization_mismatch",
+      "functional": "pass_scoped_with_verified_opt_in_selection_addition",
       "full_row_parity_verified": false
     },
     "C12": {
@@ -19,21 +19,58 @@
   },
   "commands": [
     {
-      "command": "go test -race ./internal/transcriptui -count=1",
+      "command": "scripts/go-native.sh test -race ./internal/transcriptui -count=1",
       "status": "passed",
       "fixture_inputs": true
     },
     {
-      "command": "go vet ./internal/transcriptui",
+      "command": "scripts/go-native.sh vet ./internal/transcriptui",
       "status": "passed"
     },
     {
-      "command": "ORBIT_TRANSCRIPT_CAPTURE_DIR=docs/mygo-migration/probes/transcriptui go test ./internal/transcriptui -run TestNativeTranscriptCapture -count=1",
+      "command": "python3 scripts/test-go-native-overlay.py",
+      "status": "passed",
+      "tests": 7
+    },
+    {
+      "command": "scripts/go-native.sh test -race github.com/egoist/mygo/ui -run '^(TestOrbitComposer|TestOrbitSelection|TestSelectable|TestTextInputContextMenu|TestSelection)' -count=1",
       "status": "passed",
       "fixture_inputs": true
+    },
+    {
+      "command": "scripts/go-native.sh test -race -short github.com/egoist/mygo/ui -count=1",
+      "status": "passed",
+      "elapsed_seconds": 96.736,
+      "allocation_benchmark_skipped_by_short": true
+    },
+    {
+      "command": "go test ./internal/transcriptui -run ^TestSelectionCompatibilityGuard$ -count=1",
+      "status": "passed_unpatched_capability_rejected"
+    },
+    {
+      "command": "ORBIT_TRANSCRIPT_CAPTURE_DIR=docs/mygo-migration/probes/transcriptui scripts/go-native.sh test ./internal/transcriptui -run '^TestNative(TranscriptCapture|RetainedSelectionCapture)$' -count=1",
+      "status": "passed",
+      "fixture_inputs": true
+    },
+    {
+      "command": "scripts/go-native.sh test -race ./internal/ui ./internal/transcriptui ./cmd/orbit -count=1",
+      "status": "passed",
+      "transcript_seconds": 1.335,
+      "host_seconds": 20.766,
+      "verified_at_utc": "2026-10-25T06:30:33Z"
+    },
+    {
+      "command": "ORBIT_PI_INTEGRATION_BIN=/workspace/shared/pi-rpc-reference/node_modules/.bin/pi scripts/go-native.sh test -race ./internal/agent ./internal/pirpc ./internal/transcriptui -count=1",
+      "status": "passed",
+      "agent_seconds": 33.519,
+      "pirpc_seconds": 4.977,
+      "transcript_seconds": 1.317,
+      "live_pi": "1.4.0 credential-free, no model request or spend"
     }
   ],
   "tests": [
+    "TestBoundedDiffReconstructionAndLargeGrid",
+    "TestUnicodeCapsAndMalformedToolFallback",
     "TestProjectSourceLogicalTurnsAndBoundary",
     "TestTypedToolsAndOutputBounds",
     "TestSourceFailuresAbortAndMissingMetrics",
@@ -44,6 +81,7 @@
     "TestSourceMetricFormattingAndDateBoundaries",
     "TestQuestionMalformedFallbackAndExactAnswer",
     "TestSnapshotToolImagesAndUserMetadataStayOutOfText",
+    "TestMeasuredAndEstimatedThinkingClocksAndRates",
     "TestNativeToolFailureFoldCopyRepeatAndStreaming",
     "TestNativeLogicalTurnFoldAbortAndMissingUsage",
     "TestNativeCrossMessageMarkdownSelectionAndMenu",
@@ -51,9 +89,15 @@
     "TestNativeTranscriptCapture",
     "TestNativeUsageHoverTailOwnsSingleFooter",
     "TestNativeQuestionRecordWaitingAnsweredDeclined",
-    "TestNativeVirtualizedCrossRowSelectionAndEndpointLimit"
+    "TestNativeVirtualizedCrossRowSelectionAndEndpointLimit",
+    "TestNativeToolKeyboardToggleAndCopy",
+    "TestSelectionCompatibilityGuard",
+    "TestNativeRetainedVirtualizedTranscriptSelection",
+    "TestNativeRetainedSelectionCapture",
+    "TestNativeThinkingTimingAndStreamFollowDetach"
   ],
   "captures": [
+    "probes/transcriptui/selection-restored.png",
     "probes/transcriptui/typed-tools-expanded.png",
     "probes/transcriptui/typed-tools-failure.png"
   ],
@@ -61,27 +105,16 @@
   "platform_verdict": "actual macOS/Linux/Windows window, clipboard, GPU, IME and accessibility not executed by this component suite",
   "known_limits": [
     {
-      "case": "T07",
-      "behavior": "Existing cross-message selection after a virtualized selected endpoint unmounts",
-      "source": "transcript_view.rs:518 keeps SelectedBlock snapshots",
-      "mygo": "ui/textselection.go:166-173 clears missing endpoints",
-      "evidence": "TestNativeVirtualizedCrossRowSelectionAndEndpointLimit",
-      "full_parity": false
+      "case": "T02/T06",
+      "behavior": "Exact source typography/density/devicons/shimmer and matched pixels",
+      "state": "Source shimmer and exact file devicons remain unimplemented in this component; full typography/density/pixel matching remains unverified."
     },
     {
       "case": "T06",
-      "behavior": "Source per-step thinking clocks and generation-time fallback",
-      "state": "not implemented; missing clocks hidden, never fabricated"
-    },
-    {
-      "case": "T02/T06",
-      "behavior": "Exact source typography/density/devicons/shimmer and matched pixels",
-      "state": "not fully verified"
-    },
-    {
-      "case": "T07",
-      "behavior": "Gutter hit testing uses MyGo glyph bounds rather than source block bounds",
-      "state": "not equivalent; full interaction gate open"
+      "behavior": "Fractional wheel residual crossing thought-card boundary in same event",
+      "source": "split_thinking_scroll in transcript_view.rs forwards unused delta",
+      "mygo": "ui/input.go returns after first scroller moves, even if delta was partly clamped",
+      "state": "open, ordinary boundary fallback is not exact residual chaining"
     }
   ],
   "not_claimed": [
@@ -91,5 +124,73 @@
     "native OS execution",
     "C17 questionnaire submission parity",
     "full navigation rail parity"
-  ]
+  ],
+  "toolkit_selection_tests": [
+    "TestOrbitSelectionRetainsVirtualizedSnapshot",
+    "TestOrbitSelectionSnapshotDragGutterAndDefaultIsolation",
+    "TestOrbitSelectionCopyPriorityContextMenuAndReset",
+    "TestOrbitSelectionUTF8SnapshotOffsetsAfterRewrite"
+  ],
+  "capture_sizes": {
+    "typed-tools-expanded.png": {
+      "width": 850,
+      "height": 900
+    },
+    "selection-restored.png": {
+      "width": 1470,
+      "height": 922
+    },
+    "typed-tools-failure.png": {
+      "width": 850,
+      "height": 900
+    }
+  },
+  "remediated_limits": [
+    {
+      "case": "T07",
+      "upstream_behavior": "Selected endpoint unmount clears selection; nearest-glyph gutter test differs",
+      "implementation": "Explicit opt-in immutable snapshot addition with source block-gutter hit test",
+      "files": "third_party/mygo-selection/baseline.json",
+      "canonical_wrapper": "scripts/go-native.sh",
+      "host_identity": "actual Model.SessionID",
+      "regression": "TestNativeRetainedVirtualizedTranscriptSelection plus TestOrbitSelection*",
+      "full_row_parity_verified": false
+    }
+  ],
+  "upstream_allocation_failure": {
+    "full_suite_status": "failed_preexisting_allocation_budget",
+    "test": "TestDiffFrameAllocs",
+    "patched_full_suite_seconds": 307.715,
+    "unmodified_baseline_seconds": 135.286,
+    "patched_steady_allocations": 3,
+    "patched_warm_allocations": 11,
+    "unmodified_steady_allocations": 3,
+    "unmodified_warm_allocations": 11,
+    "expected_maximum": 2,
+    "not_waived_or_reported_as_full_suite_pass": true
+  },
+  "compatibility": {
+    "default_upstream_unchanged": true,
+    "opt_in": true,
+    "only_explicit_manifest_paths": true,
+    "original_and_result_hashes_verified": true,
+    "module_cache_modified": false,
+    "app_fail_loud_guards": [
+      "composer",
+      "selection"
+    ],
+    "host_regression": "passed_canonical_full_internal_ui_race_20.766s"
+  },
+  "timing_tests": [
+    "TestStreamClockUsesReceiveIntervalsAndPreservesSettlement",
+    "TestStreamClockToolPauseResetWholeBlocksAndReload",
+    "TestStreamClockMissingFaultCancelRepeatAndClone",
+    "TestStreamClockRequestStartsBeforeFirstMessageAndUsageSurvives",
+    "TestEventParseDoesNotInventReceiveTime",
+    "TestReaderStampsArrivalBeforeDelayedDrain"
+  ],
+  "truth_boundary": {
+    "source_character_divided_by_four_token_estimator": "not rendered as real usage; missing reported output tokens remain absent",
+    "reloaded_thinking_duration": "source adjacent timestamp estimate, explicitly disclosed in tooltip; never used as generation telemetry"
+  }
 }

@@ -11,10 +11,11 @@ import (
 )
 
 type usageFilterView struct {
-	Open     bool
-	Search   string
-	Selected int
-	List     ui.ListState
+	Open        bool
+	FocusSearch bool
+	Search      string
+	Selected    int
+	List        ui.ListState
 }
 type usageFilterOption struct {
 	Key, Label string
@@ -159,6 +160,7 @@ func (a *App) usageDimensionFilter(c *ui.Context, kind string) {
 		if v.Open {
 			s.filterMenu = kind
 			v.Search = ""
+			v.FocusSearch = true
 			v.Selected = 0
 		} else {
 			s.filterMenu = ""
@@ -186,6 +188,10 @@ func (a *App) usageDimensionFilter(c *ui.Context, kind string) {
 		}
 		root.Children(func() {
 			search := ui.TextInput(c, &v.Search).Label("Filter " + kind).Placeholder("Search " + kind + "…").AlignSelf(ui.Stretch)
+			if v.FocusSearch {
+				search.Focus()
+				v.FocusSearch = false
+			}
 			if search.Submitted() && v.Selected >= 0 && v.Selected < len(options) {
 				s.toggleFilter(kind, options[v.Selected])
 			}
@@ -239,6 +245,7 @@ func (a *App) scopeUsageDay(at time.Time) {
 		s.filter.Start, s.filter.End, s.preset = at, end, "custom"
 	}
 	s.filter.FocusStart, s.filter.FocusEnd = time.Time{}, time.Time{}
+	s.granularity = usageAutoGranularity(s.filter, s.index)
 	a.saveUsagePrefs()
 }
 func (a *App) usageActiveFilters(c *ui.Context) {

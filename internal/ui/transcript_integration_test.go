@@ -2,6 +2,7 @@ package orbitui
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/charlzyx/orbit/internal/agent"
 	"github.com/egoist/mygo/ui"
 	"strings"
@@ -59,5 +60,52 @@ func TestHostCrossMessageMarkdownAndAlertSelection(t *testing.T) {
 		if !strings.Contains(text, want) {
 			t.Fatalf("cross-message alert selection missing %q: %q", want, text)
 		}
+	}
+}
+
+func TestHostRetainedTranscriptSelectionUnmountAndSessionReset(t *testing.T) {
+	a := fixture(t)
+	var messages []Message
+	for i := 0; i < 90; i++ {
+		messages = append(messages, Message{ID: fmt.Sprint(i), Role: "user", Text: fmt.Sprintf("Row %02d 用户文字", i)})
+	}
+	a.SetSnapshot(Snapshot{SessionID: "retained-a", Messages: messages})
+	tt := ui.NewTester(a.View, 1200, 800)
+	a.transcript.ScrollTo(0, ui.Start)
+	tt.Frame()
+	tt.Frame()
+	first, ok := tt.Find(messages[0].Text)
+	if !ok {
+		t.Fatal("first row not mounted")
+	}
+	last, ok := tt.Find(messages[2].Text)
+	if !ok {
+		t.Fatal("third row not mounted")
+	}
+	tt.Press(first.X+1, first.Y+first.H/2)
+	tt.Move(last.X+last.W-1, last.Y+last.H/2)
+	tt.Release(last.X+last.W-1, last.Y+last.H/2)
+	tt.Key(ui.Cmd, ui.KeyC)
+	copied := tt.Clipboard()
+	for _, want := range []string{messages[0].Text, messages[1].Text, messages[2].Text} {
+		if !strings.Contains(copied, want) {
+			t.Fatal("initial selection incomplete", copied)
+		}
+	}
+	a.transcript.ScrollToEnd()
+	for i := 0; i < 5; i++ {
+		tt.Frame()
+	}
+	tt.SetClipboard("retention sentinel")
+	tt.Key(ui.Cmd, ui.KeyC)
+	if tt.Clipboard() != copied {
+		t.Fatal("virtualized selection was lost", tt.Clipboard())
+	}
+	a.SetSnapshot(Snapshot{SessionID: "retained-b", Messages: []Message{{ID: "other", Role: "user", Text: "Other session"}}})
+	tt.Frame()
+	tt.SetClipboard("reset sentinel")
+	tt.Key(ui.Cmd, ui.KeyC)
+	if tt.Clipboard() != "reset sentinel" {
+		t.Fatal("selection leaked into another session", tt.Clipboard())
 	}
 }

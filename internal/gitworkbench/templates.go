@@ -17,8 +17,12 @@ func (s *State) formTemplates(pull bool) []workspace.RepositoryTemplate {
 func (s *State) applyTemplate(pull bool, index int) {
 	templates := s.formTemplates(pull)
 	if index < 0 || index >= len(templates) {
-		if s.body == s.templateOriginal {
-			s.body = ""
+		// Rust clear_template_body recognizes either form's known skeletons.
+		for _, template := range append(append([]workspace.RepositoryTemplate(nil), s.Data.IssueTemplates...), s.Data.PullTemplates...) {
+			if s.body == template.Body {
+				s.body = ""
+				break
+			}
 		}
 		s.templateIndex = -1
 		s.templateOriginal = ""
@@ -34,7 +38,7 @@ func (s *State) applyTemplate(pull bool, index int) {
 	s.labels = strings.Join(template.Labels, ", ")
 }
 func (s *State) applyLateTemplate() {
-	if !s.dialogOpen || (s.dialog != "new-issue" && s.dialog != "new-pull") || s.templateIndex >= 0 || s.body != "" {
+	if !s.dialogOpen || (s.dialog != "new-issue" && s.dialog != "new-pull") || s.templateIndex >= 0 || strings.TrimSpace(s.body) != "" {
 		return
 	}
 	pull := s.dialog == "new-pull"

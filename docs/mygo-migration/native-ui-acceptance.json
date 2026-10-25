@@ -1,10 +1,10 @@
 {
   "schema": "orbit-native-ui-acceptance/v1",
   "baseline_commit": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
-  "generated_utc": "2026-10-25T05:45:00Z",
+  "generated_utc": "2026-10-25T06:28:00Z",
   "scope": "Supplement to139-row source checklist; scoped cases only, no full-row or visual parity claim",
   "run": "ORBIT_GO=/path/to/go1.27.3 scripts/go-native.sh test -race ./internal/ui ./cmd/orbit -count=1",
-  "last_observed_full_ui_race": "2026-10-25T05:21:15Z: PASS11.854s before subsequent source corrections; later focused canonical-overlay regressions pass, new aggregate pending.",
+  "last_observed_full_ui_race": "2026-10-25T06:29:09Z: canonical UI + cmd PASS19.665s; vet and git diff --check PASS. Includes latest V001/V070 geometry, configured model refresh and retained-selection host regressions. No current native pixel PASS.",
   "cases": [
     {
       "id": "UI-S01",
@@ -38,16 +38,17 @@
         "Start with empty isolated preferences.",
         "Inspect native window minimum and initial maximize; close/reopen on macOS while a fake Pi session streams."
       ],
-      "expected": "Source minimum 960×640; restore85% display width and90%height capped1440×920; one parked controller/process survives close.",
+      "expected": "Source minimum 960\u00d7640; restore85% display width and90%height capped1440\u00d7920; one parked controller/process survives close.",
       "tests": [
         "TestSourceWindowRestoreBounds",
         "TestHiddenSidebarReservesNativeTrafficLights",
-        "TestSourceNativeMenuDoesNotAllocatePersistentWindowStrip"
+        "TestSourceNativeMenuDoesNotAllocatePersistentWindowStrip",
+        "TestSourceHeaderNoOpenInWithoutAppsAndInitialComposerFocus"
       ],
       "functional_verdict": "partial",
       "visual_verdict": "not_compared_to_matched_Rust_runtime",
       "platform_verdict": "native_CPU_only_unless_explicitly_noted",
-      "remaining": "Source minimum/restore bounds and native traffic-light clearance pass. Native menus now auto-hide on Linux/Windows while retaining edit roles and shortcuts. Actual initial-maximize/Alt-F10/Dock lifetime on each OS remains separate acceptance.",
+      "remaining": "Source minimum/restore bounds and native traffic-light clearance pass. Native menus now auto-hide on Linux/Windows while retaining edit roles and shortcuts. Actual initial-maximize/Alt-F10/Dock lifetime on each OS remains separate acceptance. Linux window buttons are now hidden like pinned source; initial composer focus and conditional Open-in controls are native-CPU tested. Actual recapture pending.",
       "full_row_parity_verified": false
     },
     {
@@ -74,7 +75,7 @@
         }
       ],
       "steps": [
-        "At1470×922 change scale1/1.25/1.5/2.",
+        "At1470\u00d7922 change scale1/1.25/1.5/2.",
         "Drag sidebar/review/explorer/terminal widths; relaunch.",
         "Repeat font12/14/18 and density80/100/120."
       ],
@@ -86,7 +87,7 @@
       "functional_verdict": "partial",
       "visual_verdict": "not_compared_to_matched_Rust_runtime",
       "platform_verdict": "native_CPU_only_unless_explicitly_noted",
-      "remaining": "DIP composer and modal bounds pass, including800×560 stress below source minimum. Full panel drag/relaunch/font-density matrix and matched pixels remain open.",
+      "remaining": "DIP composer and modal bounds pass, including800\u00d7560 stress below source minimum. Full panel drag/relaunch/font-density matrix and matched pixels remain open.",
       "full_row_parity_verified": false
     },
     {
@@ -503,12 +504,14 @@
       "expected": "No prompt during composition; native text editing and multiline text remain intact.",
       "tests": [
         "TestIMECompositionDoesNotSubmit",
-        "TestComposerRepeatedEnterShiftAlternateAndRejection"
+        "TestComposerRepeatedEnterShiftAlternateAndRejection",
+        "TestSourceComposerGeometryAndConditionalChips",
+        "TestSourceComposerCompactKeepsSendReachable"
       ],
       "functional_verdict": "pass_scoped",
       "visual_verdict": "not_compared_to_matched_Rust_runtime",
       "platform_verdict": "native_CPU_only_unless_explicitly_noted",
-      "remaining": "Headless composition event and multiline submission pass. Real Chinese/Japanese/Korean OS IME candidates, clipboard and accessibility remain unexecuted.",
+      "remaining": "Headless composition event and multiline submission pass. Real Chinese/Japanese/Korean OS IME candidates, clipboard and accessibility remain unexecuted. Source22/28px frames, compact omission, one-to-eight lines, surface_secondary, terse full-access and absent unavailable thinking now covered; current native recapture pending.",
       "full_row_parity_verified": false
     },
     {
@@ -719,12 +722,17 @@
       ],
       "expected": "Actual catalog/capabilities; no unsupported thinking choice; favorites/recent persistence and source model cards.",
       "tests": [
-        "TestFilteredPickersResetAndClampKeyboardSelection"
+        "TestFilteredPickersResetAndClampKeyboardSelection",
+        "TestModelsMountKeepsAuthoritativeCatalogAndSettingsControls",
+        "TestModelRefreshHostSerializesAndShowsFailureWithoutRestart",
+        "TestModelRefreshHostSuccessRestartsAndResumesSavedSession",
+        "TestModelPickerOpenQueriesOnceAndUsesSourceAnchor",
+        "TestAutomaticTitlePreferencesDoNotRestartRuntime"
       ],
       "functional_verdict": "partial",
       "visual_verdict": "not_compared_to_matched_Rust_runtime",
       "platform_verdict": "native_CPU_only_unless_explicitly_noted",
-      "remaining": "Keyboard picker works. Source favorites-only/provider filter/detail catalog page remains incomplete; existing simple model list is not full P08.",
+      "remaining": "Source modelui catalog, filters/favorites, grouped model/thinking popovers and Agent/title searchable defaults are now mounted. Authoritative raw model capabilities retained. Configured update --models action serializes, cancels, restarts and resumes saved session with an explicit zero-inference RPC fixture. CPU captures inspected; exact native pixels and OS interaction remain unverified.",
       "full_row_parity_verified": false
     },
     {
@@ -913,12 +921,13 @@
       "expected": "Source structured tool presentation, cross-block selection, context menu and turn metrics.",
       "tests": [
         "TestLogicalTranscriptKeepsAssistantProseAndToolResult",
-        "TestHostCrossMessageMarkdownAndAlertSelection"
+        "TestHostCrossMessageMarkdownAndAlertSelection",
+        "TestHostRetainedTranscriptSelectionUnmountAndSessionReset"
       ],
       "functional_verdict": "partial",
       "visual_verdict": "not_compared_to_matched_Rust_runtime",
       "platform_verdict": "native_CPU_only_unless_explicitly_noted",
-      "remaining": "Typed tools, logical turns, observed-live elapsed time, source tail/usage footer and shared user/Markdown/alert selection are mounted and native-tested. C11 remains a concrete framework gap: selection clears when a virtualized endpoint unmounts; Rust retains SelectedBlock snapshots. Do not equate mounted-row selection with full parity.",
+      "remaining": "Typed tools, logical turns, observed-live elapsed, tail/usage footer and shared Markdown/alert selection are mounted. C10 upstream endpoint-unmount limitation is covered by approved narrow opt-in retention overlay: mounted host native test now verifies exact copy after virtual endpoints unmount and reset on session switch. Full mixed selection/OS gesture corpus and matched native visuals remain open.",
       "full_row_parity_verified": false
     },
     {
@@ -1193,12 +1202,13 @@
         "TestSettingsNavigationComplete",
         "TestSettingsPageScrollRetained",
         "TestSettingsSourceSearchIndexAndSectionNavigation",
-        "TestSettingsSourceHeaderAndGeneralRows"
+        "TestSettingsSourceHeaderAndGeneralRows",
+        "TestGeneralMeasuredSourceCardGeometry"
       ],
       "functional_verdict": "partial",
       "visual_verdict": "not_compared_to_matched_Rust_runtime",
       "platform_verdict": "native_CPU_only_unless_explicitly_noted",
-      "remaining": "All14 source sections remain; nav groups/28px rows, fixed16px title,960px outer/912px inner column and source55-row setting-label/synonym search are implemented. Source search clears query and opens a section, not exact-row scrolling. Retained scroll, source-header/search, and actual notification-switch pointer/Space persistence pass under the canonical overlay (-race focused suite3.452s). General CPU capture1470×922 was inspected at05:45; source GPUI phi line-height,1.3 heading, left-aligned grouped nav and native36×20 switch geometry are now explicit. Full Settings cards, notification OS permission state/sound preview, matched pixels and OS flows remain unverified.",
+      "remaining": "All14 source sections remain; nav groups/28px rows, fixed16px title,960px outer/912px inner column and source55-row setting-label/synonym search are implemented. Source search clears query and opens a section, not exact-row scrolling. Retained scroll, source-header/search, and actual notification-switch pointer/Space persistence pass under the canonical overlay (-race focused suite3.452s). General CPU capture1470\u00d7922 was inspected at05:45; source GPUI phi line-height,1.3 heading, left-aligned grouped nav and native36\u00d720 switch geometry are now explicit. Full Settings cards, notification OS permission state/sound preview, matched pixels and OS flows remain unverified. General cards measured against real1470x922 Rust:121/377 and443/654 source edges within1DIP in CPU regression. No pixel-pass claim.",
       "full_row_parity_verified": false
     },
     {
@@ -1331,7 +1341,7 @@
       "steps": [
         "Inspect catalog including fallback diagnostic and OAuth-only provider.",
         "Save invalid custom provider; correct it and save into temporary home.",
-        "Force disk failure; cancel masked key dialog; resize800×560."
+        "Force disk failure; cancel masked key dialog; resize800\u00d7560."
       ],
       "expected": "Capability-specific controls, validated fields, no painted key, failed save keeps draft, existing key preserved when blank.",
       "tests": [
@@ -1981,6 +1991,43 @@
       "platform_verdict": "native_CPU_only_unless_explicitly_noted",
       "remaining": "Initial acceptance failed at25.821182ms. Corrected with independent deadline and actual rendering predicate; default native regression now passes. Full Review animation/pixels remain open.",
       "full_row_parity_verified": false
+    },
+    {
+      "functional_verdict": "pass_scoped",
+      "visual_verdict": "not_compared_to_matched_Rust_runtime",
+      "platform_verdict": "native_CPU_only",
+      "full_row_parity_verified": false,
+      "id": "UI-S08",
+      "rows": [
+        "S07",
+        "S13"
+      ],
+      "title": "Source workspace picker and sidebar metrics",
+      "source_locations": [
+        {
+          "path": "crates/orbit-pi/src/workspace_picker.rs",
+          "symbol": "WorkspacePicker",
+          "line": 1
+        },
+        {
+          "path": "crates/orbit-pi/src/app/view.rs",
+          "symbol": "render_empty_state",
+          "line": 2374
+        }
+      ],
+      "steps": [
+        "Open recent workspace chooser; filter, wrap arrows and select current or Browse.",
+        "Dismiss with Escape and outside press, then repeat immediately and after200ms.",
+        "Render source minimum viewport and inspect wordmark/primary-action geometry."
+      ],
+      "expected": "Current workspace pinned, recents deduplicated and bounded8; current choice does not create a task; keyboard selection/focus and200ms pointer guard behave correctly. Sidebar wordmark76px and NewTask32px source metrics.",
+      "tests": [
+        "TestWorkspacePickerSourceRecentOrderingAndFilter",
+        "TestNativeWorkspacePickerKeyboardFilteringNoopAndFocus",
+        "TestNativeWorkspacePickerWrapModalGuardAndBounds",
+        "TestSourceSidebarWordmarkAndNewTaskGeometry"
+      ],
+      "remaining": "These focused cases pass and1470x922CPU popup is inspected. Actual native folder dialog, workspace logo lookup, project mark customization, sidebar sticky headers and matched pixels remain open."
     }
   ]
 }

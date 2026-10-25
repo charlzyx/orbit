@@ -109,6 +109,11 @@ func buildUsageProjection(index workbench.UsageIndex, filter workbench.UsageFilt
 	if location == nil {
 		location = time.Local
 	}
+	allTime := !filter.Start.IsZero() && filter.Start.UnixMilli() <= 0
+	chartStart, chartEnd, effectiveGranularity := index.UsageChartRange(filter, allTime, location, time.Time{})
+	if allTime {
+		granularity = effectiveGranularity
+	}
 	p := usageProjection{Granularity: granularity, Errors: index.FilteredErrors(filter), Summary: index.Summary(filter), Records: index.FilteredRecords(filter), Tools: index.FilteredTools(filter)}
 	pricedModels := map[[2]string]bool{}
 	for _, r := range index.Records {
@@ -336,20 +341,7 @@ func buildUsageProjection(index workbench.UsageIndex, filter workbench.UsageFilt
 		point.Latency = usageLatencyFrom(bucketDurations[at])
 	}
 	p.Series, p.Daily = toPoints(series), toPoints(daily)
-	start, end := filter.Start, filter.End
-	if len(p.Series) > 0 {
-		if start.IsZero() || start.UnixMilli() <= 0 {
-			start = p.Series[0].At
-			for _, r := range index.Records {
-				if r.At.Before(start) {
-					start = bucketStart(r.At, granularity, location)
-				}
-			}
-		}
-		if end.IsZero() {
-			end = p.Series[len(p.Series)-1].End
-		}
-	}
+	start, end := chartStart, chartEnd
 	if !start.IsZero() && !end.IsZero() && start.Before(end) {
 		p.Series = nil
 		at := bucketStart(start, granularity, location)

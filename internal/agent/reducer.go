@@ -11,17 +11,31 @@ import (
 )
 
 type sessionState struct {
-	snapshot      Snapshot
-	sequence      uint64
-	activeMessage int
-	entriesCursor string
-	awaiting      bool
+	requestStarted time.Time
+	streamClock    streamClock
+	snapshot       Snapshot
+	sequence       uint64
+	activeMessage  int
+	entriesCursor  string
+	awaiting       bool
 }
 
 func newState(workspace, path string) sessionState {
 	return sessionState{activeMessage: -1, snapshot: Snapshot{ActiveSession: SessionRow{Path: path, Workspace: workspace, Name: "New task"}, ThinkingLevel: "off", SteeringMode: "one-at-a-time", FollowUpMode: "one-at-a-time", AutoCompactionEnabled: true, AccessMode: "full-access", WorkflowMode: "build", StatusEntries: map[string]string{}, Auth: AuthState{Support: "unknown"}, QuotaSupport: "unknown"}}
 }
 func (s *sessionState) apply(event pirpc.Event) {
+	s.applyAt(event, event.ReceivedAt)
+}
+
+// applyAt is deterministic for protocol-fixture clocks. Production always uses
+// the reader's ReceivedAt, never a drain/heartbeat timestamp.
+func (s *sessionState) applyAt(event pirpc.Event, receivedAt time.Time) {
+	s.beforeStreamClock(event, receivedAt)
+	s.applyRecord(event)
+	s.afterStreamClock(event, receivedAt)
+}
+
+func (s *sessionState) applyRecord(event pirpc.Event) {
 	switch event.Type {
 	case "response":
 		s.applyResponse(event)
@@ -359,7 +373,13 @@ func (s *sessionState) endMessage(raw json.RawMessage) {
 	message := decodeMessage(raw, "")
 	index := s.activeMessage
 	if index >= 0 && index < len(s.snapshot.Messages) && s.snapshot.Messages[index].Role == message.Role {
-		message.ID = s.snapshot.Messages[index].ID
+		live := s.snapshot.Messages[index]
+		message.ID = live.ID
+		message.ThinkingDuration, message.GenerationTime = live.ThinkingDuration, live.GenerationTime
+		message.RequestStartedAt = live.RequestStartedAt
+		if len(message.Usage) == 0 || string(message.Usage) == "null" {
+			message.Usage = bytes.Clone(live.Usage)
+		}
 		s.snapshot.Messages[index] = message
 	} else {
 		s.appendMessage(raw, false)

@@ -1,0 +1,21 @@
+{
+  "native_menu": [
+    "Session",
+    "Workspace",
+    "Provider",
+    "Model",
+    "Started",
+    "Duration",
+    "Requests",
+    "Input",
+    "Output",
+    "Cache",
+    "Tokens",
+    "Errors",
+    "Tools",
+    "-",
+    "Show all columns",
+    "Reset column widths"
+  ],
+  "note": "CPU Tester does not paint OS-native menus"
+}

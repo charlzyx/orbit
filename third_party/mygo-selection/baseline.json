@@ -1,0 +1,40 @@
+{
+  "upstream_commit": "9c69cf829ece196c5b3a3601f1c7bbe70526376f",
+  "module": "github.com/egoist/mygo",
+  "version": "v0.6.4-0.20261025001514-9c69cf829ece",
+  "module_sum": "h1:zKaW0m3ftywWzdR18dv/b+MKgS+iKTu7HF5twRZtSvs=",
+  "go_mod_sum": "h1:dVav53PwF2xEotjf4oA5lTY2Jp2exgzyjLhbSXhbMwE=",
+  "baseline_sha256": {
+    "ui/context.go": "0f491e367d373eccc7a71dae2eec3589e166ab06ef43b4ddec0ee1df0541cf17",
+    "ui/textselection.go": "fbdc8eb8947fd981fdb391d5f0383844d113430c6b294e6b147cc5f80d88db64",
+    "ui/input.go": "e8cec7096e780d83b34abdddc2ba9e70e0af7ec34f28150b4bfe882bcd36c1aa"
+  },
+  "overlays": {
+    "ui/context.go": {
+      "source": "context.go.txt",
+      "sha256": "bf2dfff70b7de34eafba16b3783acca7ba781c1840de301d8455a0cf8e472939",
+      "added": false
+    },
+    "ui/textselection.go": {
+      "source": "textselection.go.txt",
+      "sha256": "5666d62699c8a2aa52f0d5e71c800c5d9ff21a240ce256269c836f732a8fac22",
+      "added": false
+    },
+    "ui/input.go": {
+      "source": "input.go.txt",
+      "sha256": "c63f7d4d4e07aab122699392c3a51ef5a349c725bbfa1313246856e5275d9c99",
+      "added": false
+    },
+    "ui/orbit_selection.go": {
+      "source": "orbit_selection.go.txt",
+      "sha256": "aef70013b682ccdbdac2e7d13148ce41614d24245c7f2ed4280031b3056aaa9f",
+      "added": true
+    },
+    "ui/orbit_selection_test.go": {
+      "source": "orbit_selection_test.go.txt",
+      "sha256": "883bdb82578fd6286955b21cfe59f93bb80364873730144b393c2ee3b03353e1",
+      "added": true
+    }
+  },
+  "patch_sha256": "843ff64c703a5552fdd43690e768c62cb0b960335ad59d6b093c32aa003ca847"
+}

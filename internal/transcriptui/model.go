@@ -100,8 +100,12 @@ func (r Row) GenerationTime() *time.Duration {
 	var total time.Duration
 	found := false
 	for _, s := range r.Steps {
-		if s.Duration != nil {
-			total += *s.Duration
+		duration := s.Duration
+		if duration == nil {
+			duration = s.GenerationTime
+		}
+		if duration != nil {
+			total += *duration
 			found = true
 		}
 	}
@@ -193,7 +197,7 @@ func Project(messages []agent.Message) []Row {
 		if role != "user" && role != "assistant" {
 			continue
 		}
-		step := Step{ID: id, Text: m.Text, Thinking: m.Thinking, Streaming: m.Streaming, Timestamp: timestamp(o["timestamp"], m.Timestamp), Usage: ParseUsage(m.Usage)}
+		step := Step{ThinkingDuration: copyDuration(m.ThinkingDuration), GenerationTime: copyDuration(m.GenerationTime), RequestStartedAt: m.RequestStartedAt, ID: id, Text: m.Text, Thinking: m.Thinking, Streaming: m.Streaming, Timestamp: timestamp(o["timestamp"], m.Timestamp), Usage: ParseUsage(m.Usage)}
 		if step.Usage == nil {
 			step.Usage = ParseUsage(o["usage"])
 		}
@@ -583,4 +587,33 @@ func compactUserPrompt(text string) string {
 		text += " " + trailing
 	}
 	return text
+}
+
+func copyDuration(value *time.Duration) *time.Duration {
+	if value == nil {
+		return nil
+	}
+	v := *value
+	return &v
+}
+
+// StepThinkingDuration follows the source's measured-first contract. The
+// fallback is explicitly a timestamp-gap estimate (which includes tools), not
+// provider telemetry and never a token-rate denominator.
+func StepThinkingDuration(steps []Step, index int) (duration *time.Duration, estimated bool) {
+	if index < 0 || index >= len(steps) {
+		return nil, false
+	}
+	step := steps[index]
+	if step.ThinkingDuration != nil {
+		return copyDuration(step.ThinkingDuration), false
+	}
+	if step.Thinking == "" || step.Timestamp.IsZero() || index+1 >= len(steps) || steps[index+1].Timestamp.IsZero() {
+		return nil, false
+	}
+	d := steps[index+1].Timestamp.Sub(step.Timestamp)
+	if d <= 0 {
+		return nil, false
+	}
+	return &d, true
 }

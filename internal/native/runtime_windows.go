@@ -4,13 +4,18 @@ package native
 
 import (
 	"fmt"
+	"github.com/charlzyx/orbit/internal/runtimepath"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 )
 
 func runtimeProgram(binary string, args []string) (string, []string, error) {
+	return runtimeProgramIn(binary, args, os.Environ())
+}
+func runtimeProgramIn(binary string, args []string, environment []string) (string, []string, error) {
 	ext := strings.ToLower(filepath.Ext(binary))
 	if ext != ".cmd" && ext != ".bat" && ext != ".ps1" {
 		return binary, args, nil
@@ -22,7 +27,7 @@ func runtimeProgram(binary string, args []string) (string, []string, error) {
 	for _, relative := range []string{"dist/bundle/cli.js", "dist/cli.js"} {
 		entry := filepath.Join(root, filepath.FromSlash(relative))
 		if info, err := os.Stat(entry); err == nil && !info.IsDir() {
-			node := LocateExecutable("node")
+			node := runtimepath.ResolveIn("node", environment, runtime.GOOS)
 			if node == "" || strings.ToLower(filepath.Ext(node)) != ".exe" {
 				return "", nil, fmt.Errorf("pi requires a native node.exe executable")
 			}

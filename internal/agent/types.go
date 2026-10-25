@@ -52,6 +52,9 @@ type ContentBlock struct {
 	Raw                                        json.RawMessage
 }
 type Message struct {
+	RequestStartedAt time.Time `json:"-"`
+	// Client-measured live clocks. Nil for reloaded/whole-block-only messages.
+	ThinkingDuration, GenerationTime                      *time.Duration `json:"-"`
 	ID, Role, Text, Thinking, ToolName, ToolOutput, Error string
 	Streaming                                             bool
 	Blocks                                                []ContentBlock

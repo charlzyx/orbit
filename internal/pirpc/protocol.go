@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
 )
 
 const ProtocolVersion = "1.4.0"
@@ -109,10 +110,13 @@ func (e *CommandError) Error() string { return e.Response.Command + ": " + e.Res
 // Event retains its complete original JSON, including unknown fields and event
 // families. Synthetic local events use process_exited or transport_error.
 type Event struct {
-	Type   string
-	ID     string
-	Raw    json.RawMessage
-	Fields map[string]json.RawMessage
+	// ReceivedAt is local monotonic receive metadata, never part of Pi JSON.
+	// ParseEvent leaves it absent for replay/fixtures; the reader stamps it.
+	ReceivedAt time.Time `json:"-"`
+	Type       string
+	ID         string
+	Raw        json.RawMessage
+	Fields     map[string]json.RawMessage
 }
 
 func ParseEvent(record []byte) (Event, error) {
@@ -148,6 +152,7 @@ func (e Event) Bool(name string) bool { var value bool; _ = e.DecodeField(name, 
 func localEvent(kind, message string) Event {
 	raw, _ := json.Marshal(map[string]any{"type": kind, "error": message})
 	e, _ := ParseEvent(raw)
+	e.ReceivedAt = time.Now()
 	return e
 }
 

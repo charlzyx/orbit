@@ -17,6 +17,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parent.parent
 COMPAT = ROOT / "third_party" / "mygo-composer"
+SELECTION = ROOT / "third_party" / "mygo-selection"
 
 
 def fail(message: str) -> None:
@@ -83,6 +84,46 @@ def sha(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+# Explicit reviewed paths, never manifest or filesystem glob discovery.
+SELECTION_BASELINE = frozenset({"ui/context.go", "ui/textselection.go", "ui/input.go"})
+SELECTION_ADDED = frozenset({"ui/orbit_selection.go", "ui/orbit_selection_test.go"})
+SELECTION_IDENTITIES = ("upstream_commit", "module", "version", "module_sum", "go_mod_sum")
+
+
+def verify_selection(module_dir: Path, compatibility: Path, expected: dict) -> dict[str, Path]:
+    manifest = json.loads((compatibility / "baseline.json").read_text())
+    if set(manifest) != set(SELECTION_IDENTITIES) | {"baseline_sha256", "overlays", "patch_sha256"}:
+        fail("Unexpected selection compatibility manifest schema")
+    if any(manifest.get(key) != expected.get(key) for key in SELECTION_IDENTITIES):
+        fail("Selection compatibility identity differs from the reviewed MyGo pin")
+    if set(manifest["baseline_sha256"]) != SELECTION_BASELINE:
+        fail("Selection baseline paths differ from the explicit reviewed set")
+    if set(manifest["overlays"]) != SELECTION_BASELINE | SELECTION_ADDED:
+        fail("Selection overlay paths differ from the explicit reviewed set")
+    if sha(compatibility / "selection-retention.patch") != manifest["patch_sha256"]:
+        fail("Selection compatibility patch hash mismatch")
+    for relative, digest in manifest["baseline_sha256"].items():
+        original = module_dir / relative
+        if not original.is_file() or sha(original) != digest:
+            fail(f"Pinned MyGo selection baseline hash mismatch: {relative}")
+    result = {}
+    for relative, info in manifest["overlays"].items():
+        if set(info) != {"source", "sha256", "added"}:
+            fail(f"Unexpected selection overlay schema: {relative}")
+        is_added = relative in SELECTION_ADDED
+        if type(info["added"]) is not bool or info["added"] != is_added:
+            fail(f"Selection additive/replacement kind mismatch: {relative}")
+        if info["source"] != Path(relative).name + ".txt":
+            fail(f"Selection source path differs from the reviewed file: {relative}")
+        source = compatibility / info["source"]
+        if source.resolve().parent != compatibility.resolve() or not source.is_file() or sha(source) != info["sha256"]:
+            fail(f"Selection compatibility source hash/path mismatch: {relative}")
+        if is_added and (module_dir / relative).exists():
+            fail(f"Unexpected selection addition in module cache: {relative}")
+        result[relative] = source
+    return result
+
+
 def main() -> int:
     if len(sys.argv) < 2:
         fail("Usage: scripts/go-native.sh <run|build|test|vet|other-go-command> [arguments...]")
@@ -146,6 +187,7 @@ def main() -> int:
     source = COMPAT / "orbit_composer.go.txt"
     if sha(source) != manifest["added_sha256"]:
         fail("Composer compatibility source hash mismatch; review/update the manifest")
+    selection_overlays = verify_selection(module_dir, SELECTION, manifest)
     overlay: dict[str, str] = {}
     if previous_overlay:
         prior = json.loads((effective_cwd / previous_overlay).read_text())
@@ -173,6 +215,8 @@ def main() -> int:
         # verified source copy rather than relaxing/changing cache permissions.
         source_copy = temp_root / "mygo"
         shutil.copytree(module_dir, source_copy)
+        for relative, replacement in selection_overlays.items():
+            overlay[str(source_copy / relative)] = str(replacement)
         overlay[str(source_copy / manifest["added_file"])] = str(source)
         if test_source.exists():
             overlay[str(source_copy / "ui/orbit_composer_test.go")] = str(test_source)
@@ -194,7 +238,7 @@ def main() -> int:
         path = temp_root / "overlay.json"
         path.write_text(json.dumps({"Replace": overlay}, indent=2) + "\n")
         env["GOFLAGS"] = " ".join(quote_flag(f) for f in flags + [f"-modfile={temp_mod}", f"-overlay={path}"])
-        print(f"go-native: verified {manifest['version']}; temporary source copy + composer range-edit overlay", file=sys.stderr)
+        print(f"go-native: verified {manifest['version']}; temporary source copy + composer range-edit and selection-retention overlays", file=sys.stderr)
         process = subprocess.Popen([go, *args], env=env)
         def forward(signum, _frame):
             if process.poll() is None:

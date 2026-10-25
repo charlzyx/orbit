@@ -163,10 +163,7 @@ func (s *State) CreateIssue(options workspace.CreateIssueOptions) {
 			if apply != nil {
 				apply(s)
 			}
-			s.title = ""
-			s.body = ""
-			s.notes = ""
-			s.labels = ""
+			s.finishGitHubDraft("new-issue")
 		}, fmt.Sprintf("Issue created: %s", out), e
 	})
 }
@@ -185,10 +182,7 @@ func (s *State) CreatePull(options workspace.CreatePullOptions) {
 			if apply != nil {
 				apply(s)
 			}
-			s.title = ""
-			s.body = ""
-			s.notes = ""
-			s.labels = ""
+			s.finishGitHubDraft("new-pull")
 		}, fmt.Sprintf("Pull request created: %s", out), e
 	})
 }

@@ -20,6 +20,9 @@ import (
 )
 
 type liveSession struct {
+	modelMu              sync.Mutex
+	modelDefault         birthDefault
+	modelGeneration      uint64
 	checkpointGeneration uint64
 	checkpointID         string
 	workflowPending      string
@@ -342,8 +345,14 @@ func (m *Manager) NewSession(workspace string) error {
 	reusable := entry != nil && !entry.busy() && entry.client != nil && entry.client.Alive() && entry.state.snapshot.ActiveSession.Workspace == absolute
 	var previous sessionState
 	var previousWorkflowID string
+	var previousDefault birthDefault
+	var defaultGeneration uint64
 	if reusable {
 		previous = entry.state
+		previousDefault = entry.modelDefault
+		entry.modelGeneration++
+		defaultGeneration = entry.modelGeneration
+		entry.modelDefault = birthDefault{armed: true}
 		previousWorkflowID = entry.workflowID
 		extensions, access := entry.state.snapshot.Extensions, entry.state.snapshot.AccessMode
 		entry.state = newState(absolute, "")
@@ -363,6 +372,13 @@ func (m *Manager) NewSession(workspace string) error {
 	}
 	m.changed()
 	m.launch(func() {
+		value := preferences.New(m.options.Home).SessionDefault()
+		m.mu.Lock()
+		if entry.modelGeneration == defaultGeneration {
+			entry.modelDefault.value = value
+			entry.modelDefault.loaded = true
+		}
+		m.mu.Unlock()
 		response, err := m.callClient(entry.client, pirpc.NewCommand(pirpc.NewSession, nil))
 		if err != nil {
 			m.mu.Lock()
@@ -376,6 +392,8 @@ func (m *Manager) NewSession(workspace string) error {
 		if result.Cancelled {
 			m.mu.Lock()
 			entry.state = previous
+			entry.modelDefault = previousDefault
+			entry.modelGeneration++
 			entry.workflowID = previousWorkflowID
 			entry.workflowPending = ""
 			entry.workflowVersion++
@@ -391,7 +409,6 @@ func (m *Manager) NewSession(workspace string) error {
 		m.mu.Lock()
 		entry.creatingSession = false
 		m.mu.Unlock()
-		m.applyDefault(entry.client)
 		for _, kind := range []string{pirpc.GetState, pirpc.GetMessages, pirpc.GetSessionStats, pirpc.GetAvailableModels, pirpc.GetAvailableThinkingLevels, pirpc.GetEntries} {
 			_, _ = m.callClient(entry.client, pirpc.NewCommand(kind, nil))
 		}
@@ -416,6 +433,11 @@ func (m *Manager) Send(kind string, params map[string]any) error {
 	m.mu.Lock()
 	key := m.active
 	entry := m.sessions[key]
+	manualModel := kind == pirpc.SetModel || kind == pirpc.SetThinkingLevel || kind == pirpc.CycleModel || kind == pirpc.CycleThinkingLevel
+	if entry != nil && manualModel {
+		entry.modelDefault.armed = false
+		entry.modelGeneration++
+	}
 	if m.closed || entry == nil || entry.client == nil || entry.loading || !entry.client.Alive() || !entry.state.snapshot.Connected {
 		m.mu.Unlock()
 		return errors.New("Pi session is not ready")
@@ -471,6 +493,10 @@ func (m *Manager) Send(kind string, params map[string]any) error {
 	}
 	m.mu.Unlock()
 	m.launch(func() {
+		if manualModel {
+			entry.modelMu.Lock()
+			defer entry.modelMu.Unlock()
+		}
 		if before != nil {
 			before()
 		}
@@ -631,9 +657,11 @@ func (m *Manager) customUI(record map[string]any) error {
 // 90 ms idle UI heartbeat. It never waits on a subprocess or the filesystem.
 func (m *Manager) Tick() bool {
 	type operation struct {
-		entry   *liveSession
-		command pirpc.Command
-		dialog  string
+		entry             *liveSession
+		command           pirpc.Command
+		dialog            string
+		defaultCommand    bool
+		defaultGeneration uint64
 	}
 	var operations []operation
 	var closeClients []*pirpc.Client
@@ -668,6 +696,18 @@ func (m *Manager) Tick() bool {
 				}
 				if task := m.workflowIdentityLocked(entry); task != nil {
 					checkpoints = append(checkpoints, task)
+				}
+			}
+			if event.Type == "response" && event.Bool("success") {
+				command := event.String("command")
+				if command == pirpc.Fork || command == pirpc.Clone {
+					entry.modelDefault.armed = false
+					entry.modelGeneration++
+				}
+				if command == pirpc.GetState || command == pirpc.GetAvailableModels {
+					if next := entry.modelDefault.next(entry.state.snapshot); next != nil {
+						operations = append(operations, operation{entry: entry, command: *next, defaultCommand: true, defaultGeneration: entry.modelGeneration})
+					}
 				}
 			}
 			changed = true
@@ -816,6 +856,16 @@ func (m *Manager) Tick() bool {
 				defer cancel()
 				_ = operation.entry.client.CancelDialog(ctx, operation.dialog)
 			} else {
+				if operation.defaultCommand {
+					operation.entry.modelMu.Lock()
+					defer operation.entry.modelMu.Unlock()
+					m.mu.Lock()
+					current := !m.closed && operation.entry.modelGeneration == operation.defaultGeneration && !operation.entry.stopped
+					m.mu.Unlock()
+					if !current {
+						return
+					}
+				}
 				_, err := m.callClient(operation.entry.client, operation.command)
 				if err != nil && operation.command.Type == pirpc.GetEntries {
 					m.mu.Lock()
@@ -1094,40 +1144,6 @@ func (m *Manager) Logout(provider string) error {
 	return m.Send(pirpc.AuthLogout, map[string]any{"provider": provider})
 }
 func (m *Manager) RefreshQuota() error { return m.Send(pirpc.QuotaList, nil) }
-
-func (m *Manager) applyDefault(client *pirpc.Client) {
-	value := preferences.New(m.options.Home).SessionDefault()
-	if value.ModelID == "" {
-		return
-	}
-	provider := value.Provider
-	if provider == "" {
-		response, err := m.callClient(client, pirpc.NewCommand(pirpc.GetAvailableModels, nil))
-		if err != nil {
-			return
-		}
-		var catalog struct{ Models []ModelChoice }
-		if response.DecodeData(&catalog) != nil {
-			return
-		}
-		matches := []ModelChoice{}
-		for _, model := range catalog.Models {
-			if model.ID == value.ModelID {
-				matches = append(matches, model)
-			}
-		}
-		if len(matches) != 1 {
-			return
-		}
-		provider = matches[0].Provider
-	}
-	if _, err := m.callClient(client, pirpc.NewCommand(pirpc.SetModel, map[string]any{"provider": provider, "modelId": value.ModelID})); err != nil {
-		return
-	}
-	if value.Thinking != "" {
-		_, _ = m.callClient(client, pirpc.NewCommand(pirpc.SetThinkingLevel, map[string]any{"level": value.Thinking}))
-	}
-}
 
 func (m *Manager) PiBinary() string {
 	if value := m.configuredBinary.Load(); value != nil {

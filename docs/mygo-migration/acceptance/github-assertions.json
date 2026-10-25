@@ -1,0 +1,34 @@
+{
+  "W24": [
+    [
+      "TestGitHubNativeCancelRetainsIndependentDrafts",
+      "Native Cancel/reopen keeps separate Issue and PR title/body/notes through an unrelated comment form."
+    ],
+    [
+      "TestGitHubTemplateReopenAndBlankMatchSource",
+      "Reopening applies the lone template body while preserving nonempty title/notes; Blank recognizes any known Issue or PR skeleton and preserves unrelated prose."
+    ],
+    [
+      "TestGitHubCreatedMutationNotRetriedWhenDetailRefreshFails",
+      "Successful Issue creation followed by detail-read failure closes/clears the form, retains the created receipt and exposes no retry of the mutation."
+    ]
+  ],
+  "W28": [
+    [
+      "TestGitHubNativeCreateFailureKeepsFormAndRetryClearsOnce",
+      "Actual native Issue and PR Create stay open during/error, retain drafts, reject duplicate busy dispatch, trim the title and clear only after successful retry."
+    ]
+  ],
+  "W25": [
+    [
+      "TestGitHubOptionalLabelsNeverBlockIssuesOrPulls",
+      "Successful Issue/PR lists remain usable when optional label lookup fails; PR loading never fetches issue labels."
+    ]
+  ],
+  "W21": [
+    [
+      "TestGitHubLabelCacheSurvivesTabRoundTrip",
+      "Within one repository, successful label cache survives History/Pulls/Issues roundtrips and repeated refresh with exactly one label lookup."
+    ]
+  ]
+}

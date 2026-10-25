@@ -67,7 +67,7 @@ func TestUsageJSONAllTimeScopeCalendarAndNoMutation(t *testing.T) {
 	}
 	var out map[string]any
 	json.Unmarshal(buf.Bytes(), &out)
-	if out["range"].(map[string]any)["start_ms"] != float64(0) || len(out["series"].([]any)) != 3 {
+	if out["range"].(map[string]any)["start_ms"] != float64(0) || len(out["series"].([]any)) != 25 {
 		t.Fatal("all-time range/series start contract")
 	}
 	if index.Records[0].ModelPriced || index.Records[1].ModelPriced {
@@ -112,3 +112,48 @@ func TestUsageJSONCalendarUsesScanAnchorAndSourceDSTWindow(t *testing.T) {
 type failedUsageWriter struct{}
 
 func (failedUsageWriter) Write([]byte) (int, error) { return 0, errors.New("fixture write failure") }
+
+func TestUsageAllTimeRangeMonthRoundThenRecomputeAndExport(t *testing.T) {
+	loc, err := time.LoadLocation("America/New_York")
+	if err != nil {
+		t.Fatal(err)
+	}
+	end := time.Date(2026, 3, 10, 12, 0, 0, 0, loc)
+	oldest := time.Date(2026, 3, 9, 12, 0, 0, 0, loc)
+	index := UsageIndex{ScannedAt: end, Records: []UsageRecord{{At: oldest, Provider: "other", Model: "m", Tokens: Tokens{Total: 1}}, {At: end.Add(-time.Hour), Provider: "selected", Model: "m", Tokens: Tokens{Total: 2}}}}
+	f := UsageFilter{Start: time.UnixMilli(0), End: end, Provider: "selected"}
+	start, gotEnd, g := index.UsageChartRange(f, true, loc, time.Time{})
+	if start.Format("2006-01-02 15:04") != "2026-03-01 00:00" || !gotEnd.Equal(end) || g != "day" {
+		t.Fatal(start, gotEnd, g)
+	}
+	// The rounded start predates the spring DST change; each day is civil, not
+	// an invented fixed-duration 24h lattice. Filters must not move the axis.
+	var b bytes.Buffer
+	if err := index.ExportJSON(&b, f, UsageExportOptions{Preset: "all", Granularity: "hour", Location: loc, Now: end}); err != nil {
+		t.Fatal(err)
+	}
+	var out map[string]any
+	if err := json.Unmarshal(b.Bytes(), &out); err != nil {
+		t.Fatal(err)
+	}
+	points := out["series"].([]any)
+	if len(points) != 10 || out["range"].(map[string]any)["start_ms"] != float64(0) {
+		t.Fatal("range schema or source leading zeros changed", len(points))
+	}
+	for i, raw := range points {
+		p := raw.(map[string]any)
+		stamp := time.UnixMilli(int64(p["start_ms"].(float64))).In(loc)
+		if stamp.Hour() != 0 || stamp.Day() != i+1 {
+			t.Fatal("DST bucket drift", stamp)
+		}
+		if i < 9 && p["requests"] != float64(0) {
+			t.Fatal("scoped or leading bucket fabricated traffic", p)
+		}
+	}
+	// A range lasting more than seventy days after month rounding uses weeks.
+	index.Records[0].At = time.Date(2025, 12, 31, 12, 0, 0, 0, loc)
+	start, _, g = index.UsageChartRange(f, true, loc, time.Time{})
+	if start.Day() != 1 || start.Month() != time.December || g != "week" {
+		t.Fatal("effective granularity not recomputed", start, g)
+	}
+}

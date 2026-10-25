@@ -134,7 +134,7 @@ func usageRowField(r usageTableRow, id, metric, latency string) (string, float64
 	case "output":
 		return "", float64(r.Tokens.Output), false
 	case "cache":
-		return "", float64(r.Tokens.CacheRead + r.Tokens.CacheWrite), false
+		return "", float64(usageAdd(r.Tokens.CacheRead, r.Tokens.CacheWrite)), false
 	case "cache-hit":
 		rate, ok := usageCacheRate(r.Tokens)
 		if !ok {
@@ -204,8 +204,16 @@ func queryUsageTable(rows []usageTableRow, t *usageTableState, kind, metric, lat
 			}
 			return cmp < 0
 		}
+		if kind == "series" || kind == "daily" || kind == "failures" {
+			if !a.At.Equal(b.At) {
+				return a.At.Before(b.At)
+			}
+		}
 		if a.Name != b.Name {
 			return a.Name < b.Name
+		}
+		if kind == "sessions" && a.ID != b.ID {
+			return a.ID < b.ID
 		}
 		return a.Key < b.Key
 	})
@@ -236,6 +244,9 @@ func mergeUsageAggregate(a *usageAggregate, b usageAggregate) {
 	a.Tokens.CacheWrite = usageAdd(a.Tokens.CacheWrite, b.Tokens.CacheWrite)
 	a.Cost += b.Cost
 	a.Priced += b.Priced
+	a.Timed += b.Timed
+	a.Duration += b.Duration
+	a.MaxDuration = max(a.MaxDuration, b.MaxDuration)
 }
 func usageTableColumns(kind, metric string) []ui.TableColumn {
 	ids := []string{"title", "workspace", "provider", "model", "started", "duration", "requests", "input", "output", "cache", "tokens", "errors", "tools"}
@@ -354,9 +365,9 @@ func (a *App) usageCell(r usageTableRow, id string) string {
 		if r.Started.IsZero() || r.Ended.IsZero() {
 			return "—"
 		}
-		return max(time.Duration(0), r.Ended.Sub(r.Started)).Round(time.Second).String()
+		return usageSpan(r.Ended.Sub(r.Started))
 	case "requests", "calls":
-		return fmt.Sprint(r.Requests)
+		return usageCount(uint64(r.Requests))
 	case "input":
 		return compactCount(r.Tokens.Input)
 	case "output":
@@ -368,7 +379,7 @@ func (a *App) usageCell(r usageTableRow, id string) string {
 		if !ok {
 			return "—"
 		}
-		return fmt.Sprintf("%.1f%%", rate)
+		return usagePercent(rate)
 	case "errors":
 		return fmt.Sprint(r.Errors + r.ToolFailures)
 	case "tools":
@@ -377,14 +388,14 @@ func (a *App) usageCell(r usageTableRow, id string) string {
 		if r.Timed == 0 {
 			return "—"
 		}
-		return fmt.Sprintf("%.2fs", r.Duration.Seconds()/float64(r.Timed))
+		return usageDuration(r.Duration.Seconds() / float64(r.Timed))
 	case "max":
 		if r.Timed == 0 {
 			return "—"
 		}
-		return r.MaxDuration.Round(time.Millisecond).String()
+		return usageDuration(r.MaxDuration.Seconds())
 	case "share":
-		return fmt.Sprintf("%.1f%%", usageShare(r.usageAggregate, s.projection.Summary)*100)
+		return usagePercent(usageShare(r.usageAggregate, s.projection.Summary) * 100)
 	case "value":
 		v, ok := usageMetricValue(r.usageAggregate, s.metric)
 		if s.metric == "latency" && r.Point != nil {
@@ -468,11 +479,23 @@ func (a *App) usageTable(c *ui.Context, kind string) {
 			}
 		})
 	})
+	probe := ui.Box(c.Key("usage-table-width:" + kind)).Height(0).AlignSelf(ui.Stretch)
+	width := probe.Bounds().W
+	if width <= 0 {
+		width, _ = c.Size()
+		if a.SidebarVisible {
+			width -= a.SidebarWidth
+		}
+		width = min(width, 1180) - 64
+	}
 	var cols []ui.TableColumn
 	for _, col := range all {
 		if col.ID == required || !slices.Contains(t.Hidden, col.ID) {
 			cols = append(cols, col)
 		}
+	}
+	if kind == "sessions" {
+		cols = usageSessionColumns(cols, t.List.Columns.Widths, width)
 	}
 	result := queryUsageTable(a.usageTableRows(kind), t, kind, s.metric, s.latencyMetric)
 	t.Page = result.Page
@@ -484,11 +507,22 @@ func (a *App) usageTable(c *ui.Context, kind string) {
 	t.List.Key = func(i int) any { return result.Rows[i].Key }
 	t.List.Label = func(i int) string { return usageRowText(result.Rows[i], kind) }
 	t.List.CellMenu = func(m *ui.Menu, row, col int) { a.usageRowMenu(m, kind, result.Rows[row]) }
+	baseTheme := c.Theme()
+	tableTheme := *baseTheme
+	tableTheme.Spacing = 5 // frozen Usage HEADER_H and ROW_H are 40 DIPs
+	c.SetTheme(&tableTheme)
 	table := ui.Table(c.Key("usage-table:"+kind), &t.List, cols, len(result.Rows), func(row, col int) {
 		r := result.Rows[row]
+		if cols[col].ID == "open" {
+			if a.iconButton(c, "Open "+r.Name, "icons/arrow-right.svg").Size(12, 20).Disabled(r.Path == "").Clicked() {
+				a.openUsageSession(r)
+			}
+			return
+		}
 		text := a.usageCell(r, cols[col].ID)
 		ui.Text(c, text).SingleLine().Tooltip(text)
 	}).Height(float32(max(3, len(result.Rows))*40 + 40)).AlignSelf(ui.Stretch).Label("Usage " + kind + " table")
+	c.SetTheme(baseTheme)
 	if t.Selected >= 0 && t.Selected < len(result.Rows) {
 		r := result.Rows[t.Selected]
 		if table.Submitted() {
@@ -513,7 +547,9 @@ func (a *App) usageTable(c *ui.Context, kind string) {
 	if result.Total == 0 {
 		ui.Text(c, "No matching rows.").TextColor(a.Theme.TextMuted)
 	}
-	if kind != "failures" {
+	if kind == "breakdown:tools" {
+		ui.Text(c, fmt.Sprintf("%d calls · %d errors · %d measured", result.Totals.Requests, result.Totals.ToolFailures, result.Totals.Timed)).TextColor(a.Theme.TextMuted).FontSize(11)
+	} else if kind != "failures" {
 		ui.Text(c, fmt.Sprintf("Filtered: %d requests · %s tokens    Page: %d requests · %s tokens", result.Totals.Requests, compactCount(result.Totals.Tokens.Total), result.PageTotals.Requests, compactCount(result.PageTotals.Tokens.Total))).TextColor(a.Theme.TextMuted).FontSize(11)
 	}
 	ui.Row(c.Key("usage-pager:" + kind)).Gap(8).AlignItems(ui.Center).Children(func() {
@@ -589,4 +625,46 @@ func (a *App) openUsageSession(r usageTableRow) {
 	}
 	a.Dispatch(Action{Kind: "SwitchSession", Value: r.Path})
 	a.Navigate("chat")
+}
+
+func usageSessionColumns(columns []ui.TableColumn, resized map[string]float32, available float32) []ui.TableColumn {
+	defaults := map[string]float32{"workspace": 110, "provider": 110, "model": 156, "started": 88, "duration": 92, "requests": 92, "input": 70, "output": 76, "cache": 72, "tokens": 82, "errors": 82}
+	optional := map[string]bool{"started": true, "input": true, "output": true, "cache": true}
+	budget := max(360, available-48)
+	width := func(id string, fallback float32) float32 {
+		if w, ok := resized[id]; ok {
+			return max(48, w)
+		}
+		return fallback
+	}
+	running := float32(0)
+	for _, col := range columns {
+		if col.ID != "title" && col.ID != "tools" && !optional[col.ID] {
+			running += width(col.ID, defaults[col.ID])
+		}
+	}
+	admitted := map[string]bool{}
+	for _, col := range columns {
+		if optional[col.ID] {
+			w := width(col.ID, defaults[col.ID])
+			if running+w+38+12+180 <= budget {
+				running += w
+				admitted[col.ID] = true
+			}
+		}
+	}
+	title := max(180, min(460, budget-running-38-12))
+	out := make([]ui.TableColumn, 0, len(columns)+1)
+	for _, col := range columns {
+		if col.ID == "tools" || (optional[col.ID] && !admitted[col.ID]) {
+			continue
+		}
+		fallback := defaults[col.ID]
+		if col.ID == "title" {
+			fallback = title
+		}
+		col.Width = width(col.ID, fallback)
+		out = append(out, col)
+	}
+	return append(out, ui.TableColumn{ID: "open", Width: 38, MinWidth: 38, Align: ui.Center, Sortable: false})
 }

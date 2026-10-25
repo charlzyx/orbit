@@ -178,6 +178,7 @@ func (a *App) refreshUsage() {
 				s.err = e.Error()
 			} else {
 				s.index = v
+				s.granularity = usageAutoGranularity(s.filter, s.index)
 				if pruneUsageFilter(v, &s.filter) {
 					s.scopeNotice = "A removed session scope was cleared."
 					s.noticeUntil = time.Now().Add(6 * time.Second)
@@ -390,92 +391,19 @@ func (a *App) usageCard(c *ui.Context, title, subtitle string, body func()) {
 		ui.Column(c).AlignSelf(ui.Stretch).Padding(12).Gap(12).Children(body)
 	})
 }
-func compactCount(n uint64) string {
-	switch {
-	case n >= 1_000_000_000:
-		return fmt.Sprintf("%.2fB", float64(n)/1e9)
-	case n >= 1_000_000:
-		return fmt.Sprintf("%.2fM", float64(n)/1e6)
-	case n >= 1000:
-		return fmt.Sprintf("%.1fK", float64(n)/1e3)
-	default:
-		return fmt.Sprint(n)
-	}
-}
 func (a *App) usageSimple(c *ui.Context) {
 	s := &a.usageState
 	p := s.projection
-	t := a.Theme
-	ui.Text(c, "OVERVIEW").FontSize(10).TextColor(t.TextMuted)
+	ui.Text(c, a.text("usage.overview", "OVERVIEW")).FontSize(10).TextColor(a.Theme.TextMuted)
 	a.usageHeatmap(c)
-	a.usageCard(c, a.text("usage.summary", "Summary"), fmt.Sprintf("%d requests · %d sessions", p.Summary.Requests, len(p.Sessions)), func() {
-		avg := "—"
-		if p.Summary.TimedRequests > 0 {
-			avg = fmt.Sprintf("%.1fs", p.Summary.Duration.Seconds()/float64(p.Summary.TimedRequests))
-		}
-		cache := "—"
-		if p.Summary.Tokens.CacheRead+p.Summary.Tokens.CacheWrite > 0 {
-			cache = fmt.Sprintf("%.1f%%", p.Summary.Tokens.CacheRate())
-		}
-		width, _ := c.Size()
-		if a.SidebarVisible {
-			width -= a.SidebarWidth
-		}
-		cols := 4
-		if width < 880 {
-			cols = 2
-		}
-		if width < 560 {
-			cols = 1
-		}
-		stats := []struct{ label, value, hint string }{{"Requests", compactCount(uint64(p.Summary.Requests)), "model calls in range"}, {"Total tokens", compactCount(p.Summary.Tokens.Total), "reported by pi"}, {"Cache hit rate", cache, compactCount(p.Summary.Tokens.CacheRead) + " read"}, {"Avg response", avg, usageLatencyHint(p.P95, p.Timed)}}
-		for start := 0; start < len(stats); start += cols {
-			ui.Row(c).Gap(12).Children(func() {
-				for _, stat := range stats[start:min(start+cols, len(stats))] {
-					ui.Column(c).Grow(1).MinWidth(0).Gap(6).Children(func() {
-						ui.Text(c, stat.label).TextColor(t.TextMuted)
-						ui.Text(c, stat.value).Font(a.Fonts.CodeFamily).FontSize(24)
-						ui.Text(c, stat.hint).TextColor(t.TextMuted).FontSize(11)
-						metric := map[string]string{"Requests": "requests", "Total tokens": "tokens", "Avg response": "latency"}[stat.label]
-						if metric != "" {
-							if delta := usageComparison(p, metric); delta != "" {
-								ui.Text(c, delta).TextColor(t.TextMuted).FontSize(11)
-							}
-						}
-					})
-				}
-			})
-		}
-		a.line(c)
-		a.usageSummaryDetails(c, p)
-		if a.button(c, "View failures", "", false).Clicked() {
-			s.filter.ErrorsOnly = true
-			s.filter.CachedOnly = false
-			a.saveUsagePrefs()
-		}
-	})
+	a.usageSummary(c)
 	a.usageCard(c, a.text("usage.over_time", "Usage over time"), "Click a bucket to focus the page. Arrow keys inspect the chart.", func() { a.usageChart(c) })
 	a.usageCard(c, a.text("usage.buckets", "Buckets"), "The same buckets as the chart, with independent search and paging.", func() { a.usageTable(c, "series") })
 	a.usageSignals(c)
-	a.usageCard(c, a.text("usage.token_health", "Token health"), "Actual token categories reported by pi.", func() {
-		total := p.Summary.Tokens.Total
-		for _, part := range []struct {
-			name  string
-			value uint64
-		}{{"Input", p.Summary.Tokens.Input}, {"Output", p.Summary.Tokens.Output}, {"Cache read", p.Summary.Tokens.CacheRead}, {"Cache write", p.Summary.Tokens.CacheWrite}} {
-			ui.Row(c).Gap(12).Children(func() {
-				ui.Text(c, part.name).Width(100)
-				ui.Box(c).Grow(1).Height(8).Radius(4).Background(t.Background).Children(func() {
-					if total > 0 {
-						ui.Box(c).Height(8).WidthPercent(min(100, float32(part.value)*100/float32(total))).Radius(4).Background(t.Accent)
-					}
-				})
-				ui.Text(c, compactCount(part.value)).Width(80).Font(a.Fonts.CodeFamily)
-			})
-		}
-	})
-	ui.Text(c, a.text("usage.composition_formula", "Total = input + output + cache read + cache write. Reasoning tokens are a subset of output.")).FontSize(11).TextColor(t.TextMuted)
-	a.usageHealthDetails(c)
+	if p.Summary.Tokens.Total > 0 || p.CacheDataRequests > 0 {
+		a.usageHealthDetails(c)
+	}
+
 }
 func (a *App) usageHeatmap(c *ui.Context) {
 	s := &a.usageState
@@ -619,9 +547,9 @@ func usageMetricText(value float64, valid bool, metric string) string {
 	}
 	switch metric {
 	case "cost":
-		return fmt.Sprintf("$%.4f", value)
+		return usageCost(value)
 	case "latency":
-		return fmt.Sprintf("%.2fs", value)
+		return usageDuration(value)
 	default:
 		return compactCount(uint64(value)) + " " + metric
 	}
@@ -637,28 +565,19 @@ func (a *App) usageChart(c *ui.Context) {
 			}
 		}
 		if s.metric == "latency" {
-			ui.MenuButton(c, titleCase(s.latencyMetric), func(m *ui.Menu) {
+			ui.Row(c).Gap(3).Margin(0, 0, 0, 8).Children(func() {
 				for _, metric := range []string{"average", "p50", "p95", "p99"} {
 					_, available := s.projection.Latency.value(metric)
-					if m.Item(strings.ToUpper(metric)).Checked(s.latencyMetric == metric).Disabled(!available).Chosen() {
+					label := a.text("usage.latency_"+metric, strings.ToUpper(metric))
+					if a.button(c.Key("usage-latency-"+metric), label, "", s.latencyMetric == metric).Height(26).Disabled(!available).Clicked() {
 						s.latencyMetric = metric
 						a.saveUsagePrefs()
 					}
 				}
 			})
 		}
-		ui.Spacer(c)
-		ui.MenuButton(c, titleCase(s.granularity), func(m *ui.Menu) {
-			for _, g := range []string{"hour", "day", "week", "month"} {
-				if m.Item(titleCase(g)).Checked(s.granularity == g).Chosen() {
-					s.granularity = g
-				}
-			}
-		})
+
 	})
-	if !usageMetricAvailable(s.projection.Summary, s.metric) {
-		ui.Text(c, "This metric is unavailable for this range; no missing measurements are shown as zero.").TextColor(t.TextMuted)
-	}
 	if s.projection.SeriesTruncated {
 		ui.Text(c, "Chart limited to the first 4,000 buckets. Choose a coarser interval to show the full range.").TextColor(t.Warning)
 	}
@@ -707,8 +626,19 @@ func (a *App) usageChart(c *ui.Context) {
 		}
 		ticks = sparse
 	}
-	chart.Plot(c, chart.Axes{Left: y.Ticks(4), Bottom: ticks, Label: func(_ chart.Side, tick chart.Tick) {
-		ui.Text(c, tick.Label).FontSize(10).TextColor(t.TextMuted).NoWrap()
+	chart.Plot(c, chart.Axes{Left: y.Ticks(4), Bottom: ticks, Label: func(side chart.Side, tick chart.Tick) {
+		label := tick.Label
+		if side == chart.Left {
+			switch s.metric {
+			case "cost":
+				label = usageCost(tick.Value)
+			case "latency":
+				label = usageDuration(tick.Value)
+			default:
+				label = compactCount(uint64(max(0, tick.Value)))
+			}
+		}
+		ui.Text(c, label).FontSize(10).TextColor(t.TextMuted).NoWrap()
 	}}, func(area ui.Element) {
 		area.Label("Usage trend").Description("Left and right arrow keys inspect buckets. Enter focuses the selected bucket.")
 		area.Draw(func(p *ui.Painter, r ui.Rect) {
@@ -744,13 +674,37 @@ func (a *App) usageChart(c *ui.Context) {
 				align = ui.End
 			}
 			chart.Anchor(c, xs[i], 1, align, ui.Start, func() {
-				ui.Text(c, labels[i]+" · "+usageMetricText(values[i], valid[i], s.metric)).FontSize(11).Padding(5, 8).Radius(5).Background(t.Surface).Border(1, t.Border).NoWrap()
+				ui.Text(c, usagePointReadout(points[i], s.metric, s.latencyMetric)).FontSize(11).Padding(5, 8).Radius(5).Background(t.Surface).Border(1, t.Border).NoWrap()
 			})
 			if area.Shortcut(0, ui.KeyEnter) {
 				a.focusUsageBucket(points[i].At, points[i].End)
 			}
 		}
 	}).Height(168).Gap(8).AlignSelf(ui.Stretch)
+	if s.projection.Latency.Samples > 0 {
+		a.usageLatencyLine(c, s.projection.Latency, a.text("view.response_time", "Response time"))
+	}
+	if reason := a.usageUnavailableReason(s.projection.Summary); reason != "" {
+		ui.Text(c, reason).FontSize(12).TextColor(t.TextMuted)
+	}
+}
+func (a *App) usageUnavailableReason(summary workbench.UsageSummary) string {
+	var metrics, reasons []string
+	for _, metric := range []string{"tokens", "requests", "input", "output", "cache", "cost", "latency", "errors"} {
+		if !usageMetricAvailable(summary, metric) {
+			metrics = append(metrics, metric)
+		}
+	}
+	if summary.PricedRequests == 0 {
+		reasons = append(reasons, a.text("usage.reason_needs_price_table", "cost needs a price table for these models"))
+	}
+	if summary.TimedRequests == 0 {
+		reasons = append(reasons, a.text("usage.reason_needs_request_gaps", "response time needs measurable request gaps"))
+	}
+	if len(reasons) == 0 {
+		return ""
+	}
+	return strings.NewReplacer("%{metrics}", strings.Join(metrics, ", "), "%{reasons}", strings.Join(reasons, "; ")).Replace(a.text("usage.not_shown", "%{metrics} not shown: %{reasons}"))
 }
 func (a *App) usageDetails(c *ui.Context) {
 	s := &a.usageState
@@ -789,6 +743,9 @@ func (a *App) usageDetails(c *ui.Context) {
 				})
 				ui.Text(c, compactCount(uint64(value))).Font(a.Fonts.CodeFamily).Width(85)
 			})
+		}
+		if s.breakdown == "tools" {
+			a.usageLatencyLine(c, s.projection.ToolLatency, a.text("usage.tool_response_time", "Tool response time"))
 		}
 		a.usageTable(c, "breakdown:"+s.breakdown)
 	})
@@ -925,6 +882,7 @@ func (a *App) usageDialogs(c *ui.Context) {
 }
 
 func usageValid(v, fallback string, values ...string) string {
+	v = strings.TrimSpace(v)
 	for _, candidate := range values {
 		if candidate == v {
 			return v
@@ -933,25 +891,8 @@ func usageValid(v, fallback string, values ...string) string {
 	return fallback
 }
 func usageAutoGranularity(f workbench.UsageFilter, index workbench.UsageIndex) string {
-	start, end := f.Start, f.End
-	if start.IsZero() || start.UnixMilli() <= 0 {
-		for _, r := range index.Records {
-			if start.IsZero() || start.UnixMilli() <= 0 || r.At.Before(start) {
-				start = r.At
-			}
-		}
-	}
-	days := end.Sub(start).Hours() / 24
-	switch {
-	case days <= 2.5:
-		return "hour"
-	case days <= 70:
-		return "day"
-	case days <= 400:
-		return "week"
-	default:
-		return "month"
-	}
+	_, _, granularity := index.UsageChartRange(f, !f.Start.IsZero() && f.Start.UnixMilli() <= 0, time.Local, time.Time{})
+	return granularity
 }
 
 func cloneUsageFilter(f workbench.UsageFilter) workbench.UsageFilter {
@@ -1044,7 +985,7 @@ func usagePointReadout(p usagePoint, metric, latency string) string {
 	if metric == "latency" {
 		v, ok = p.Latency.value(latency)
 	}
-	text := fmt.Sprintf("%s · %s\n%d requests · %s tokens\nInput %s · Output %s\nCache read %s · Cache write %s", p.At.Local().Format("Jan 2, 2006 15:04"), usageMetricText(v, ok, metric), p.Requests, compactCount(p.Tokens.Total), compactCount(p.Tokens.Input), compactCount(p.Tokens.Output), compactCount(p.Tokens.CacheRead), compactCount(p.Tokens.CacheWrite))
+	text := fmt.Sprintf("%s · %s\n%d requests · %s tokens\nInput %s · Output %s\nCache read %s · Cache write %s", p.At.Local().Format("Jan 2, 2006 15:04"), usageMetricText(v, ok, metric), p.Requests, usageExact(p.Tokens.Total), usageExact(p.Tokens.Input), usageExact(p.Tokens.Output), usageExact(p.Tokens.CacheRead), usageExact(p.Tokens.CacheWrite))
 	if p.Errors > 0 {
 		text += fmt.Sprintf("\n%d failed requests", p.Errors)
 	}

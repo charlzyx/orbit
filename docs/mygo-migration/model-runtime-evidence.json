@@ -1,0 +1,20 @@
+{
+  "source_baseline": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "verification": "Executed scoped race and full agent race against these current working files; native source unchanged since helper race7.345s. Full current UI/controller acceptance is separately owned. Not whole-feature PASS. Output redaction also uses longest-first non-recursive replacement with a final byte cap; its additional regression is included in the next immutable aggregate run.",
+  "commands": [
+    "scripts/go-native.sh test -race ./internal/agent -count=1 (real Pi1.4 enabled;33.573s)",
+    "scripts/go-native.sh test -race ./internal/native -run TestModelCatalog|TestManagedPiUpdate|TestRuntimeProbe -count=1 (7.345s)"
+  ],
+  "files": {
+    "internal/agent/model_defaults.go": "0288477d95cb88d7028d9e4c708067239805e0fc931993cd4b06fda6b140fa07",
+    "internal/agent/model_defaults_test.go": "3fc89e53ff05d366bd3e73c1d22d6b7fd56ab43561d13a05f984d7fa99ae525b",
+    "internal/agent/model_defaults_integration_test.go": "0bb575e6bbb82c043597df54920064c59172f59141cd2228d452fc0a71442966",
+    "internal/agent/manager.go": "79417a17be31bdf62f501985ef4bdba13bda5f7ad1f932ef6ab6ae3342c720af",
+    "internal/native/model_catalog.go": "aa017d376137b5b33569c38710c3c0f71e13e72041546a9422590f5ec8c9dc84",
+    "internal/native/model_catalog_test.go": "cee63620d9db1708ef3482cd1c1a948a155232c35f6f873b84c85526a3b1e49e",
+    "internal/native/runtime.go": "f6d93879a9cf56875c1338190367963adc99c9bd106cc8bc16c1c04cb64a8b8c",
+    "internal/native/bounded_output_test.go": "d790b55a2f0edf61fa2d1e99778ec77353ae8ac40a59d461744548164b60fdef",
+    "internal/native/runtime_unix.go": "9442aa6fac6f374c95d98942ed8cde2769c1f6d7c6e9eeefd9cacc3d03bffa87",
+    "internal/native/runtime_windows.go": "32512007d82ccab354f8ccf9218e3c867456498abaaae70194754412abb1fef4"
+  }
+}

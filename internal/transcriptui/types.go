@@ -30,12 +30,14 @@ type Usage struct {
 	Cost                                        *float64
 }
 type Step struct {
-	ID, Text, Thinking string
-	Tools              []ToolCall
-	Usage              *Usage
-	Timestamp          time.Time
-	Duration           *time.Duration // Pi durationMs only; no inferred reload clock.
-	Streaming          bool
+	ID, Text, Thinking               string
+	Tools                            []ToolCall
+	Usage                            *Usage
+	Timestamp                        time.Time
+	Duration                         *time.Duration // Pi durationMs only; no inferred reload clock.
+	ThinkingDuration, GenerationTime *time.Duration
+	RequestStartedAt                 time.Time
+	Streaming                        bool
 }
 type SummaryRow struct {
 	Branch       bool
@@ -84,11 +86,12 @@ type Options struct {
 // State is per-session view state. Reset it when switching transcript identity,
 // not on every streamed snapshot. Keys include stable row and tool identities.
 type State struct {
-	session string
-	open    map[string]bool
-	chosen  map[string]bool
-	copied  map[string]time.Time
-	clocks  map[string]turnClock
+	session        string
+	open           map[string]bool
+	chosen         map[string]bool
+	copied         map[string]time.Time
+	clocks         map[string]turnClock
+	thoughtScrolls map[string]*ui.ScrollState
 }
 
 func (s *State) Reset(session string) {
@@ -97,6 +100,7 @@ func (s *State) Reset(session string) {
 	s.chosen = make(map[string]bool)
 	s.copied = make(map[string]time.Time)
 	s.clocks = make(map[string]turnClock)
+	s.thoughtScrolls = make(map[string]*ui.ScrollState)
 }
 func (s *State) Session(session string) {
 	if s.open == nil || s.session != session {

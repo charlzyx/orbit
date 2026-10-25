@@ -190,7 +190,9 @@ func (s *State) dialogActions(c *ui.Context, label string, disabled bool, submit
 			s.dialogOpen = false
 		}
 		if button(c, label, s.Busy || disabled).Clicked() {
-			s.dialogOpen = false
+			if s.dialog != "new-issue" && s.dialog != "new-pull" {
+				s.dialogOpen = false
+			}
 			submit()
 		}
 	})
@@ -325,6 +327,9 @@ func (s *State) createDialog(c *ui.Context) {
 		title = "New pull request"
 	}
 	ui.Text(c, title).FontSize(18).Bold()
+	if s.Error != nil {
+		ui.Text(c, s.Error.Error()).Selectable()
+	}
 	s.templatePicker(c, pull)
 	ui.TextInput(c, &s.title).Label("Title").Placeholder("Title").AutoFocus().AlignSelf(ui.Stretch)
 	ui.TextArea(c, &s.body).Label("Description").Placeholder("Markdown description").Height(200).AlignSelf(ui.Stretch)
@@ -362,10 +367,10 @@ func (s *State) createDialog(c *ui.Context) {
 	muted(c, fmt.Sprintf("This will publish to the current repository on GitHub."))
 	s.dialogActions(c, "Create", strings.TrimSpace(s.title) == "", func() {
 		if pull {
-			o := workspace.CreatePullOptions{Title: s.title, Body: s.body, Base: s.base, Draft: s.draft, Labels: splitValues(s.labels)}
+			o := workspace.CreatePullOptions{Title: strings.TrimSpace(s.title), Body: s.body, Base: s.base, Draft: s.draft, Labels: splitValues(s.labels)}
 			s.CreatePull(o)
 		} else {
-			o := workspace.CreateIssueOptions{Title: s.title, Body: s.body, Labels: splitValues(s.labels), Assignees: splitValues(s.assignees), Attachments: append([]string(nil), s.attachments...)}
+			o := workspace.CreateIssueOptions{Title: strings.TrimSpace(s.title), Body: s.body, Labels: splitValues(s.labels), Assignees: splitValues(s.assignees), Attachments: append([]string(nil), s.attachments...)}
 			s.CreateIssue(o)
 		}
 	})

@@ -270,3 +270,48 @@ func TestSnapshotToolImagesAndUserMetadataStayOutOfText(t *testing.T) {
 		}
 	}
 }
+
+func TestMeasuredAndEstimatedThinkingClocksAndRates(t *testing.T) {
+	base := time.Unix(1000, 0)
+	gen, measured := 2*time.Second, 1500*time.Millisecond
+	msg := fixtureMessage(t, "clock", `{"role":"assistant","content":[{"type":"thinking","thinking":"fixture reasoning"},{"type":"text","text":"fixture answer"}],"usage":{"input":2,"output":12},"durationMs":4000}`)
+	msg.GenerationTime = &gen
+	msg.ThinkingDuration = &measured
+	msg.RequestStartedAt = base
+	msg.Streaming = true
+	row := Project([]agent.Message{msg})[0]
+	if d := row.GenerationTime(); d == nil || *d != 4*time.Second {
+		t.Fatal("Pi duration did not override client fallback")
+	}
+	if d, estimated := StepThinkingDuration(row.Steps, 0); d == nil || *d != measured || estimated {
+		t.Fatal("measured thinking clock lost")
+	}
+	if row.LiveRate(base.Add(3*time.Second)) != "4.0" {
+		t.Fatal("live rate did not use actual request clock")
+	}
+	*row.Steps[0].ThinkingDuration = 99 * time.Second
+	if *msg.ThinkingDuration != 1500*time.Millisecond {
+		t.Fatal("projection aliased clock pointer")
+	}
+	rows := []Step{{Thinking: "historical reason", Timestamp: base}, {Timestamp: base.Add(8 * time.Second)}}
+	d, estimated := StepThinkingDuration(rows, 0)
+	if d == nil || *d != 8*time.Second || !estimated {
+		t.Fatal("source adjacent-timestamp estimate missing")
+	}
+	rows[1].Timestamp = base.Add(-time.Second)
+	if d, _ := StepThinkingDuration(rows, 0); d != nil {
+		t.Fatal("negative timestamp gap became duration")
+	}
+	noUsage := Row{Streaming: true, Steps: []Step{{Text: strings.Repeat("chars are not reported tokens", 30), RequestStartedAt: base}}}
+	if noUsage.LiveRate(base.Add(3*time.Second)) != "" {
+		t.Fatal("fabricated token rate from character count")
+	}
+	row.Steps[0].Duration = nil
+	if d := row.GenerationTime(); d == nil || *d != gen {
+		t.Fatal("measured fallback not used when provider omitted duration")
+	}
+	row.Steps = append(row.Steps, Step{RequestStartedAt: base.Add(8 * time.Second), Usage: &Usage{Output: 8}})
+	if row.LiveRate(base.Add(10*time.Second)) != "5.0" {
+		t.Fatal("live rate did not sum prior measured step and current request")
+	}
+}

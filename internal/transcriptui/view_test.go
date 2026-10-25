@@ -375,3 +375,173 @@ func TestNativeToolKeyboardToggleAndCopy(t *testing.T) {
 		t.Fatalf("keyboard copy %q", tt.Clipboard())
 	}
 }
+
+func TestSelectionCompatibilityGuard(t *testing.T) {
+	if os.Getenv("ORBIT_REQUIRE_SELECTION_PATCH") == "1" && !RetainedSelectionAvailable() {
+		t.Fatal("canonical retained-selection compatibility patch required")
+	}
+	err := RequireCompatibility()
+	if (err == nil) != RetainedSelectionAvailable() {
+		t.Fatal("capability and fail-loud guard disagree")
+	}
+	if err != nil && !strings.Contains(err.Error(), "scripts/go-native.sh") {
+		t.Fatal("missing canonical build instruction")
+	}
+}
+
+func TestNativeRetainedVirtualizedTranscriptSelection(t *testing.T) {
+	if !RetainedSelectionAvailable() {
+		t.Skip("canonical go-native.sh selection overlay required; unpatched limit has its own test")
+	}
+	var list ui.ListState
+	identity := "actual-fixture-session-a"
+	opts := nativeOptions()
+	tt := ui.NewTester(func(c *ui.Context) {
+		scope := ui.Column(c).Size(500, 180).Selectable()
+		if !RetainSelection(scope, identity) {
+			t.Fatal("canonical capability disappeared")
+		}
+		scope.Children(func() {
+			ui.List(c, &list, 80, func(i int) { ui.Text(c, fmt.Sprintf("Row %02d 用户文字", i)).Height(40) }).Grow(1)
+		})
+		SelectionMenu(c, scope, "Actual right-click message", opts)
+	}, 500, 180)
+	a, _ := tt.Find("Row 00 用户文字")
+	b, _ := tt.Find("Row 02 用户文字")
+	tt.Press(a.X+1, a.Y+10)
+	tt.Move(b.X+b.W-1, b.Y+10)
+	tt.Release(b.X+b.W-1, b.Y+10)
+	want := "Row 00 用户文字\nRow 01 用户文字\nRow 02 用户文字"
+	list.ScrollToEnd()
+	tt.Frame()
+	tt.SetClipboard("sentinel")
+	tt.Key(ui.Cmd, ui.KeyC)
+	if tt.Clipboard() != want {
+		t.Fatalf("unmount copy %q", tt.Clipboard())
+	}
+	if _, ok := tt.Find("Row 00 用户文字"); ok {
+		t.Fatal("selected virtual row retained in tree")
+	}
+	if e := tt.RightClick("Row 79 用户文字"); e != nil {
+		t.Fatal(e)
+	}
+	if e := tt.ChooseMenuItem("Copy Selection"); e != nil {
+		t.Fatal(e)
+	}
+	if tt.Clipboard() != want {
+		t.Fatal("right-click new row erased snapshot")
+	}
+	if e := tt.RightClick("Row 79 用户文字"); e != nil {
+		t.Fatal(e)
+	}
+	if e := tt.ChooseMenuItem("Copy Message"); e != nil {
+		t.Fatal(e)
+	}
+	if tt.Clipboard() != "Actual right-click message" {
+		t.Fatal("menu copied selected text instead of targeted message")
+	}
+	identity = "actual-fixture-session-b"
+	tt.Frame()
+	tt.SetClipboard("sentinel")
+	tt.Key(ui.Cmd, ui.KeyC)
+	if tt.Clipboard() != "sentinel" {
+		t.Fatal("stale selection crossed session identity")
+	}
+}
+
+func TestNativeRetainedSelectionCapture(t *testing.T) {
+	out := os.Getenv("ORBIT_TRANSCRIPT_CAPTURE_DIR")
+	if out == "" {
+		t.Skip("set ORBIT_TRANSCRIPT_CAPTURE_DIR for explicit retained-selection native CPU review image")
+	}
+	if !RetainedSelectionAvailable() {
+		t.Fatal("selection capture requires canonical compatibility overlay")
+	}
+	if e := os.MkdirAll(out, 0755); e != nil {
+		t.Fatal(e)
+	}
+	var list ui.ListState
+	opts := nativeOptions()
+	tt := ui.NewTester(func(c *ui.Context) {
+		ui.Column(c).Size(1470, 922).Padding(24).Gap(14).Background(opts.Colors.Code).Children(func() {
+			ui.Text(c, "EXPLICIT NATIVE CPU FIXTURE · not a matched Rust capture").Unselectable().TextColor(opts.Colors.Warning)
+			ui.Text(c, "Selection restored after virtualized rows unmounted and remounted").Unselectable().TextColor(opts.Colors.Text)
+			scope := ui.Column(c).Height(320).AlignSelf(ui.Stretch).Selectable().SelectionColor(opts.Colors.Selection)
+			RetainSelection(scope, "selection-capture-fixture")
+			scope.CopyData(SelectionData).Children(func() {
+				ui.List(c, &list, 80, func(i int) {
+					ui.Text(c, fmt.Sprintf("Fixture row %02d · 用户 selected text", i)).Height(50).TextColor(opts.Colors.Text)
+				}).Grow(1)
+			})
+		})
+	}, 1470, 922)
+	a, _ := tt.Find("Fixture row 00 · 用户 selected text")
+	b, _ := tt.Find("Fixture row 02 · 用户 selected text")
+	tt.Press(a.X+1, a.Y+12)
+	tt.Move(b.X+b.W-1, b.Y+12)
+	tt.Release(b.X+b.W-1, b.Y+12)
+	list.ScrollToEnd()
+	tt.Frame()
+	tt.Key(ui.Cmd, ui.KeyC)
+	want := "Fixture row 00 · 用户 selected text\nFixture row 01 · 用户 selected text\nFixture row 02 · 用户 selected text"
+	if tt.Clipboard() != want {
+		t.Fatalf("retained copy %q", tt.Clipboard())
+	}
+	list.ScrollTo(0, ui.Start)
+	tt.Frame()
+	f, e := os.Create(filepath.Join(out, "selection-restored.png"))
+	if e != nil {
+		t.Fatal(e)
+	}
+	defer f.Close()
+	if e = png.Encode(f, tt.Image()); e != nil {
+		t.Fatal(e)
+	}
+}
+
+func TestNativeThinkingTimingAndStreamFollowDetach(t *testing.T) {
+	var state State
+	state.Session("thinking-fixture")
+	duration := 1500 * time.Millisecond
+	row := Row{ID: "thinking", Role: "assistant", Streaming: true, Steps: []Step{{ID: "step", Thinking: strings.Repeat("Explicit fixture reasoning line\n", 60), ThinkingDuration: &duration, Streaming: true}}}
+	tt := ui.NewTester(nativeView(func(c *ui.Context) { Turn(c, &state, row, nativeOptions()) }), 850, 900)
+	header, ok := tt.Find("Thinking for 1s")
+	if !ok {
+		t.Fatalf("measured header absent %v", tt.Texts())
+	}
+	if len(state.thoughtScrolls) != 1 {
+		t.Fatal("thought scroll not tracked")
+	}
+	var scroll *ui.ScrollState
+	for _, v := range state.thoughtScrolls {
+		scroll = v
+	}
+	if scroll.MaxY <= 0 || scroll.Y != scroll.MaxY {
+		t.Fatalf("stream did not follow end: %#v", scroll)
+	}
+	tt.Scroll(header.X+50, header.Y+header.H+40, 0, -100)
+	detached := scroll.Y
+	if detached >= scroll.MaxY {
+		t.Fatal("reader could not detach from stream")
+	}
+	row.Steps[0].Thinking += strings.Repeat("Appended explicit fixture line\n", 20)
+	tt.Frame()
+	if scroll.Y != detached || scroll.Y >= scroll.MaxY {
+		t.Fatal("stream stole reader's detached position")
+	}
+	tt.Scroll(header.X+50, header.Y+header.H+40, 0, 100000)
+	row.Steps[0].Thinking += "Newest fixture line"
+	tt.Frame()
+	if scroll.Y != scroll.MaxY {
+		t.Fatal("reaching bottom did not resume following")
+	}
+	click(t, tt, "Thinking for 1s")
+	click(t, tt, "Thinking for 1s")
+	if scroll.Y != scroll.MaxY {
+		t.Fatal("reopened live thought lost follow state")
+	}
+	state.Session("different")
+	if len(state.thoughtScrolls) != 0 {
+		t.Fatal("thought scroll leaked across sessions")
+	}
+}

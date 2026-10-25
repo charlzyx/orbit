@@ -48,7 +48,7 @@ deployment is authorized or performed as part of this work-in-progress branch.
 
 Current verification uses the [source-first checklist](docs/mygo-migration/acceptance-checklist.md): source-specific procedures and unexpanded draft gates are distinct, and functional, native-OS and visual results are separate. The [intentional deviations](docs/mygo-migration/intentional-deviations.md) retain drafts on save failure and avoid false runtime/discard claims instead of reproducing unsafe source defects.
 
-The required composer caret/undo compatibility addition is hash-pinned and attributed. Canonical `scripts/go-native.sh` commands verify the original module, copy it temporarily, and apply an explicit source overlay. The app rejects an unpatched build at startup. No Rust executable or runtime sidecar is part of the new application.
+The required composer caret/undo and opt-in retained transcript-selection compatibility additions are hash-pinned and attributed. Canonical `scripts/go-native.sh` commands verify the original module, copy it temporarily, and apply explicit source overlays. The app rejects a build missing either required capability at startup. Default toolkit selection remains unchanged outside the opted-in transcript scope. No Rust executable or runtime sidecar is part of the new application.
 
 ### D1 — Transport: pi CLI RPC over stdio (replaces the Node daemon + SSE)
 **Choice:** spawn `pi --mode rpc` as a child process per open session; JSONL commands on stdin,

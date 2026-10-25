@@ -2,6 +2,7 @@ package orbitui
 
 import (
 	"github.com/egoist/mygo/ui"
+	"math"
 	"strings"
 	"testing"
 )
@@ -44,6 +45,7 @@ func TestSettingsSourceHeaderAndGeneralRows(t *testing.T) {
 	if r.X != 399 || r.Y != 20 {
 		t.Fatalf("source fixed header position: %+v", r)
 	}
+
 	text := strings.Join(tt.Texts(), "\n")
 	for _, key := range []string{"settings.general_description", "settings.sessions_live_in_pi_s_own_store_on_this_computer", "settings.new_tasks_start_in_this_directory", "settings.notifications_description"} {
 		if !strings.Contains(text, a.Tr(key)) {
@@ -66,5 +68,22 @@ func TestSettingsSourceHeaderAndGeneralRows(t *testing.T) {
 	tt.Key(0, ui.KeySpace)
 	if a.Options.Store.Notifications().Sound != before {
 		t.Fatal("focused switch did not toggle back by keyboard")
+	}
+}
+
+func TestGeneralMeasuredSourceCardGeometry(t *testing.T) {
+	a := fixture(t)
+	a.Model.Workspace = "/tmp/orbit-visual-fixture/workspace"
+	a.Navigate("settings")
+	tt := ui.NewTester(a.View, 1470, 922)
+	tt.Frame()
+	for _, entry := range []struct {
+		key       string
+		y, bottom float32
+	}{{"settings.this_machine", 121, 377}, {"settings.notifications", 443, 654}} {
+		r, ok := tt.Find("Settings group " + a.Tr(entry.key))
+		if !ok || math.Abs(float64(r.Y-entry.y)) > 1 || math.Abs(float64(r.Y+r.H-entry.bottom)) > 1 {
+			t.Fatal("measured source card bounds", entry, r)
+		}
 	}
 }

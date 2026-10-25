@@ -13,6 +13,7 @@ import (
 	orbitassets "github.com/charlzyx/orbit"
 	"github.com/charlzyx/orbit/internal/agent"
 	"github.com/charlzyx/orbit/internal/composerui"
+	"github.com/charlzyx/orbit/internal/modelui"
 	"github.com/charlzyx/orbit/internal/native"
 	"github.com/charlzyx/orbit/internal/preferences"
 	orbiterm "github.com/charlzyx/orbit/internal/terminal"
@@ -58,6 +59,8 @@ type Usage struct {
 	ContextTokens, ContextWindow                     int64
 }
 type Snapshot struct {
+	ModelCatalog                                                                                            []agent.ModelChoice
+	CurrentModel                                                                                            agent.ModelChoice
 	LatestTurn                                                                                              int
 	RawMessages                                                                                             []agent.Message
 	AutoCompactionKnown                                                                                     bool
@@ -85,6 +88,8 @@ type Action struct {
 	Data                   map[string]any
 }
 type Options struct {
+	RefreshModels         func() error
+	QueryModelCatalog     func()
 	BeginRuntimeOperation func() (func(), error)
 	Version               string
 	Custom                *orbiterm.CustomPanel
@@ -118,6 +123,9 @@ type Notice struct {
 	Until time.Time
 }
 type App struct {
+	Models                                                          *modelui.State
+	modelDismissedAt                                                time.Time
+	workspacePicker                                                 workspacePickerState
 	transcriptHover                                                 string
 	transcriptUI                                                    transcriptui.State
 	autocomplete                                                    composerui.Controller
@@ -242,6 +250,7 @@ func New(o Options) *App {
 	a.md.OnLink = func(s string) { a.Dispatch(Action{Kind: "OpenLink", Value: s}) }
 	a.loadUsagePrefs()
 	a.initBackground()
+	a.initModels()
 	return a
 }
 func (a *App) reloadLocale() {
@@ -281,6 +290,7 @@ func (a *App) SetSnapshot(s Snapshot) {
 		}
 	}
 	a.Model = s
+	a.syncModelCatalog()
 	if a.reviewState.source == workspace.ReviewLastTurn {
 		if s.LatestTurn == 0 {
 			a.reviewState.source = workspace.ReviewUncommitted
@@ -325,6 +335,12 @@ func (a *App) save(err error) {
 	}
 }
 func (a *App) Navigate(page string) {
+	a.workspaceOpen = false
+	if a.Models != nil {
+		a.Models.Escape()
+	}
+	a.modelOpen = false
+	a.thinkingOpen = false
 	a.flushFilesOnLeave(page)
 	a.previousPage = a.page
 	a.page = page
@@ -394,8 +410,11 @@ drained:
 			return
 		}
 		if a.SidebarVisible {
-			if ui.Split(c, &a.SidebarWidth, func() { a.sidebar(c) }, func() { a.main(c) }).Fill().Changed() {
-				a.SidebarWidth = max(SidebarMinWidth, a.SidebarWidth)
+			// Rust's persisted sidebar width includes its right border. MyGo
+			// Split adds a separate1DIP divider, so only its content pane is W-1.
+			paneWidth := a.SidebarWidth - 1
+			if ui.Split(c, &paneWidth, func() { a.sidebar(c) }, func() { a.main(c) }).Fill().Changed() {
+				a.SidebarWidth = max(SidebarMinWidth, paneWidth+1)
 				a.Layout.SidebarWidth = float64(a.SidebarWidth)
 				a.save(a.Options.Store.SaveLayout(a.Layout))
 			}
@@ -424,7 +443,7 @@ drained:
 	if a.paletteOpen {
 		a.commandPalette(c)
 	}
-	if a.modelOpen {
+	if a.modelOpen && a.Models == nil {
 		a.modelPicker(c)
 	}
 	if a.Model.Dialog != nil {
@@ -480,8 +499,8 @@ func (a *App) line(c *ui.Context) {
 }
 func (a *App) sidebar(c *ui.Context) {
 	t := a.Theme
-	ui.Column(c.Key("sessions-sidebar")).Fill().MinWidth(SidebarMinWidth).Background(t.Surface).Children(func() {
-		ui.Row(c).DragWindow().Height(HeaderHeight).PaddingX(12).AlignItems(ui.Center).Children(func() {
+	ui.Column(c.Key("sessions-sidebar")).Fill().Width(a.SidebarWidth).Shrink(0).MinWidth(SidebarMinWidth).LineHeight(sourceDefaultLineHeight).Background(t.Surface).Children(func() {
+		ui.Row(c).DragWindow().Height(HeaderHeight).PaddingX(12).Gap(8).AlignItems(ui.Center).Children(func() {
 			ui.Spacer(c)
 			if a.iconButton(c, "Toggle sidebar", "icons/layout-left.svg").Clicked() {
 				a.SidebarVisible = false
@@ -493,37 +512,49 @@ func (a *App) sidebar(c *ui.Context) {
 				a.goHistory(1)
 			}
 		})
-		ui.Column(c).Height(38).Center().Children(func() {
+		ui.Column(c).Padding(2, 12, 12).AlignSelf(ui.Stretch).Center().Children(func() {
 			logo := "logo.png"
 			if !t.Dark {
 				logo = "logo-dark.png"
 			}
 			if im := logos[logo]; im != nil {
-				ui.Image(c, im).Width(104).Height(25)
+				w, h := im.Size()
+				ui.Image(c, im).Width(76).Height(76 * float32(h) / float32(w)).Label("Sidebar wordmark")
 			} else {
-				ui.Text(c, "ORBIT PI").Bold().FontSize(t.Px(21))
+				ui.Text(c, "ORBIT PI").Bold().FontSize(t.Px(16))
 			}
 		})
-		ui.Column(c).Padding(t.Space(12)).Gap(t.Space(8)).Children(func() {
-			b := a.button(c, a.text("sidebar.new_session", "New Task"), "icons/compose.svg", false).Height(t.Px(34)).AlignSelf(ui.Stretch).Background(t.Elevated).Border(1, t.Border)
+		ui.Column(c).Padding(4, 12, 8).AlignSelf(ui.Stretch).Children(func() {
+			b := ui.ButtonBase(c.Key("sidebar-new-task")).Justify(ui.Start).AlignItems(ui.Center).Height(t.Px(32)).AlignSelf(ui.Stretch).PaddingX(t.Space(8)).Gap(t.Space(4)).Radius(t.Px(8)).Background(t.Elevated).Border(1, t.Border).Label(a.text("sidebar.new_session", "New Task"))
+			b.Children(func() {
+				a.icon(c, "icons/task-add-01.svg", t.Px(16), t.AccentText)
+				ui.Text(c, a.text("sidebar.new_session", "New Task")).Grow(1).MinWidth(0).MaxLines(1).FontWeight(500).LineHeight(1)
+				ui.Text(c, shortcutLabel("secondary-n")).FontSize(t.Px(12)).LineHeight(1).TextColor(t.TextMuted)
+			})
+			if b.Hovered() {
+				b.Background(t.Hover)
+			}
 			if b.Clicked() {
 				a.command("NewSession", "")
 			}
-			ui.Row(c).AlignItems(ui.Center).Children(func() {
-				ui.Text(c, a.text("sidebar.projects", "Projects")).FontSize(t.Px(12)).TextColor(t.TextMuted)
-				ui.Spacer(c)
-				a.iconButton(c, "Project options", "icons/more.svg").Menu(func(m *ui.Menu) {
-					a.workspaceMenu(m)
-					if m.Item("Refresh sessions").Chosen() {
-						a.Dispatch(Action{Kind: "RefreshSessions"})
-					}
-					if m.Item("Browse workspace…").Chosen() {
-						a.Dispatch(Action{Kind: "BrowseWorkspace"})
-					}
-					if m.Item("Worktrees").Chosen() {
-						a.Navigate("worktrees")
-					}
-				})
+		})
+		ui.Row(c).AlignSelf(ui.Stretch).Padding(0, 14, 2).AlignItems(ui.Center).Children(func() {
+			label := a.text("sidebar.projects", "Projects")
+			if a.Workspaces.GroupBy == "one_list" {
+				label = a.text("sidebar.all_sessions", "All sessions")
+			}
+			ui.Text(c, label).Grow(1).MinWidth(0).FontSize(t.Px(12)).FontWeight(500).TextColor(t.TextMuted)
+			a.iconButton(c, "Project options", "icons/sort.svg").Size(t.Px(18), t.Px(18)).Menu(func(m *ui.Menu) {
+				a.workspaceMenu(m)
+				if m.Item("Refresh sessions").Chosen() {
+					a.Dispatch(Action{Kind: "RefreshSessions"})
+				}
+				if m.Item("Browse workspace…").Chosen() {
+					a.Dispatch(Action{Kind: "BrowseWorkspace"})
+				}
+				if m.Item("Worktrees").Chosen() {
+					a.Navigate("worktrees")
+				}
 			})
 		})
 		rows := a.sidebarRows()
@@ -768,11 +799,12 @@ func (a *App) main(c *ui.Context) {
 }
 func (a *App) header(c *ui.Context) {
 	t := a.Theme
-	left := t.Space(16)
+	// Pinned view.rs main_top_bar uses a fixed20px leading inset.
+	left := float32(20)
 	if !a.SidebarVisible {
 		left = max(left, c.TitleBar().Left)
 	}
-	ui.Row(c.Key("header")).DragWindow().Height(HeaderHeight).Padding(0, max(t.Space(16), c.TitleBar().Right), 0, left).AlignItems(ui.Center).Gap(t.Space(6)).Children(func() {
+	ui.Row(c.Key("header")).DragWindow().Height(HeaderHeight).Padding(0, max(float32(12), c.TitleBar().Right), 0, left).AlignItems(ui.Center).Gap(8).Children(func() {
 		if !a.SidebarVisible {
 			if a.iconButton(c, "Show sidebar", "icons/layout-left.svg").Clicked() {
 				a.SidebarVisible = true
@@ -787,7 +819,7 @@ func (a *App) header(c *ui.Context) {
 		if a.page != "chat" {
 			title = strings.ToUpper(a.page[:1]) + a.page[1:]
 		} else if title == "" {
-			title = a.text("view.new_task", "New task")
+			title = a.text("settings.new_task", "New task")
 		}
 		ui.Text(c, title).TextColor(t.TextSecondary).MaxLines(1).Grow(1)
 		if a.Model.Running {
@@ -800,24 +832,24 @@ func (a *App) header(c *ui.Context) {
 				a.Dispatch(Action{Kind: "OpenInApp", Value: preferred.ID})
 			}
 		}
-		a.iconButton(c, "Open in…", "icons/external-link.svg").Menu(func(m *ui.Menu) {
-			for _, app := range a.OpenApps {
-				if m.Item(app.Label).Chosen() {
-					a.Dispatch(Action{Kind: "OpenInApp", Value: app.ID})
+		if len(a.OpenApps) > 0 {
+			a.iconButton(c, "Open in…", "icons/external-link.svg").Menu(func(m *ui.Menu) {
+				for _, app := range a.OpenApps {
+					if m.Item(app.Label).Chosen() {
+						a.Dispatch(Action{Kind: "OpenInApp", Value: app.ID})
+					}
 				}
-			}
-			for _, entry := range []struct{ label, kind string }{{"File manager", "RevealWorkspace"}, {"Terminal", "ToggleTerminal"}, {"Files", "OpenFiles"}, {"Git", "OpenGit"}} {
-				if m.Item(entry.label).Chosen() {
-					a.command(entry.kind, "")
+				for _, entry := range []struct{ label, kind string }{{"File manager", "RevealWorkspace"}, {"Terminal", "ToggleTerminal"}, {"Files", "OpenFiles"}, {"Git", "OpenGit"}} {
+					if m.Item(entry.label).Chosen() {
+						a.command(entry.kind, "")
+					}
 				}
-			}
-		})
-		if a.iconButton(c, "Project files", "icons/panel-right.svg").Clicked() {
-			a.ExplorerVisible = !a.ExplorerVisible
-			a.ReviewVisible = false
-			a.Dispatch(Action{Kind: "RefreshFiles"})
+			})
 		}
-		a.iconButton(c, "More actions", "icons/more.svg").Menu(func(m *ui.Menu) {
+		if a.iconButton(c, "Review changes", "icons/panel-right.svg").Background(t.Elevated).Border(1, t.Border).Radius(t.Px(8)).Clicked() {
+			a.command("ReviewChanges", "")
+		}
+		a.iconButton(c, "More actions", "icons/more.svg").Background(t.Elevated).Border(1, t.Border).Radius(t.Px(8)).Menu(func(m *ui.Menu) {
 			for _, entry := range []struct{ label, kind string }{{"Rename task…", "RenameSession"}, {"Review changes", "ReviewChanges"}, {"Git", "OpenGit"}, {"Worktrees", "OpenWorktrees"}, {"Usage", "ToggleUsage"}, {"Settings", "OpenSettings"}, {"Export session…", "ExportSession"}} {
 				if m.Item(entry.label).Chosen() {
 					a.command(entry.kind, "")
@@ -828,8 +860,13 @@ func (a *App) header(c *ui.Context) {
 }
 func (a *App) newTask(c *ui.Context) {
 	t := a.Theme
-	ui.Column(c.Key("new-task")).Grow(1).MinHeight(0).Center().Padding(24, 24, 88).Children(func() {
-		ui.Column(c).Width(400).MaxWidth(500).Gap(t.Space(20)).AlignItems(ui.Center).Children(func() {
+	ui.Column(c.Key("new-task")).Grow(1).MinHeight(0).Center().Padding(0, 24, 88).LineHeight(sourceDefaultLineHeight).Children(func() {
+		width, _ := c.Size()
+		if a.SidebarVisible {
+			width -= a.SidebarWidth
+		}
+		fieldWidth := workspaceFieldWidth(width)
+		ui.Column(c).Width(fieldWidth).Gap(t.Space(20)).AlignItems(ui.Center).Children(func() {
 			ui.Column(c).Size(56, 56).Center().Radius(28).Background(t.Elevated).Border(1, t.Border).Children(func() { a.icon(c, "icons/start-up.svg", 24, t.TextSecondary) })
 			ui.Column(c).Gap(t.Space(6)).AlignItems(ui.Center).Children(func() {
 				ui.Text(c, a.text("view.start_a_task", "Start a task")).FontSize(t.Px(20)).FontWeight(500)
@@ -837,10 +874,10 @@ func (a *App) newTask(c *ui.Context) {
 			})
 			ui.Column(c).AlignSelf(ui.Stretch).Gap(t.Space(6)).Children(func() {
 				ui.Text(c, a.text("view.workspace", "Workspace")).FontSize(t.Px(10)).TextColor(t.TextMuted)
-				b := ui.ButtonBase(c).AlignSelf(ui.Stretch).Padding(7, 8).Gap(10).Radius(t.Px(8)).Background(t.Elevated).Border(1, t.Border).Label("Choose workspace")
+				b := ui.ButtonBase(c).AlignSelf(ui.Stretch).Padding(7, 10, 7, t.Space(8)).Gap(10).Radius(t.Px(8)).Background(t.Elevated).Border(1, t.Border).Label("Choose workspace")
 				b.Children(func() {
-					a.icon(c, "icons/folder.svg", 20, t.TextSecondary)
-					ui.Column(c).Grow(1).MinWidth(0).Gap(2).Children(func() {
+					ui.Box(c).Size(28, 28).Radius(t.Px(8)).Background(t.Text.Alpha(.05)).Center().Children(func() { a.icon(c, "icons/folder.svg", t.Px(14), t.TextSecondary) })
+					ui.Column(c).Grow(1).MinWidth(0).Gap(1).Children(func() {
 						name := filepath.Base(a.Model.Workspace)
 						if a.Model.Workspace == "" {
 							name = "Choose a folder"
@@ -851,8 +888,12 @@ func (a *App) newTask(c *ui.Context) {
 					a.icon(c, "icons/chevron-down.svg", 14, t.TextMuted)
 				})
 				if b.Clicked() {
-					a.Dispatch(Action{Kind: "BrowseWorkspace"})
+					a.toggleWorkspacePicker(c.Now())
 				}
+				if a.workspaceOpen {
+					b.BorderColor(t.Accent.Alpha(.55))
+				}
+				a.workspacePickerPopup(c, b, fieldWidth)
 			})
 		})
 	})

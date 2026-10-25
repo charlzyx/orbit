@@ -25,7 +25,9 @@ func TestNativeBackdropBoundsAndFeatureVisibility(t *testing.T) {
 		t.Fatal("empty task backdrop missing")
 	}
 	r := node
-	if r.X != a.SidebarWidth+1 || r.Y != HeaderHeight || r.W != 1470-a.SidebarWidth-1 || r.H != 922-HeaderHeight {
+	// The source's saved sidebar width includes its overlaid right border.
+	// A separate split-divider pixel must not shift the procedural field.
+	if r.X != a.SidebarWidth || r.Y != HeaderHeight || r.W != 1470-a.SidebarWidth || r.H != 922-HeaderHeight {
 		t.Fatalf("backdrop escaped main below-header bounds: %+v", r)
 	}
 	a.Navigate("settings")
@@ -105,7 +107,8 @@ func TestBackdropPaintsBehindOpaqueComposer(t *testing.T) {
 		t.Fatal("composer missing")
 	}
 	pixels := tt.Image()
-	want := a.Theme.Surface
+	// Source composer-box uses surface_secondary, not sidebar surface.
+	want := a.Theme.SurfaceSecondary
 	for y := int(r.Y + 5); y < int(r.Y+20); y++ {
 		for x := int(r.X + r.W - 100); x < int(r.X+r.W-20); x++ {
 			red, green, blue, alpha := pixels.At(x, y).RGBA()

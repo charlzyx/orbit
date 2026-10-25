@@ -100,10 +100,14 @@ func (a *App) settings(c *ui.Context) {
 			ui.Column(c).AlignSelf(ui.Stretch).Padding(t.Space(20), t.Space(24), t.Space(12)).Gap(t.Space(4)).Children(func() {
 				for _, cat := range settingsCategories {
 					if cat.ID == a.settingsPage {
-						ui.Text(c, a.settingsTitle(cat.ID, cat.Title)).Label("Settings page title").FontSize(t.Px(16)).LineHeight(1.3).FontWeight(500)
-						ui.Text(c, a.settingsDescription(cat.ID, cat.Description)).FontSize(t.Px(12)).TextColor(t.TextMuted)
+						ui.Text(c, a.settingsTitle(cat.ID, cat.Title)).Label("Settings page title").FontSize(t.Px(16)).LineHeight(1.3).Height(sourceTextHeight(t.Px(16), 1.3)).FontWeight(500)
+						ui.Text(c, a.settingsDescription(cat.ID, cat.Description)).FontSize(t.Px(12)).Height(sourceTextHeight(t.Px(12), sourceDefaultLineHeight)).TextColor(t.TextMuted)
 						break
 					}
+				}
+				if a.settingsPage == "models" && a.Models != nil {
+					ui.Box(c).Height(a.Theme.Space(8))
+					a.Models.Toolbar(c)
 				}
 			})
 			ui.Box(c).AlignSelf(ui.Stretch).Height(1).MarginX(t.Space(24)).Background(t.Border)
@@ -284,39 +288,14 @@ func (a *App) shortcutsSettings(c *ui.Context) {
 }
 func (a *App) agentSettings(c *ui.Context) {
 	a.section(c, "New sessions", func() {
-		d := a.sessionDefaultPrefs
-		label := d.ModelID
-		if label == "" {
-			label = "Use pi default"
-		}
-		a.setting(c, "Default model", "Applies only to new sessions; existing sessions keep their model.", func() {
-			ui.MenuButton(c, label, func(m *ui.Menu) {
-				if m.Item("Use pi default").Chosen() {
-					a.sessionDefaultPrefs = preferences.SessionDefault{}
-					a.save(a.Options.Store.SaveSessionDefault(a.sessionDefaultPrefs))
-				}
-				for _, model := range a.Model.Models {
-					if m.Item(model.Provider + " / " + model.ID).Chosen() {
-						d.Provider = model.Provider
-						d.ModelID = model.ID
-						a.sessionDefaultPrefs = d
-						a.save(a.Options.Store.SaveSessionDefault(d))
-					}
-				}
-			})
-		})
-		a.selectSetting(c, "Default thinking", "Applied when a new session begins.", d.Thinking, a.Model.ThinkingLevels, func(v string) {
-			d.Thinking = v
-			a.sessionDefaultPrefs = d
-			a.save(a.Options.Store.SaveSessionDefault(d))
-		})
+		a.setting(c, "Default model", "Applies only to new sessions; existing sessions keep their model.", func() { a.Models.DefaultModelControl(c) })
+		a.setting(c, "Default thinking", "Applied when a new session begins.", func() { a.Models.DefaultThinkingControl(c) })
 		a.selectSetting(c, "Send while running", "Enter queues a follow-up or steers the running agent.", a.Prefs.ComposerSendMode, []string{"follow_up", "steer"}, func(v string) { a.Prefs.ComposerSendMode = v; a.save(a.Options.Store.SaveUI(a.Prefs)) })
 		title := a.autoTitlePrefs
 		a.setting(c, "Automatic task titles", "Generate task titles using the bundled pi extension.", func() {
 			if ui.Switch(c, &title.Enabled).Label("Automatic task titles").Changed() {
 				a.autoTitlePrefs = title
 				a.save(a.Options.Store.SaveAutoTitle(title))
-				a.Dispatch(Action{Kind: "AutoTitleChanged"})
 			}
 		})
 	})
@@ -330,27 +309,8 @@ func (a *App) agentSettings(c *ui.Context) {
 	})
 }
 func (a *App) modelsSettings(c *ui.Context) {
-	ui.Row(c).Gap(8).Children(func() {
-		ui.TextInput(c, &a.modelQuery).Placeholder("Filter models…").Label("Filter models").Grow(1)
-		if a.button(c, "Refresh", "icons/refresh.svg", false).Clicked() {
-			a.Dispatch(Action{Kind: "RefreshModels"})
-		}
-	})
-	for _, m := range a.Model.Models {
-		if a.modelQuery != "" && !strings.Contains(strings.ToLower(m.Provider+" "+m.ID+" "+m.Name), strings.ToLower(a.modelQuery)) {
-			continue
-		}
-		m := m
-		a.section(c, m.Provider, func() {
-			a.setting(c, m.Name, m.ID, func() {
-				if a.button(c, "Select", "", m.ID == a.Model.ModelID).Clicked() {
-					a.Dispatch(Action{Kind: "SetModel", Value: m.ID, Data: map[string]any{"provider": m.Provider}})
-				}
-			})
-		})
-	}
-	if len(a.Model.Models) == 0 {
-		ui.Text(c, "No models have been reported by pi.").TextColor(a.Theme.TextMuted)
+	if a.Models != nil {
+		a.Models.View(c)
 	}
 }
 func (a *App) privacySettings(c *ui.Context) {

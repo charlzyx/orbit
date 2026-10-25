@@ -1,0 +1,222 @@
+// Orbit's opt-in text selection snapshot compatibility for MyGo 9c69cf829ece.
+// Original MyGo is MIT licensed; see LICENSE. This addition does not retain UI
+// nodes or change default Selectable semantics. See README.md for attribution.
+package ui
+
+import (
+	"strings"
+	"unicode/utf8"
+)
+
+type retainedTextScope struct {
+	identity string
+	frame    uint64
+	pass     int
+}
+
+// RetainTextSelection preserves an immutable snapshot of the currently mounted
+// paragraphs when a selection starts, so virtual-list unmount does not erase
+// Copy or highlights when those paragraphs return. It is opt-in on a Selectable
+// container. Call every frame with a stable session/document identity; changing
+// identity, removing/disabling the scope, or clicking outside clears it. Drag
+// extension is limited to the initial snapshot, not newly mounted paragraphs.
+// Snapshot text is never updated by a later edit, and no row/layout is retained.
+func (e Element) RetainTextSelection(identity string) Element {
+	n := e.node()
+	if n == nil || n.kind != kindBox {
+		return e
+	}
+	n.Selectable()
+	rt, s := n.c.rt, n.st
+	if s.retainedText == nil || s.retainedText.identity != identity {
+		if rt.selection.scope == s.id {
+			rt.selection = textSelection{}
+		}
+		s.retainedText = &retainedTextScope{identity: identity}
+	}
+	s.retainedText.frame, s.retainedText.pass = rt.frame, rt.pass
+	return e
+}
+
+func (rt *engine) retainsTextSelection(scope uint64) bool {
+	s := rt.states[scope]
+	if s == nil || s.seen != rt.frame || s.pass != rt.pass || s.retainedText == nil || s.retainedText.frame != rt.frame || s.retainedText.pass != rt.pass || s.flags&flagUnselectable != 0 {
+		return false
+	}
+	for p := s; p != nil; p = rt.states[p.parent] {
+		if p.flags&(flagDisabled|flagInvisible|flagInert) != 0 {
+			return false
+		}
+	}
+	return true
+}
+
+func (rt *engine) captureRetainedTextSelection() {
+	if rt.selection.blocks != nil || !rt.retainsTextSelection(rt.selection.scope) {
+		return
+	}
+	for _, s := range rt.texts {
+		if s.textScope == rt.selection.scope && s.editor != nil {
+			rt.selection.blocks = append(rt.selection.blocks, SelectedText{ID: s.id, Text: s.editor.source})
+		}
+	}
+}
+
+func (rt *engine) retainedSelectedTexts() []SelectedText {
+	a, b, selected := rt.textSelectionBounds()
+	if !selected {
+		return nil
+	}
+	first, last := rt.textPointIndex(a), rt.textPointIndex(b)
+	parts := make([]SelectedText, 0, last-first+1)
+	for i := first; i <= last; i++ {
+		part := rt.selection.blocks[i]
+		part.Start, part.End = 0, utf8.RuneCountInString(part.Text)
+		if i == first {
+			part.Start = min(a.at, part.End)
+		}
+		if i == last {
+			part.End = min(b.at, part.End)
+		}
+		parts = append(parts, part)
+	}
+	return parts
+}
+
+func (rt *engine) copyRetainedTextSelection() bool {
+	parts := rt.retainedSelectedTexts()
+	nonempty := false
+	for _, p := range parts {
+		nonempty = nonempty || p.Start < p.End
+	}
+	if !nonempty {
+		return false
+	}
+	if scope := rt.states[rt.selection.scope]; scope != nil && scope.copyData != nil {
+		rt.host.writeClipboardData(scope.copyData(parts))
+		return true
+	}
+	var text []string
+	for _, p := range parts {
+		if p.Start < p.End {
+			text = append(text, string([]rune(p.Text)[p.Start:p.End]))
+		}
+	}
+	if len(text) > 0 {
+		rt.host.writeClipboard(strings.Join(text, "\n"))
+	}
+	return len(text) > 0
+}
+
+func (rt *engine) syncRetainedTextSelection() {
+	if !rt.retainsTextSelection(rt.selection.scope) {
+		rt.selection = textSelection{}
+		return
+	}
+	scope := rt.states[rt.selection.scope]
+	if !rt.selection.dragging {
+		if focused := rt.states[rt.focused]; focused != nil && focused.textScope == scope.id {
+			rt.focused = scope.id
+		}
+	}
+	// A virtualized endpoint's state can be recycled. Move only the focus/capture
+	// to its owning scope before pruning, never retain the endpoint state itself.
+	if focused := rt.states[rt.focused]; rt.focused == rt.selection.anchor.id || rt.focused == rt.selection.caret.id {
+		if focused == nil || focused.seen != rt.frame || focused.pass != rt.pass {
+			rt.focused = scope.id
+		}
+	}
+	if rt.selection.dragging && rt.pressed != nil && (rt.pressed.seen != rt.frame || rt.pressed.pass != rt.pass) {
+		rt.pressed = scope
+		scope.pressed = true
+	}
+	if rt.selection.dragging && rt.pressed != nil {
+		rt.moveTextSelection(rt.pointerX, rt.pointerY)
+	}
+	a, b, selected := rt.textSelectionBounds()
+	if !selected {
+		return
+	}
+	first, last := rt.textPointIndex(a), rt.textPointIndex(b)
+	for _, s := range rt.texts {
+		if s.textScope != rt.selection.scope || s.editor == nil {
+			continue
+		}
+		i := rt.textPointIndex(textPoint{id: s.id})
+		if i < first || i > last {
+			continue
+		}
+		from, to := 0, s.editor.buf.n
+		if i == first {
+			from = min(rt.currentRetainedOffset(s, a), to)
+		}
+		if i == last {
+			to = min(rt.currentRetainedOffset(s, b), to)
+		}
+		s.editor.anchor, s.editor.caret = from, to
+	}
+}
+
+// The retained scope follows Orbit's block-boundary gutter hit test, not the
+// default nearest-glyph Euclidean test. Layout is always current, never cloned.
+func (rt *engine) retainedTextSelectionAt(scope uint64, x, y float32) textPoint {
+	var nearest *state
+	distance := inf
+	for _, s := range rt.texts {
+		if s.textScope != scope || s.vw <= 0 || s.vh <= 0 || !s.editor.laidOut() {
+			continue
+		}
+		r := intersect(transformRect(s.world, Rect{s.x, s.y, s.w, s.h}), Rect{s.vx, s.vy, s.vw, s.vh})
+		if r.W <= 0 || r.H <= 0 {
+			continue
+		}
+		dx, dy := max(r.X-x, x-r.X-r.W, 0), max(r.Y-y, y-r.Y-r.H, 0)
+		if d := dx + dy; nearest == nil || d < distance {
+			nearest, distance = s, d
+		}
+	}
+	if nearest == nil {
+		return textPoint{}
+	}
+	return textHit(nearest, x, y)
+}
+
+// Retained offsets follow the source snapshot's UTF-8 byte boundaries, while
+// MyGo editors use runes. Convert through byte boundaries after live rewrites.
+func selectionByteAtRune(text string, offset int) int {
+	if offset <= 0 {
+		return 0
+	}
+	for i := range text {
+		if offset == 0 {
+			return i
+		}
+		offset--
+	}
+	return len(text)
+}
+func selectionRuneAtByte(text string, offset int) int {
+	offset = max(0, min(offset, len(text)))
+	for offset > 0 && offset < len(text) && !utf8.RuneStart(text[offset]) {
+		offset--
+	}
+	return utf8.RuneCountInString(text[:offset])
+}
+func (rt *engine) snapshotTextPoint(p textPoint) textPoint {
+	if rt.selection.blocks == nil {
+		return p
+	}
+	i := rt.textPointIndex(p)
+	s := rt.states[p.id]
+	if i >= 0 && s != nil && s.editor != nil {
+		p.at = selectionRuneAtByte(rt.selection.blocks[i].Text, selectionByteAtRune(s.editor.source, p.at))
+	}
+	return p
+}
+func (rt *engine) currentRetainedOffset(s *state, p textPoint) int {
+	i := rt.textPointIndex(p)
+	if i < 0 {
+		return 0
+	}
+	return selectionRuneAtByte(s.editor.source, selectionByteAtRune(rt.selection.blocks[i].Text, p.at))
+}

@@ -136,7 +136,7 @@ func usageInsights(p usageProjection, all bool) []usageInsight {
 		if point.Tokens.Total > 0 {
 			nonzero++
 			mean += float64(point.Tokens.Total)
-			if point.Tokens.Total > peak.Tokens.Total {
+			if point.Tokens.Total >= peak.Tokens.Total {
 				peak = point
 			}
 		}
@@ -144,7 +144,7 @@ func usageInsights(p usageProjection, all bool) []usageInsight {
 	if nonzero >= 5 {
 		mean /= float64(nonzero)
 		if float64(peak.Tokens.Total) >= mean*2 {
-			add("usage.insight_peak_bucket", fmt.Sprintf("%s is %.1f× the average bucket volume.", peak.At.Format("Jan 2"), float64(peak.Tokens.Total)/mean), "warning", "bucket", peak.At.Format("Jan 2"), "factor", fmt.Sprintf("%.1f", float64(peak.Tokens.Total)/mean), "metric", p.Granularity)
+			add("usage.insight_peak_bucket", fmt.Sprintf("%s is %.1f× the average bucket volume.", peak.At.Format("Jan 2"), float64(peak.Tokens.Total)/mean), "warning", "bucket", peak.At.Format("Jan 2"), "factor", fmt.Sprintf("%.1f", float64(peak.Tokens.Total)/mean), "metric", map[bool]string{true: "day", false: p.Granularity}[p.Granularity == "hour"])
 		}
 	}
 	if p.Summary.Errors > 0 {
@@ -185,59 +185,135 @@ func (a *App) usageSignals(c *ui.Context) {
 	})
 }
 func (a *App) usageLatencyLine(c *ui.Context, l usageLatency, label string) {
-	ui.Column(c).Gap(6).Children(func() {
-		ui.Text(c, label).FontWeight(500)
+	ui.Row(c.Key("usage-latency-readout:" + label)).Wrap().Gap(12).AlignItems(ui.Center).Children(func() {
+		ui.Text(c, label).NoWrap().FontWeight(500).FontSize(11).TextColor(a.Theme.TextMuted)
 		if l.Samples == 0 {
-			ui.Text(c, "Not measured").TextColor(a.Theme.TextMuted)
+			ui.Text(c, a.text("usage.unavailable", "Unavailable")).FontSize(11).TextColor(a.Theme.TextMuted)
 			return
 		}
 		avg, _ := l.value("average")
-		line := fmt.Sprintf("avg %.2fs · max %s", avg, l.Max.Round(time.Millisecond))
+		items := []struct{ label, value string }{{"avg", usageDuration(avg)}}
 		if l.Samples >= 20 {
-			line += fmt.Sprintf(" · p50 %s · p95 %s · p99 %s", l.P50.Round(time.Millisecond), l.P95.Round(time.Millisecond), l.P99.Round(time.Millisecond))
+			for _, item := range []struct {
+				label string
+				value time.Duration
+			}{{"p50", l.P50}, {"p95", l.P95}, {"p99", l.P99}} {
+				items = append(items, struct{ label, value string }{item.label, usageDuration(item.value.Seconds())})
+			}
 		}
-		ui.Text(c, line).Font(a.Fonts.CodeFamily)
-		ui.Text(c, usageLatencyHint(l.P95, l.Samples)).TextColor(a.Theme.TextMuted).FontSize(11)
+		items = append(items, struct{ label, value string }{"max", usageDuration(l.Max.Seconds())})
+		for _, item := range items {
+			ui.Row(c).Gap(4).Children(func() {
+				ui.Text(c, item.label).TextColor(a.Theme.TextMuted).FontSize(11)
+				ui.Text(c, item.value).Font(a.Fonts.CodeFamily).FontSize(11)
+			})
+		}
+		ui.Text(c, usageLatencyHint(l.P95, l.Samples)).TextColor(a.Theme.TextMuted).FontSize(10)
 	})
 }
 func (a *App) usageHealthDetails(c *ui.Context) {
-	s := &a.usageState
-	p := s.projection
-	a.usageCard(c, a.text("usage.cache_performance", "Cache performance"), "", func() {
-		rate, ok := usageCacheRate(p.Summary.Tokens)
-		if !ok {
-			ui.Text(c, a.text("usage.cache_unavailable_range", "Cache data unavailable: no cache tokens were reported in this range.")).TextColor(a.Theme.TextMuted)
-			return
+	p := a.usageState.projection
+	a.usageCard(c, a.text("usage.token_health", "Token health"), a.text("usage.composition_and_cache", "Composition and cache"), func() {
+		width, _ := c.Size()
+		if a.SidebarVisible {
+			width -= a.SidebarWidth
 		}
-		ui.Text(c, fmt.Sprintf("%.1f%% of prompt tokens served from cache", rate)).FontSize(20)
-		for _, item := range []struct{ label, value string }{{"Cache reads", compactCount(p.Summary.Tokens.CacheRead)}, {"Cache writes", compactCount(p.Summary.Tokens.CacheWrite)}, {"Uncached input", compactCount(p.Summary.Tokens.Input)}, {"Requests served from cache", fmt.Sprintf("%d of %d", p.CachedRequests, p.Summary.Requests)}} {
-			ui.Row(c).Children(func() { ui.Text(c, item.label).Grow(1); ui.Text(c, item.value).Font(a.Fonts.CodeFamily) })
-		}
-		ui.Text(c, "Hit rate = cache read / (input + cache read + cache write)").FontSize(11).TextColor(a.Theme.TextMuted)
-		if a.button(c, map[bool]string{true: "Show all requests", false: "Show cached only"}[s.filter.CachedOnly], "", false).Clicked() {
-			s.filter.CachedOnly = !s.filter.CachedOnly
-			if s.filter.CachedOnly {
-				s.filter.ErrorsOnly = false
+		width = min(width, 1180)
+		panel := func(title string, body func()) {
+			if width >= 820 {
+				ui.Column(c).Grow(1).MinWidth(0).Children(func() { a.usageWell(c, title, body) })
+			} else {
+				a.usageWell(c, title, body)
 			}
 		}
-		ui.Row(c).Height(50).Gap(2).Children(func() {
-			for _, point := range p.Series {
-				rate, ok := usageCacheRate(point.Tokens)
-				height := float32(3)
-				tip := point.At.Format("Jan 2 15:04") + " · no cache traffic"
-				if ok {
-					height = max(3, float32(rate)/100*50)
-					tip = fmt.Sprintf("%s · %.1f%% hit rate", point.At.Format("Jan 2 15:04"), rate)
+		panels := func() {
+			panel(a.text("usage.token_composition", "Token composition"), func() { a.usageComposition(c, p) })
+			panel(a.text("usage.cache_performance", "Cache performance"), func() { a.usageCacheBody(c, p) })
+		}
+		if width >= 820 {
+			ui.Row(c).AlignItems(ui.Start).Gap(16).Children(panels)
+		} else {
+			ui.Column(c).AlignSelf(ui.Stretch).Gap(16).Children(panels)
+		}
+		readable := 0
+		for _, point := range p.Series {
+			if point.Tokens.Input > 0 || point.Tokens.CacheRead > 0 {
+				readable++
+			}
+		}
+		if readable >= 2 {
+			a.usageWell(c, a.text("view.hit_rate_over_time", "Hit rate over time"), func() {
+				ui.Row(c).Height(56).Gap(2).Children(func() {
+					for _, point := range p.Series {
+						rate, ok := usageCacheRate(point.Tokens)
+						height := float32(3)
+						color := a.Theme.TextMuted.Alpha(.2)
+						tip := point.At.Format("Jan 2 15:04") + " · " + a.text("usage.unavailable", "Unavailable")
+						if ok {
+							height = max(3, float32(rate)/100*56)
+							color = a.Theme.Accent.Alpha(.65)
+							tip = point.At.Format("Jan 2 15:04") + " · " + usagePercent(rate)
+						}
+						ui.Box(c).Grow(1).Height(height).AlignSelf(ui.End).Background(color).Tooltip(tip)
+					}
+				})
+			})
+		}
+	})
+}
+func (a *App) usageWell(c *ui.Context, title string, body func()) {
+	ui.Column(c).MinWidth(0).AlignSelf(ui.Stretch).Padding(12).Gap(12).Background(a.Theme.Background).Radius(8).Children(func() {
+		ui.Text(c, title).FontSize(12).FontWeight(500)
+		body()
+	})
+}
+func (a *App) usageComposition(c *ui.Context, p usageProjection) {
+	total := p.Summary.Tokens.Total
+	for _, part := range []struct {
+		key, label string
+		value      uint64
+	}{{"input", "Input", p.Summary.Tokens.Input}, {"output", "Output", p.Summary.Tokens.Output}, {"cache_read", "Cache read", p.Summary.Tokens.CacheRead}, {"cache_write", "Cache write", p.Summary.Tokens.CacheWrite}} {
+		ui.Row(c).Gap(8).AlignItems(ui.Center).Children(func() {
+			ui.Text(c, a.text("usage.composition_"+part.key, part.label)).Width(80).FontSize(11)
+			ui.Box(c).Grow(1).Height(6).Radius(3).Background(a.Theme.Surface).Children(func() {
+				if total > 0 {
+					ui.Box(c).Height(6).WidthPercent(min(100, float32(part.value)*100/float32(total))).Radius(3).Background(a.Theme.Accent)
 				}
-				ui.Box(c).Grow(1).Height(height).AlignSelf(ui.End).Background(a.Theme.Accent.Alpha(.65)).Tooltip(tip)
-			}
+			})
+			ui.Text(c, compactCount(part.value)).Width(58).Font(a.Fonts.CodeFamily).FontSize(11).Tooltip(usageExact(part.value))
 		})
+	}
+	ui.Text(c, a.text("usage.composition_formula", "Total = input + output + cache read + cache write. Reasoning tokens are a subset of output.")).FontSize(10).TextColor(a.Theme.TextMuted)
+}
+func (a *App) usageCacheBody(c *ui.Context, p usageProjection) {
+	s := &a.usageState
+	rate, ok := usageCacheRate(p.Summary.Tokens)
+	if !ok {
+		ui.Text(c, a.text("usage.cache_unavailable_range", "Cache data unavailable: no cache tokens were reported in this range.")).FontSize(11).TextColor(a.Theme.TextMuted)
+		return
+	}
+	ui.Row(c).Wrap().Gap(8).AlignItems(ui.Center).Children(func() {
+		ui.Text(c, usagePercent(rate)).Font(a.Fonts.CodeFamily).FontSize(20)
+		ui.Text(c, a.text("view.of_prompt_tokens_served_from_cache", "of prompt tokens served from cache")).FontSize(11).TextColor(a.Theme.TextMuted)
 	})
-	a.usageCard(c, "Response time", "Only measured response and tool durations.", func() {
-		a.usageLatencyLine(c, p.Latency, "Model responses")
-		a.line(c)
-		a.usageLatencyLine(c, p.ToolLatency, "Tools")
-	})
+	ui.Box(c).AlignSelf(ui.Stretch).Height(6).Radius(3).Background(a.Theme.Surface).Children(func() { ui.Box(c).Height(6).WidthPercent(float32(rate)).Radius(3).Background(a.Theme.Accent) })
+	for _, item := range []struct{ key, label, value string }{{"cache_reads", "Cache reads", compactCount(p.Summary.Tokens.CacheRead)}, {"cache_writes", "Cache writes", compactCount(p.Summary.Tokens.CacheWrite)}, {"uncached_input", "Uncached input", compactCount(p.Summary.Tokens.Input)}, {"requests_served_from_cache", "Requests served from cache", fmt.Sprintf("%s of %s", usageCount(uint64(p.CachedRequests)), usageCount(uint64(p.Summary.Requests)))}} {
+		ui.Row(c).Gap(8).Children(func() {
+			ui.Text(c, a.text("usage."+item.key, item.label)).Grow(1).FontSize(11)
+			ui.Text(c, item.value).Font(a.Fonts.CodeFamily).FontSize(11)
+		})
+	}
+	ui.Text(c, a.text("usage.hit_rate_formula", "Hit rate = cache read / (input + cache read + cache write)")).FontSize(10).TextColor(a.Theme.TextMuted)
+	key, label := "usage.show_cached_only", "Show cached only"
+	if s.filter.CachedOnly {
+		key, label = "usage.show_all_requests", "Show all requests"
+	}
+	if a.button(c, a.text(key, label), "", false).Clicked() {
+		s.filter.CachedOnly = !s.filter.CachedOnly
+		if s.filter.CachedOnly {
+			s.filter.ErrorsOnly = false
+		}
+	}
 }
 
 func usageInsightTexts(insights []usageInsight) []string {
@@ -326,14 +402,18 @@ func (a *App) usageSummaryDetails(c *ui.Context, p usageProjection) {
 	s := p.Summary
 	cost := a.text("usage.unavailable", "Unavailable")
 	if s.PricedRequests > 0 {
-		cost = fmt.Sprintf("$%.4f · $%.4f / req", s.Cost, s.Cost/float64(s.PricedRequests))
+		cost = usageCost(s.Cost) + " · " + usageCost(s.Cost/float64(s.PricedRequests)) + " / req"
 	}
-	stats := []struct{ key, label, value string }{{"input_tokens", "Input tokens", compactCount(s.Tokens.Input)}, {"output_tokens", "Output tokens", compactCount(s.Tokens.Output)}, {"cost", "Cost", cost}, {"failed", "Failed", fmt.Sprint(s.Errors)}, {"sessions", "Sessions", fmt.Sprint(len(p.Sessions))}, {"turns", "Turns", fmt.Sprint(s.Turns)}, {"tool_calls", "Tool calls", fmt.Sprint(s.ToolRuns)}, {"bash_commands", "Bash commands", fmt.Sprint(s.BashRuns)}}
+	failed := a.text("usage.none", "None")
+	if s.Errors > 0 {
+		failed = usageExact(uint64(s.Errors))
+	}
+	stats := []struct{ key, label, value string }{{"input_tokens", "Input tokens", compactCount(s.Tokens.Input)}, {"output_tokens", "Output tokens", compactCount(s.Tokens.Output)}, {"cost", "Cost", cost}, {"failed", "Failed", failed}, {"sessions", "Sessions", fmt.Sprint(len(p.Sessions))}, {"turns", "Turns", fmt.Sprint(s.Turns)}, {"tool_calls", "Tool calls", fmt.Sprint(s.ToolRuns)}, {"bash_commands", "Bash commands", fmt.Sprint(s.BashRuns)}}
 	if p.ToolFailures > 0 {
 		stats = append(stats, struct{ key, label, value string }{"tool_failures", "Tool failures", fmt.Sprint(p.ToolFailures)})
 	}
 	if s.TimedRequests > 0 {
-		stats = append(stats, struct{ key, label, value string }{"generation_time", "Generation time", s.Duration.Round(time.Second).String()})
+		stats = append(stats, struct{ key, label, value string }{"generation_time", "Generation time", usageSpan(s.Duration)})
 	}
 	if s.Requests > 0 {
 		stats = append(stats, struct{ key, label, value string }{"avg_prompt", "Avg prompt", compactCount(usageAdd(usageAdd(s.Tokens.Input, s.Tokens.CacheRead), s.Tokens.CacheWrite) / uint64(s.Requests))})
@@ -347,7 +427,7 @@ func (a *App) usageSummaryDetails(c *ui.Context, p usageProjection) {
 		stats = append(stats, struct{ key, label, value string }{"output_input", "Output / input", text})
 	}
 	if s.Tokens.Total > 0 && s.PricedRequests > 0 {
-		stats = append(stats, struct{ key, label, value string }{"cost_per_mtok", "Cost / M tokens", fmt.Sprintf("$%.4f", s.Cost*1e6/float64(s.Tokens.Total))})
+		stats = append(stats, struct{ key, label, value string }{"cost_per_mtok", "Cost / M tokens", usageCost(s.Cost * 1e6 / float64(s.Tokens.Total))})
 	}
 	if p.PeakPrompt > 0 {
 		stats = append(stats, struct{ key, label, value string }{"peak_prompt", "Peak prompt", compactCount(p.PeakPrompt)})
@@ -361,6 +441,80 @@ func (a *App) usageSummaryDetails(c *ui.Context, p usageProjection) {
 				ui.Text(c, a.text("usage.stat_"+item.key, item.label)).TextColor(a.Theme.TextMuted).FontSize(11)
 				ui.Text(c, item.value).Font(a.Fonts.CodeFamily).FontSize(11)
 			})
+		}
+	})
+}
+
+func (a *App) usageSummary(c *ui.Context) {
+	s := &a.usageState
+	p := s.projection
+	t := a.Theme
+	a.usageCard(c, a.text("usage.summary", "Summary"), fmt.Sprintf("%s requests · %s sessions", usageCount(uint64(p.Summary.Requests)), usageCount(uint64(len(p.Sessions)))), func() {
+		unavailable := a.text("usage.unavailable", "Unavailable")
+		avg, avgHint := unavailable, a.text("usage.sub_no_request_gaps", "No request timing available")
+		if p.Summary.TimedRequests > 0 {
+			avg = usageDuration(p.Summary.Duration.Seconds() / float64(p.Summary.TimedRequests))
+			avgHint = usageLatencyHint(p.P95, p.Timed)
+		}
+		cache, cacheHint := unavailable, a.text("usage.sub_no_cache_tokens", "No cache tokens reported")
+		if rate, ok := usageCacheRate(p.Summary.Tokens); ok {
+			cache = usagePercent(rate)
+			cacheHint = compactCount(p.Summary.Tokens.CacheRead) + " read · " + compactCount(p.Summary.Tokens.CacheWrite) + " written"
+		}
+		tokenHint := a.text("usage.sub_no_requests", "No requests")
+		if p.Summary.Requests > 0 {
+			tokenHint = compactCount(p.Summary.Tokens.Total/uint64(p.Summary.Requests)) + " avg / request"
+		}
+		requestHint := usageComparison(p, "requests")
+		if requestHint == "" {
+			requestHint = a.text("usage.sub_requests_in_range", "Model calls in range")
+		}
+		stats := []struct {
+			metric, key, label, value, hint string
+			available                       bool
+		}{
+			{"requests", "requests", "Requests", usageCount(uint64(p.Summary.Requests)), requestHint, true},
+			{"tokens", "total_tokens", "Total tokens", compactCount(p.Summary.Tokens.Total), tokenHint, true},
+			{"cache", "cache_hit_rate", "Cache hit rate", cache, cacheHint, cache != unavailable},
+			{"latency", "avg_response", "Avg response", avg, avgHint, avg != unavailable},
+		}
+		width, _ := c.Size()
+		if a.SidebarVisible {
+			width -= a.SidebarWidth
+		}
+		cols := 4
+		if width < 880 {
+			cols = 2
+		}
+		if width < 560 {
+			cols = 1
+		}
+		for start := 0; start < len(stats); start += cols {
+			ui.Row(c).Gap(0).Children(func() {
+				for i, stat := range stats[start:min(start+cols, len(stats))] {
+					cell := ui.ButtonBase(c.Key("usage-kpi:" + stat.metric)).Grow(1).MinWidth(0).Padding(12).Justify(ui.Start).Disabled(!stat.available).Label(a.text("usage.metric_"+stat.key, stat.label))
+					if i+1 < cols {
+						cell.BorderWidth(0, 1, 0, 0).BorderColor(t.Border)
+					}
+					if cell.Clicked() {
+						s.metric = stat.metric
+						a.saveUsagePrefs()
+					}
+					cell.Children(func() {
+						ui.Column(c).Grow(1).AlignSelf(ui.Stretch).Gap(6).Children(func() {
+							ui.Text(c, a.text("usage.metric_"+stat.key, stat.label)).TextColor(t.TextMuted).FontSize(11)
+							ui.Text(c, stat.value).Font(a.Fonts.CodeFamily).FontSize(20)
+							ui.Text(c, stat.hint).TextColor(t.TextMuted).FontSize(11)
+						})
+					})
+				}
+			})
+		}
+		a.line(c)
+		a.usageSummaryDetails(c, p)
+		if p.Summary.Errors > 0 && a.button(c, a.text("usage.view_failures", "View failures"), "", false).Clicked() {
+			s.filter.ErrorsOnly = true
+			s.filter.CachedOnly = false
 		}
 	})
 }

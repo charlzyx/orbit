@@ -1,0 +1,710 @@
+--- a/ui/context.go
++++ b/ui/context.go
+@@ -487,6 +487,8 @@
+ 
+ // state is what the runtime keeps about an element from frame to frame.
+ type state struct {
++	// Opt-in immutable transcript selection; no virtual row/node retention.
++	retainedText  *retainedTextScope
+ 	rt            *engine
+ 	pendingSubmit bool
+ 	pendingChange bool
+--- a/ui/textselection.go
++++ b/ui/textselection.go
+@@ -15,6 +15,8 @@
+ // Each paragraph keeps its own layout and editor; syncTextSelection projects
+ // the shared endpoints onto those editors for painting.
+ type textSelection struct {
++	// blocks snapshots the initial mounted order for opt-in retained scopes.
++	blocks        []SelectedText
+ 	scope         uint64
+ 	anchor, caret textPoint
+ 	start         [2]textPoint
+@@ -78,7 +80,7 @@
+ 		// Text only added at the end, as a reply being written, keeps
+ 		// the selection and its offsets.
+ 		grew := len(ed.buf.paras) > 0 && strings.HasPrefix(e.text, ed.source)
+-		if !grew && scope != 0 && e.c.rt.selection.scope == scope && e.c.rt.textSelectionIncludes(e.id) {
++		if !grew && scope != 0 && e.c.rt.selection.scope == scope && e.c.rt.selection.blocks == nil && e.c.rt.textSelectionIncludes(e.id) {
+ 			e.c.rt.selection = textSelection{}
+ 		}
+ 		caret, anchor := ed.caret, ed.anchor
+@@ -108,6 +110,14 @@
+ }
+ 
+ func (rt *engine) textPointIndex(p textPoint) int {
++	if rt.selection.blocks != nil {
++		for i, block := range rt.selection.blocks {
++			if block.ID == p.id {
++				return i
++			}
++		}
++		return -1
++	}
+ 	for i, s := range rt.texts {
+ 		if s.id == p.id && s.textScope == rt.selection.scope {
+ 			return i
+@@ -153,7 +163,7 @@
+ 		return rt.focused == s.id
+ 	}
+ 	f := rt.states[rt.focused]
+-	return s.textScope == rt.selection.scope && f != nil && f.textScope == s.textScope && f.flags&flagDisabled == 0
++	return s.textScope == rt.selection.scope && f != nil && (f.textScope == s.textScope || rt.selection.blocks != nil && f.id == s.textScope) && f.flags&flagDisabled == 0
+ }
+ 
+ func (rt *engine) syncTextSelection() {
+@@ -163,6 +173,10 @@
+ 		}
+ 	}
+ 	if rt.selection.scope == 0 {
++		return
++	}
++	if rt.selection.blocks != nil {
++		rt.syncRetainedTextSelection()
+ 		return
+ 	}
+ 	if rt.textPointIndex(rt.selection.anchor) < 0 || rt.textPointIndex(rt.selection.caret) < 0 {
+@@ -202,6 +216,9 @@
+ 			return textHit(s, x, y)
+ 		}
+ 	}
++	if rt.retainsTextSelection(scope) {
++		return rt.retainedTextSelectionAt(scope, x, y)
++	}
+ 	var nearest *state
+ 	distance := inf
+ 	for _, s := range rt.texts {
+@@ -301,11 +318,13 @@
+ 	if t.scope != scope || mods&Shift == 0 || rt.textPointIndex(t.anchor) < 0 {
+ 		*t = textSelection{scope: scope, anchor: p, caret: p}
+ 	}
++	p = rt.snapshotTextPoint(p)
+ 	t.caret, t.unit, t.dragging, t.hasDesired = p, min(clicks, 3), true, false
+ 	if t.unit > 1 {
+ 		a, b := textUnit(rt.states[p.id], p.at, t.unit)
+ 		t.anchor, t.caret = textPoint{p.id, a}, textPoint{p.id, b}
+ 	}
++	rt.captureRetainedTextSelection()
+ 	t.start = [2]textPoint{t.anchor, t.caret}
+ 	// A press in padding starts in the nearest paragraph, which keeps the
+ 	// focus and pointer capture until the release.
+@@ -321,11 +340,15 @@
+ func (rt *engine) moveTextSelection(x, y float32) {
+ 	t := &rt.selection
+ 	p := rt.textSelectionAt(t.scope, x, y)
+-	if p.id == 0 {
+-		return
+-	}
++	if p.id == 0 || t.blocks != nil && rt.textPointIndex(p) < 0 {
++		return
++	}
++	raw := p
++	p = rt.snapshotTextPoint(p)
+ 	if t.unit > 1 {
+-		a, b := textUnit(rt.states[p.id], p.at, t.unit)
++		a, b := textUnit(rt.states[raw.id], raw.at, t.unit)
++		a = rt.snapshotTextPoint(textPoint{raw.id, a}).at
++		b = rt.snapshotTextPoint(textPoint{raw.id, b}).at
+ 		if rt.compareTextPoints(p, t.start[0]) < 0 {
+ 			t.anchor, t.caret = t.start[1], textPoint{p.id, a}
+ 		} else {
+@@ -359,10 +382,15 @@
+ 		}
+ 		if first != nil {
+ 			rt.selection = textSelection{scope: s.textScope, anchor: textPoint{first.id, 0}, caret: textPoint{last.id, last.editor.buf.n}}
++			rt.captureRetainedTextSelection()
+ 		}
+ 	case "copy":
+ 		a, b, selected := rt.textSelectionBounds()
+ 		if !selected || rt.selection.scope != s.textScope {
++			break
++		}
++		if rt.selection.blocks != nil {
++			rt.copyRetainedTextSelection()
+ 			break
+ 		}
+ 		if sc := rt.states[s.textScope]; sc != nil && sc.copyData != nil {
+@@ -402,6 +430,9 @@
+ 	if !selected || rt.selection.scope != scope {
+ 		return nil
+ 	}
++	if rt.selection.blocks != nil {
++		return rt.retainedSelectedTexts()
++	}
+ 	var parts []SelectedText
+ 	first, last := rt.textPointIndex(a), rt.textPointIndex(b)
+ 	for i := first; i <= last; i++ {
+@@ -422,6 +453,14 @@
+ }
+ 
+ func (rt *engine) neighboringText(p textPoint, direction int) *state {
++	if rt.selection.blocks != nil {
++		for i := rt.textPointIndex(p) + direction; i >= 0 && i < len(rt.selection.blocks); i += direction {
++			if s := rt.states[rt.selection.blocks[i].ID]; s != nil && s.seen == rt.frame && s.textScope == rt.selection.scope {
++				return s
++			}
++		}
++		return nil
++	}
+ 	for i := rt.textPointIndex(p) + direction; i >= 0 && i < len(rt.texts); i += direction {
+ 		if s := rt.texts[i]; s.textScope == rt.selection.scope {
+ 			return s
+@@ -450,6 +489,9 @@
+ 		*t = textSelection{scope: s.textScope, anchor: p, caret: p}
+ 	}
+ 	s = rt.states[t.caret.id]
++	if s == nil || s.seen != rt.frame || s.editor == nil {
++		return true // An off-screen snapshot is copyable, not an editable layout.
++	}
+ 	ed, at := s.editor, t.caret.at
+ 	mods := k.mods &^ Shift
+ 	if (runtime.GOOS == "darwin" && mods == Cmd && (k.key == KeyUp || k.key == KeyDown)) ||
+@@ -522,6 +564,10 @@
+ 	if s.textScope == 0 {
+ 		return false
+ 	}
++	if rt.selection.blocks != nil && rt.selection.scope == s.textScope {
++		rt.focused, rt.focusVisible = s.textScope, false
++		return true
++	}
+ 	p := textHit(s, x, y)
+ 	a, b, selected := rt.textSelectionBounds()
+ 	if !rt.textSelectionVisible(s) || !selected || rt.compareTextPoints(p, a) < 0 || rt.compareTextPoints(p, b) > 0 {
+--- a/ui/input.go
++++ b/ui/input.go
+@@ -308,6 +308,9 @@
+ 	if button == 0 && rt.scrollbarPress(chain, x, y) {
+ 		return
+ 	}
++	if button == 0 && rt.selection.blocks != nil && !slices.Contains(chain, rt.selection.scope) {
++		rt.selection = textSelection{}
++	}
+ 	var target, focus *state
+ 	for _, id := range chain {
+ 		s := rt.states[id]
+@@ -320,6 +323,9 @@
+ 		if focus == nil && s.flags&(flagFocusable|flagEditable|flagSelectable) != 0 && s.flags&flagDisabled == 0 {
+ 			focus = s
+ 		}
++	}
++	if button == 0 && rt.selection.blocks != nil && target != nil && target.id != rt.selection.scope && target.textScope != rt.selection.scope {
++		rt.selection = textSelection{} // A control owns this new press, not stale transcript text.
+ 	}
+ 	keep := slices.ContainsFunc(chain, func(id uint64) bool {
+ 		s := rt.states[id]
+@@ -691,6 +697,11 @@
+ 	if rt.inspectKey(mods, key) {
+ 		return true
+ 	}
++	// Retained transcript selection copies before focus dispatch, even when
++	// focus moved programmatically. An outside pointer press clears it.
++	if mods == Cmd && key == KeyC && rt.selection.blocks != nil && rt.copyRetainedTextSelection() {
++		return true
++	}
+ 	k := keyEvent{mods, key}
+ 	if key == KeyEscape && mods == 0 && rt.dragCancel() {
+ 		return true
+--- /dev/null
++++ b/ui/orbit_selection.go
+@@ -0,0 +1,222 @@
++// Orbit's opt-in text selection snapshot compatibility for MyGo 9c69cf829ece.
++// Original MyGo is MIT licensed; see LICENSE. This addition does not retain UI
++// nodes or change default Selectable semantics. See README.md for attribution.
++package ui
++
++import (
++	"strings"
++	"unicode/utf8"
++)
++
++type retainedTextScope struct {
++	identity string
++	frame    uint64
++	pass     int
++}
++
++// RetainTextSelection preserves an immutable snapshot of the currently mounted
++// paragraphs when a selection starts, so virtual-list unmount does not erase
++// Copy or highlights when those paragraphs return. It is opt-in on a Selectable
++// container. Call every frame with a stable session/document identity; changing
++// identity, removing/disabling the scope, or clicking outside clears it. Drag
++// extension is limited to the initial snapshot, not newly mounted paragraphs.
++// Snapshot text is never updated by a later edit, and no row/layout is retained.
++func (e Element) RetainTextSelection(identity string) Element {
++	n := e.node()
++	if n == nil || n.kind != kindBox {
++		return e
++	}
++	n.Selectable()
++	rt, s := n.c.rt, n.st
++	if s.retainedText == nil || s.retainedText.identity != identity {
++		if rt.selection.scope == s.id {
++			rt.selection = textSelection{}
++		}
++		s.retainedText = &retainedTextScope{identity: identity}
++	}
++	s.retainedText.frame, s.retainedText.pass = rt.frame, rt.pass
++	return e
++}
++
++func (rt *engine) retainsTextSelection(scope uint64) bool {
++	s := rt.states[scope]
++	if s == nil || s.seen != rt.frame || s.pass != rt.pass || s.retainedText == nil || s.retainedText.frame != rt.frame || s.retainedText.pass != rt.pass || s.flags&flagUnselectable != 0 {
++		return false
++	}
++	for p := s; p != nil; p = rt.states[p.parent] {
++		if p.flags&(flagDisabled|flagInvisible|flagInert) != 0 {
++			return false
++		}
++	}
++	return true
++}
++
++func (rt *engine) captureRetainedTextSelection() {
++	if rt.selection.blocks != nil || !rt.retainsTextSelection(rt.selection.scope) {
++		return
++	}
++	for _, s := range rt.texts {
++		if s.textScope == rt.selection.scope && s.editor != nil {
++			rt.selection.blocks = append(rt.selection.blocks, SelectedText{ID: s.id, Text: s.editor.source})
++		}
++	}
++}
++
++func (rt *engine) retainedSelectedTexts() []SelectedText {
++	a, b, selected := rt.textSelectionBounds()
++	if !selected {
++		return nil
++	}
++	first, last := rt.textPointIndex(a), rt.textPointIndex(b)
++	parts := make([]SelectedText, 0, last-first+1)
++	for i := first; i <= last; i++ {
++		part := rt.selection.blocks[i]
++		part.Start, part.End = 0, utf8.RuneCountInString(part.Text)
++		if i == first {
++			part.Start = min(a.at, part.End)
++		}
++		if i == last {
++			part.End = min(b.at, part.End)
++		}
++		parts = append(parts, part)
++	}
++	return parts
++}
++
++func (rt *engine) copyRetainedTextSelection() bool {
++	parts := rt.retainedSelectedTexts()
++	nonempty := false
++	for _, p := range parts {
++		nonempty = nonempty || p.Start < p.End
++	}
++	if !nonempty {
++		return false
++	}
++	if scope := rt.states[rt.selection.scope]; scope != nil && scope.copyData != nil {
++		rt.host.writeClipboardData(scope.copyData(parts))
++		return true
++	}
++	var text []string
++	for _, p := range parts {
++		if p.Start < p.End {
++			text = append(text, string([]rune(p.Text)[p.Start:p.End]))
++		}
++	}
++	if len(text) > 0 {
++		rt.host.writeClipboard(strings.Join(text, "\n"))
++	}
++	return len(text) > 0
++}
++
++func (rt *engine) syncRetainedTextSelection() {
++	if !rt.retainsTextSelection(rt.selection.scope) {
++		rt.selection = textSelection{}
++		return
++	}
++	scope := rt.states[rt.selection.scope]
++	if !rt.selection.dragging {
++		if focused := rt.states[rt.focused]; focused != nil && focused.textScope == scope.id {
++			rt.focused = scope.id
++		}
++	}
++	// A virtualized endpoint's state can be recycled. Move only the focus/capture
++	// to its owning scope before pruning, never retain the endpoint state itself.
++	if focused := rt.states[rt.focused]; rt.focused == rt.selection.anchor.id || rt.focused == rt.selection.caret.id {
++		if focused == nil || focused.seen != rt.frame || focused.pass != rt.pass {
++			rt.focused = scope.id
++		}
++	}
++	if rt.selection.dragging && rt.pressed != nil && (rt.pressed.seen != rt.frame || rt.pressed.pass != rt.pass) {
++		rt.pressed = scope
++		scope.pressed = true
++	}
++	if rt.selection.dragging && rt.pressed != nil {
++		rt.moveTextSelection(rt.pointerX, rt.pointerY)
++	}
++	a, b, selected := rt.textSelectionBounds()
++	if !selected {
++		return
++	}
++	first, last := rt.textPointIndex(a), rt.textPointIndex(b)
++	for _, s := range rt.texts {
++		if s.textScope != rt.selection.scope || s.editor == nil {
++			continue
++		}
++		i := rt.textPointIndex(textPoint{id: s.id})
++		if i < first || i > last {
++			continue
++		}
++		from, to := 0, s.editor.buf.n
++		if i == first {
++			from = min(rt.currentRetainedOffset(s, a), to)
++		}
++		if i == last {
++			to = min(rt.currentRetainedOffset(s, b), to)
++		}
++		s.editor.anchor, s.editor.caret = from, to
++	}
++}
++
++// The retained scope follows Orbit's block-boundary gutter hit test, not the
++// default nearest-glyph Euclidean test. Layout is always current, never cloned.
++func (rt *engine) retainedTextSelectionAt(scope uint64, x, y float32) textPoint {
++	var nearest *state
++	distance := inf
++	for _, s := range rt.texts {
++		if s.textScope != scope || s.vw <= 0 || s.vh <= 0 || !s.editor.laidOut() {
++			continue
++		}
++		r := intersect(transformRect(s.world, Rect{s.x, s.y, s.w, s.h}), Rect{s.vx, s.vy, s.vw, s.vh})
++		if r.W <= 0 || r.H <= 0 {
++			continue
++		}
++		dx, dy := max(r.X-x, x-r.X-r.W, 0), max(r.Y-y, y-r.Y-r.H, 0)
++		if d := dx + dy; nearest == nil || d < distance {
++			nearest, distance = s, d
++		}
++	}
++	if nearest == nil {
++		return textPoint{}
++	}
++	return textHit(nearest, x, y)
++}
++
++// Retained offsets follow the source snapshot's UTF-8 byte boundaries, while
++// MyGo editors use runes. Convert through byte boundaries after live rewrites.
++func selectionByteAtRune(text string, offset int) int {
++	if offset <= 0 {
++		return 0
++	}
++	for i := range text {
++		if offset == 0 {
++			return i
++		}
++		offset--
++	}
++	return len(text)
++}
++func selectionRuneAtByte(text string, offset int) int {
++	offset = max(0, min(offset, len(text)))
++	for offset > 0 && offset < len(text) && !utf8.RuneStart(text[offset]) {
++		offset--
++	}
++	return utf8.RuneCountInString(text[:offset])
++}
++func (rt *engine) snapshotTextPoint(p textPoint) textPoint {
++	if rt.selection.blocks == nil {
++		return p
++	}
++	i := rt.textPointIndex(p)
++	s := rt.states[p.id]
++	if i >= 0 && s != nil && s.editor != nil {
++		p.at = selectionRuneAtByte(rt.selection.blocks[i].Text, selectionByteAtRune(s.editor.source, p.at))
++	}
++	return p
++}
++func (rt *engine) currentRetainedOffset(s *state, p textPoint) int {
++	i := rt.textPointIndex(p)
++	if i < 0 {
++		return 0
++	}
++	return selectionRuneAtByte(s.editor.source, selectionByteAtRune(rt.selection.blocks[i].Text, p.at))
++}
+--- /dev/null
++++ b/ui/orbit_selection_test.go
+@@ -0,0 +1,276 @@
++package ui
++
++import (
++	"fmt"
++	"strings"
++	"testing"
++)
++
++// Synthetic native UI fixtures only. No model, files, or external clipboard.
++func TestOrbitSelectionRetainsVirtualizedSnapshot(t *testing.T) {
++	var list ListState
++	var parts []SelectedText
++	identity := "session-a"
++	value := "first 用户文字"
++	show, enabled, retain := true, true, true
++	build := func(c *Context) {
++		Column(c).Size(500, 240).Children(func() {
++			if show {
++				scope := Column(c.Key("retained")).Height(180).Width(500).Selectable().Disabled(!enabled)
++				if retain {
++					scope.RetainTextSelection(identity)
++				}
++				scope.Children(func() {
++					List(c, &list, 80, func(i int) {
++						s := fmt.Sprintf("Row %02d 用户文字", i)
++						if i == 0 {
++							s = value
++						}
++						Text(c, s).Height(40)
++					}).Grow(1)
++				})
++				parts = scope.SelectedTexts()
++			} else {
++				parts = nil
++			}
++			TextInput(c.Key("outside"), new(string)).Label("Outside input")
++		})
++	}
++	tt := NewTester(build, 500, 240)
++	selectRows := func() {
++		t.Helper()
++		a, ok := tt.Find(value)
++		if !ok {
++			t.Fatal("missing first row")
++		}
++		b, ok := tt.Find("Row 02 用户文字")
++		if !ok {
++			t.Fatal("missing third row")
++		}
++		tt.Press(a.X+1, a.Y+10)
++		tt.Move(b.X+b.W-1, b.Y+10)
++		tt.Release(b.X+b.W-1, b.Y+10)
++	}
++	selectRows()
++	tt.Key(Cmd, KeyC)
++	original := value + "\nRow 01 用户文字\nRow 02 用户文字"
++	if tt.Clipboard() != original {
++		t.Fatalf("initial selection %q", tt.Clipboard())
++	}
++	baselineStates := len(tt.rt.states)
++	list.ScrollToEnd()
++	tt.Frame()
++	tt.SetClipboard("sentinel")
++	tt.Key(Cmd, KeyC)
++	if tt.Clipboard() != original || len(parts) != 3 {
++		t.Fatalf("unmounted selection lost: %q %v", tt.Clipboard(), parts)
++	}
++	if _, ok := tt.Find(value); ok {
++		t.Fatalf("virtualization disabled: %v", tt.Texts())
++	}
++	if len(tt.rt.states) > baselineStates+5 {
++		t.Fatalf("retained nodes: before=%d after=%d", baselineStates, len(tt.rt.states))
++	}
++	for id, s := range tt.rt.states {
++		if s.seen != tt.rt.frame {
++			t.Fatalf("stale UI node %d retained", id)
++		}
++	}
++	list.ScrollTo(0, Start)
++	tt.Frame()
++	a, _ := tt.Find(value)
++	// A matching remounted paragraph must have the exact selected range.
++	var painted bool
++	for _, s := range tt.rt.texts {
++		if s.editor.source == value {
++			painted = s.editor.anchor == 0 && s.editor.caret == len([]rune(value))
++		}
++	}
++	if !painted {
++		t.Fatal("remounted highlight not restored")
++	}
++	// Immutable copied text survives streaming append/replacement. Highlights are
++	// clamped against current text, as Rust range_for does.
++	value = "替"
++	tt.Frame()
++	tt.SetClipboard("sentinel")
++	tt.Key(Cmd, KeyC)
++	if tt.Clipboard() != original {
++		t.Fatal("later content replaced immutable snapshot")
++	}
++	for _, s := range tt.rt.texts {
++		if s.editor.source == value && (s.editor.anchor > 1 || s.editor.caret > 1) {
++			t.Fatal("unclamped highlight")
++		}
++	}
++	identity = "session-b"
++	tt.Frame()
++	tt.SetClipboard("sentinel")
++	tt.Key(Cmd, KeyC)
++	if len(parts) != 0 || tt.Clipboard() != "sentinel" {
++		t.Fatal("selection leaked across session identity")
++	}
++	value = "first 用户文字"
++	tt.Frame()
++	selectRows()
++	tt.Click("Outside input")
++	tt.Frame()
++	if len(parts) != 0 {
++		t.Fatal("outside click retained selection")
++	}
++	selectRows()
++	enabled = false
++	tt.Frame()
++	if tt.rt.selection.blocks != nil {
++		t.Fatal("disabled scope retained selection")
++	}
++	enabled = true
++	tt.Frame()
++	selectRows()
++	retain = false
++	tt.Frame()
++	if tt.rt.selection.blocks != nil {
++		t.Fatal("removed opt-in retained selection")
++	}
++	retain = true
++	tt.Frame()
++	selectRows()
++	show = false
++	tt.Frame()
++	if tt.rt.selection.blocks != nil {
++		t.Fatal("removed scope retained snapshot")
++	}
++	_ = a
++}
++
++func TestOrbitSelectionSnapshotDragGutterAndDefaultIsolation(t *testing.T) {
++	var list ListState
++	var parts []SelectedText
++	tt := NewTester(func(c *Context) {
++		scope := Column(c).Size(500, 180).Selectable().RetainTextSelection("drag")
++		scope.Children(func() {
++			List(c, &list, 80, func(i int) { Text(c, fmt.Sprintf("Row %02d", i)).Width(300).Height(40) }).Grow(1)
++		})
++		parts = scope.SelectedTexts()
++	}, 500, 180)
++	a, _ := tt.Find("Row 00")
++	b, _ := tt.Find("Row 02")
++	tt.Press(a.X+1, a.Y+10)
++	// A row's padding/gutter belongs to its block, not the wider previous text.
++	tt.Move(b.X+250, b.Y+10)
++	tt.Key(Cmd, KeyC)
++	expected := "Row 00\nRow 01\nRow 02"
++	if tt.Clipboard() != expected {
++		t.Fatalf("gutter selection=%q", tt.Clipboard())
++	}
++	captured := len(tt.rt.selection.blocks)
++	list.ScrollToEnd()
++	tt.Frame()
++	last, _ := tt.Find("Row 79")
++	tt.Move(last.X+last.W-1, last.Y+10)
++	tt.Release(last.X+last.W-1, last.Y+10)
++	tt.Key(Cmd, KeyC)
++	if tt.Clipboard() != expected || len(tt.rt.selection.blocks) != captured || len(parts) != 3 {
++		t.Fatal("drag captured newly mounted blocks unlike source")
++	}
++	// Replacing the selection after a scroll must discard the old block set.
++	tt.Press(last.X+1, last.Y+10)
++	tt.Move(last.X+last.W-1, last.Y+10)
++	tt.Release(last.X+last.W-1, last.Y+10)
++	tt.Key(Cmd, KeyC)
++	if !strings.Contains(tt.Clipboard(), "Row 79") || strings.Contains(tt.Clipboard(), "Row 00") {
++		t.Fatal("new selection copied stale snapshot")
++	}
++}
++
++func TestOrbitSelectionCopyPriorityContextMenuAndReset(t *testing.T) {
++	var input = "composer selection"
++	focusInput := false
++	var scopeID uint64
++	tt := NewTester(func(c *Context) {
++		Column(c).Size(400, 240).Children(func() {
++			scope := Column(c.Key("scope")).Size(400, 160).RetainTextSelection("menu-fixture")
++			scopeID = scope.ID()
++			scope.Children(func() {
++				Text(c, "First 用户").Height(40)
++				Text(c, "Second row").Height(40)
++				Text(c, "Third untouched").Height(40)
++			})
++			scope.ContextMenu(func(m *Menu) {
++				if m.Item("Copy Selection").Disabled(len(scope.SelectedTexts()) == 0).Chosen() {
++					c.WriteClipboard("menu:" + strings.Join(func() []string {
++						var out []string
++						for _, p := range scope.SelectedTexts() {
++							out = append(out, string([]rune(p.Text)[p.Start:p.End]))
++						}
++						return out
++					}(), "\n"))
++				}
++			})
++			editor := TextInput(c, &input).Label("composer")
++			if focusInput {
++				editor.Focus()
++			}
++		})
++	}, 400, 240)
++	a, _ := tt.Find("First 用户")
++	b, _ := tt.Find("Second row")
++	tt.Press(a.X+1, a.Y+10)
++	tt.Move(b.X+b.W-1, b.Y+10)
++	tt.Release(b.X+b.W-1, b.Y+10)
++	focusInput = true
++	tt.Frame()
++	tt.Key(Cmd, KeyA)
++	tt.Key(Cmd, KeyC)
++	if tt.Clipboard() != "First 用户\nSecond row" {
++		t.Fatalf("source copy priority lost: %q", tt.Clipboard())
++	}
++	// Right-clicking even an unselected location within the same transcript
++	// leaves the source snapshot intact and offers the selected copy action.
++	focusInput = false
++	if err := tt.RightClick("Third untouched"); err != nil {
++		t.Fatal(err)
++	}
++	if err := tt.ChooseMenuItem("Copy Selection"); err != nil {
++		t.Fatal(err)
++	}
++	if tt.Clipboard() != "menu:First 用户\nSecond row" {
++		t.Fatalf("menu selection %q", tt.Clipboard())
++	}
++	tt.RightClick("Third untouched")
++	tt.Key(0, KeyEscape)
++	if tt.rt.selection.scope != scopeID {
++		t.Fatal("menu dismissal cleared selection")
++	}
++	if err := tt.Click("composer"); err != nil {
++		t.Fatal(err)
++	}
++	tt.Key(Cmd, KeyA)
++	tt.Key(Cmd, KeyC)
++	if tt.Clipboard() != input {
++		t.Fatal("cleared transcript selection stole input copy")
++	}
++}
++
++func TestOrbitSelectionUTF8SnapshotOffsetsAfterRewrite(t *testing.T) {
++	text := "ab 用户"
++	tt := NewTester(func(c *Context) {
++		Column(c).Size(300, 120).RetainTextSelection("unicode").Children(func() { Text(c, text).Height(50) })
++	}, 300, 120)
++	box, _ := tt.Find(text)
++	tt.Press(box.X+1, box.Y+10)
++	tt.Move(box.X+box.W-1, box.Y+10)
++	tt.Release(box.X+box.W-1, box.Y+10)
++	tt.rt.selection.anchor.at, tt.rt.selection.caret.at = 1, 2 // snapshot bytes [1,2), "b"
++	text = "é 用户"                                              // byte 1 is now inside é; source clamps backward to byte 0.
++	tt.Frame()
++	tt.Key(Cmd, KeyC)
++	if tt.Clipboard() != "b" {
++		t.Fatalf("snapshot changed %q", tt.Clipboard())
++	}
++	for _, s := range tt.rt.texts {
++		if s.editor.source == text && (s.editor.anchor != 0 || s.editor.caret != 1) {
++			t.Fatalf("UTF-8 range not source-clamped: %d %d", s.editor.anchor, s.editor.caret)
++		}
++	}
++}

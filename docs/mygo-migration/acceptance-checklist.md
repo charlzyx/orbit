@@ -2,7 +2,7 @@
 
 Baseline: [`299a32bc87fe3d4851bdb902d9c03dcf9bf99cac`](https://github.com/imrj05/orbit/tree/299a32bc87fe3d4851bdb902d9c03dcf9bf99cac). Native Go + MyGo target; cloud-only fixtures.
 
-**139 feature scopes · 342 row-specific procedures · 631 explicitly unexpanded draft gates · 50 narrow assertions passed · 0 full feature passes.**
+**139 feature scopes · 362 row-specific procedures · 611 explicitly unexpanded draft gates · 56 narrow assertions passed · 0 full feature passes.**
 
 This is an initial checklist to expand and execute, not a completion report. Gates marked DRAFT_NEEDS_SOURCE_EXPANSION still need exact source-specific faults, files, timing and chords; they are not finished behavioral specifications. Every scope links pinned Rust handlers, row-specific behavior/edge actions, Go mapping and evidence. Functional, visual and native-OS verdicts are separate.
 
@@ -18,7 +18,7 @@ This is an initial checklist to expand and execute, not a completion report. Gat
 | Usage analytics, update, privacy and release behavior | 14 | PARTIAL 8, UNTESTED 6 | UNTESTED 14 | UNTESTED 14 | [U01–U04](acceptance/updates-privacy-U01-U04.md) · [U05–U08](acceptance/updates-privacy-U05-U08.md) · [U09–U12](acceptance/updates-privacy-U09-U12.md) · [U13–U14](acceptance/updates-privacy-U13-U14.md) |
 | Workbench lifecycle and shared state | 3 | UNTESTED 2, PARTIAL 1 | UNTESTED 3 | UNTESTED 3 | [W01–W03](acceptance/workbench-lifecycle-W01-W03.md) |
 | Git changes, history, graph and repository operations | 16 | UNTESTED 15, PARTIAL 1 | UNTESTED 16 | UNTESTED 16 | [W04–W07](acceptance/git-changes-history-W04-W07.md) · [W08–W11](acceptance/git-changes-history-W08-W11.md) · [W12–W15](acceptance/git-changes-history-W12-W15.md) · [W16–W19](acceptance/git-changes-history-W16-W19.md) |
-| GitHub issues and pull requests | 11 | UNTESTED 11 | UNTESTED 11 | UNTESTED 11 | [W20–W23](acceptance/github-W20-W23.md) · [W24–W27](acceptance/github-W24-W27.md) · [W28–W30](acceptance/github-W28-W30.md) |
+| GitHub issues and pull requests | 11 | UNTESTED 7, PARTIAL 4 | UNTESTED 11 | UNTESTED 11 | [W20–W23](acceptance/github-W20-W23.md) · [W24–W27](acceptance/github-W24-W27.md) · [W28–W30](acceptance/github-W28-W30.md) |
 | Review and turn checkpoints | 9 | PARTIAL 6, UNTESTED 3 | UNTESTED 9 | UNTESTED 9 | [W31–W34](acceptance/review-W31-W34.md) · [W35–W38](acceptance/review-W35-W38.md) · [W39–W39](acceptance/review-W39-W39.md) |
 | Worktrees and setup lifecycle | 12 | UNTESTED 4, PARTIAL 8 | UNTESTED 12 | UNTESTED 12 | [W40–W43](acceptance/worktrees-W40-W43.md) · [W44–W47](acceptance/worktrees-W44-W47.md) · [W48–W51](acceptance/worktrees-W48-W51.md) |
 | Explorer and file editor | 9 | UNTESTED 6, PARTIAL 3 | UNTESTED 9 | UNTESTED 9 | [W52–W55](acceptance/files-W52-W55.md) · [W56–W59](acceptance/files-W56-W59.md) · [W60–W60](acceptance/files-W60-W60.md) |
@@ -34,6 +34,7 @@ Visual procedure for each row: capture pinned Rust and Go at identical OS, scale
 
 ## First independently challenged cases
 
+- W21/W24/W25/W28: native cancel/create failure lost drafts and optional labels blocked successful GitHub lists; six named fake-gh/local-repository assertions now pass after bounded fixes. [Source procedures, failures and remaining gaps](github-acceptance.md).
 - W31/W32: Last Turn incorrectly targeted a new unfinished prompt and lost the prior diff. Separate completed state, pinned historical identity and safe recovery now pass20 narrow assertions; five original Rust checkpoint tests also pass. [Failure, correction and remaining cases](checkpoint-acceptance.md).
 - W34: fixed and regression-tested reversed numstat/file identity, suppressed raw diff metadata, synthetic unpositioned hunks, escaped paths and asymmetric compact gaps. 1,204 lexical oracle cases plus separate old/new carry and paint-only spans pass; W34 as a whole remains PARTIAL.
 - W39: fast native Review refresh failed the650ms feedback floor (27.372ms locally). The ordinary rendered-spinner/repeated-click regression now passes. [Failure and correction evidence](acceptance/strict-results.json).
@@ -44,6 +45,7 @@ Visual procedure for each row: capture pinned Rust and Go at identical OS, scale
 
 ## Additional owner evidence, separately scoped
 
+- [GitHub native failure-path source acceptance](github-acceptance.md) and [exact dirty-source evidence](acceptance/github-evidence.json).
 - [Settings/backend source checklist](settings-backend-implementation.md) and [exact source hashes](settings-backend-source-evidence.json).
 - [Native UI source challenges and corrected regressions](native-ui-acceptance.md).
 - [Skills/Plugins:R01–R21 source cases](resource-ui-implementation.md).

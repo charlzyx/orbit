@@ -1,0 +1,276 @@
+package ui
+
+import (
+	"fmt"
+	"strings"
+	"testing"
+)
+
+// Synthetic native UI fixtures only. No model, files, or external clipboard.
+func TestOrbitSelectionRetainsVirtualizedSnapshot(t *testing.T) {
+	var list ListState
+	var parts []SelectedText
+	identity := "session-a"
+	value := "first 用户文字"
+	show, enabled, retain := true, true, true
+	build := func(c *Context) {
+		Column(c).Size(500, 240).Children(func() {
+			if show {
+				scope := Column(c.Key("retained")).Height(180).Width(500).Selectable().Disabled(!enabled)
+				if retain {
+					scope.RetainTextSelection(identity)
+				}
+				scope.Children(func() {
+					List(c, &list, 80, func(i int) {
+						s := fmt.Sprintf("Row %02d 用户文字", i)
+						if i == 0 {
+							s = value
+						}
+						Text(c, s).Height(40)
+					}).Grow(1)
+				})
+				parts = scope.SelectedTexts()
+			} else {
+				parts = nil
+			}
+			TextInput(c.Key("outside"), new(string)).Label("Outside input")
+		})
+	}
+	tt := NewTester(build, 500, 240)
+	selectRows := func() {
+		t.Helper()
+		a, ok := tt.Find(value)
+		if !ok {
+			t.Fatal("missing first row")
+		}
+		b, ok := tt.Find("Row 02 用户文字")
+		if !ok {
+			t.Fatal("missing third row")
+		}
+		tt.Press(a.X+1, a.Y+10)
+		tt.Move(b.X+b.W-1, b.Y+10)
+		tt.Release(b.X+b.W-1, b.Y+10)
+	}
+	selectRows()
+	tt.Key(Cmd, KeyC)
+	original := value + "\nRow 01 用户文字\nRow 02 用户文字"
+	if tt.Clipboard() != original {
+		t.Fatalf("initial selection %q", tt.Clipboard())
+	}
+	baselineStates := len(tt.rt.states)
+	list.ScrollToEnd()
+	tt.Frame()
+	tt.SetClipboard("sentinel")
+	tt.Key(Cmd, KeyC)
+	if tt.Clipboard() != original || len(parts) != 3 {
+		t.Fatalf("unmounted selection lost: %q %v", tt.Clipboard(), parts)
+	}
+	if _, ok := tt.Find(value); ok {
+		t.Fatalf("virtualization disabled: %v", tt.Texts())
+	}
+	if len(tt.rt.states) > baselineStates+5 {
+		t.Fatalf("retained nodes: before=%d after=%d", baselineStates, len(tt.rt.states))
+	}
+	for id, s := range tt.rt.states {
+		if s.seen != tt.rt.frame {
+			t.Fatalf("stale UI node %d retained", id)
+		}
+	}
+	list.ScrollTo(0, Start)
+	tt.Frame()
+	a, _ := tt.Find(value)
+	// A matching remounted paragraph must have the exact selected range.
+	var painted bool
+	for _, s := range tt.rt.texts {
+		if s.editor.source == value {
+			painted = s.editor.anchor == 0 && s.editor.caret == len([]rune(value))
+		}
+	}
+	if !painted {
+		t.Fatal("remounted highlight not restored")
+	}
+	// Immutable copied text survives streaming append/replacement. Highlights are
+	// clamped against current text, as Rust range_for does.
+	value = "替"
+	tt.Frame()
+	tt.SetClipboard("sentinel")
+	tt.Key(Cmd, KeyC)
+	if tt.Clipboard() != original {
+		t.Fatal("later content replaced immutable snapshot")
+	}
+	for _, s := range tt.rt.texts {
+		if s.editor.source == value && (s.editor.anchor > 1 || s.editor.caret > 1) {
+			t.Fatal("unclamped highlight")
+		}
+	}
+	identity = "session-b"
+	tt.Frame()
+	tt.SetClipboard("sentinel")
+	tt.Key(Cmd, KeyC)
+	if len(parts) != 0 || tt.Clipboard() != "sentinel" {
+		t.Fatal("selection leaked across session identity")
+	}
+	value = "first 用户文字"
+	tt.Frame()
+	selectRows()
+	tt.Click("Outside input")
+	tt.Frame()
+	if len(parts) != 0 {
+		t.Fatal("outside click retained selection")
+	}
+	selectRows()
+	enabled = false
+	tt.Frame()
+	if tt.rt.selection.blocks != nil {
+		t.Fatal("disabled scope retained selection")
+	}
+	enabled = true
+	tt.Frame()
+	selectRows()
+	retain = false
+	tt.Frame()
+	if tt.rt.selection.blocks != nil {
+		t.Fatal("removed opt-in retained selection")
+	}
+	retain = true
+	tt.Frame()
+	selectRows()
+	show = false
+	tt.Frame()
+	if tt.rt.selection.blocks != nil {
+		t.Fatal("removed scope retained snapshot")
+	}
+	_ = a
+}
+
+func TestOrbitSelectionSnapshotDragGutterAndDefaultIsolation(t *testing.T) {
+	var list ListState
+	var parts []SelectedText
+	tt := NewTester(func(c *Context) {
+		scope := Column(c).Size(500, 180).Selectable().RetainTextSelection("drag")
+		scope.Children(func() {
+			List(c, &list, 80, func(i int) { Text(c, fmt.Sprintf("Row %02d", i)).Width(300).Height(40) }).Grow(1)
+		})
+		parts = scope.SelectedTexts()
+	}, 500, 180)
+	a, _ := tt.Find("Row 00")
+	b, _ := tt.Find("Row 02")
+	tt.Press(a.X+1, a.Y+10)
+	// A row's padding/gutter belongs to its block, not the wider previous text.
+	tt.Move(b.X+250, b.Y+10)
+	tt.Key(Cmd, KeyC)
+	expected := "Row 00\nRow 01\nRow 02"
+	if tt.Clipboard() != expected {
+		t.Fatalf("gutter selection=%q", tt.Clipboard())
+	}
+	captured := len(tt.rt.selection.blocks)
+	list.ScrollToEnd()
+	tt.Frame()
+	last, _ := tt.Find("Row 79")
+	tt.Move(last.X+last.W-1, last.Y+10)
+	tt.Release(last.X+last.W-1, last.Y+10)
+	tt.Key(Cmd, KeyC)
+	if tt.Clipboard() != expected || len(tt.rt.selection.blocks) != captured || len(parts) != 3 {
+		t.Fatal("drag captured newly mounted blocks unlike source")
+	}
+	// Replacing the selection after a scroll must discard the old block set.
+	tt.Press(last.X+1, last.Y+10)
+	tt.Move(last.X+last.W-1, last.Y+10)
+	tt.Release(last.X+last.W-1, last.Y+10)
+	tt.Key(Cmd, KeyC)
+	if !strings.Contains(tt.Clipboard(), "Row 79") || strings.Contains(tt.Clipboard(), "Row 00") {
+		t.Fatal("new selection copied stale snapshot")
+	}
+}
+
+func TestOrbitSelectionCopyPriorityContextMenuAndReset(t *testing.T) {
+	var input = "composer selection"
+	focusInput := false
+	var scopeID uint64
+	tt := NewTester(func(c *Context) {
+		Column(c).Size(400, 240).Children(func() {
+			scope := Column(c.Key("scope")).Size(400, 160).RetainTextSelection("menu-fixture")
+			scopeID = scope.ID()
+			scope.Children(func() {
+				Text(c, "First 用户").Height(40)
+				Text(c, "Second row").Height(40)
+				Text(c, "Third untouched").Height(40)
+			})
+			scope.ContextMenu(func(m *Menu) {
+				if m.Item("Copy Selection").Disabled(len(scope.SelectedTexts()) == 0).Chosen() {
+					c.WriteClipboard("menu:" + strings.Join(func() []string {
+						var out []string
+						for _, p := range scope.SelectedTexts() {
+							out = append(out, string([]rune(p.Text)[p.Start:p.End]))
+						}
+						return out
+					}(), "\n"))
+				}
+			})
+			editor := TextInput(c, &input).Label("composer")
+			if focusInput {
+				editor.Focus()
+			}
+		})
+	}, 400, 240)
+	a, _ := tt.Find("First 用户")
+	b, _ := tt.Find("Second row")
+	tt.Press(a.X+1, a.Y+10)
+	tt.Move(b.X+b.W-1, b.Y+10)
+	tt.Release(b.X+b.W-1, b.Y+10)
+	focusInput = true
+	tt.Frame()
+	tt.Key(Cmd, KeyA)
+	tt.Key(Cmd, KeyC)
+	if tt.Clipboard() != "First 用户\nSecond row" {
+		t.Fatalf("source copy priority lost: %q", tt.Clipboard())
+	}
+	// Right-clicking even an unselected location within the same transcript
+	// leaves the source snapshot intact and offers the selected copy action.
+	focusInput = false
+	if err := tt.RightClick("Third untouched"); err != nil {
+		t.Fatal(err)
+	}
+	if err := tt.ChooseMenuItem("Copy Selection"); err != nil {
+		t.Fatal(err)
+	}
+	if tt.Clipboard() != "menu:First 用户\nSecond row" {
+		t.Fatalf("menu selection %q", tt.Clipboard())
+	}
+	tt.RightClick("Third untouched")
+	tt.Key(0, KeyEscape)
+	if tt.rt.selection.scope != scopeID {
+		t.Fatal("menu dismissal cleared selection")
+	}
+	if err := tt.Click("composer"); err != nil {
+		t.Fatal(err)
+	}
+	tt.Key(Cmd, KeyA)
+	tt.Key(Cmd, KeyC)
+	if tt.Clipboard() != input {
+		t.Fatal("cleared transcript selection stole input copy")
+	}
+}
+
+func TestOrbitSelectionUTF8SnapshotOffsetsAfterRewrite(t *testing.T) {
+	text := "ab 用户"
+	tt := NewTester(func(c *Context) {
+		Column(c).Size(300, 120).RetainTextSelection("unicode").Children(func() { Text(c, text).Height(50) })
+	}, 300, 120)
+	box, _ := tt.Find(text)
+	tt.Press(box.X+1, box.Y+10)
+	tt.Move(box.X+box.W-1, box.Y+10)
+	tt.Release(box.X+box.W-1, box.Y+10)
+	tt.rt.selection.anchor.at, tt.rt.selection.caret.at = 1, 2 // snapshot bytes [1,2), "b"
+	text = "é 用户"                                              // byte 1 is now inside é; source clamps backward to byte 0.
+	tt.Frame()
+	tt.Key(Cmd, KeyC)
+	if tt.Clipboard() != "b" {
+		t.Fatalf("snapshot changed %q", tt.Clipboard())
+	}
+	for _, s := range tt.rt.texts {
+		if s.editor.source == text && (s.editor.anchor != 0 || s.editor.caret != 1) {
+			t.Fatalf("UTF-8 range not source-clamped: %d %d", s.editor.anchor, s.editor.caret)
+		}
+	}
+}

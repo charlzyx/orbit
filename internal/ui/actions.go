@@ -95,7 +95,7 @@ func (a *App) shortcuts(c *ui.Context) {
 			a.command(b.Command, value)
 		}
 	}
-	if a.thinkingOpen {
+	if a.thinkingOpen && a.Models == nil {
 		a.thinkingOpen = false
 		a.Prompt("Thinking level", a.Model.Thinking, func(v string) {
 			for _, valid := range a.Model.ThinkingLevels {
@@ -109,7 +109,7 @@ func (a *App) shortcuts(c *ui.Context) {
 	}
 }
 func (a *App) modalOpen() bool {
-	return a.usageState.filterMenu != "" || a.providerState.editor != nil || (a.Options.HasModal != nil && a.Options.HasModal()) || a.promptOpen || a.confirmOpen || a.Model.Dialog != nil || a.paletteOpen || a.modelOpen || a.jsonOpen || a.secretOpen || a.imageOpen || a.usageState.detailError != nil || a.usageState.customOpen || a.usageState.detailRecord != nil || a.usageState.detailSession != nil
+	return (a.Models != nil && a.Models.HasModal()) || a.workspaceOpen || a.usageState.filterMenu != "" || a.providerState.editor != nil || (a.Options.HasModal != nil && a.Options.HasModal()) || a.promptOpen || a.confirmOpen || a.Model.Dialog != nil || a.paletteOpen || a.modelOpen || a.jsonOpen || a.secretOpen || a.imageOpen || a.usageState.detailError != nil || a.usageState.customOpen || a.usageState.detailRecord != nil || a.usageState.detailSession != nil
 }
 
 // Native menu accelerators arrive outside MyGo's modal shortcut scope. Apply

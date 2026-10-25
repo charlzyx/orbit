@@ -103,6 +103,7 @@ type State struct {
 	notes, templateOriginal                           string
 	templateIndex                                     int
 	attachments                                       []string
+	issueDraft, pullDraft                             githubFormDraft
 }
 type result struct {
 	keepError  bool
@@ -120,6 +121,7 @@ type loadSpec struct {
 	pulls       workspace.PullFilter
 	commit      string
 	issue, pull int
+	labels      []workspace.GitHubLabel
 }
 
 func New(dir string, options Options) *State {
@@ -151,6 +153,7 @@ func (s *State) SetWorkspace(dir string) {
 	s.pendingCommit, s.pendingPush, s.refreshPending = false, false, false
 	s.title, s.body, s.labels, s.assignees, s.base, s.notes = "", "", "", "", "", ""
 	s.templateIndex, s.templateOriginal, s.attachments = -1, "", nil
+	s.issueDraft, s.pullDraft = githubFormDraft{}, githubFormDraft{}
 	s.list = ui.ListState{}
 	s.initialized = false
 	s.collapsed = map[string]bool{}
@@ -169,7 +172,7 @@ func (s *State) Cancel() {
 	s.lastAction = nil
 }
 func (s *State) spec() loadSpec {
-	o := loadSpec{s.Tab, s.HistoryOptions, s.GraphLimit, s.GraphAllRefs, s.IssueFilter, s.PullFilter, "", 0, 0}
+	o := loadSpec{tab: s.Tab, history: s.HistoryOptions, graphLimit: s.GraphLimit, graphAll: s.GraphAllRefs, issues: s.IssueFilter, pulls: s.PullFilter, labels: append([]workspace.GitHubLabel(nil), s.Data.Labels...)}
 	if s.CommitDetail != nil {
 		o.commit = s.CommitDetail.Hash
 	}
@@ -255,6 +258,7 @@ func (s *State) Refresh() {
 }
 func load(ctx context.Context, g workspace.Git, h workspace.GitHub, o loadSpec) (func(*State), string, error) {
 	var d Data
+	d.Labels = append([]workspace.GitHubLabel(nil), o.labels...)
 	d.IssueTemplates = workspace.IssueTemplates(g.Dir)
 	d.PullTemplates = workspace.PullTemplates(g.Dir)
 	var e error
@@ -321,8 +325,10 @@ func load(ctx context.Context, g workspace.Git, h workspace.GitHub, o loadSpec) 
 			} else {
 				d.Pulls, e = h.Pulls(ctx, o.pulls)
 			}
-			if e == nil {
-				d.Labels, e = h.Labels(ctx)
+			// Source refresh_issues fetches labels only while its cache is empty,
+			// and treats their failure as best effort. PR refresh never needs them.
+			if e == nil && o.tab == 4 && len(d.Labels) == 0 {
+				d.Labels, _ = h.Labels(ctx)
 			}
 		}
 	}
@@ -459,6 +465,7 @@ func (s *State) Confirm(title, detail string, action func()) {
 	s.confirmOpen = true
 }
 func (s *State) openDialog(kind string) {
+	s.rememberGitHubDraft()
 	s.dialog = kind
 	s.dialogOpen = true
 	s.title = ""
@@ -474,7 +481,11 @@ func (s *State) openDialog(kind string) {
 	s.notes = ""
 	s.templateIndex = -1
 	s.templateOriginal = ""
+	if kind == "new-issue" || kind == "new-pull" {
+		s.restoreGitHubDraft(kind)
+	}
 	if kind == "new-pull" {
+		s.base = ""
 		for _, name := range []string{"main", "master"} {
 			for _, branch := range s.Data.Branches {
 				if branch == name {
@@ -490,7 +501,14 @@ func (s *State) openDialog(kind string) {
 			s.base = s.Data.Branches[0]
 		}
 	}
-	s.applyLateTemplate()
+	if kind == "new-issue" || kind == "new-pull" {
+		pull := kind == "new-pull"
+		selected := -1
+		if len(s.formTemplates(pull)) == 1 {
+			selected = 0
+		}
+		s.applyTemplate(pull, selected)
+	}
 }
 func (s *State) review(source, ref, path string) {
 	if s.Options.OpenReview != nil {

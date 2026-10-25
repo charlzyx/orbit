@@ -4,16 +4,16 @@ Frozen Rust: `299a32bc87fe3d4851bdb902d9c03dcf9bf99cac`. Cloud-only. This supple
 
 ## Reproduce
 
-Use the pinned Go1.27.3 toolchain through `scripts/go-native.sh test -race ./internal/ui ./cmd/orbit -count=1`. The canonical wrapper verifies upstream hashes and applies the isolated composer range-edit compatibility; cmd refuses unpatched startup. Tests use disposable homes and explicit fixtures, never authenticated model inference. Opt-in actual Ghostty tests require `ORBIT_TERMINAL_TEST=1` plus the pinned library. Skips are not passing evidence.
+Use the pinned Go1.27.3 toolchain through `scripts/go-native.sh test -race ./internal/ui ./cmd/orbit -count=1`. The canonical wrapper verifies upstream hashes and applies the isolated composer range-edit and retained-selection compatibility; cmd refuses unpatched startup. Tests use disposable homes and explicit fixtures, never authenticated model inference. Opt-in actual Ghostty tests require `ORBIT_TERMINAL_TEST=1` plus the pinned library. Skips are not passing evidence.
 
 Native CPU captures: `ORBIT_CAPTURE_DIR=/absolute/output scripts/go-native.sh test ./internal/ui -run '^Test(NativeCapture|NativeUsageCapture)$' -count=1`. These are not matched Rust pixel comparisons.
 
 ## Highest-priority remaining failures
 
-- C11: selection survives across mounted rows, but pinned MyGo clears it when a virtualized endpoint unmounts; Rust retains source selection snapshots. C17/C19/C20 specialized approval/questionnaire/widgets are not complete.
-- P08 favorites/provider-filter model catalog and full appearance/localization remain incomplete. Settings source search semantics were corrected: label/synonym results open sections, not exact-row highlighting.
+- C10: the source endpoint-retention gap is now covered by the approved opt-in compatibility addition and mounted host copy/unmount/session-reset regression. The full native OS gesture corpus is still unverified. C17/C19/C20 specialized approval/questionnaire/widgets are not complete.
+- P08 native model catalog/favorites/provider filters/pickers/defaults are now mounted and source-tested, but native pixel and OS acceptance remain incomplete; full appearance/localization still has gaps. Settings source search semantics were corrected: label/synonym results open sections, not exact-row highlighting.
 - Usage comparison/table/filter acceptance is being reconstructed separately; do not infer full UI parity from backend export/accounting tests.
-- S12/S13 full sidebar marks/icons/sticky reveal remain incomplete. Linux desktop captures exist, but current Rust/Go viewport mismatch prevents a valid pixel comparison; no image is resized to conceal it. OS IME/accessibility/native lifecycle on all targets remains open.
+- S12/S13 full sidebar marks/icons/sticky reveal remain incomplete. The first two1470×922 native Linux pairs (V001/V070) now exist and both fail visual comparison. Current local source geometry corrections await a new native capture; no image is resized to conceal differences. OS IME/accessibility/native lifecycle on all targets remains open.
 
 ## Cases
 
@@ -30,7 +30,7 @@ Expected: Source minimum 960×640; restore85% display width and90%height capped1
 
 Executed test coverage: `TestSourceWindowRestoreBounds`, `TestHiddenSidebarReservesNativeTrafficLights`, `TestSourceNativeMenuDoesNotAllocatePersistentWindowStrip`.
 
-Remaining: Source minimum/restore bounds and native traffic-light clearance pass. Native menus now auto-hide on Linux/Windows while retaining edit roles and shortcuts. Actual initial-maximize/Alt-F10/Dock lifetime on each OS remains separate acceptance.
+Remaining: Source minimum/restore bounds and native traffic-light clearance pass. Native menus now auto-hide on Linux/Windows while retaining edit roles and shortcuts. Actual initial-maximize/Alt-F10/Dock lifetime on each OS remains separate acceptance. Linux window buttons are now hidden like pinned source; initial composer focus and conditional Open-in controls are native-CPU tested. Actual recapture pending.
 
 ### UI-S02 · Geometry, fractional scaling and restored dimensions (S02)
 
@@ -126,7 +126,7 @@ Expected: No prompt during composition; native text editing and multiline text r
 
 Executed test coverage: `TestIMECompositionDoesNotSubmit`, `TestComposerRepeatedEnterShiftAlternateAndRejection`.
 
-Remaining: Headless composition event and multiline submission pass. Real Chinese/Japanese/Korean OS IME candidates, clipboard and accessibility remain unexecuted.
+Remaining: Headless composition event and multiline submission pass. Real Chinese/Japanese/Korean OS IME candidates, clipboard and accessibility remain unexecuted. Source22/28px frames, compact omission, one-to-eight lines, surface_secondary, terse full-access and absent unavailable thinking now covered; current native recapture pending.
 
 ### UI-C02 · Delivery policy, repeated send and rejected retry (C02, C03)
 
@@ -190,7 +190,7 @@ Expected: Actual catalog/capabilities; no unsupported thinking choice; favorites
 
 Executed test coverage: `TestFilteredPickersResetAndClampKeyboardSelection`.
 
-Remaining: Keyboard picker works. Source favorites-only/provider filter/detail catalog page remains incomplete; existing simple model list is not full P08.
+Remaining: Source modelui catalog, filters/favorites, grouped model/thinking popovers and Agent/title searchable defaults are now mounted. Authoritative raw model capabilities retained. Configured update --models action serializes, cancels, restarts and resumes saved session with an explicit zero-inference RPC fixture. CPU captures inspected; exact native pixels and OS interaction remain unverified.
 
 ### UI-C06 · Long streamed transcript reading position (C07, C08)
 
@@ -238,7 +238,7 @@ Expected: Source structured tool presentation, cross-block selection, context me
 
 Executed test coverage: `TestLogicalTranscriptKeepsAssistantProseAndToolResult`, `TestHostCrossMessageMarkdownAndAlertSelection`.
 
-Remaining: Typed tools, logical turns, observed-live elapsed time, source tail/usage footer and shared user/Markdown/alert selection are mounted and native-tested. C11 remains a concrete framework gap: selection clears when a virtualized endpoint unmounts; Rust retains SelectedBlock snapshots. Do not equate mounted-row selection with full parity.
+Remaining: Typed tools, logical turns, observed-live elapsed, tail/usage footer and shared Markdown/alert selection are mounted. C10 upstream endpoint-unmount limitation is covered by approved narrow opt-in retention overlay: mounted host native test now verifies exact copy after virtual endpoints unmount and reset on session switch. Full mixed selection/OS gesture corpus and matched native visuals remain open.
 
 ### UI-C09 · Transcript search (C13)
 
@@ -302,7 +302,7 @@ Expected: Source section order and grouped rows; retained page scroll; translate
 
 Executed test coverage: `TestSettingsNavigationComplete`, `TestSettingsPageScrollRetained`, `TestSettingsSourceSearchIndexAndSectionNavigation`, `TestSettingsSourceHeaderAndGeneralRows`.
 
-Remaining: All14 source sections remain; nav groups/28px rows, fixed16px title,960px outer/912px inner column and source55-row setting-label/synonym search are implemented. Source search clears query and opens a section, not exact-row scrolling. Retained scroll, source-header/search, and actual notification-switch pointer/Space persistence pass under the canonical overlay (-race focused suite3.452s). General CPU capture1470×922 was inspected at05:45; source GPUI phi line-height,1.3 heading, left-aligned grouped nav and native36×20 switch geometry are now explicit. Full Settings cards, notification OS permission state/sound preview, matched pixels and OS flows remain unverified.
+Remaining: All14 source sections remain; nav groups/28px rows, fixed16px title,960px outer/912px inner column and source55-row setting-label/synonym search are implemented. Source search clears query and opens a section, not exact-row scrolling. Retained scroll, source-header/search, and actual notification-switch pointer/Space persistence pass under the canonical overlay (-race focused suite3.452s). General CPU capture1470×922 was inspected at05:45; source GPUI phi line-height,1.3 heading, left-aligned grouped nav and native36×20 switch geometry are now explicit. Full Settings cards, notification OS permission state/sound preview, matched pixels and OS flows remain unverified. General cards measured against real1470x922 Rust:121/377 and443/654 source edges within1DIP in CPU regression. No pixel-pass claim.
 
 ### UI-P02 · Runtime diagnostics and agent settings (P02, P03, P04)
 
@@ -495,3 +495,19 @@ Executed test coverage: `TestReviewRefreshKeepsSource650msFeedback`.
 
 Remaining: Initial acceptance failed at25.821182ms. Corrected with independent deadline and actual rendering predicate; default native regression now passes. Full Review animation/pixels remain open.
 
+
+## 2026-10-25 06:16 UTC host checkpoint
+
+Canonical full UI + command race suite passed20.366s. Later focused configured catalog update success/resume, failure/cancel/duplicate gate, source picker anchoring/read-only-open queries and no-auto-title-restart tests passed4.429s. Model catalog data preserves provider+id identity and raw capabilities. Update model list invokes the explicitly configured executable/home, then restarts/resumes the existing session and re-queries actual RPC catalogs; it is distinct from cheap picker-open getter queries.
+
+Workspace picker current/recents/filter/browse, repeated Escape/focus,200ms outside-click guard and source sidebar wordmark/primary-button geometry pass native CPU regressions. Seven1470×922 CPU host images under the cloud probe output were inspected; they are component/fixture evidence, not matched Rust native pairs. The numbered visual register remains the authority for native comparison counts.
+
+Mounted transcript retention now survives virtual endpoint unmount and clears on actual session identity change in `TestHostRetainedTranscriptSelectionUnmountAndSessionReset`. This closes the reproduced toolkit behavior only under the canonical verified compatibility build, not the whole C10 row or platform corpus.
+
+### V001/V070 bounded correction pass
+
+After viewing the first same-size1470×922 Rust desktop pair, the host now hides unwanted Linux caption controls, omits Open-in when no app was discovered, restores initial composer focus, uses the source Review dock action and correct header fallback title. Composer source controls use22/28px frames, default access is icon-only, unavailable thinking is absent, input auto-grows one-to-eight lines and idle send hints are omitted. Source `surface_secondary` remains fully opaque above the backdrop.
+
+General heading/section text boxes now follow source whole-pixel geometry; a native CPU test checks the actual reference card edges121/377 and443/654 with a1DIP geometric tolerance. This is not a pixel threshold or a matched screenshot PASS. Original/native font rasterization, residual composer vertical differences and complete OS verification remain open. All14Settings categories remain reachable by source nav order with fresh empty filters and no automatic modal.
+
+Final bounded checkpoint: canonical UI + cmd race PASS19.665s at06:29UTC, followed by clean vet and diff-check. This supersedes earlier aggregate runs for the current source boundary.

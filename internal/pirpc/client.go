@@ -401,6 +401,7 @@ func (c *Client) readStdout(stdout io.Reader) {
 	reader := bufio.NewReader(stdout)
 	for {
 		record, err := readRecord(reader, c.config.MaxRecordBytes)
+		receivedAt := time.Now() // Before parsing/enqueue; never the UI heartbeat.
 		if err == io.EOF {
 			return
 		}
@@ -416,6 +417,7 @@ func (c *Client) readStdout(stdout io.Reader) {
 			raw, _ := json.Marshal(map[string]any{"type": "protocol_error", "error": parseErr.Error(), "record": string(record)})
 			event, _ = ParseEvent(raw)
 		}
+		event.ReceivedAt = receivedAt
 		if !c.enqueue(event) {
 			c.fail(ErrEventOverflow)
 			return

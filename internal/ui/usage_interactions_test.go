@@ -198,7 +198,7 @@ func TestUsageComparisonCacheLatencyThresholdsAndFocusedPreviousWindow(t *testin
 		t.Fatal("zero baseline gave percentage")
 	}
 	all := buildUsageProjection(index, workbench.UsageFilter{Start: time.UnixMilli(0), End: start.Add(24 * time.Hour)}, "day", time.UTC)
-	if all.Previous != nil || len(all.Series) != 2 {
+	if all.Previous != nil || len(all.Series) != 20 || all.Series[0].At.Day() != 1 {
 		t.Fatal("all-time epoch or comparison error", len(all.Series))
 	}
 }
@@ -398,8 +398,11 @@ func TestUsageRefreshCoalescesAndFailureKeepsLastSnapshot(t *testing.T) {
 }
 
 func TestUsageProjectionRejectsLateResultAndClonesFilterSlices(t *testing.T) {
-	a := fixtureUsageApp(t)
+	a := &App{updates: make(chan func(), 4)}
 	s := &a.usageState
+	s.index = usageFixtureIndex()
+	s.loaded = true
+	s.granularity = "day"
 	first, second := make(chan struct{}), make(chan struct{})
 	seen := make(chan workbench.UsageFilter, 2)
 	s.project = func(index workbench.UsageIndex, f workbench.UsageFilter, g string, l *time.Location) usageProjection {
@@ -426,14 +429,8 @@ func TestUsageProjectionRejectsLateResultAndClonesFilterSlices(t *testing.T) {
 		t.Fatal("new filter not applied")
 	}
 	close(first)
-	for len(seen) < 2 {
-		drainUsageUpdate(t, a)
-	}
-	select {
-	case apply := <-a.updates:
-		apply()
-	default:
-	}
+	// No fixture initialization jobs: this is necessarily the stale apply.
+	drainUsageUpdate(t, a)
 	if s.computed != latest || s.projecting || s.projection.Summary.Requests == 0 {
 		t.Fatal("late projection overwrote current filter")
 	}
