@@ -27,6 +27,11 @@ jobs:
         env:
           ORBIT_PI_INTEGRATION_BIN: /tmp/orbit-pi-runtime/node_modules/.bin/pi
           ORBIT_TERMINAL_TEST: "1"
+      - name: Terminal compatibility module regressions
+        run: |
+          if [ -f third_party/mygo-terminal/go.mod ]; then
+            go -C third_party/mygo-terminal test -race ./...
+          fi
       - name: Reproducible CPU captures (not desktop integration)
         run: ORBIT_CAPTURE_DIR="$PWD/capture/native-cpu" go test ./internal/ui -run '^TestNativeCapture$' -count=1
       - name: No-cgo cross compilation
@@ -48,7 +53,7 @@ jobs:
       - name: Reference renderer and isolated display dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang cmake pkg-config libfontconfig-dev libvulkan1 mesa-vulkan-drivers libwayland-dev libx11-xcb-dev libxi-dev libxtst-dev libxkbcommon-x11-dev libssl-dev libgtk-3-0 libpango-1.0-0 libcairo2 xvfb openbox xdotool x11-utils imagemagick
+          sudo apt-get install -y clang cmake pkg-config libfontconfig-dev libvulkan1 mesa-vulkan-drivers vulkan-tools libwayland-dev libx11-xcb-dev libxi-dev libxtst-dev libxkbcommon-x11-dev libssl-dev libgtk-3-0 libpango-1.0-0 libcairo2 xvfb openbox xdotool x11-utils imagemagick
       - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
         with:
           toolchain: '1.94.0'
@@ -61,15 +66,32 @@ jobs:
         run: npm install --prefix /tmp/orbit-pi-runtime @earendil-works/pi-coding-agent@1.4.0
       - name: Capture actual original native window
         run: scripts/capture-native-reference.sh /tmp/orbit-reference/target/debug/orbit-pi "$PWD/capture/reference-desktop" reference
-      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16
-        with:
-          go-version: '1.27.3'
-      - name: Capture actual Go native desktop window at the same viewport
-        run: |
-          CGO_ENABLED=0 go build -o /tmp/orbit-go-native ./cmd/orbit
-          scripts/capture-native-reference.sh /tmp/orbit-go-native "$PWD/capture/go-desktop" go
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           name: pinned-reference-desktop
+          path: capture/
+
+  native-desktop:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16
+        with:
+          go-version: '1.27.3'
+      - name: Isolated native display dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-0 libpango-1.0-0 libcairo2 libfontconfig1 libgl1-mesa-dri mesa-vulkan-drivers vulkan-tools xvfb openbox xdotool x11-utils imagemagick
+      - name: Build native Go app and pinned Pi fixture
+        run: |
+          CGO_ENABLED=0 go build -o /tmp/orbit-go-native ./cmd/orbit
+          npm install --prefix /tmp/orbit-pi-runtime @earendil-works/pi-coding-agent@1.4.0
+      - name: Capture real Go native desktop window
+        run: scripts/capture-native-reference.sh /tmp/orbit-go-native "$PWD/capture/go-desktop" go
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: go-native-desktop
           path: capture/
