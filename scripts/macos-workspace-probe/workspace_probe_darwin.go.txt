@@ -7,9 +7,11 @@
 package orbitui
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"image/png"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -332,6 +334,19 @@ func (p *workspaceProbe) dialog(name, path string, accept bool) error {
 	}
 	if path != "" {
 		mygo.RunOnMain(func() { probeSetDirectory(probePanel(p.w.NativeHandle()), path) })
+		deadline := time.Now().Add(4 * time.Second)
+		var actual string
+		for time.Now().Before(deadline) {
+			mygo.RunOnMain(func() { actual = probePanelDirectory(probePanel(p.w.NativeHandle())) })
+			if filepath.Clean(actual) == filepath.Clean(path) {
+				break
+			}
+			time.Sleep(100 * time.Millisecond)
+		}
+		workspaceProbeStage("panel.directory", map[string]any{"expected": path, "actual": actual})
+		if filepath.Clean(actual) != filepath.Clean(path) {
+			return fmt.Errorf("panel did not navigate to expected directory: want %s, got %s", path, actual)
+		}
 		time.Sleep(600 * time.Millisecond)
 	}
 	var err error
@@ -349,7 +364,7 @@ func (p *workspaceProbe) dialog(name, path string, accept bool) error {
 			return
 		}
 		if accept {
-			probeSend(objc.ID(panel), "ok:", 0)
+			err = probeAcceptPanel(panel)
 		} else {
 			probeSend(objc.ID(panel), "cancel:", 0)
 		}
@@ -390,7 +405,10 @@ func (p *workspaceProbe) invalid(before workspaceProbeState) error {
 		return err
 	}
 	workspaceProbeStage("panel.invalid_ok.before", p.config.Invalid)
-	mygo.RunOnMain(func() { probeSend(objc.ID(probePanel(p.w.NativeHandle())), "ok:", 0) })
+	mygo.RunOnMain(func() { err = probeAcceptPanel(probePanel(p.w.NativeHandle())) })
+	if err != nil {
+		return err
+	}
 	time.Sleep(800 * time.Millisecond)
 	if p.panel() == 0 {
 		return errors.New("invalid-directory attempt closed the panel; cannot claim rejection, inspect stage log")
@@ -422,6 +440,7 @@ type probeRect struct {
 var probeMsg uintptr
 var probeRectMsg func(objc.ID, objc.SEL) probeRect
 var probeConvertPoint func(objc.ID, objc.SEL, probePoint) probePoint
+var probeKeyEvent func(objc.ID, objc.SEL, uint, probePoint, uint, float64, int, objc.ID, objc.ID, objc.ID, bool, uint16) objc.ID
 var probeMouseEvent func(objc.ID, objc.SEL, uint, probePoint, uint, float64, int, objc.ID, int, int, float32) objc.ID
 var probeBitmap func(objc.ID, objc.SEL, probeRect) objc.ID
 var probeCacheBitmap func(objc.ID, objc.SEL, probeRect, objc.ID)
@@ -441,6 +460,7 @@ func probeNativeLoad() error {
 	purego.RegisterFunc(&probeRectMsg, probeMsg)
 	purego.RegisterFunc(&probeConvertPoint, probeMsg)
 	purego.RegisterFunc(&probeMouseEvent, probeMsg)
+	purego.RegisterFunc(&probeKeyEvent, probeMsg)
 	purego.RegisterFunc(&probeBitmap, probeMsg)
 	purego.RegisterFunc(&probeCacheBitmap, probeMsg)
 	return nil
@@ -585,6 +605,41 @@ func probePanel(handle uintptr) uintptr {
 	}
 	return 0
 }
+
+// NSOpenPanel inherits ok: but modern NSSavePanel deliberately throws from it.
+// Send a real Return key through the public native window event path instead;
+// AppKit's actual default-button handling owns validation and the result code.
+func probeAcceptPanel(handle uintptr) (err error) {
+	if handle == 0 {
+		return errors.New("no native panel to accept")
+	}
+	probePool(func() {
+		panel := objc.ID(handle)
+		// Key-down may complete/release the sheet before the matching key-up.
+		probeSend(panel, "retain")
+		defer probeSend(panel, "release")
+		if !probeResponds(panel, "sendEvent:") || !probeResponds(panel, "makeKeyWindow") {
+			err = errors.New("native panel cannot receive key events")
+			return
+		}
+		probeSend(panel, "makeKeyWindow")
+		number := int(probeSend(panel, "windowNumber"))
+		chars := probeString("\r")
+		workspaceProbeStage("panel.return_key.before", map[string]any{"window_number": number, "directory": probePanelDirectory(handle)})
+		for _, typ := range []uint{10, 11} { // NSEventTypeKeyDown/KeyUp, kVK_Return.
+			event := probeKeyEvent(objc.ID(objc.GetClass("NSEvent")), objc.RegisterName("keyEventWithType:location:modifierFlags:timestamp:windowNumber:context:characters:charactersIgnoringModifiers:isARepeat:keyCode:"), typ, probePoint{}, 0, 0, number, 0, chars, chars, false, 36)
+			if event == 0 {
+				err = errors.New("failed to construct native Return event")
+				return
+			}
+			probeSend(panel, "sendEvent:", uintptr(event))
+		}
+	})
+	return
+}
+func probePanelDirectory(panel uintptr) string {
+	return probeGoString(probeSend(probeOptional(objc.ID(panel), "directoryURL"), "path"))
+}
 func probeSetDirectory(panel uintptr, path string) {
 	probePool(func() {
 		url := probeSend(objc.ID(objc.GetClass("NSURL")), "fileURLWithPath:", uintptr(probeString(path)))
@@ -610,5 +665,32 @@ func probeCapturePanel(panel uintptr, path string) (err error) {
 			err = errors.New("native panel PNG write failed")
 		}
 	})
+	if err == nil {
+		data, readErr := os.ReadFile(path)
+		if readErr != nil {
+			return readErr
+		}
+		im, decodeErr := png.Decode(bytes.NewReader(data))
+		if decodeErr != nil {
+			return decodeErr
+		}
+		visible := false
+		for y := im.Bounds().Min.Y; y < im.Bounds().Max.Y && !visible; y++ {
+			for x := im.Bounds().Min.X; x < im.Bounds().Max.X; x++ {
+				_, _, _, a := im.At(x, y).RGBA()
+				if a != 0 {
+					visible = true
+					break
+				}
+			}
+		}
+		if !visible {
+			unavailable := strings.TrimSuffix(path, ".png") + "-transparent.png"
+			if err := os.Rename(path, unavailable); err != nil {
+				return err
+			}
+			workspaceProbeStage("panel.capture_unavailable", map[string]any{"path": unavailable, "reason": "AppKit bitmap is fully transparent; not visible-panel evidence"})
+		}
+	}
 	return
 }
