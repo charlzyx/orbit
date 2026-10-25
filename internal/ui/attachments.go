@@ -11,7 +11,6 @@ import (
 
 	"github.com/charlzyx/orbit/internal/agent"
 	"github.com/charlzyx/orbit/internal/attachments"
-	"github.com/charlzyx/orbit/internal/workspace"
 	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
 )
@@ -83,7 +82,7 @@ func (a *App) addPaths(paths []string, read func(string) ([]byte, string, error)
 		return
 	}
 	for _, p := range paths {
-		if !workspace.IsImage(p) {
+		if !imagePickerPathSupported(p) {
 			a.queueAttachmentPath(owner, p+" ")
 			continue
 		}

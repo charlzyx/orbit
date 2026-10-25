@@ -16,7 +16,7 @@ func (a *App) sessionRowMenu(m *ui.Menu, s SessionRow) {
 		{"CopySessionPath", a.Tr("sidebar.copy_path")}, {"RevealSession", a.Tr("sidebar.reveal_in_finder")},
 		{"CloneSession", a.Tr("sidebar.clone_session")},
 		// Retain existing Go convenience actions without confusing ID with path.
-		{"RenameSession", "Rename…"}, {"CopySessionId", "Copy session ID"},
+		{"RenameSession", a.Tr("go.session.rename")}, {"CopySessionId", a.Tr("usage.ctx_copy_session_id")},
 	} {
 		if m.Item(cmd.label).Chosen() {
 			a.commandSession(cmd.id, s)

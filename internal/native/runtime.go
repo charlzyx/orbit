@@ -29,12 +29,25 @@ type Dependency struct {
 	Required, Installed                                     bool
 }
 
-func CheckDependencies(ctx context.Context) []Dependency {
+func CheckDependencies(ctx context.Context) []Dependency { return CheckDependenciesFor(ctx, "") }
+
+// CheckDependenciesFor probes the selected Pi launcher without running an unrelated
+// PATH installation. It only executes version queries, never install commands.
+func CheckDependenciesFor(ctx context.Context, piBinary string) []Dependency {
 	specs := []Dependency{{Name: "pi", Bin: "pi", Required: true, DetailKey: "onboarding.pi_detail"}, {Name: "Node.js", Bin: "node", Required: true, DetailKey: "onboarding.node_detail"}, {Name: "git", Bin: "git", DetailKey: "onboarding.git_detail"}}
 	for i := range specs {
 		d := &specs[i]
 		d.InstallHint = DependencyInstallHint(runtime.GOOS, d.Bin)
-		d.Path = LocateExecutable(d.Bin)
+		if d.Bin == "pi" && piBinary != "" {
+			var err error
+			d.Path, err = exec.LookPath(piBinary)
+			d.InstallHint = "" // Installing on PATH cannot repair a selected custom launcher.
+			if err != nil {
+				d.Error = fmt.Sprintf("Configured Pi executable is unavailable: %v", err)
+			}
+		} else {
+			d.Path = LocateExecutable(d.Bin)
+		}
 		d.Installed = d.Path != ""
 		if d.Installed {
 			version, err := ExecutableVersion(ctx, d.Path)

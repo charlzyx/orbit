@@ -19,21 +19,60 @@ def process_identity(pid):
     fields=(path/'stat').read_text().rsplit(')',1)[1].split()
     return {'pid':pid,'startTicks':fields[19],'exe':str((path/'exe').resolve(strict=True))}
 
+def process_parent(pid):
+    fields=Path(f'/proc/{pid}/stat').read_text().rsplit(')',1)[1].split()
+    return int(fields[1])
+
+def lineage_live(lineage):
+    try:
+        for index,identity in enumerate(lineage):
+            if process_identity(identity['pid'])!=identity:return False
+            if index and process_parent(identity['pid'])!=lineage[index-1]['pid']:return False
+        return True
+    except (FileNotFoundError,ProcessLookupError):return False
+
 def owned_rpc_children(pid,pi_entry):
-    found=[];pending=[pid];seen=set()
+    # Linux task/TID/children is thread-local, not the whole process group.
+    # Enumerate only threads in this already-owned ancestry; never scan /proc
+    # globally or infer ownership from a matching executable name.
+    root=process_identity(pid)
+    found=[];pending=[(pid,[root])];seen=set();discovered={pid};thread_count=0
     while pending:
-        current=pending.pop()
+        current,lineage=pending.pop()
         if current in seen:continue
         seen.add(current)
         if len(seen)>64:raise ValueError('Unexpected capture child process fanout')
+        if not lineage_live(lineage):continue
         try:
-            pending.extend(int(p) for p in Path(f'/proc/{current}/task/{current}/children').read_text().split())
+            children=set()
+            for task in (Path('/proc')/str(current)/'task').iterdir():
+                if not task.name.isdigit():continue
+                thread_count+=1
+                if thread_count>1024:raise ValueError('Unexpected capture thread fanout')
+                try:
+                    children.update(int(p)for p in (task/'children').read_text().split())
+                except (FileNotFoundError,ProcessLookupError):continue
+                if len(children|seen)>64:raise ValueError('Unexpected capture child process fanout')
+            if not lineage_live(lineage):continue
+            for child in children:
+                if child in discovered:continue
+                try:
+                    identity=process_identity(child)
+                    branch=lineage+[identity]
+                    if lineage_live(branch):
+                        discovered.add(child)
+                        if len(discovered)>64:raise ValueError('Unexpected capture child process fanout')
+                        pending.append((child,branch))
+                except (FileNotFoundError,ProcessLookupError):continue
+            if current==pid:continue  # Root is never its own descendant.
             argv=Path(f'/proc/{current}/cmdline').read_bytes().split(b'\0')
             args=[s.decode('utf-8','replace')for s in argv if s]
             if any(args[i:i+2]==['--mode','rpc'] for i in range(len(args)-1)) and any(s.startswith('/') and Path(s).resolve()==pi_entry for s in args):
-                found.append(dict(identity=process_identity(current),argv=args))
+                if lineage_live(lineage):found.append(dict(identity=lineage[-1],argv=args,ancestry=lineage))
         except (FileNotFoundError,ProcessLookupError):continue
-    return found
+    if process_identity(pid)!=root:raise ValueError('Capture process changed during descendant scan')
+    # A child may exit/reparent after it was visited; omit unproved candidates.
+    return [item for item in found if lineage_live(item['ancestry'])]
 
 def validate_suite(suite):
     if suite.get('viewport')!=[1470,922] or suite.get('suite')!='static-native-chat-stage1':raise ValueError('Unexpected static Chat suite')
@@ -66,8 +105,9 @@ class Capture(base.Capture):
     def capture(self,path):
         self.guard();captured=time.monotonic()
         rows,metadata=super().capture(path)
+        children=owned_rpc_children(self.pid,self.pi_entry)
         self.guard()
-        return rows,dict(metadata,processIdentity=self.identity,capturedMonotonic=captured,rpcChildren=owned_rpc_children(self.pid,self.pi_entry))
+        return rows,dict(metadata,processIdentity=self.identity,capturedMonotonic=captured,rpcChildren=children)
 
     def readiness(self,image,rows,metadata,required,sample):
         if not metadata.get('rpcChildren'):
@@ -80,6 +120,14 @@ class Capture(base.Capture):
         age=time.monotonic()-frame['capturedMonotonic']
         if not 0<=age<=5:raise ValueError('Screenshot input proof expired; no input')
         if base.sha(image)!=frame['pngSha256']:raise ValueError('Screenshot changed after target verification; no input')
+        children=owned_rpc_children(self.pid,self.pi_entry)
+        self.guard(active=True)
+        observed=[item.get('identity') for item in frame.get('rpcChildren',[])]
+        if not any(item['identity'] in observed for item in children):
+            raise ValueError('Pinned Pi descendant changed or exited before input; no input')
+        if time.monotonic()-frame['capturedMonotonic']>5 or base.sha(image)!=frame['pngSha256']:
+            raise ValueError('Screenshot input proof changed or expired during descendant scan; no input')
+        frame['inputRpcChildren']=children
 
     def action(self,case_id,ordinal,action):
         expected=EXPECTED_ACTIONS[['CHAT01','CHAT02'].index(case_id)]

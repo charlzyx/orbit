@@ -61,14 +61,14 @@ func (a *App) agentRuntimeSettings(c *ui.Context) {
 		a.sourceSettingsDivider(c)
 		a.sourceSettingsRow(c, a.Tr("settings.follow_up_messages"), a.Tr("settings.messages_sent_while_the_agent_is_running_wait_in"), "", func() {
 			if a.Model.FollowUpMode == "" {
-				ui.Text(c, "Unknown").FontSize(a.Theme.Px(12)).TextColor(a.Theme.TextMuted)
+				ui.Text(c, a.Tr("context_meter.unknown")).FontSize(a.Theme.Px(12)).TextColor(a.Theme.TextMuted)
 			}
 			a.agentSettingsSegments(c, "Follow-up delivery", a.Model.FollowUpMode, []settingsChoice{{"one-at-a-time", a.Tr("settings.one_at_a_time")}, {"all", a.Tr("settings.all")}}, a.Theme.Selection, !a.Model.Connected || a.Model.FollowUpMode == "", func(v string) { a.Dispatch(Action{Kind: "SetFollowUpMode", Value: v}) })
 		})
 		a.sourceSettingsDivider(c)
 		a.sourceSettingsRow(c, a.Tr("settings.auto_compaction"), a.Tr("settings.compact_conversation_context_automatically_when_"), "", func() {
 			if !a.Model.AutoCompactionKnown {
-				ui.Text(c, "Unknown").FontSize(a.Theme.Px(12)).TextColor(a.Theme.TextMuted)
+				ui.Text(c, a.Tr("context_meter.unknown")).FontSize(a.Theme.Px(12)).TextColor(a.Theme.TextMuted)
 				return
 			}
 			value := a.Model.AutoCompactionEnabled
@@ -81,15 +81,15 @@ func (a *App) agentRuntimeSettings(c *ui.Context) {
 		if a.Runtime.Active != nil {
 			retry = a.Runtime.Active.AutoRetry
 		}
-		status := "Unknown: this pi version has no getter"
+		status := a.Tr("go.retry.unknown")
 		if retry.Known {
-			status = map[bool]string{true: "Enabled", false: "Disabled"}[retry.Enabled]
+			status = map[bool]string{true: a.Tr("go.state.enabled"), false: a.Tr("go.state.disabled")}[retry.Enabled]
 		}
 		if retry.Support == "unsupported" {
-			status = "Unsupported by this pi runtime"
+			status = a.Tr("go.retry.unsupported")
 		}
 		if retry.Pending {
-			status = "Updating…"
+			status = a.Tr("updater_ui.updating")
 		}
 		a.agentRetryRow(c, retry, status)
 		if retry.Error != "" {
@@ -124,9 +124,9 @@ func (a *App) agentRetryRow(c *ui.Context, retry agent.RetrySetting, status stri
 		}
 		ui.MenuButton(c, "", func(m *ui.Menu) {
 			for _, value := range []bool{true, false} {
-				label := "Enable"
+				label := a.Tr("go.action.enable")
 				if !value {
-					label = "Disable"
+					label = a.Tr("go.action.disable")
 				}
 				if m.Item(label).Disabled(disabled).Chosen() {
 					a.Dispatch(Action{Kind: "SetAutoRetry", Data: map[string]any{"enabled": value}})

@@ -140,6 +140,7 @@ type Notice struct {
 	Until time.Time
 }
 type App struct {
+	setup                  onboardingState
 	pendingAttachmentPaths []attachmentPathInsertion
 	navigation             navigationState
 	transcriptScroll       ui.ScrollState
@@ -473,6 +474,10 @@ func (a *App) View(c *ui.Context) {
 			a.settings(c)
 			return
 		}
+		if a.setupBlocked() {
+			a.onboardingView(c)
+			return
+		}
 		// Keep the workspace's native ancestry stable when the sidebar hides.
 		// A conditional Split reparents every editor and discards private undo.
 		if a.SidebarVisible {
@@ -487,14 +492,14 @@ func (a *App) View(c *ui.Context) {
 		a.AddPaths(paths)
 	}
 	if a.Options.Terminal != nil {
-		a.Options.Terminal.SetVisible(a.page == "chat" && !a.reviewFull())
+		a.Options.Terminal.SetVisible(a.page == "chat" && !a.reviewFull() && !a.setupBlocked())
 	}
 	if a.workspaceActions.open && !a.workspaceActions.rendered {
 		a.workspaceActions.open = false
 	}
 	a.shortcuts(c)
 	modalNow := a.modalOpen()
-	if !modalNow && a.Options.Overlay != nil {
+	if !modalNow && !a.setupBlocked() && a.Options.Overlay != nil {
 		a.Options.Overlay(c)
 	}
 	if modalNow && !a.modalWasOpen {

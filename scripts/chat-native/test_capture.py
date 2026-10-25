@@ -45,8 +45,9 @@ class CaptureGuards(unittest.TestCase):
     def test_stale_foreign_or_changed_image_refuses_input(self):
         with tempfile.TemporaryDirectory()as d:
             cap=instance(d);image=Path(d)/'fresh.png';image.write_bytes(b'new')
-            frame=dict(processIdentity=IDENTITY,capturedMonotonic=time.monotonic(),pngSha256=c.base.sha(image))
-            with patch.object(cap,'guard'):
+            frame=dict(processIdentity=IDENTITY,capturedMonotonic=time.monotonic(),pngSha256=c.base.sha(image),rpcChildren=[{'identity':{'pid':456}}])
+            cap.pi_entry=Path('/pinned/pi')
+            with patch.object(cap,'guard'),patch.object(c,'owned_rpc_children',return_value=[{'identity':{'pid':456}}]):
                 cap.validate_input_proof(image,frame)
                 for bad in (dict(frame,capturedMonotonic=time.monotonic()-6),dict(frame,processIdentity={}),dict(frame,pngSha256='old')):
                     with self.assertRaises(ValueError):cap.validate_input_proof(image,bad)
@@ -124,3 +125,13 @@ class ProductionMetadataChain(unittest.TestCase):
                 self.assertEqual(proof['consecutiveReadySamples'],3);self.assertEqual(proof['selectedReadinessOcrPSM'],11)
                 self.assertEqual(proof['pngSha256'],c.base.sha(Path(d)/case['image']))
             self.assertEqual([a['requested']for a in cap.actions if a['outcome']=='INPUT_REQUESTED'],[{'key':'ctrl+1'},{'key':'ctrl+Up'}])
+
+
+class InputDescendantRefresh(unittest.TestCase):
+    def test_exited_or_replaced_child_blocks_input_even_with_fresh_image(self):
+        with tempfile.TemporaryDirectory() as d:
+            cap=instance(d);cap.pi_entry=Path('/pinned/pi');image=Path(d)/'proof.png';image.write_bytes(b'frame')
+            frame=dict(processIdentity=IDENTITY,capturedMonotonic=time.monotonic(),pngSha256=c.base.sha(image),rpcChildren=[{'identity':{'pid':456,'startTicks':'old'}}])
+            for children in ([],[{'identity':{'pid':456,'startTicks':'new'}}]):
+                with patch.object(cap,'guard'),patch.object(c,'owned_rpc_children',return_value=children):
+                    with self.assertRaisesRegex(ValueError,'descendant changed or exited'):cap.validate_input_proof(image,frame)

@@ -45,6 +45,7 @@ type RunOptions struct {
 	Offline, NoExtensions bool
 }
 type Controller struct {
+	setupProbe        setupProbeState
 	workspaceBrowse   workspaceBrowseState
 	fileDialogs       nativeFileDialogState
 	diagnostics       *diagnosticlog.Logger
@@ -280,6 +281,10 @@ func (x *Controller) syncAt(now time.Time) {
 	s := x.Agent.Snapshot()
 	x.UI.Runtime = x.Agent.RuntimeSnapshot()
 	x.UI.SetSnapshot(adaptSnapshot(s, x.workspace, x.pinned, x.archived))
+	if x.UI.setup.enabled && x.setupProbe.binary != x.Agent.PiBinary() {
+		x.invalidateSetupProbe()
+		x.refreshSetup()
+	}
 	x.openAuthBrowser(s.Auth, native.OpenURL)
 	x.UI.syncUsageStore()
 	if d := x.UI.Model.Dialog; d != nil && d.Method == "custom" {
@@ -644,6 +649,8 @@ func (x *Controller) Action(a Action) {
 			command = pirpc.SetSteeringMode
 		}
 		e = m.Send(command, map[string]any{"mode": a.Value})
+	case "RefreshSetup":
+		x.refreshSetup()
 	case "CheckPiUpdate":
 		u.checkPiUpdate()
 	case "ChoosePiBinary":
@@ -659,6 +666,10 @@ func (x *Controller) Action(a Action) {
 				u.Options.PiBinary = p
 				x.MCP.SetPiBinary(p)
 				x.Resources.SetPiBinary(p)
+				x.invalidateSetupProbe()
+				if x.UI.setup.enabled {
+					x.refreshSetup()
+				}
 				u.save(x.Store.Write("runtime.json", map[string]any{"piBinary": p}))
 			}
 		})
@@ -835,6 +846,7 @@ func Run(o RunOptions) error {
 	}
 	registerNativeHostReady(mygo.App.WhenReady, func() {
 		x.rebuildMenu()
+		x.refreshSetup()
 		lifecycle.SetWindow(create())
 		x.UI.Async(func() func() {
 			apps, e := native.DetectOpenInApps()

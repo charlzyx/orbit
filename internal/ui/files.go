@@ -727,6 +727,10 @@ func (a *App) fileEditorContent(c *ui.Context) {
 	})
 	ui.Row(c).Height(34).PaddingX(10).Gap(6).AlignItems(ui.Center).Children(func() {
 		ui.Text(c, d.Content.Path).MaxLines(1).FontSize(12).TextColor(t.TextMuted).Grow(1)
+		if d.Content.Mode != workspace.FileBinary && d.Content.Mode != workspace.FileTooLarge {
+			lines := strings.ReplaceAll(a.text("explorer.lines", "%{count} lines"), "%{count}", fmt.Sprint(len(d.Content.Lines)))
+			ui.Text(c, lines).FontSize(12).TextColor(t.TextMuted).Shrink(0)
+		}
 		if d.Content.Mode == workspace.FileMarkdown {
 			if a.button(c, "Preview", "", d.Preview).Clicked() && a.syncFileBuffers() {
 				if err := s.editor.SetPreview(d.Content.Path, !d.Preview); err != nil {
@@ -795,13 +799,7 @@ func (a *App) fileEditorContent(c *ui.Context) {
 		s.versions[d.Content.Path] = st.Buffer.Version()
 	}
 	pos := st.CursorPos()
-	status := fmt.Sprintf("Ln %d, Col %d · %d lines", pos.Line+1, pos.Col+1, st.Buffer.LineCount())
-	if d.Dirty {
-		status += " · Saving…"
-	}
-	if !d.Content.Editable() {
-		status += " · Read-only"
-	}
+	status := fmt.Sprintf("Ln %d, Col %d · %s", pos.Line+1, pos.Col+1, a.fileSaveStatus(d))
 	if d.Content.Truncated {
 		status += " · Preview truncated"
 	}

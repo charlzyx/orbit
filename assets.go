@@ -79,6 +79,7 @@ func Locale(language string) (map[string]string, error) {
 	if err := scanner.Err(); err != nil {
 		return nil, err
 	}
+	supplementGoLocale(result, language)
 	return result, nil
 }
 
