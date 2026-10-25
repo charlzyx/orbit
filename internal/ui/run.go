@@ -45,6 +45,7 @@ type RunOptions struct {
 	Offline, NoExtensions bool
 }
 type Controller struct {
+	setupInstall      setupInstallState
 	setupProbe        setupProbeState
 	workspaceBrowse   workspaceBrowseState
 	fileDialogs       nativeFileDialogState
@@ -412,6 +413,7 @@ func (x *Controller) Close() {
 		x.hostMailboxMu.Unlock()
 		close(x.stop)
 		x.cancelBackground()
+		x.waitSetupInstallRunner(3 * time.Second)
 		if x.watcher != nil {
 			x.watcher.Close()
 		}
@@ -422,6 +424,7 @@ func (x *Controller) Close() {
 		x.UI.autocomplete.Close()
 		x.UI.Models.Close()
 		x.UI.closeBackground()
+		x.UI.closeInlineImages()
 		x.UI.markdownImages.Close()
 		x.Worktrees.Close()
 		x.Agent.Close()
@@ -510,6 +513,9 @@ func (x *Controller) Action(a Action) {
 	case "NewSession":
 		x.workspaceBrowse.epoch++
 		e = m.NewSession(x.workspace)
+		if e == nil {
+			a.acceptNewTask()
+		}
 	case "SwitchSession":
 		x.OpenSession(a.Value)
 	case "SetWorkspace":

@@ -318,17 +318,16 @@ func (a *App) reviewLineContent(c *ui.Context, l workspace.ReviewLine, index int
 	case "gap":
 		a.reviewGap(c, l, index)
 		return
+	case "context", "addition", "deletion":
+		number := l.NewLine
+		if number == 0 {
+			number = l.OldLine
+		}
+		a.reviewCodeRow(c, l, number, false)
+		return
 	}
 	color, bg, prefix := t.TextSecondary, t.Background, " "
 	switch l.Kind {
-	case "addition":
-		color = t.Text
-		bg = t.Success.Alpha(.10)
-		prefix = "+"
-	case "deletion":
-		color = t.Text
-		bg = t.Error.Alpha(.10)
-		prefix = "−"
 	case "hunk_header", "meta":
 		color = t.TextMuted
 		bg = t.Surface
@@ -599,15 +598,16 @@ func (a *App) reviewDiffRows(c *ui.Context, width float32) {
 			if r.Full != nil {
 				a.reviewLine(c, *r.Full, -1)
 			} else {
-				ui.Row(c).Children(func() {
-					ui.Column(c).WidthPercent(50).MinWidth(0).Children(func() {
+				ui.Row(c).MinHeight(19).AlignItems(ui.Stretch).Children(func() {
+					ui.Column(c).Grow(1).Basis(0).MinWidth(0).Background(a.Theme.overlay()).Children(func() {
 						if r.Left != nil {
-							a.reviewLine(c, *r.Left, -1)
+							a.reviewCodeRow(c, *r.Left, r.Left.OldLine, true).Grow(1)
 						}
 					})
-					ui.Column(c).WidthPercent(50).MinWidth(0).Children(func() {
+					ui.Box(c).Width(1).Shrink(0).Background(a.Theme.Border)
+					ui.Column(c).Grow(1).Basis(0).MinWidth(0).Background(a.Theme.overlay()).Children(func() {
 						if r.Right != nil {
-							a.reviewLine(c, *r.Right, -1)
+							a.reviewCodeRow(c, *r.Right, r.Right.NewLine, true).Grow(1)
 						}
 					})
 				})

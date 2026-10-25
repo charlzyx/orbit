@@ -137,6 +137,7 @@ func (a *App) markdownImageBlock(c *ui.Context, d *parser.Document, i int) bool 
 // Reset at both snapshot and service ownership boundaries. Services update
 // Model.Workspace before the next snapshot, including A→B→A without a frame.
 func (a *App) resetMarkdownImageOwner() {
+	a.resetInlineImages()
 	a.markdownImages.Reset()
 	a.imageOpen = false
 	a.imagePreview = nil

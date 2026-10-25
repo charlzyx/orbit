@@ -149,13 +149,16 @@ func (a *App) attachmentRow(c *ui.Context) {
 }
 
 func (a *App) messageImageRow(c *ui.Context, m Message) {
+	owner := a.inlineImageToken()
+	if !a.ownsInlineImage(owner) {
+		return
+	}
 	ui.Row(c).Gap(8).Children(func() {
 		for i, im := range m.Images {
 			key := fmt.Sprintf("%s:%d", m.ID, i)
 			source := a.messageImages[key]
 			if source == nil && !a.imageLoading[key] && a.imageErrors[key] == "" {
 				a.imageLoading[key] = true
-				session := a.Model.SessionID
 				a.Async(func() func() {
 					var source ui.ImageSource
 					var e error
@@ -173,7 +176,7 @@ func (a *App) messageImageRow(c *ui.Context, m Message) {
 						}
 					}
 					return func() {
-						if session != a.Model.SessionID {
+						if !a.ownsInlineImage(owner) {
 							return
 						}
 						a.imageLoading[key] = false
@@ -186,7 +189,7 @@ func (a *App) messageImageRow(c *ui.Context, m Message) {
 				})
 			}
 			if source != nil {
-				b := ui.ButtonBase(c.Key(key)).Label("Open image attachment").Padding(4).Radius(8).Border(1, a.Theme.Border).Children(func() { ui.Image(c, source).MaxWidth(240).MaxHeight(180) })
+				b := ui.ButtonBase(c.Key(fmt.Sprintf("inline-image:%d:%s", owner.generation, key))).Label("Open image attachment").Padding(4).Radius(8).Border(1, a.Theme.Border).Children(func() { ui.Image(c, source).MaxWidth(240).MaxHeight(180) })
 				if b.Clicked() {
 					a.imagePreview = source
 					a.imageOpen = true

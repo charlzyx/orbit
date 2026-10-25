@@ -21,7 +21,7 @@ func (a *App) setupBlocked() bool {
 func (a *App) onboardingView(c *ui.Context) {
 	s := &a.setup
 	t := a.Theme
-	ui.Scroll(c.Key("setup-page")).Fill().Children(func() {
+	ui.Scroll(c.Key("setup-page")).Fill().MinWidth(0).Children(func() {
 		ui.Column(c).AlignSelf(ui.Center).WidthPercent(100).MaxWidth(560).Padding(32, 24).Gap(18).Children(func() {
 			ui.Text(c, a.Tr("view.set_up_orbit")).FontSize(t.Px(26)).FontWeight(600)
 			ui.Text(c, a.Tr("view.setup_missing_hint")).TextColor(t.TextSecondary)

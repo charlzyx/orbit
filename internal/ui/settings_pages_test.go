@@ -37,6 +37,18 @@ func TestAppearanceSourceGroupsMappedChoicesAndPersistence(t *testing.T) {
 	if a.Options.Store.Appearance().Mode != "light" {
 		t.Fatal("segmented mode did not persist")
 	}
+	// Rust suppresses pointer focus transfer on segments; keyboard selection
+	// starts only after Tab enters the actual group owner.
+	if err := tt.Click("Search settings"); err != nil {
+		t.Fatal(err)
+	}
+	for i := 0; i < 40 && !tt.Focused("Appearance mode"); i++ {
+		tt.Key(0, ui.KeyTab)
+		tt.Frame()
+	}
+	if !tt.Focused("Appearance mode") {
+		t.Fatal("appearance group not keyboard reachable")
+	}
 	tt.Key(0, ui.KeyRight)
 	if a.Options.Store.Appearance().Mode != "dark" {
 		t.Fatal("arrow key did not choose adjacent appearance")

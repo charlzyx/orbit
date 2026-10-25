@@ -76,11 +76,12 @@ func (a *App) messageTranscript(c *ui.Context) ui.Element {
 						a.toolMessage(c, m)
 					default:
 						if m.Thinking != "" {
-							label := "Thinking"
+							label, display := "Thinking", a.Tr("transcript.thinking")
 							if !m.Streaming {
 								label = "Thought process"
+								display = label
 							}
-							if a.button(c, label, "icons/thinking-medium.svg", false).Clicked() {
+							if a.button(c, display, "icons/thinking-medium.svg", false).Label(label).Clicked() {
 								a.collapsedMessages[m.ID+":thinking"] = !a.collapsedMessages[m.ID+":thinking"]
 							}
 							if a.collapsedMessages[m.ID+":thinking"] {
@@ -114,7 +115,7 @@ func (a *App) messageTranscript(c *ui.Context) ui.Element {
 		}).Grow(1).MinHeight(0).Justify(ui.End).TrackScroll(&a.transcriptScroll)
 		if !a.transcript.AtEnd() {
 			ui.Row(c).AlignSelf(ui.Stretch).Justify(ui.Center).Children(func() {
-				if a.button(c, "Jump to latest", "icons/arrow-down.svg", false).Clicked() {
+				if a.button(c, a.Tr("message_scroller.jump_to_latest"), "icons/arrow-down.svg", false).Label("Jump to latest").Clicked() {
 					a.transcript.ScrollToEnd()
 				}
 			})
@@ -235,23 +236,24 @@ func (a *App) composerView(c *ui.Context) {
 						if label == "" {
 							label = a.access
 						}
-						display := label
+						translated := a.accessDisplay(a.access, label)
+						display := translated
 						terse := a.access == "full-access" || a.access == "full"
 						if terse {
 							display = ""
 						}
-						a.composerChip(c, label, display, "icons/lock.svg", !terse, 0).Menu(func(m *ui.Menu) {
+						a.composerChip(c, label, display, "icons/lock.svg", !terse, 0).Tooltip(translated).Menu(func(m *ui.Menu) {
 							for _, v := range []struct{ id, title string }{{"supervised", "Supervised"}, {"auto-accept-edits", "Auto-accept edits"}, {"full-access", "Full access"}} {
-								if m.Item(v.title).Checked(a.access == v.id).Chosen() {
+								if m.Item(a.accessDisplay(v.id, v.title)).Checked(a.access == v.id).Chosen() {
 									a.access = v.id
 									a.save(a.Options.Store.SaveAccess(v.id))
 									a.Dispatch(Action{Kind: "SetAccess", Value: v.id})
 								}
 							}
 						})
-						a.composerChip(c, titleCase(a.workflow), titleCase(a.workflow), "icons/start-up.svg", true, 0).Menu(func(m *ui.Menu) {
+						a.composerChip(c, titleCase(a.workflow), a.workflowDisplay(a.workflow), "icons/start-up.svg", true, 0).Tooltip(a.workflowDisplay(a.workflow)).Menu(func(m *ui.Menu) {
 							for _, v := range []string{"plan", "build", "ask"} {
-								if m.Item(titleCase(v)).Checked(a.workflow == v).Chosen() {
+								if m.Item(a.workflowDisplay(v)).Checked(a.workflow == v).Chosen() {
 									a.workflow = v
 									a.Dispatch(Action{Kind: "SetWorkflow", Value: v})
 								}
@@ -351,6 +353,32 @@ func (a *App) composerView(c *ui.Context) {
 		})
 	})
 }
+
+// Keep native public labels and stored protocol values separate from painted copy.
+func (a *App) accessDisplay(value, fallback string) string {
+	switch value {
+	case "supervised":
+		return a.Tr("access.supervised")
+	case "auto-accept-edits":
+		return a.Tr("access.auto_accept_edits")
+	case "full", "full-access":
+		return a.Tr("access.full_access")
+	default:
+		return fallback
+	}
+}
+func (a *App) workflowDisplay(value string) string {
+	switch value {
+	case "", "build":
+		return a.Tr("workflow.build")
+	case "plan":
+		return a.Tr("workflow.plan")
+	case "ask":
+		return a.Tr("workflow.ask")
+	default:
+		return titleCase(value)
+	}
+}
 func titleCase(s string) string {
 	if s == "" {
 		return "Build"
@@ -384,7 +412,7 @@ func (a *App) submit(text, mode string) bool {
 func (a *App) findBar(c *ui.Context) {
 	t := a.Theme
 	ui.Row(c.Key("find-transcript")).Padding(8, 16).Gap(8).AlignItems(ui.Center).Children(func() {
-		ui.TextInput(c, &a.Search).Bind(&a.searchInput).Placeholder("Find in transcript…").Label("Find in transcript").Grow(1).OnTextKey(func(k ui.TextKey) bool {
+		ui.TextInput(c, &a.Search).Bind(&a.searchInput).Placeholder(a.Tr("search.find_in_transcript")).Label("Find in transcript").Grow(1).OnTextKey(func(k ui.TextKey) bool {
 			if k.Key == ui.KeyEscape && k.Mods == 0 {
 				a.closeFind()
 				return true

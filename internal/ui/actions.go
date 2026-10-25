@@ -156,12 +156,14 @@ func (a *App) command(id, value string) {
 		}
 		a.Dispatch(Action{Kind: id, Value: value})
 	case "NewSession":
+		if !a.admitNewTask() {
+			return
+		}
 		a.drafts[a.Model.SessionID] = draftState{a.Draft, append([]attachment(nil), a.attachments...)}
 		a.Draft = ""
 		a.attachments = nil
 		a.pendingNew = true
 		a.Navigate("chat")
-		a.Dispatch(Action{Kind: id, Value: a.Model.Workspace})
 		a.composer.Focus()
 	case "SwitchSession":
 		a.Navigate("chat")

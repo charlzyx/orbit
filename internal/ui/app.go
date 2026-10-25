@@ -99,6 +99,7 @@ type Snapshot struct {
 	QuotaSupport                                                                                            string
 }
 type Action struct {
+	newTaskAdmission       *newTaskAdmission
 	Kind, Value, SessionID string
 	Data                   map[string]any
 }
@@ -188,6 +189,7 @@ type App struct {
 	SidebarWidth, ExplorerWidth, ReviewWidth                        float32
 	Draft, Search, paletteQuery, modelQuery                         string
 	attachments                                                     []attachment
+	inlineImages                                                    inlineImageState
 	messageImages                                                   map[string]ui.ImageSource
 	imageLoading                                                    map[string]bool
 	imageErrors                                                     map[string]string
@@ -353,6 +355,7 @@ func (a *App) SetSnapshot(s Snapshot) {
 		s.Error = orbitassets.Translate(a.catalog, a.english, "events.auto_retry_failed", map[string]string{"error": message})
 	}
 	a.Model = s
+	a.syncInlineImageOwner()
 	a.pruneAttachmentPaths()
 	a.syncExtensionUI(s)
 	a.syncModelCatalog()
@@ -474,16 +477,16 @@ func (a *App) View(c *ui.Context) {
 			a.settings(c)
 			return
 		}
-		if a.setupBlocked() {
-			a.onboardingView(c)
-			return
-		}
 		// Keep the workspace's native ancestry stable when the sidebar hides.
 		// A conditional Split reparents every editor and discards private undo.
 		if a.SidebarVisible {
 			a.sidebar(c)
 		}
-		a.main(c)
+		if a.setupBlocked() {
+			a.onboardingView(c)
+		} else {
+			a.main(c)
+		}
 		if a.SidebarVisible {
 			a.sidebarResize(c)
 		}
@@ -949,12 +952,13 @@ func (a *App) terminal(c *ui.Context) {
 			a.save(a.Options.Store.SaveLayout(a.Layout))
 		}
 		ui.Row(c).Height(32).PaddingX(8).Gap(4).AlignItems(ui.Center).Children(func() {
-			for i, tab := range s.Tabs {
-				if a.button(c.Key(fmt.Sprintf("terminal-tab-%d", tab.ID)), tab.Label, tab.Icon, i == s.Active).Tooltip(tab.Tooltip).Clicked() {
-					p.Select(i)
-				}
-			}
-			ui.Spacer(c)
+			ui.ScrollHorizontal(c.Key("terminal-tabs")).Grow(1).MinWidth(0).FillHeight().Children(func() {
+				ui.Row(c).Gap(t.Space(4)).AlignItems(ui.Center).Children(func() {
+					for i, tab := range s.Tabs {
+						a.terminalTab(c.Key(tab.ID), p, tab, i == s.Active)
+					}
+				})
+			})
 			if a.iconButton(c, "New terminal tab", "icons/plus.svg").Clicked() {
 				a.save(p.NewTab())
 			}
@@ -968,10 +972,7 @@ func (a *App) terminal(c *ui.Context) {
 			if restart.Clicked() {
 				a.save(p.Restart())
 			}
-			if a.iconButton(c, "Close terminal tab", "icons/x.svg").Clicked() {
-				a.save(p.CloseActive())
-			}
-			if a.iconButton(c, "Hide terminal", "icons/chevron-down.svg").Clicked() {
+			if a.iconButton(c, "Hide terminal", "icons/x.svg").Clicked() {
 				p.Hide()
 			}
 		})

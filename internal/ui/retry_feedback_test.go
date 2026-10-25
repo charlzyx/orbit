@@ -141,7 +141,13 @@ func TestRetryCancellationFooterLocalizationAndSessionOwnership(t *testing.T) {
 	}
 	state.ExtensionStatusText = "newer extension status"
 	tt.Advance(time.Millisecond)
-	state.ExtensionStatusAt = tt.Now()
+	// Extension status expires against real receipt time, unlike this test's
+	// virtual clock for local retry feedback. A slow mounted frame must not
+	// make this newly received status older than the real six-second TTL.
+	state.ExtensionStatusAt = time.Now()
+	if !state.ExtensionStatusAt.After(a.retryStatusAt) {
+		t.Fatal("fixture did not establish newer extension receipt", state.ExtensionStatusAt, a.retryStatusAt)
+	}
 	a.SetSnapshot(state)
 	tt.Frame()
 	if tt.HasText(a.Tr("settings.retry_aborted")) || !tt.HasText("newer extension status") {

@@ -102,17 +102,17 @@ func (a *App) workspaceHeader(c *ui.Context, r sidebarRow, sticky, ownsActions b
 			a.activateSidebarRow(r)
 		}
 		menu := func(m *ui.Menu) {
-			if m.Item("Copy path").Chosen() {
+			if m.Item(a.Tr("sidebar.copy_path")).Chosen() {
 				c.WriteClipboard(r.path)
 			}
 			if m.Item("Worktrees").Chosen() {
 				a.Navigate("worktrees")
 			}
-			if m.Item("Icon & color").Chosen() {
+			if m.Item(a.Tr("sidebar.icon_and_color")).Chosen() {
 				s.target = w
 				s.open = true
 			}
-			if m.Item("Remove from sidebar").Disabled(s.busy).Chosen() {
+			if m.Item(a.Tr("sidebar.remove_from_sidebar")).Disabled(s.busy).Chosen() {
 				a.editWorkspace(w, true, "", "")
 			}
 			m.Separator()
@@ -193,8 +193,8 @@ func (a *App) workspaceAppearance(c *ui.Context, anchor ui.Element, w *preferenc
 	ui.PopoverBase(c.Key("workspace-appearance"), anchor, &s.open, func(panel ui.Element) {
 		panel.Column().Width(t.Px(206)).Padding(t.Px(8), t.Px(16)).Gap(t.Px(8)).Background(t.Elevated).Border(1, t.Border).Radius(8).Label("Workspace appearance").Children(func() {
 			ui.Row(c).AlignSelf(ui.Stretch).AlignItems(ui.Center).Children(func() {
-				ui.Text(c, "Icon & color").Grow(1)
-				if a.button(c, "Reset", "", false).Disabled(s.busy).Clicked() {
+				ui.Text(c, a.Tr("sidebar.icon_and_color")).Grow(1)
+				if a.workspaceResetButton(c, s.busy).Clicked() {
 					a.editWorkspace(w, false, "", "")
 				}
 			})
@@ -266,4 +266,9 @@ func (a *App) invalidateWorkspaceMenu(next string) {
 		a.workspaceActions.epoch++
 		a.workspaceActions.open = false
 	}
+}
+
+// Stable state identity is independent of the visible/accessibility language.
+func (a *App) workspaceResetButton(c *ui.Context, busy bool) ui.Element {
+	return a.button(c.Key("workspace-appearance-reset"), a.Tr("sidebar.reset"), "", false).Disabled(busy)
 }

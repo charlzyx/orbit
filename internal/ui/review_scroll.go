@@ -46,10 +46,14 @@ func (a *App) reviewUnwrappedWidth(c *ui.Context) float32 {
 		first = &s.data.Lines[0]
 	}
 	cache := &s.widthCache
-	if cache.first != first || cache.count != len(s.data.Lines) || cache.generation != s.generation || cache.font != a.Fonts.CodeFamily || cache.size != a.Theme.CodeSize {
-		*cache = reviewWidthCache{first: first, count: len(s.data.Lines), generation: s.generation, font: a.Fonts.CodeFamily, size: a.Theme.CodeSize}
+	if cache.first != first || cache.count != len(s.data.Lines) || cache.generation != s.generation || cache.font != a.Fonts.CodeFamily || cache.size != a.reviewCodeFontSize() {
+		*cache = reviewWidthCache{first: first, count: len(s.data.Lines), generation: s.generation, font: a.Fonts.CodeFamily, size: a.reviewCodeFontSize()}
 		measure := func(line workspace.ReviewLine) {
-			w, _ := c.MeasureText(0, ui.Span{Text: line.Content, Font: a.Fonts.CodeFamily, Size: a.Theme.CodeSize})
+			size := a.Theme.CodeSize
+			if line.Kind == "context" || line.Kind == "addition" || line.Kind == "deletion" {
+				size = a.reviewCodeFontSize()
+			}
+			w, _ := c.MeasureText(0, ui.Span{Text: line.Content, Font: a.Fonts.CodeFamily, Size: size})
 			cache.width = max(cache.width, w)
 		}
 		for _, line := range s.data.Lines {
@@ -61,10 +65,10 @@ func (a *App) reviewUnwrappedWidth(c *ui.Context) float32 {
 			}
 		}
 	}
-	// Current rendered row chrome: 2×6 padding, 36 number, 10 sign, 2×6 gaps.
-	width := cache.width + 70
+	// Match actual code-row chrome, retaining room for the unified change edge.
+	width := cache.width + reviewCodeGutter + a.Theme.Space(12) + 10 + 2
 	if s.split {
-		width = width * 2
+		width = (cache.width+reviewCodeGutter+2*a.Theme.Space(12))*2 + 1
 	}
 	return width
 }

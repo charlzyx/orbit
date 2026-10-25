@@ -1,6 +1,7 @@
 package orbitui
 
 import (
+	"fmt"
 	"image/png"
 	"os"
 	"path/filepath"
@@ -80,7 +81,7 @@ func terminalHostCapture(t *testing.T, tt *ui.Tester, name string) {
 }
 func TestTerminalHostExitedRestartPreservesTabAndOtherShell(t *testing.T) {
 	firstDir, secondDir := t.TempDir(), t.TempDir()
-	_, p, tt := terminalHostFixture(t, firstDir, []string{"/bin/sh"})
+	a, p, tt := terminalHostFixture(t, firstDir, []string{"/bin/sh"})
 	first := terminalHostReady(t, tt, p)
 	firstID := p.Snapshot().Tabs[0].ID
 	p.SetWorkspace(secondDir)
@@ -150,7 +151,8 @@ func TestTerminalHostExitedRestartPreservesTabAndOtherShell(t *testing.T) {
 	if err := tt.Click("Restart terminal"); err != nil {
 		t.Fatal(err)
 	}
-	if err := tt.Click("Close terminal tab"); err != nil {
+	state := p.Snapshot()
+	if err := tt.Click(fmt.Sprintf("%s %d", a.text("terminal.close_tab", "Close tab"), state.Tabs[state.Active].ID)); err != nil {
 		t.Fatal(err)
 	}
 	// A starter finishing after close must never recreate the removed tab.

@@ -183,7 +183,9 @@ func (a *App) sourceSettingsSegments(c *ui.Context, id, value string, choices []
 	row := ui.Row(c.Key(id)).Label(id).Focusable().Disabled(disabled).AlignItems(ui.Center).Radius(t.Px(8)).Border(1, t.Border).Clip()
 	row.Children(func() {
 		for _, choice := range choices {
-			b := ui.ButtonBase(c.Key(choice.Value)).Label(choice.Label).Height(t.Px(26)).Padding(0, t.Space(8)).Radius(0).FontSize(t.Px(14)).TextColor(t.TextSecondary).Background(t.Elevated)
+			// Rust keeps only the group in Tab order; pointer selection preserves focus.
+			// Keep an explicit accessible button/press action without a second Tab stop.
+			b := ui.Row(c.Key(choice.Value)).Center().Shrink(0).KeepFocus().Role(ui.RoleButton).Label(choice.Label).Height(t.Px(26)).Padding(0, t.Space(8)).Radius(0).FontSize(t.Px(14)).TextColor(t.TextSecondary).Background(t.Elevated)
 			if value == choice.Value {
 				b.Background(t.Selection).TextColor(t.Text)
 			} else if b.Hovered() {

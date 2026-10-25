@@ -68,8 +68,8 @@ func TestMountedReviewPointerPanReachesTailAndKeepsVerticalVirtualization(t *tes
 			if got, _ := a.reviewState.list.Visible(); got != first {
 				t.Fatal("horizontal pan changed vertical anchor", got, first)
 			}
-			if !split && math.Abs(float64(moved.X+moved.W-(viewport.X+viewport.W-6))) > 2 {
-				t.Fatal("tail edge not reachable", moved, viewport)
+			if !split && math.Abs(float64(moved.X+moved.W-(viewport.X+viewport.W-10))) > 2 {
+				t.Fatal("tail edge not reachable with source 10px body end padding", moved, viewport)
 			}
 			tt.Scroll(viewport.X+viewport.W/2, viewport.Y+80, 0, 400)
 			if got, _ := a.reviewState.list.Visible(); got <= first {
