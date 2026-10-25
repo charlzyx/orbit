@@ -21,7 +21,7 @@ def sha(path):
 
 
 def words(tsv):
-    return [row for row in csv.DictReader(io.StringIO(tsv), delimiter='\t') if row.get('level') == '5' and row.get('text', '').strip()]
+    return [row for row in csv.DictReader(io.StringIO(tsv), delimiter='\t') if row.get('level') == '5' and (row.get('text') or '').strip()]
 
 
 def plain(rows):

@@ -19,6 +19,20 @@ def row(text='alpha.go', x=1250, y=155, confidence=95):
 
 
 class CaptureTests(unittest.TestCase):
+    def test_truncated_tsv_word_has_no_text_and_cannot_satisfy_readiness_or_click(self):
+        header = 'level\tleft\ttop\twidth\theight\tconf\ttext\n'
+        for truncated in ['5\t1250\t155\t70\t15\t95', '5\t1250\t155\t70\t15\t95\t']:
+            with self.subTest(truncated=truncated):
+                rows = c.words(header + truncated)
+                self.assertEqual(rows, [])
+                self.assertFalse(c.ready(rows, ['alpha.go'])[0])
+                with self.assertRaisesRegex(ValueError, 'no click sent'):
+                    c.exact_target(rows, 'alpha.go', [1100, 90, 1470, 850])
+        valid = '5\t1250\t155\t70\t15\t95\talpha.go\n'
+        rows = c.words(header + valid + '5\t1250\t155\t70\t15\t95')
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(c.exact_target(rows, 'alpha.go', [1100, 90, 1470, 850])['center'], [1285, 162])
+
     def test_startup_and_case_driver_share_owned_evidence_directory(self):
         with tempfile.TemporaryDirectory() as directory:
             first = c.Capture('42', 123, directory, SUITE)
