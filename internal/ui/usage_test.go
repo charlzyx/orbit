@@ -125,11 +125,11 @@ func TestUsageNativeLoadedEmptyErrorAndModal(t *testing.T) {
 }
 func TestUsageNativeMinimumWindowControls(t *testing.T) {
 	a := fixtureUsageApp(t)
-	tt := ui.NewTester(a.View, 800, 560)
+	tt := ui.NewTester(a.View, 960, 640)
 	tt.Frame()
 	for _, label := range []string{"All workspaces", "All providers", "All models", "Details", "Export", "Refresh"} {
 		r, ok := tt.Find(label)
-		if !ok || r.X < 0 || r.X+r.W > 800.5 || r.Y+r.H > 560.5 {
+		if !ok || r.X < 0 || r.X+r.W > 960.5 || r.Y+r.H > 640.5 {
 			t.Fatalf("%s clipped at minimum window: %+v", label, r)
 		}
 	}

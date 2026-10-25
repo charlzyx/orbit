@@ -32,6 +32,7 @@ func TestHelperProcess(t *testing.T) {
 		mu.Unlock()
 	}
 	input := bufio.NewReader(os.Stdin)
+	var heldResponse map[string]any
 	for {
 		line, err := input.ReadBytes('\n')
 		if err != nil {
@@ -49,6 +50,17 @@ func TestHelperProcess(t *testing.T) {
 		}
 		response := map[string]any{"type": "response", "id": id, "command": kind, "success": true, "data": command}
 		switch kind {
+		case "pipeline_hold":
+			heldResponse = response
+			continue
+		case "pipeline_release":
+			response["data"] = map[string]any{"receivedAfterHold": heldResponse != nil}
+			write(response)
+			if heldResponse != nil {
+				write(heldResponse)
+				heldResponse = nil
+			}
+			continue
 		case "hang":
 			continue
 		case "exit":

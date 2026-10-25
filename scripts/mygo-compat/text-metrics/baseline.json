@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "upstream_commit": "9c69cf829ece196c5b3a3601f1c7bbe70526376f",
+  "module": "github.com/egoist/mygo",
+  "version": "v0.6.4-0.20261025001514-9c69cf829ece",
+  "module_sum": "h1:zKaW0m3ftywWzdR18dv/b+MKgS+iKTu7HF5twRZtSvs=",
+  "go_mod_sum": "h1:dVav53PwF2xEotjf4oA5lTY2Jp2exgzyjLhbSXhbMwE=",
+  "pristine_tree_sha256": "96dae6d68d612b648267f72fdf90f2211698612d29f3c89ca923a314c23af110",
+  "baseline_sha256": {
+    "internal/text/pango_linux.go": "2f260729c9321875c121f05b42a15116696d1cddc8a10dd0f79efd4ce8d57275"
+  },
+  "overlays": {
+    "internal/text/pango_linux.go": {
+      "source": "pango_linux.go.txt",
+      "sha256": "d23cf414a5fd443f51e94aef456e797d618dd4f492cf0b5b76627b38de2e4ed8"
+    },
+    "internal/text/orbit_text_metrics_linux.go": {
+      "source": "orbit_text_metrics_linux.go.txt",
+      "sha256": "85a90869b83e436871e0129cf60ff2f42c407095ca07ba70946344201fab8a9d"
+    },
+    "internal/text/orbit_text_metrics_linux_test.go": {
+      "source": "orbit_text_metrics_linux_test.go.txt",
+      "sha256": "cca103c3ee2c77ba1751db697e9ded8b02b08bed76c067c2308c72d56afd8479"
+    },
+    "internal/text/orbit_text_metrics_specimen_linux_test.go": {
+      "source": "orbit_text_metrics_specimen_linux_test.go.txt",
+      "sha256": "a6ed63b7016d1a78fb988cdf1e18dba6de1228f450b1db74f464b8809a9031b9"
+    },
+    "ui/orbit_text_metrics_linux.go": {
+      "source": "orbit_text_metrics_ui_linux.go.txt",
+      "sha256": "5517d3fb4101a2137e043067ed40eeffc44cd47cc0ce3d457bda0b23a07c1e89"
+    },
+    "ui/orbit_text_metrics_other.go": {
+      "source": "orbit_text_metrics_ui_other.go.txt",
+      "sha256": "2db332026696c82d4be8891c5be6f74b0f6491f5b0816c88c8fd33a1453e5c29"
+    }
+  },
+  "patch_sha256": "1adb8771459e1ed4f67ef27b9a035287898b2dbf80b02218d1d1ea2e2c70c70b",
+  "license_sha256": "f0b56f4ab53beb6e18c5e155219c2e2b6000b5475c0ae3ddb3af3894fd9349b4"
+}

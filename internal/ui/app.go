@@ -58,6 +58,14 @@ type Usage struct {
 	ContextTokens, ContextWindow                     int64
 }
 type Snapshot struct {
+	ExtensionStatusText                                                                                     string
+	ExtensionStatusAt                                                                                       time.Time
+	RuntimeID, ComposerText                                                                                 string
+	ComposerRevision                                                                                        uint64
+	Approval                                                                                                *agent.ApprovalRequest
+	Ask                                                                                                     *agent.AskPrompt
+	ExtensionWidgets                                                                                        []agent.ExtensionWidget
+	ExtensionNotices                                                                                        []agent.ExtensionNotice
 	Auth                                                                                                    agent.AuthState
 	Retrying                                                                                                bool
 	ModelCatalog                                                                                            []agent.ModelChoice
@@ -77,6 +85,7 @@ type Snapshot struct {
 	ThinkingLevels, Commands                                                                                []string
 	CommandsRaw                                                                                             []json.RawMessage
 	Dialog                                                                                                  *DialogRequest
+	Queue                                                                                                   agent.Queue
 	Queued                                                                                                  []string
 	Usage                                                                                                   Usage
 	AuthProviders                                                                                           []agent.AuthProvider
@@ -124,6 +133,7 @@ type Notice struct {
 	Until time.Time
 }
 type App struct {
+	extensionUI                                                     extensionUIState
 	rpcPatchSaving                                                  bool
 	Models                                                          *modelui.State
 	modelDismissedAt                                                time.Time
@@ -294,6 +304,7 @@ func (a *App) SetSnapshot(s Snapshot) {
 		}
 	}
 	a.Model = s
+	a.syncExtensionUI(s)
 	a.syncModelCatalog()
 	if a.reviewState.source == workspace.ReviewLastTurn {
 		if s.LatestTurn == 0 {
@@ -413,17 +424,14 @@ drained:
 			a.settings(c)
 			return
 		}
+		// Keep the workspace's native ancestry stable when the sidebar hides.
+		// A conditional Split reparents every editor and discards private undo.
 		if a.SidebarVisible {
-			// Rust's persisted sidebar width includes its right border. MyGo
-			// Split adds a separate1DIP divider, so only its content pane is W-1.
-			paneWidth := a.SidebarWidth - 1
-			if ui.Split(c, &paneWidth, func() { a.sidebar(c) }, func() { a.main(c) }).Fill().Changed() {
-				a.SidebarWidth = max(SidebarMinWidth, paneWidth+1)
-				a.Layout.SidebarWidth = float64(a.SidebarWidth)
-				a.save(a.Options.Store.SaveLayout(a.Layout))
-			}
-		} else {
-			a.main(c)
+			a.sidebar(c)
+		}
+		a.main(c)
+		if a.SidebarVisible {
+			a.sidebarResize(c)
 		}
 	})
 	if paths := root.DroppedFiles(); len(paths) > 0 && a.page != "settings" {
@@ -529,10 +537,10 @@ func (a *App) sidebar(c *ui.Context) {
 			}
 		})
 		ui.Column(c).Padding(4, 12, 8).AlignSelf(ui.Stretch).Children(func() {
-			b := ui.ButtonBase(c.Key("sidebar-new-task")).Justify(ui.Start).AlignItems(ui.Center).Height(t.Px(32)).AlignSelf(ui.Stretch).PaddingX(t.Space(8)).Gap(t.Space(4)).Radius(t.Px(8)).Background(t.Elevated).Border(1, t.Border).Label(a.text("sidebar.new_session", "New Task"))
+			b := ui.ButtonBase(c.Key("sidebar-new-task")).Justify(ui.Start).AlignItems(ui.Center).Height(t.Px(32)).AlignSelf(ui.Stretch).PaddingX(t.Space(8)).Gap(t.Space(4)).Radius(t.Px(8)).Background(t.Elevated).Border(1, t.Border).Label(a.text("menu.new_task", "New Task"))
 			b.Children(func() {
 				a.icon(c, "icons/task-add-01.svg", t.Px(16), t.AccentText)
-				ui.Text(c, a.text("sidebar.new_session", "New Task")).Grow(1).MinWidth(0).MaxLines(1).FontWeight(500).LineHeight(1)
+				ui.Text(c, a.text("menu.new_task", "New Task")).Grow(1).MinWidth(0).MaxLines(1).FontWeight(500).LineHeight(1)
 				ui.Text(c, shortcutLabel("secondary-n")).FontSize(t.Px(12)).LineHeight(1).TextColor(t.TextMuted)
 			})
 			if b.Hovered() {
@@ -678,7 +686,7 @@ func (a *App) main(c *ui.Context) {
 		// Usage owns the whole workspace area. Other feature pages share the
 		// same content row with the Review dock, as pinned view.rs does.
 		if a.page == "usage" {
-			a.renderFeaturePage(c)
+			a.usageShell(c)
 			return
 		}
 		ui.Row(c.Key("workspace-content")).Grow(1).MinHeight(0).AlignSelf(ui.Stretch).AlignItems(ui.Stretch).Children(func() {
@@ -732,24 +740,32 @@ func (a *App) header(c *ui.Context) {
 	if !a.SidebarVisible {
 		left = max(left, c.TitleBar().Left)
 	}
-	ui.Row(c.Key("header")).DragWindow().Height(HeaderHeight).Padding(0, max(float32(12), c.TitleBar().Right), 0, left).AlignItems(ui.Center).Gap(8).Children(func() {
+	header := ui.Row(c.Key("header")).Height(HeaderHeight).Padding(0, max(float32(12), c.TitleBar().Right), 0, left).AlignItems(ui.Center).Gap(8)
+	if a.page != "usage" {
+		header.DragWindow()
+	}
+	header.Children(func() {
 		if !a.SidebarVisible {
 			if a.iconButton(c, "Show sidebar", "icons/layout-left.svg").Clicked() {
 				a.SidebarVisible = true
 			}
 		}
-		if a.page != "chat" {
-			if a.iconButton(c, "Back to task", "icons/arrow-left.svg").Clicked() {
-				a.Navigate("chat")
+		if a.page == "usage" {
+			a.usageHeaderLeading(c)
+		} else {
+			if a.page != "chat" {
+				if a.iconButton(c, "Back to task", "icons/arrow-left.svg").Clicked() {
+					a.Navigate("chat")
+				}
 			}
+			title := a.Model.SessionName
+			if a.page != "chat" {
+				title = strings.ToUpper(a.page[:1]) + a.page[1:]
+			} else if title == "" {
+				title = a.text("settings.new_task", "New task")
+			}
+			ui.Text(c, title).TextColor(t.TextSecondary).MaxLines(1).Grow(1)
 		}
-		title := a.Model.SessionName
-		if a.page != "chat" {
-			title = strings.ToUpper(a.page[:1]) + a.page[1:]
-		} else if title == "" {
-			title = a.text("settings.new_task", "New task")
-		}
-		ui.Text(c, title).TextColor(t.TextSecondary).MaxLines(1).Grow(1)
 		if a.Model.Running {
 			ui.Spinner(c).Size(14, 14)
 			ui.Text(c, "Working").FontSize(t.Px(12)).TextColor(t.TextMuted)

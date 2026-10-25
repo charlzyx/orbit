@@ -17,7 +17,7 @@ import (
 )
 
 type Theme struct {
-	Elevated                                     ui.Color
+	Elevated, SurfaceSecondary                   ui.Color
 	Secondary, Action, ActionText, SelectionText ui.Color
 	CodeFont                                     string
 	Px                                           func(float32) float32

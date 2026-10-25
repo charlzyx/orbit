@@ -20,6 +20,8 @@ import (
 )
 
 type liveSession struct {
+	queueRestoreEpoch    uint64
+	queueRestorePending  bool
 	modelMu              sync.Mutex
 	modelDefault         birthDefault
 	modelGeneration      uint64
@@ -155,6 +157,9 @@ func (m *Manager) open(workspace, sessionPath, pendingWorkflow string) error {
 			if !session.stopped && session.state.snapshot.ActiveSession.Path == sessionPath && (session.loading || session.client != nil && session.client.Alive()) {
 				if old := m.sessions[m.active]; old != nil {
 					old.parkedAt = time.Now()
+					if key != m.active {
+						old.state.cancelExtensionUI()
+					}
 				}
 				m.active = key
 				m.mu.Unlock()
@@ -165,6 +170,7 @@ func (m *Manager) open(workspace, sessionPath, pendingWorkflow string) error {
 	}
 	if previous := m.sessions[m.active]; previous != nil {
 		previous.parkedAt = time.Now()
+		previous.state.cancelExtensionUI()
 	}
 	m.sequence++
 	key := fmt.Sprintf("live-%d", m.sequence)
@@ -350,10 +356,13 @@ func (m *Manager) NewSession(workspace string) error {
 	entry := m.sessions[key]
 	reusable := entry != nil && !entry.busy() && entry.client != nil && entry.client.Alive() && entry.state.snapshot.ActiveSession.Workspace == absolute
 	var previous sessionState
+	var departingUI []pirpc.UIResponse
 	var previousWorkflowID string
 	var previousDefault birthDefault
 	var defaultGeneration uint64
 	if reusable {
+		entry.state.cancelExtensionUI()
+		departingUI = entry.state.takeUIResponses()
 		previous = entry.state
 		previousDefault = entry.modelDefault
 		entry.modelGeneration++
@@ -378,6 +387,14 @@ func (m *Manager) NewSession(workspace string) error {
 	}
 	m.changed()
 	m.launch(func() {
+		for _, reply := range departingUI {
+			ctx, cancel := context.WithTimeout(m.ctx, m.options.CommandTimeout)
+			err := entry.client.SendUI(ctx, reply)
+			cancel()
+			if err != nil {
+				m.operationError(err)
+			}
+		}
 		value := preferences.New(m.options.Home).SessionDefault()
 		m.mu.Lock()
 		if entry.modelGeneration == defaultGeneration {
@@ -578,7 +595,15 @@ func (m *Manager) Submit(text string, images []Image, mode SendMode) error {
 	return nil
 }
 
-func (m *Manager) ClearQueue() error { return m.Send(pirpc.ClearQueue, nil) }
+func (m *Manager) ClearQueue() error {
+	m.mu.Lock()
+	if entry := m.sessions[m.active]; entry != nil {
+		entry.queueRestorePending = false
+		entry.queueRestoreEpoch++
+	}
+	m.mu.Unlock()
+	return m.Send(pirpc.ClearQueue, nil)
+}
 func (m *Manager) SetModel(provider, id string) error {
 	if provider == "" || id == "" {
 		return errors.New("provider and model are required")
@@ -611,10 +636,18 @@ func (m *Manager) RespondDialog(id, value string, confirmed *bool, cancelled boo
 			break
 		}
 	}
+	if p := entry.state.snapshot.Approval; p != nil && p.ID == id {
+		dialog = &PendingDialog{ID: id, Method: "select", Options: p.Options}
+	}
+	if p := entry.state.snapshot.Ask; p != nil && p.ID == id && !p.Submitted && cancelled {
+		dialog = &PendingDialog{ID: id, Method: "input"}
+	}
 	if dialog == nil {
 		m.mu.Unlock()
 		return errors.New("dialog request is no longer pending")
 	}
+	// Claim the request before launching I/O: repeated clicks cannot answer twice.
+	entry.state.removeDialog(id)
 	client := entry.client
 	m.mu.Unlock()
 	response := pirpc.UIResponse{ID: id, Cancelled: cancelled, Confirmed: confirmed}
@@ -626,9 +659,7 @@ func (m *Manager) RespondDialog(id, value string, confirmed *bool, cancelled boo
 		defer cancel()
 		err := client.SendUI(ctx, response)
 		m.mu.Lock()
-		if err == nil {
-			entry.state.removeDialog(id)
-		} else {
+		if err != nil {
 			entry.state.snapshot.ConnectionError = err.Error()
 		}
 		m.mu.Unlock()
@@ -673,7 +704,7 @@ func (m *Manager) Tick() bool {
 	type operation struct {
 		entry             *liveSession
 		command           pirpc.Command
-		dialog            string
+		uiResponse        *pirpc.UIResponse
 		defaultCommand    bool
 		defaultGeneration uint64
 	}
@@ -694,11 +725,22 @@ func (m *Manager) Tick() bool {
 			continue
 		}
 		for _, event := range entry.client.DrainEvents() {
+			if event.Type == "response" && strings.HasPrefix(event.ID, abortRequestPrefix) {
+				origin, valid := parseAbortOrigin(event.ID, event.String("command"))
+				if !valid || !origin.matches(entry) {
+					continue
+				}
+			}
 			if entry.creatingSession && event.Type == "response" && event.String("command") == pirpc.GetState {
 				continue
 			}
 			wasRunning := entry.state.snapshot.Running
-			entry.state.apply(event)
+			parkedRequest := key != m.active && event.Type == "extension_ui_request"
+			if parkedRequest {
+				entry.state.cancelUI(event.ID)
+			} else {
+				entry.state.apply(event)
+			}
 			if event.Type == "response" && event.String("command") == pirpc.GetState && event.Bool("success") {
 				id := entry.state.snapshot.ActiveSession.ID
 				if id != "" && id != entry.checkpointID {
@@ -729,13 +771,7 @@ func (m *Manager) Tick() bool {
 				entry.entriesPending = false
 				entry.lastEntries = now
 			}
-			if key != m.active && event.Type == "extension_ui_request" {
-				method := event.String("method")
-				if method == "select" || method == "confirm" || method == "input" || method == "editor" || method == "custom" {
-					operations = append(operations, operation{entry: entry, dialog: event.ID})
-					entry.state.removeDialog(event.ID)
-				}
-			}
+
 			if event.Type == "agent_settled" {
 				if entry.promptCancel != nil {
 					entry.promptCancel()
@@ -805,13 +841,11 @@ func (m *Manager) Tick() bool {
 			auth.Error = "Provider sign-in timed out"
 			changed = true
 		}
-		for i := len(entry.state.snapshot.Dialogs) - 1; i >= 0; i-- {
-			dialog := entry.state.snapshot.Dialogs[i]
-			if dialog.Timeout > 0 && now.Sub(dialog.ReceivedAt) >= dialog.Timeout {
-				entry.state.removeDialog(dialog.ID)
-				changed = true
-			}
+		for _, response := range entry.state.takeUIResponses() {
+			response := response
+			operations = append(operations, operation{entry: entry, uiResponse: &response})
 		}
+
 		if !entry.loading && entry.client.Alive() && !entry.entriesPending && now.Sub(entry.lastEntries) >= time.Minute {
 			params := map[string]any{}
 			if entry.state.entriesCursor != "" {
@@ -865,10 +899,16 @@ func (m *Manager) Tick() bool {
 	for _, operation := range operations {
 		operation := operation
 		m.launch(func() {
-			if operation.dialog != "" {
+			if operation.uiResponse != nil {
 				ctx, cancel := context.WithTimeout(m.ctx, m.options.CommandTimeout)
 				defer cancel()
-				_ = operation.entry.client.CancelDialog(ctx, operation.dialog)
+				if err := operation.entry.client.SendUI(ctx, *operation.uiResponse); err != nil {
+					m.mu.Lock()
+					operation.entry.state.snapshot.ConnectionError = err.Error()
+					m.mu.Unlock()
+					m.changed()
+				}
+
 			} else {
 				if operation.defaultCommand {
 					operation.entry.modelMu.Lock()
@@ -939,6 +979,7 @@ func (m *Manager) Snapshot() Snapshot {
 	snapshot.Extensions.Patches.Enabled = m.patchPolicyEnabled
 	if entry := m.sessions[m.active]; entry != nil {
 		snapshot = entry.state.snapshot
+		snapshot.RuntimeID = m.active
 		snapshot.Awaiting = entry.state.awaiting
 		snapshot.Running = snapshot.Running || entry.state.awaiting
 		snapshot.ActiveSession.Running = snapshot.Running
@@ -1244,7 +1285,8 @@ func (m *Manager) SetPiBinary(path string) error {
 // aborting so they cannot immediately restart the run, and restore their text.
 func (m *Manager) Abort() error {
 	m.mu.Lock()
-	entry := m.sessions[m.active]
+	key := m.active
+	entry := m.sessions[key]
 	if m.closed || entry == nil || entry.client == nil || entry.loading || !entry.client.Alive() {
 		m.mu.Unlock()
 		return errors.New("Pi session is not ready")
@@ -1255,27 +1297,55 @@ func (m *Manager) Abort() error {
 	entry.state.awaiting = false
 	client := entry.client
 	hasQueue := len(entry.state.snapshot.Queue.Steering)+len(entry.state.snapshot.Queue.FollowUp) > 0
+	m.sequence++
+	origin := abortOrigin{sessionID: entry.state.snapshot.ActiveSession.ID, reset: entry.workflowGeneration, nonce: m.sequence}
+	if hasQueue && !entry.queueRestorePending {
+		entry.queueRestoreEpoch++
+		entry.queueRestorePending = true
+	}
+	restoreEpoch := entry.queueRestoreEpoch
 	m.mu.Unlock()
 	if !m.launch(func() {
+		commands := []pirpc.Command{}
 		if hasQueue {
-			response, err := m.callClient(client, pirpc.NewCommand(pirpc.ClearQueue, nil))
-			if err == nil {
-				var dropped Queue
-				if response.DecodeData(&dropped) == nil {
-					parts := append(append([]string{}, dropped.Steering...), dropped.FollowUp...)
-					m.mu.Lock()
-					entry.state.snapshot.Queue = Queue{}
-					if len(parts) > 0 {
-						entry.state.snapshot.ComposerText = strings.Join(parts, "\n\n")
+			commands = append(commands, origin.command(pirpc.ClearQueue))
+		}
+		commands = append(commands, origin.command(pirpc.Abort))
+		ctx, cancel := context.WithTimeout(m.ctx, m.options.CommandTimeout)
+		defer cancel()
+		// Source enqueues clear_queue then abort immediately. Restoration waits
+		// for the clear response; abort transmission must never wait for it.
+		client.CallOrdered(ctx, commands, func(i int, response pirpc.Response, err error) {
+			if commands[i].Type == pirpc.ClearQueue {
+				if err == nil {
+					var dropped Queue
+					if response.DecodeData(&dropped) == nil {
+						parts := append(append([]string{}, dropped.Steering...), dropped.FollowUp...)
+						m.mu.Lock()
+						// NewSession advances workflowGeneration when replacing the
+						// state. A late clear reply belongs to that old state, not
+						// a new task reusing its process. Parking alone remains valid.
+						if !m.closed && m.sessions[key] == entry && entry.client == client && origin.matches(entry) {
+							entry.state.snapshot.Queue = Queue{}
+							if entry.queueRestorePending && entry.queueRestoreEpoch == restoreEpoch {
+								entry.queueRestorePending = false
+								if len(parts) > 0 {
+									entry.state.setComposerText(strings.Join(parts, "\n\n"))
+								}
+							}
+						}
+						m.mu.Unlock()
+						m.changed()
 					}
-					m.mu.Unlock()
 				}
+			} else if err != nil {
+				m.mu.Lock()
+				if !m.closed && m.sessions[key] == entry && entry.client == client && origin.matches(entry) {
+					entry.state.snapshot.ConnectionError = err.Error()
+				}
+				m.mu.Unlock()
 			}
-		}
-		_, abortErr := m.callClient(client, pirpc.NewCommand(pirpc.Abort, nil))
-		if abortErr != nil {
-			m.operationError(abortErr)
-		}
+		})
 		m.Tick()
 		m.changed()
 	}) {

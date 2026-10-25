@@ -1,0 +1,86 @@
+name: Explicit macOS test prerelease
+
+on:
+  push:
+    branches: [redesign/mygo-rpc]
+    paths: [.github/macos-test-prerelease.json]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: orbit-macos-test-prerelease-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate-and-package:
+    if: github.repository == 'charlzyx/orbit' && github.event_name == 'push' && github.ref == 'refs/heads/redesign/mygo-rpc'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    outputs:
+      version: ${{ steps.marker.outputs.version }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Require changed explicit test-version marker and fixed runtime fingerprint
+        id: marker
+        env:
+          EVENT_BEFORE: ${{ github.event.before }}
+        run: python3 scripts/macos-test/verify-marker.py
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16
+        with:
+          go-version: '1.27.3'
+          cache: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22.19.0'
+      - name: Install isolated native-test dependencies and pinned Pi
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libpango-1.0-0 libcairo2 libfontconfig1
+          npm install --prefix "$RUNNER_TEMP/orbit-pi-runtime" @earendil-works/pi-coding-agent@1.4.0
+      - name: Aggregate tests, six cross-builds, static runtime audit and packaging
+        id: package
+        run: bash scripts/macos-test/ci-build.sh
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: macos-test-assets-${{ github.sha }}
+          path: |
+            ${{ steps.package.outputs.assets }}/*.zip
+            ${{ steps.package.outputs.assets }}/SHA256SUMS
+            ${{ steps.package.outputs.assets }}/KNOWN-LIMITS.txt
+            ${{ steps.package.outputs.assets }}/release-manifest.json
+            ${{ steps.package.outputs.assets }}/RELEASE-NOTES.md
+          if-no-files-found: error
+          retention-days: 14
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: macos-test-validation-${{ github.sha }}
+          path: ${{ runner.temp }}/orbit-macos-test-${{ github.sha }}/logs/
+          if-no-files-found: warn
+          retention-days: 14
+
+  publish-requested-prerelease:
+    needs: validate-and-package
+    if: github.repository == 'charlzyx/orbit' && github.event_name == 'push' && github.ref == 'refs/heads/redesign/mygo-rpc' && needs.validate-and-package.result == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: macos-test-assets-${{ github.sha }}
+          path: ${{ runner.temp }}/orbit-release-assets
+      - name: Publish only a new exact-commit prerelease, never overwrite
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/macos-test/publish-prerelease.py --source "$GITHUB_WORKSPACE" --assets "$RUNNER_TEMP/orbit-release-assets"

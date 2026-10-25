@@ -155,20 +155,18 @@ func (a *App) composerView(c *ui.Context) {
 	}
 	style := composerui.Style{FontSize: t.FontSize, Density: t.Density, Font: t.Font, Dark: t.Dark, Surface: t.Elevated, Border: t.Text.Alpha(borderAlpha), Selection: t.Selection, Hover: t.Hover, Text: t.Text, Secondary: t.TextSecondary, Muted: t.TextMuted, Badge: t.Text.Alpha(badgeAlpha), CommandColor: t.AccentText, FileColor: composerui.MentionFileColor(t.AccentText), TextFor: a.text, Icon: func(c *ui.Context, path string, size float32, color ui.Color) { a.icon(c, path, size, color) }}
 	ui.Column(c.Key("composer-wrap")).AlignSelf(ui.Stretch).AlignItems(ui.Center).Padding(0, 16, 16).LineHeight(sourceDefaultLineHeight).Children(func() {
-		ui.Column(c).WidthPercent(100).MaxWidth(ContentMaxWidth).Gap(6).Children(func() {
-			for i, q := range a.Model.Queued {
-				ui.Row(c.Key(fmt.Sprintf("queued-%d", i))).Padding(8, 12).Radius(8).Border(1, t.Border).Background(t.SurfaceSecondary).Children(func() {
-					ui.Text(c, q).MaxLines(2).Grow(1).TextColor(t.TextMuted)
-					if a.iconButton(c, "Clear queued messages", "icons/x.svg").Clicked() {
-						a.Dispatch(Action{Kind: "ClearQueue"})
-					}
-				})
-			}
+		ui.Column(c).WidthPercent(100).MaxWidth(ContentMaxWidth).Gap(0).Children(func() {
+			a.inlineExtensionPanels(c)
+			a.queueBar(c)
+			a.extensionWidgets(c, "aboveEditor")
 			anchor := ui.Column(c.Key("composer")).AlignSelf(ui.Stretch).Padding(t.Space(12), t.Space(16), t.Space(12)).Gap(t.Space(16)).Radius(t.Px(16)).Border(1, t.Border).Background(t.SurfaceSecondary).Shadow(0, 2, 10, -3, t.composerContact()).Label("Composer box")
 			var input ui.Element
 			anchor.Children(func() {
 				a.attachmentRow(c)
-				input = ui.TextAreaBase(c.Key(struct{ Field, Session, Workspace string }{"draft", a.Model.SessionID, a.Model.Workspace}), &a.Draft).Bind(&a.composer).Label("Message").Placeholder(a.text("composer.placeholder", "Describe the task…")).Lines(1, 8).AlignSelf(ui.Stretch).OnTextKey(func(k ui.TextKey) bool {
+				input = ui.TextAreaBase(c.Key(struct {
+					Field, Session, Workspace string
+					ComposerEpoch             uint64
+				}{"draft", a.Model.SessionID, a.Model.Workspace, a.extensionUI.composerEpoch}), &a.Draft).Bind(&a.composer).Label("Message").Placeholder(a.text("composer.placeholder", "Describe the task…")).Lines(1, 8).AlignSelf(ui.Stretch).OnTextKey(func(k ui.TextKey) bool {
 					if a.autocomplete.HandleKey(k) {
 						return true
 					}
@@ -206,6 +204,7 @@ func (a *App) composerView(c *ui.Context) {
 					c.AnimationFrame()
 				}
 				a.retainReviewComposer(c, input)
+				a.trackExtensionComposer(c, input)
 				composerui.PaintMentions(input, a.Draft, style)
 				ui.Row(c).AlignSelf(ui.Stretch).AlignItems(ui.Center).Gap(8).Children(func() {
 					a.composerChip(c, "Add attachment", "", "icons/plus.svg", false, 0).Menu(func(m *ui.Menu) {
@@ -309,6 +308,7 @@ func (a *App) composerView(c *ui.Context) {
 					}
 				})
 			})
+			a.extensionWidgets(c, "belowEditor")
 			a.autocomplete.Popup(c, anchor, input, &a.Draft, style)
 			ui.Row(c).Height(t.Px(22)).AlignSelf(ui.Stretch).AlignItems(ui.Center).Gap(16).Children(func() {
 				if a.composerChip(c, filepath.Base(a.Model.Workspace), filepath.Base(a.Model.Workspace), "icons/folder.svg", false, 0).Clicked() {
@@ -323,6 +323,7 @@ func (a *App) composerView(c *ui.Context) {
 					}
 				}
 				ui.Spacer(c)
+				a.extensionStatus(c)
 				if a.Model.Usage.ContextAvailable {
 					usage := a.Model.Usage
 					detail := fmt.Sprintf("Context: %d / %d tokens", usage.ContextTokens, usage.ContextWindow)

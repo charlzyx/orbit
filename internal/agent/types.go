@@ -73,15 +73,15 @@ type ModelChoice struct {
 	Raw           json.RawMessage `json:"-"`
 }
 type PendingDialog struct {
-	ID, Method, Title, Message, Value string
-	Options                           []string
-	Timeout                           time.Duration
-	ReceivedAt                        time.Time
-	Phase                             string
-	Lines                             []string
-	Width, Height                     int
-	Cursor                            json.RawMessage
-	Raw                               json.RawMessage
+	ID, Method, Title, Message, Value, Placeholder string
+	Options                                        []string
+	Timeout                                        time.Duration
+	ReceivedAt                                     time.Time
+	Phase                                          string
+	Lines                                          []string
+	Width, Height                                  int
+	Cursor                                         json.RawMessage
+	Raw                                            json.RawMessage
 }
 type Queue struct {
 	Steering []string `json:"steering"`
@@ -140,8 +140,12 @@ type ExtensionStatus struct {
 	Patches                       PatchStatus
 }
 type Snapshot struct {
-	Awaiting bool
-	Turn     int
+	RuntimeID           string
+	ComposerRevision    uint64
+	ExtensionStatusText string
+	ExtensionStatusAt   time.Time
+	Awaiting            bool
+	Turn                int
 	// LatestTurn is the newest successfully captured completed turn. Turn may
 	// already identify a running prompt; Review must never substitute it here.
 	LatestTurn                               int
@@ -156,6 +160,10 @@ type Snapshot struct {
 	ThinkingLevel, ConnectionError, Status   string
 	Connected, Running, Compacting, Retrying bool
 	Dialogs                                  []PendingDialog
+	Approval                                 *ApprovalRequest
+	Ask                                      *AskPrompt
+	ExtensionWidgets                         []ExtensionWidget
+	ExtensionNotices                         []ExtensionNotice
 	Queue                                    Queue
 	Auth                                     AuthState
 	Quotas                                   []QuotaReport

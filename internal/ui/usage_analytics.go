@@ -406,7 +406,7 @@ func (a *App) usageSummaryDetails(c *ui.Context, p usageProjection) {
 	s := p.Summary
 	cost := a.text("usage.unavailable", "Unavailable")
 	if s.PricedRequests > 0 {
-		cost = usageCost(s.Cost) + " · " + usageCost(s.Cost/float64(s.PricedRequests)) + " / req"
+		cost = a.usageText("usage.stat_cost_per_req", "%{cost} · %{per} / req", map[string]string{"cost": usageCost(s.Cost), "per": usageCost(s.Cost / float64(s.PricedRequests))})
 	}
 	failed := a.text("usage.none", "None")
 	if s.Errors > 0 {
@@ -437,14 +437,27 @@ func (a *App) usageSummaryDetails(c *ui.Context, p usageProjection) {
 		stats = append(stats, struct{ key, label, value string }{"peak_prompt", "Peak prompt", compactCount(p.PeakPrompt)})
 	}
 	if p.ReasoningReported {
-		stats = append(stats, struct{ key, label, value string }{"reasoning", "Reasoning", compactCount(s.Tokens.Reasoning) + " of output"})
+		stats = append(stats, struct{ key, label, value string }{"reasoning", "Reasoning", a.usageText("usage.stat_reasoning_of_output", "%{value} of output", map[string]string{"value": compactCount(s.Tokens.Reasoning)})})
 	}
-	ui.Row(c).Wrap().Gap(16).Children(func() {
+	ui.Row(c).Label("Usage summary metadata").Wrap().GapX(a.Theme.Space(20)).GapY(a.Theme.Space(6)).AlignItems(ui.Center).Children(func() {
 		for _, item := range stats {
-			ui.Row(c).Gap(6).Children(func() {
-				ui.Text(c, a.text("usage.stat_"+item.key, item.label)).TextColor(a.Theme.TextMuted).FontSize(11)
-				ui.Text(c, item.value).Font(a.Fonts.CodeFamily).FontSize(11)
+			ui.Row(c).Gap(a.Theme.Space(6)).AlignItems(ui.Center).Children(func() {
+				ui.Text(c, a.text("usage.stat_"+item.key, item.label)).TextColor(a.Theme.TextMuted).FontSize(a.Theme.Px(12)).FixedLineHeight(usageLineHeight(a.Theme.Px(12)))
+				ui.Text(c, item.value).Font(a.Theme.Font).FontFeatures("tnum", "lnum").TextColor(a.Theme.TextSecondary).FontSize(a.Theme.Px(12)).FixedLineHeight(usageLineHeight(a.Theme.Px(12)))
 			})
+		}
+		if p.Summary.Errors > 0 {
+			label := a.text("view.view_failures", "View failures")
+			b := ui.ButtonBase(c).Label(label).Height(a.Theme.Px(18)).PaddingX(a.Theme.Space(4)).Radius(a.Theme.Px(6)).AlignItems(ui.Center)
+			fg := a.Theme.Error
+			if b.Hovered() {
+				fg = a.Theme.Text
+			}
+			b.Children(func() { ui.Text(c, label).FontSize(a.Theme.Px(12)).FixedLineHeight(a.Theme.Px(12)).TextColor(fg) })
+			if b.Clicked() {
+				a.usageState.filter.ErrorsOnly = true
+				a.usageState.filter.CachedOnly = false
+			}
 		}
 	})
 }
@@ -453,21 +466,24 @@ func (a *App) usageSummary(c *ui.Context) {
 	s := &a.usageState
 	p := s.projection
 	t := a.Theme
-	a.usageCard(c, a.text("usage.summary", "Summary"), a.usageSummaryMeta(), func() {
+	a.usageCardLayout(c, a.text("usage.summary", "Summary"), a.usageSummaryMeta(), 0, 0, func() {
 		unavailable := a.text("usage.unavailable", "Unavailable")
 		avg, avgHint := unavailable, a.text("usage.sub_no_request_gaps", "No request timing available")
 		if p.Summary.TimedRequests > 0 {
 			avg = usageDuration(p.Summary.Duration.Seconds() / float64(p.Summary.TimedRequests))
-			avgHint = usageLatencyHint(p.P95, p.Timed)
+			avgHint = a.usageText("usage.sub_measured", "%{count} measured", map[string]string{"count": usageCount(uint64(p.Timed))})
+			if p.Timed >= 20 {
+				avgHint = a.usageText("usage.sub_p95_measured", "p95 %{p95} · %{count} measured", map[string]string{"p95": usageDuration(p.P95.Seconds()), "count": usageCount(uint64(p.Timed))})
+			}
 		}
 		cache, cacheHint := unavailable, a.text("usage.sub_no_cache_tokens", "No cache tokens reported")
 		if rate, ok := usageCacheRate(p.Summary.Tokens); ok {
 			cache = usagePercent(rate)
-			cacheHint = compactCount(p.Summary.Tokens.CacheRead) + " read · " + compactCount(p.Summary.Tokens.CacheWrite) + " written"
+			cacheHint = a.usageText("usage.sub_read_written", "%{read} read · %{written} written", map[string]string{"read": compactCount(p.Summary.Tokens.CacheRead), "written": compactCount(p.Summary.Tokens.CacheWrite)})
 		}
 		tokenHint := a.text("usage.sub_no_requests", "No requests")
 		if p.Summary.Requests > 0 {
-			tokenHint = compactCount(p.Summary.Tokens.Total/uint64(p.Summary.Requests)) + " avg / request"
+			tokenHint = a.usageText("usage.sub_avg_per_request", "%{value} avg/request", map[string]string{"value": compactCount(p.Summary.Tokens.Total / uint64(p.Summary.Requests))})
 		}
 		requestHint := usageComparison(p, "requests")
 		if requestHint == "" {
@@ -482,10 +498,7 @@ func (a *App) usageSummary(c *ui.Context) {
 			{"cache", "cache_hit_rate", "Cache hit rate", cache, cacheHint, cache != unavailable},
 			{"latency", "avg_response", "Avg response", avg, avgHint, avg != unavailable},
 		}
-		width, _ := c.Size()
-		if a.SidebarVisible {
-			width -= a.SidebarWidth
-		}
+		width := a.usageColumnWidth(c)
 		cols := 4
 		if width < 880 {
 			cols = 2
@@ -496,29 +509,36 @@ func (a *App) usageSummary(c *ui.Context) {
 		for start := 0; start < len(stats); start += cols {
 			ui.Row(c).Gap(0).Children(func() {
 				for i, stat := range stats[start:min(start+cols, len(stats))] {
-					cell := ui.ButtonBase(c.Key("usage-kpi:" + stat.metric)).Grow(1).MinWidth(0).Padding(12).Justify(ui.Start).Disabled(!stat.available).Label(a.text("usage.metric_"+stat.key, stat.label))
+					cell := ui.ButtonBase(c.Key("usage-kpi:" + stat.metric)).Grow(1).MinWidth(150).Padding(t.Space(12)).Justify(ui.Start).Disabled(!stat.available).Label(a.text("usage.metric_"+stat.key, stat.label))
+					top, right := float32(0), float32(0)
+					if start > 0 {
+						top = 1
+					}
 					if i+1 < cols {
-						cell.BorderWidth(0, 1, 0, 0).BorderColor(t.Border)
+						right = 1
+					}
+					cell.BorderWidth(top, right, 0, 0).BorderColor(t.Border)
+					if stat.available && cell.Hovered() {
+						cell.Background(t.Hover)
 					}
 					if cell.Clicked() {
 						s.metric = stat.metric
 						a.saveUsagePrefs()
 					}
 					cell.Children(func() {
-						ui.Column(c).Grow(1).AlignSelf(ui.Stretch).Gap(6).Children(func() {
-							ui.Text(c, a.text("usage.metric_"+stat.key, stat.label)).TextColor(t.TextMuted).FontSize(11)
-							ui.Text(c, stat.value).Font(a.Fonts.CodeFamily).FontSize(20)
-							ui.Text(c, stat.hint).TextColor(t.TextMuted).FontSize(11)
+						ui.Column(c).Grow(1).AlignSelf(ui.Stretch).Gap(t.Space(6)).Children(func() {
+							ui.Text(c, a.text("usage.metric_"+stat.key, stat.label)).TextColor(t.TextMuted).FontSize(t.Px(12)).FontWeight(500).FixedLineHeight(usageLineHeight(t.Px(12)))
+							valueColor := t.Text
+							if !stat.available {
+								valueColor = t.TextMuted
+							}
+							ui.Text(c, stat.value).TextColor(valueColor).Font(t.Font).FontFeatures("tnum", "lnum").FontSize(t.Px(20)).FontWeight(500).FixedLineHeight(usageLineHeight(t.Px(20)))
+							ui.Text(c, stat.hint).TextColor(t.TextMuted).FontSize(t.Px(12)).FixedLineHeight(usageLineHeight(t.Px(12)))
 						})
 					})
 				}
 			})
 		}
-		a.line(c)
-		a.usageSummaryDetails(c, p)
-		if p.Summary.Errors > 0 && a.button(c, a.text("usage.view_failures", "View failures"), "", false).Clicked() {
-			s.filter.ErrorsOnly = true
-			s.filter.CachedOnly = false
-		}
+		ui.Column(c).AlignSelf(ui.Stretch).Padding(t.Space(8), t.Space(12)).BorderWidth(1, 0, 0, 0).BorderColor(t.Border).Children(func() { a.usageSummaryDetails(c, p) })
 	})
 }

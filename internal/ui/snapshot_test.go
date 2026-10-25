@@ -13,6 +13,9 @@ import (
 )
 
 func TestMain(m *testing.M) {
+	if e := configureDiagnosticTextMetrics(); e != nil {
+		panic(e)
+	}
 	dir, e := os.MkdirTemp("", "orbit-native-ui-cache-")
 	if e != nil {
 		panic(e)

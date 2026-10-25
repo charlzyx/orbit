@@ -13,19 +13,19 @@ import (
 
 func (s *State) skillsView(c *ui.Context) ui.Element {
 	a := s.appearance(c)
-	root := ui.Row(c).Grow(1).MinWidth(0).MinHeight(0).AlignSelf(ui.Stretch).AlignItems(ui.Stretch).Background(a.native.Background)
+	root := ui.Row(c).Grow(1).MinWidth(0).MinHeight(0).AlignSelf(ui.Stretch).AlignItems(ui.Stretch).Background(a.native.Background).LineHeight(1.618034)
 	root.Children(func() {
 		s.skillsList(c)
 		selected := s.skill(s.Selected)
 		if selected == nil {
-			ui.Column(c.Key("select-empty")).Grow(1).MinWidth(0).Center().Gap(a.Space(8)).Padding(a.Space(24)).Children(func() {
+			ui.Column(c.Key("select-empty")).Grow(1).MinWidth(0).Center().Gap(a.Space(8)).Children(func() {
 				if s.Busy {
 					ui.Spinner(c).Size(a.Px(22), a.Px(22))
 				} else {
 					icon(c, "magic-wand", a.Px(30), a.native.TextMuted)
 				}
 				ui.Text(c, s.label("skills_ui.select_a_skill", "Select a skill")).FontSize(a.Px(14)).FontWeight(500)
-				ui.Text(c, s.label("skills_ui.pick_one_from_the_list_to_see_its_details_and_sk", "Pick one from the list to see its details and SKILL.md.")).FontSize(a.Px(12)).TextColor(a.native.TextMuted)
+				ui.Text(c, s.label("skills_ui.pick_one_from_the_list_to_see_its_details_and_sk", "Pick one from the list to see its details and SKILL.md.")).FontSize(a.Px(12)).TextColor(a.Secondary)
 				for i, e := range s.SkillErrors {
 					s.notice(c, fmt.Sprintf("skill-error-%d", i), s.label("settings.could_not_read_settings", "Could not read settings"), e, a.native.Danger)
 				}
@@ -44,13 +44,13 @@ func (s *State) skillsList(c *ui.Context) {
 	a := s.appearance(c)
 	visible := s.visibleSkills()
 	ui.Column(c.Key("master")).Width(320).Shrink(0).MinHeight(0).Background(a.native.Surface).BorderWidth(0, 1, 0, 0).BorderColor(a.native.Border).Children(func() {
-		ui.Row(c.Key("search-row")).Margin(a.Space(12), a.Space(12), a.Space(8)).Gap(a.Space(6)).AlignItems(ui.Center).Children(func() {
+		ui.Row(c.Key("search-row")).Label("Skills search row").Height(a.Px(36)).Shrink(0).Margin(a.Space(12), a.Space(12), a.Space(8)).Padding(0, a.Px(10)).Gap(a.Px(4)).BorderWidth(0, 0, 1, 0).BorderColor(a.native.Border).AlignItems(ui.Center).Children(func() {
 			icon(c, "search", a.Px(14), a.native.TextMuted)
-			ui.TextInput(c.Key("filter"), &s.SkillQuery).Placeholder(s.label("app.search_skills", "Search skills…")).Label(s.label("skills_ui.search_skills_label", "Search skills")).Grow(1).MinWidth(0).Height(a.Px(30)).Background(a.native.Surface).Border(0, a.native.Border)
+			ui.TextInput(c.Key("filter"), &s.SkillQuery).Placeholder(s.label("app.search_skills", "Search skills…")).Label(s.label("app.search_skills", "Search skills")).Grow(1).MinWidth(0).Height(a.Px(36)).Padding(0).Background(ui.Color{}).Border(0, ui.Color{}).FocusRing(false)
 		})
 		ui.Row(c.Key("all-row")).Margin(0, a.Space(12), a.Space(10)).Height(30).Shrink(0).Padding(0, a.Space(8)).Gap(a.Space(8)).Radius(a.Px(8)).Background(a.Elevated).Border(1, a.native.Border).AlignItems(ui.Center).Children(func() {
-			icon(c, "magic-wand", a.Px(14), a.native.TextMuted)
-			ui.Text(c, s.label("skills_ui.all_skills", "All skills")).Grow(1).FontSize(a.Px(12)).TextColor(a.native.TextMuted)
+			icon(c, "magic-wand", a.Px(14), a.Secondary)
+			ui.Text(c, s.label("skills_ui.all_skills", "All skills")).Grow(1).FontSize(a.Px(12)).TextColor(a.Secondary)
 			ui.Text(c, fmt.Sprint(len(s.Skills))).FontSize(a.Px(12)).TextColor(a.native.TextMuted)
 		})
 		list := ui.Scroll(c.Key("skill-list")).TrackScroll(&s.listScroll).Grow(1).MinHeight(0).Focusable().Label(s.label("resources.skills_list", "Skills list"))
@@ -74,11 +74,17 @@ func (s *State) skillsList(c *ui.Context) {
 				}
 			}
 			if len(visible) == 0 {
-				ui.Column(c).Padding(a.Px(28), a.Space(16)).Center().Gap(a.Space(8)).Children(func() {
+				ui.Column(c.Key("no-matches")).Label("Skills no matches state").Padding(28, a.Space(16)).AlignItems(ui.Center).Gap(a.Px(8)).Children(func() {
 					if s.Busy {
-						ui.Spinner(c).Size(a.Px(20), a.Px(20))
+						ui.Spinner(c).Size(a.Px(22), a.Px(22))
+					} else {
+						icon(c, "search", a.Px(22), a.native.TextMuted)
 					}
-					ui.Text(c, s.label("skills_ui.no_skills_match", "No skills match")).FontSize(a.Px(12)).TextColor(a.native.TextMuted)
+					label := s.label("skills_ui.no_skills_match", "No skills match")
+					if s.Busy && !s.loaded {
+						label = s.activity
+					}
+					ui.Text(c, label).FontSize(a.Px(12)).TextColor(a.Secondary)
 				})
 			}
 		})

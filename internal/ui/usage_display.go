@@ -5,6 +5,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/egoist/mygo/ui"
 )
 
 func usageProviderLabel(id string) string {
@@ -28,9 +30,6 @@ func usageModelLabel(id string) string {
 	return id
 }
 func usageModelPair(provider, model string) string {
-	if model == "" {
-		return "—"
-	}
 	return usageModelLabel(model) + " · " + usageProviderLabel(provider)
 }
 func usageWorkspaceLabel(path string) string {
@@ -78,4 +77,74 @@ func (a *App) usageStamp(at time.Time, granularity string) string {
 	default:
 		return at.Format("Jan 2, 2006")
 	}
+}
+
+func usageSessionModel(r usageAggregate) string {
+	if !r.HasModel && r.Model == "" {
+		return "—"
+	}
+	return usageModelPair(r.Provider, r.Model)
+}
+
+func (a *App) usageColumnTitle(kind, id, metric string, menu bool) string {
+	fallback := titleCase(id)
+	if id == "title" {
+		fallback = "Session"
+	}
+	if id == "kind" {
+		fallback = "Type"
+	}
+	if id == "cache-hit" {
+		fallback = "Cache hit"
+	}
+	if !menu && (kind == "breakdown:tools" || id == "share") {
+		return fallback
+	}
+	key := "usage.col_" + id
+	switch id {
+	case "title", "session":
+		key = "usage.col_session"
+	case "kind":
+		key = "usage.col_type"
+	case "cache-hit":
+		key = "usage.col_cache_hit"
+	case "value":
+		key, fallback = "usage.metric_"+metric, titleCase(metric)
+		if menu {
+			key, fallback = "usage.col_metric", "Metric"
+		}
+	case "requests", "tokens", "input", "output", "cache", "errors":
+		key = "usage.metric_" + id
+		if menu && strings.HasPrefix(kind, "breakdown:") && (id == "input" || id == "output") {
+			key = "usage.slice_" + id
+		}
+	}
+	return a.text(key, fallback)
+}
+func (a *App) usageColumns(kind, metric string) []ui.TableColumn {
+	cols := usageTableColumns(kind, metric)
+	for i := range cols {
+		cols[i].Title = a.usageColumnTitle(kind, cols[i].ID, metric, false)
+	}
+	return cols
+}
+func (a *App) usageSearchPlaceholder(kind string) string {
+	key, fallback := "page.search_sessions", "Search sessions…"
+	switch {
+	case strings.HasPrefix(kind, "breakdown:"):
+		key, fallback = "page.search_breakdown", "Search breakdown…"
+	case kind == "series" || kind == "daily":
+		key, fallback = "page.search_buckets", "Search buckets…"
+	case kind == "failures":
+		key, fallback = "page.search_failures", "Search failures…"
+	}
+	return a.text(key, fallback)
+}
+
+func (a *App) usageSessionTitle(title, id string) string {
+	if title != "" {
+		return title
+	}
+	runes := []rune(id)
+	return a.usageText("usage.session_fallback", "Session %{id}", map[string]string{"id": string(runes[:min(8, len(runes))])})
 }

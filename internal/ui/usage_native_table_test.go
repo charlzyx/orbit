@@ -1,9 +1,12 @@
 package orbitui
 
 import (
+	"fmt"
+	"github.com/charlzyx/orbit/internal/workbench"
 	"image"
 	"image/color"
 	"math"
+	"slices"
 	"testing"
 
 	"github.com/egoist/mygo/ui"
@@ -113,3 +116,64 @@ func TestUsageSourceNativeCellGeometryAndHoverOpen(t *testing.T) {
 }
 
 func headerLeftForResize(tt *ui.Tester) float32 { r, _ := tt.Find("Session"); return r.X }
+
+func TestUsageSourceSharedBreakdownWidthsAndIndependentSearchPage(t *testing.T) {
+	a := fixtureUsageApp(t)
+	s := &a.usageState
+	s.projection.Models = nil
+	s.projection.Providers = nil
+	for i := 0; i < 35; i++ {
+		r := usageAggregate{Key: fmt.Sprint(i), Name: fmt.Sprintf("Match %02d", i), Requests: 1, Tokens: workbench.Tokens{Total: uint64(i + 1)}}
+		s.projection.Models = append(s.projection.Models, r)
+		s.projection.Providers = append(s.projection.Providers, r)
+	}
+	kind := "breakdown:models"
+	tt := ui.NewTester(func(c *ui.Context) { ui.Column(c).Fill().Padding(10).Gap(8).Children(func() { a.usageTable(c, kind) }) }, 1000, 700)
+	tt.Frame()
+	models := s.table(kind)
+	models.Page = 2
+	tt.Frame()
+	head, ok := tt.Find("Usage table search head " + kind)
+	if !ok || head.H != 36 || head.W < 800 {
+		t.Fatal("source search should grow beside Columns", head)
+	}
+	if err := tt.Click("Search " + kind); err != nil {
+		t.Fatal(err)
+	}
+	tt.Type("Match")
+	tt.Frame()
+	if models.Page != 2 {
+		t.Fatal("source breakdown search does not reset page", models.Page)
+	}
+	grip, ok := tt.Find("Resize " + kind + " name")
+	if !ok {
+		t.Fatal("no name grip")
+	}
+	tt.Press(grip.X+1, grip.Y+20)
+	tt.Move(grip.X-40, grip.Y+20)
+	tt.Release(grip.X-40, grip.Y+20)
+	tt.Frame()
+	width := models.List.Columns.Widths["name"]
+	if width < 48 || width == 0 {
+		t.Fatal("no resize override", width)
+	}
+	models.Hidden = []string{"input"}
+	kind = "breakdown:providers"
+	tt.Frame()
+	providers := s.table(kind)
+	if providers.Search != "" || providers.Page != 1 || len(providers.Hidden) != 0 || providers.List.Columns.Widths["name"] != width {
+		t.Fatal("width scope versus view state", providers, width)
+	}
+	header, _ := tt.Find("Name")
+	if header.W != width {
+		t.Fatal("shared override not painted", header, width)
+	}
+	if len(s.table("sessions").List.Columns.Widths) != 0 || len(s.table("breakdown:tools").List.Columns.Widths) != 0 {
+		t.Fatal("breakdown widths leaked into unrelated table")
+	}
+	kind = "breakdown:models"
+	tt.Frame()
+	if models.Search != "Match" || models.Page != 2 || !slices.Contains(models.Hidden, "input") {
+		t.Fatal("dimension view not restored", models)
+	}
+}

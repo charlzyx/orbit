@@ -135,8 +135,11 @@ func (a *App) reviewResizeHandle(c *ui.Context) {
 // A remounted composer must not steal focus from the Review control the user
 // is still using. Ordinary first appearance keeps its existing autofocus.
 func (a *App) reviewComposerAutoFocus(c *ui.Context) bool {
-	if a.reviewFull() {
+	if a.reviewFull() || (a.Model.Ask != nil && !a.extensionUI.askSent) || (a.Model.Approval != nil && !a.extensionUI.approvalSent) {
 		return false
+	}
+	if a.extensionUI.composerPending {
+		return a.extensionUI.composerWasFocused
 	}
 	s := &a.reviewState.layout
 	p := s.composer
@@ -158,7 +161,7 @@ func (a *App) retainReviewComposer(c *ui.Context, input ui.Element) {
 		s.restoreComposer = false
 		if previous.valid && previous.session == a.Model.SessionID && previous.draft == a.Draft {
 			input.SetTextSelection(previous.anchor, previous.caret)
-			if previous.focused && !a.reviewState.handle.FocusWithin(c) {
+			if previous.focused && !a.reviewState.handle.FocusWithin(c) && (a.Model.Ask == nil || a.extensionUI.askSent) && (a.Model.Approval == nil || a.extensionUI.approvalSent) {
 				input.Focus()
 			}
 		}

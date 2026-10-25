@@ -1,0 +1,14 @@
+//go:build linux && (amd64 || arm64)
+
+package ui
+
+import "github.com/egoist/mygo/internal/text"
+
+// EnableOrbitFractionalTextMetrics opts the process-wide Linux text system into
+// Orbit's fractional layout metrics. Call before creating any native UI layout,
+// measuring text, or preloading fonts. Asset registration is allowed beforehand.
+// Repeating the call is harmless; the policy cannot be disabled for live fonts.
+// This does not promise identical pixels or change rasterization/fallback policy.
+func EnableOrbitFractionalTextMetrics() error {
+	return text.Shared().EnableOrbitFractionalTextMetrics()
+}

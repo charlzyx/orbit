@@ -86,7 +86,7 @@ func (a *App) usageSessionContextPopup(c *ui.Context, anchor ui.Element, row usa
 			item("usage.ctx_copy_session_id", "Copy session ID", nil, true, func() { a.Dispatch(Action{Kind: "CopyText", Value: row.ID}) })
 			ui.Box(c).Height(1).AlignSelf(ui.Stretch).Margin(a.Theme.Space(6), 0).Background(a.Theme.Border)
 			item("usage.ctx_filter_by_provider", "Filter by provider: %{name}", map[string]string{"name": usageProviderLabel(row.Provider)}, true, func() { s.toggleFilter("providers", usageFilterOption{Key: row.Provider}) })
-			if row.Model != "" {
+			if row.HasModel || row.Model != "" {
 				item("usage.ctx_filter_by_model", "Filter by model: %{name}", map[string]string{"name": usageModelPair(row.Provider, row.Model)}, true, func() {
 					s.toggleFilter("models", usageFilterOption{Model: workbench.UsageModelRef{Provider: row.Provider, Model: row.Model}})
 				})

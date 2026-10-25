@@ -24,6 +24,7 @@ type usageState struct {
 	sourceKnown                              bool
 	noticeUntil                              time.Time
 	scan                                     func(context.Context) (workbench.UsageIndex, error)
+	breakdownWidths                          map[string]float32
 	tables                                   map[string]*usageTableState
 	hiddenColumns                            []string
 	breakdownSort, latencyMetric, filterMenu string
@@ -115,6 +116,7 @@ func (a *App) loadUsagePrefs() {
 		}
 	}
 	s.tables = nil
+	s.breakdownWidths = nil
 	s.calendarSelected = -1
 	s.granularity = "day"
 	s.selected = -1
@@ -257,28 +259,24 @@ func (a *App) usagePage(c *ui.Context) {
 				status = a.usageAge(s.now().Sub(s.updated))
 			}
 
-			ui.Text(c, status).TextColor(t.TextMuted).Grow(1)
+			ui.Text(c, status).FontSize(t.Px(12)).FixedLineHeight(usageLineHeight(t.Px(12))).TextColor(t.TextMuted).Grow(1)
 			a.usageExportControl(c)
 			refreshLabel := a.text("common.refresh", "Refresh")
 			if refreshing {
 				refreshLabel = a.text("usage.refreshing", "Refreshing…")
 			}
-			if a.button(c, refreshLabel, "icons/refresh.svg", refreshing).Clicked() {
+			if a.usageTextButton(c, refreshLabel, "icons/refresh.svg", !refreshing).Clicked() {
 				a.refreshUsage()
 			}
 		})
-		ui.Row(c).Wrap().Padding(8, 12).Gap(6).AlignItems(ui.Center).BorderWidth(0, 0, 1, 0).BorderColor(t.Border).Children(func() {
+		ui.Row(c).Padding(t.Space(8), t.Space(20)).Gap(t.Space(8)).AlignItems(ui.Center).BorderWidth(0, 0, 1, 0).BorderColor(t.Border).Children(func() {
 			a.usageRangeControl(c)
 			a.usageDimensionFilter(c, "workspaces")
 			a.usageDimensionFilter(c, "providers")
 			a.usageDimensionFilter(c, "models")
 			ui.Spacer(c)
-			for _, mode := range []string{"simple", "details"} {
-				if a.button(c, a.text("usage.mode_"+mode, titleCase(mode)), "", s.mode == mode).Clicked() {
-					s.mode = mode
-					a.saveUsagePrefs()
-				}
-			}
+			a.usageSegments(c, "mode", []string{"simple", "details"}, s.mode, false,
+				func(mode string) string { return a.text("usage.mode_"+mode, titleCase(mode)) }, nil, a.setUsageMode)
 		})
 		if s.err != "" && s.loaded {
 			ui.Row(c).Padding(8, 12).Background(t.Error.Alpha(.08)).Children(func() {
@@ -379,15 +377,21 @@ func (a *App) usageSkeleton(c *ui.Context) {
 	})
 }
 func (a *App) usageCard(c *ui.Context, title, meta string, body func()) {
-	ui.Column(c).AlignSelf(ui.Stretch).Background(a.Theme.Elevated).Border(1, a.Theme.Border).Radius(12).Shadow(0, 2, 10, -3, a.Theme.composerContact()).Children(func() {
-		ui.Row(c).Padding(12).Gap(8).AlignItems(ui.Center).Children(func() {
-			ui.Text(c, title).FontWeight(500).FontSize(a.Theme.Px(16)).Height(a.Theme.Px(20)).NoWrap()
+	a.usageCardLayout(c, title, meta, a.Theme.Space(12), a.Theme.Space(12), body)
+}
+
+// Card body geometry belongs to the source caller: Summary is full-bleed,
+// while the heatmap supplies its own month/grid/legend spacing.
+func (a *App) usageCardLayout(c *ui.Context, title, meta string, padding, gap float32, body func()) {
+	t := a.Theme
+	ui.Column(c).Label("Usage card "+title).AlignSelf(ui.Stretch).Background(t.Elevated).Border(1, t.Border).Radius(t.Px(12)).Shadow(0, 2, 10, -3, t.composerContact()).Children(func() {
+		ui.Row(c).Padding(t.Space(12)).Gap(t.Space(8)).AlignItems(ui.Center).BorderWidth(0, 0, 1, 0).BorderColor(t.Border).Children(func() {
+			ui.Text(c, title).FontWeight(500).FontSize(t.Px(16)).FixedLineHeight(t.Px(20)).Height(t.Px(20)).NoWrap()
 			if meta != "" {
-				ui.Text(c, meta).TextColor(a.Theme.TextMuted).FontSize(a.Theme.Px(12))
+				ui.Text(c, meta).TextColor(t.TextMuted).FontSize(t.Px(12)).FixedLineHeight(usageLineHeight(t.Px(12)))
 			}
 		})
-		a.line(c)
-		ui.Column(c).AlignSelf(ui.Stretch).Padding(12).Gap(12).Children(body)
+		ui.Column(c).AlignSelf(ui.Stretch).Padding(padding).Gap(gap).Children(body)
 	})
 }
 func (a *App) usageSimple(c *ui.Context) {
@@ -407,7 +411,7 @@ func (a *App) usageSimple(c *ui.Context) {
 func (a *App) usageHeatmap(c *ui.Context) {
 	s := &a.usageState
 	t := a.Theme
-	a.usageCard(c, a.text("usage.daily_activity", "Daily activity"), a.usageText("usage.per_day_last_year", "%{metric} per day · last 12 months", map[string]string{"metric": strings.ToLower(a.text("usage.metric_"+s.metric, titleCase(s.metric)))}), func() {
+	a.usageCardLayout(c, a.text("usage.daily_activity", "Daily activity"), a.usageText("usage.per_day_last_year", "%{metric} per day · last 12 months", map[string]string{"metric": strings.ToLower(a.text("usage.metric_"+s.metric, titleCase(s.metric)))}), t.Space(12), 0, func() {
 		start, first, last := usageCalendarBounds(s.index, time.Local)
 		values := map[string]usagePoint{}
 		maximum := 0.0
@@ -434,13 +438,9 @@ func (a *App) usageHeatmap(c *ui.Context) {
 			lastIndex--
 		}
 		thresholds := usageHeatmapThresholds(activeValues)
-		width, _ := c.Size()
-		if a.SidebarVisible {
-			width -= a.SidebarWidth
-		}
-		width = min(1180, width) - 64
+		width := max(float32(360), a.usageColumnWidth(c)-2*t.Space(20)-2-2*t.Space(12))
 		cellHeight := min(float32(22), max(float32(4), (width-28)/float32(len(days)/7)))
-		ui.Row(c).Height(16).Padding(0, 0, 0, 28).Children(func() {
+		ui.Row(c).Label("Usage calendar months").Height(16).Padding(0, 0, 0, 28).Children(func() {
 			previous := time.Month(0)
 			for week := 0; week < len(days)/7; week++ {
 				at := days[week*7]
@@ -449,7 +449,9 @@ func (a *App) usageHeatmap(c *ui.Context) {
 					label = at.Format("Jan")
 					previous = at.Month()
 				}
-				ui.Box(c).Grow(1).MinWidth(0).Children(func() { ui.Text(c, label).Absolute().Left(0).Top(0).NoWrap().FontSize(10).TextColor(t.TextMuted) })
+				ui.Box(c).Grow(1).MinWidth(0).Height(16).Children(func() {
+					ui.Text(c, label).Absolute().Left(0).Top((16 - usageLineHeight(t.Px(10))) / 2).NoWrap().FontSize(t.Px(10)).FixedLineHeight(usageLineHeight(t.Px(10))).TextColor(t.TextMuted)
+				})
 			}
 		})
 		grid := ui.Row(c.Key("usage-calendar-grid")).Height(cellHeight * 7).Gap(0).Focusable().Label("Usage activity calendar").Description("Arrow keys inspect days. Enter selects a day. Escape clears inspection.")
@@ -459,7 +461,9 @@ func (a *App) usageHeatmap(c *ui.Context) {
 					if i%2 != 0 || cellHeight < 8 {
 						name = ""
 					}
-					ui.Text(c, name).Height(cellHeight).FontSize(10).TextColor(t.TextMuted)
+					ui.Row(c).Height(cellHeight).FillWidth().Padding(0, 6, 0, 0).Justify(ui.End).AlignItems(ui.Center).Children(func() {
+						ui.Text(c, name).FontSize(t.Px(10)).FixedLineHeight(usageLineHeight(t.Px(10))).TextColor(t.TextMuted)
+					})
 				}
 			})
 			for week := 0; week < len(days)/7; week++ {
@@ -477,13 +481,13 @@ func (a *App) usageHeatmap(c *ui.Context) {
 						}
 						border := t.Border
 						if i == s.calendarSelected {
-							border = t.Accent
+							border = t.Text
 						}
 						if !inRange {
 							ui.Box(c).Height(cellHeight).AlignSelf(ui.Stretch)
 							continue
 						}
-						cell := ui.ButtonBase(c).Height(cellHeight).AlignSelf(ui.Stretch).Radius(3).Background(color).Border(1, border).Label("Usage day " + at.Format("2006-01-02")).Tooltip(fmt.Sprintf("%s · %s", at.Format("Jan 2, 2006"), usageMetricText(v, ok, s.metric))).Disabled(!inRange)
+						cell := ui.ButtonBase(c).Height(cellHeight).AlignSelf(ui.Stretch).Radius(t.Px(4)).Background(color).Border(1, border).Label("Usage day " + at.Format("2006-01-02")).Tooltip(fmt.Sprintf("%s · %s", at.Format("Jan 2, 2006"), usageMetricText(v, ok, s.metric))).Disabled(!inRange)
 						if cell.Clicked() {
 							s.calendarSelected = i
 							a.scopeUsageDay(at)
@@ -492,16 +496,18 @@ func (a *App) usageHeatmap(c *ui.Context) {
 				})
 			}
 		})
-		ui.Row(c).Gap(4).Justify(ui.End).Children(func() {
-			ui.Text(c, "Less").FontSize(10).TextColor(t.TextMuted)
-			for _, alpha := range []float32{0, .24, .46, .72, 1} {
-				color := t.Background
-				if alpha > 0 {
-					color = t.Accent.Alpha(alpha)
+		ui.Row(c).Label("Usage calendar legend").Padding(8, 0, 0, 0).Gap(t.Space(6)).Justify(ui.End).AlignItems(ui.Center).Children(func() {
+			ui.Text(c, a.text("heatmap.less", "Less")).FontSize(t.Px(10)).FixedLineHeight(usageLineHeight(t.Px(10))).TextColor(t.TextMuted)
+			ui.Row(c).Gap(t.Space(2)).AlignItems(ui.Center).Children(func() {
+				for _, alpha := range []float32{0, .24, .46, .72, 1} {
+					color := t.Background
+					if alpha > 0 {
+						color = t.Accent.Alpha(alpha)
+					}
+					ui.Box(c).Size(10, 10).Radius(t.Px(4)).Border(1, t.Border).Background(color)
 				}
-				ui.Box(c).Size(10, 10).Radius(2).Border(1, t.Border).Background(color)
-			}
-			ui.Text(c, "More").FontSize(10).TextColor(t.TextMuted)
+			})
+			ui.Text(c, a.text("heatmap.more", "More")).FontSize(t.Px(10)).FixedLineHeight(usageLineHeight(t.Px(10))).TextColor(t.TextMuted)
 		})
 		move := func(delta int) {
 			grid.Focus()
@@ -556,26 +562,17 @@ func usageMetricText(value float64, valid bool, metric string) string {
 func (a *App) usageChart(c *ui.Context) {
 	s := &a.usageState
 	t := a.Theme
-	ui.Row(c).Wrap().Gap(3).Children(func() {
-		for _, metric := range []string{"tokens", "requests", "input", "output", "cache", "cost", "latency", "errors"} {
-			if a.button(c, a.text("usage.metric_"+metric, titleCase(metric)), "", s.metric == metric).Height(26).Disabled(!usageMetricAvailable(s.projection.Summary, metric)).Clicked() {
-				s.metric = metric
-				a.saveUsagePrefs()
-			}
-		}
+	ui.Row(c).Wrap().Gap(t.Space(8)).Children(func() {
+		a.usageSegments(c, "metric", []string{"tokens", "requests", "input", "output", "cache", "cost", "latency", "errors"}, s.metric, true,
+			func(metric string) string { return a.text("usage.metric_"+metric, titleCase(metric)) },
+			func(metric string) bool { return usageMetricAvailable(s.projection.Summary, metric) },
+			func(metric string) { s.metric = metric; a.saveUsagePrefs() })
 		if s.metric == "latency" {
-			ui.Row(c).Gap(3).Margin(0, 0, 0, 8).Children(func() {
-				for _, metric := range []string{"average", "p50", "p95", "p99"} {
-					_, available := s.projection.Latency.value(metric)
-					label := a.text("usage.latency_"+metric, strings.ToUpper(metric))
-					if a.button(c.Key("usage-latency-"+metric), label, "", s.latencyMetric == metric).Height(26).Disabled(!available).Clicked() {
-						s.latencyMetric = metric
-						a.saveUsagePrefs()
-					}
-				}
-			})
+			a.usageSegments(c, "latency", []string{"average", "p50", "p95", "p99"}, s.latencyMetric, true,
+				func(metric string) string { return a.text("usage.latency_"+metric, strings.ToUpper(metric)) },
+				func(metric string) bool { _, available := s.projection.Latency.value(metric); return available },
+				func(metric string) { s.latencyMetric = metric; a.saveUsagePrefs() })
 		}
-
 	})
 	if s.projection.SeriesTruncated {
 		ui.Text(c, "Chart limited to the first 4,000 buckets. Choose a coarser interval to show the full range.").TextColor(t.Warning)

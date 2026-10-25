@@ -1,0 +1,8 @@
+{
+  "enabled": true,
+  "version": "0.2.12-go-test.20261025.1",
+  "runtime_source_sha256": "80cada3450e66872958864ba5fa817697b9baa32877562b18421892c211da764",
+  "runtime_reference_tree": "a7aa6cfde4e6f7ac487f88554deb979cbf0e3182",
+  "minimum_macos": "13.0",
+  "native_mac_execution": "NOT_RUN"
+}

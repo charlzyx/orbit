@@ -1,0 +1,8 @@
+Historical attribution caveat, not licensing clearance
+
+The inherited Orbit NOTICE and historical Rust reference describe Waku-derived patterns as MIT licensed. That historical license claim is unresolved. Public Waku history first adds a root GPL-3.0 LICENSE at commit c0ea87b5592b2bcbbe5c7d53eb26656ec66f868c (2026-08-11 UTC); no permissive historical license was established by this task.
+
+The new Go highlight scanner explicitly identifies itself as independently authored from the observable pinned behavior and language vocabulary, not a mechanical translation or copy of Waku. Waku is not a Go module dependency and no Waku, Rust or GPUI binary is distributed in this test package. This does not assert legal clearance for the historical Rust reference tree or every inherited attribution. The original Orbit NOTICE is preserved rather than silently rewritten.
+
+Source evidence in the frozen reference: internal/highlight/highlight.go header; docs/mygo-migration/highlight-parity.md, Licensing provenance caveat.
+Official history: https://github.com/egoist/waku/commit/c0ea87b5592b2bcbbe5c7d53eb26656ec66f868c

@@ -1,0 +1,63 @@
+#!/bin/bash
+# Experimental launcher. Does not alter Gatekeeper, quarantine, or signatures.
+set -euo pipefail
+export PATH=/usr/bin:/bin:/usr/sbin:/sbin
+HERE="$(cd -- "$(dirname -- "$0")" && pwd -P)"
+RES="$(cd -- "$HERE/../Resources" && pwd -P)"
+usage() {
+  printf '%s\n' 'Orbit Go Test: isolated experimental launch' 'Usage: Launch.command [--pi /absolute/path/to/pi] [--workspace /absolute/path/to/disposable/project]' '' 'Default: a new private temporary HOME and synthetic workspace; no Pi runtime is selected.' 'Pi is separate, not included. Existing provider credentials and sessions are not imported.' '--offline disables catalog/update checks, NOT all network access or model inference.' 'This is isolation of configuration, NOT a filesystem, process, or network sandbox.'
+}
+PI=''; WORKSPACE=''
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --help|-h) usage; exit 0 ;;
+    --pi|--workspace)
+      option="$1"; shift
+      [ "$#" -gt 0 ] || { usage >&2; exit 2; }
+      case "$1" in /*) ;; *) printf 'Expected absolute path for %s\n' "$option" >&2; exit 2;; esac
+      if [ "$option" = --pi ]; then PI="$1"; else WORKSPACE="$1"; fi ;;
+    -psn_*) ;; # Finder process serial number, if supplied by older LaunchServices.
+    *) printf 'Unknown option: %s\n' "$1" >&2; usage >&2; exit 2 ;;
+  esac
+  shift
+done
+[ "$(/usr/bin/uname -s)" = Darwin ] || { printf 'This bundle is for macOS, not this operating system.\n' >&2; exit 1; }
+MACHINE="$(/usr/bin/uname -m)"
+[ "$MACHINE" = '__MACHINE__' ] || { printf 'Wrong architecture: this is the __ARCHLABEL__ bundle; detected %s. Download the matching bundle, without Rosetta.\n' "$MACHINE" >&2; exit 1; }
+OSVER="$(/usr/bin/sw_vers -productVersion)"
+[ "${OSVER%%.*}" -ge 13 ] || { printf 'These binaries declare macOS 13.0 or newer. Detected %s.\n' "$OSVER" >&2; exit 1; }
+check_hash() {
+  got="$(/usr/bin/shasum -a 256 "$1" | /usr/bin/awk '{print $1}')"
+  [ "$got" = "$2" ] || { printf 'Integrity mismatch: %s. Do not run this bundle.\n' "$1" >&2; exit 1; }
+}
+check_hash "$HERE/orbit-bin" '__APPHASH__'
+check_hash "$RES/libghostty-vt.dylib" '__LIBHASH__'
+if [ -n "$PI" ] && [ ! -x "$PI" ]; then printf 'Pi must be an executable file: %s\n' "$PI" >&2; exit 2; fi
+if [ -n "$WORKSPACE" ] && [ ! -d "$WORKSPACE" ]; then printf 'Workspace does not exist: %s\n' "$WORKSPACE" >&2; exit 2; fi
+umask 077
+STATE="$(/usr/bin/mktemp -d /tmp/orbit-go-test.XXXXXXXX)"
+HOME_DIR="$STATE/home"
+/bin/mkdir -p "$HOME_DIR/.pi/agent" "$HOME_DIR/.config" "$HOME_DIR/.cache" "$HOME_DIR/.local/share" "$HOME_DIR/.local/state" "$HOME_DIR/Library/Caches" "$STATE/tmp"
+if [ -z "$WORKSPACE" ]; then
+  WORKSPACE="$STATE/workspace"
+  /bin/mkdir "$WORKSPACE"
+  /bin/cp -R "$RES/sample-workspace/." "$WORKSPACE/"
+fi
+if [ -z "$PI" ]; then PI="$STATE/no-pi-selected"; fi
+printf '%s\n' 'Orbit Go experimental test; not a release or a native-macOS-validated build.' "Test data: $STATE" "Workspace: $WORKSPACE" "Log: $STATE/launch.log" 'No existing HOME credentials/sessions are imported. Keep this Terminal window for the log location.' 'If macOS blocks opening this unsigned/unnotarized app, stop and report the exact message. No security setting changes are needed or performed.'
+printf 'source_tree=__SOURCE_COMMIT__\narchitecture=__ARCH__\nmacos=%s\n' "$OSVER" > "$STATE/test-info.txt"
+cd -- "$WORKSPACE"
+# Clear inherited credentials, shell startup overrides, SSH agent, Pi settings,
+# MYGO/DYLD overrides, and CLI auth tokens. The app is still not a sandbox.
+exec /usr/bin/env -i \
+  HOME="$HOME_DIR" USERPROFILE="$HOME_DIR" \
+  PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin" \
+  SHELL=/bin/zsh ZDOTDIR="$HOME_DIR" \
+  TMPDIR="$STATE/tmp/" \
+  XDG_CONFIG_HOME="$HOME_DIR/.config" XDG_CACHE_HOME="$HOME_DIR/.cache" \
+  XDG_DATA_HOME="$HOME_DIR/.local/share" XDG_STATE_HOME="$HOME_DIR/.local/state" \
+  PI_CODING_AGENT_DIR="$HOME_DIR/.pi/agent" PI_BIN="$PI" PI_OFFLINE=1 PI_SKIP_VERSION_CHECK=1 \
+  MYGO_GHOSTTY_VT="$RES/libghostty-vt.dylib" \
+  LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 \
+  "$HERE/orbit-bin" --home "$HOME_DIR" --workspace "$WORKSPACE" --pi "$PI" --offline \
+  >> "$STATE/launch.log" 2>&1

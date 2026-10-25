@@ -204,3 +204,44 @@ func TestUsageSourcePickerSearchFooterAndRetainedPointerHighlight(t *testing.T) 
 		t.Fatal("Enter must dismiss, not select")
 	}
 }
+
+func TestUsageSourceLocalizedColumnHeadersMenusAndSearch(t *testing.T) {
+	a := fixtureUsageApp(t)
+	a.Prefs.Language = "zh-CN"
+	a.reloadLocale()
+	for _, tc := range []struct {
+		kind, id, metric, want string
+		menu                   bool
+	}{
+		{"sessions", "title", "tokens", "会话", false}, {"sessions", "provider", "tokens", "服务商", false},
+		{"daily", "cache-hit", "tokens", "缓存命中", false}, {"failures", "kind", "tokens", "类型", false},
+		{"series", "value", "latency", "延迟", false}, {"series", "value", "latency", "指标", true},
+		{"breakdown:tools", "tool", "tokens", "Tool", false}, {"breakdown:tools", "errors", "tokens", "Errors", false},
+		{"breakdown:tools", "errors", "tokens", a.text("usage.metric_errors", "Errors"), true},
+		{"breakdown:models", "share", "tokens", "Share", false}, {"breakdown:models", "share", "tokens", a.text("usage.col_share", "Share"), true},
+	} {
+		if got := a.usageColumnTitle(tc.kind, tc.id, tc.metric, tc.menu); got != tc.want {
+			t.Fatal(tc, got)
+		}
+	}
+	for _, tc := range []struct{ kind, want string }{{"sessions", "搜索会话…"}, {"breakdown:models", "搜索明细…"}, {"series", "搜索时段…"}, {"daily", "搜索时段…"}, {"failures", "搜索失败项…"}} {
+		if a.usageSearchPlaceholder(tc.kind) != tc.want {
+			t.Fatal(tc, a.usageSearchPlaceholder(tc.kind))
+		}
+	}
+	a.usageState.metric = "latency"
+	tt := ui.NewTester(func(c *ui.Context) {
+		c.SetTheme(a.Theme.Native())
+		ui.Column(c).Fill().Padding(10).Children(func() { a.usageTable(c, "series") })
+	}, 1000, 500)
+	tt.Frame()
+	if !tt.HasText("时间") || !tt.HasText("延迟") {
+		t.Fatal("localized source labels not painted", tt.Texts())
+	}
+	if err := tt.Click(a.text("usage.columns", "Columns")); err != nil {
+		t.Fatal(err)
+	}
+	if !tt.HasText("指标") {
+		t.Fatal("Series menu copied metric header instead of source Metric label", tt.Texts())
+	}
+}

@@ -1,7 +1,13 @@
 package orbitassets
 
 import (
+	"go/ast"
+	"go/parser"
+	"go/token"
 	"io/fs"
+	"path/filepath"
+	"strconv"
+	"strings"
 	"testing"
 )
 
@@ -44,5 +50,53 @@ func TestTranslationFallbackAndPathGuard(t *testing.T) {
 	got := Translate(nil, map[string]string{"hello": "Hello %{name}"}, "hello", map[string]string{"name": "Ada"})
 	if got != "Hello Ada" {
 		t.Fatal(got)
+	}
+}
+
+// Literal calls to Tr never have a fallback. Check actual native callsites,
+// rather than catalog-to-catalog completeness alone, to prevent raw IDs leaking.
+func TestNativeLiteralTranslationKeysResolve(t *testing.T) {
+	en, err := Locale("en")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = filepath.WalkDir("internal", func(path string, entry fs.DirEntry, walkErr error) error {
+		if walkErr != nil {
+			return walkErr
+		}
+		if entry.IsDir() || !strings.HasSuffix(path, ".go") || strings.HasSuffix(path, "_test.go") {
+			return nil
+		}
+		f, err := parser.ParseFile(token.NewFileSet(), path, nil, 0)
+		if err != nil {
+			return err
+		}
+		ast.Inspect(f, func(node ast.Node) bool {
+			call, ok := node.(*ast.CallExpr)
+			if !ok || len(call.Args) == 0 {
+				return true
+			}
+			fn, ok := call.Fun.(*ast.SelectorExpr)
+			if !ok || fn.Sel.Name != "Tr" {
+				return true
+			}
+			literal, ok := call.Args[0].(*ast.BasicLit)
+			if !ok || literal.Kind != token.STRING {
+				return true
+			}
+			key, err := strconv.Unquote(literal.Value)
+			if err != nil {
+				t.Error(err)
+				return true
+			}
+			if _, ok := en[key]; !ok {
+				t.Errorf("%s: untranslated literal Tr key %q", path, key)
+			}
+			return true
+		})
+		return nil
+	})
+	if err != nil {
+		t.Fatal(err)
 	}
 }

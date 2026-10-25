@@ -40,7 +40,10 @@ func toggleUsageModel(values *[]workbench.UsageModelRef, value workbench.UsageMo
 		*values = append(*values, value)
 	}
 }
-func (s *usageState) filterOptions(kind string, search string) []usageFilterOption {
+func (s *usageState) filterOptions(kind, search string) []usageFilterOption {
+	return s.filterOptionsRanked(kind, search, true)
+}
+func (s *usageState) filterOptionsRanked(kind string, search string, selectedFirst bool) []usageFilterOption {
 	var all []usageFilterOption
 	counts := map[string]int{}
 	for _, r := range s.index.Records {
@@ -79,16 +82,18 @@ func (s *usageState) filterOptions(kind string, search string) []usageFilterOpti
 			return !strings.Contains(strings.ToLower(v.Label), needle) && !strings.Contains(strings.ToLower(v.Sub), needle)
 		})
 	}
-	slices.SortStableFunc(all, func(a, b usageFilterOption) int {
-		aa, bb := s.filterChecked(kind, a), s.filterChecked(kind, b)
-		if aa == bb {
-			return 0
-		}
-		if aa {
-			return -1
-		}
-		return 1
-	})
+	if selectedFirst {
+		slices.SortStableFunc(all, func(a, b usageFilterOption) int {
+			aa, bb := s.filterChecked(kind, a), s.filterChecked(kind, b)
+			if aa == bb {
+				return 0
+			}
+			if aa {
+				return -1
+			}
+			return 1
+		})
+	}
 	return all
 }
 func (s *usageState) filterChecked(kind string, o usageFilterOption) bool {
@@ -96,9 +101,9 @@ func (s *usageState) filterChecked(kind string, o usageFilterOption) bool {
 	case "models":
 		return slices.Contains(s.filter.ModelRefs, o.Model) || (s.filter.Model != "" && s.filter.Model == o.Model.Model) || slices.Contains(s.filter.Models, o.Model.Model)
 	case "providers":
-		return s.filter.Provider == o.Key || slices.Contains(s.filter.Providers, o.Key)
+		return (s.filter.Provider != "" && s.filter.Provider == o.Key) || slices.Contains(s.filter.Providers, o.Key)
 	case "workspaces":
-		return s.filter.Workspace == o.Key || slices.Contains(s.filter.Workspaces, o.Key)
+		return (s.filter.Workspace != "" && s.filter.Workspace == o.Key) || slices.Contains(s.filter.Workspaces, o.Key)
 	}
 	return false
 }
@@ -181,8 +186,7 @@ func (a *App) usageDimensionFilter(c *ui.Context, kind string) {
 	} else if len(selected) > 1 {
 		label = a.usageText("usage.n_selected", "%{count} selected", map[string]string{"count": usageCount(uint64(len(selected)))})
 	}
-	anchor := a.button(c, label, "icons/filter.svg", len(selected) > 0).MaxWidth(240).AlignSelf(ui.Start).Border(1, a.Theme.Border)
-	anchor.Children(func() { a.icon(c, "icons/chevron-down.svg", 12, a.Theme.TextMuted) })
+	anchor := a.usageChip(c, label, "icons/filter.svg", len(selected) > 0, false).AlignSelf(ui.Start)
 	if anchor.Clicked() {
 		s.closeUsagePopovers(kind)
 		v.Open = !v.Open
@@ -214,7 +218,7 @@ func (a *App) usageDimensionFilter(c *ui.Context, kind string) {
 		root.Children(func() {
 			ui.Row(c).Height(a.Theme.Px(36)).Shrink(0).Padding(0, a.Theme.Px(10)).Gap(a.Theme.Space(8)).AlignItems(ui.Center).BorderWidth(0, 0, 1, 0).BorderColor(a.Theme.Border).Clip().Label("Usage filter search head").Children(func() {
 				a.icon(c, "icons/search.svg", a.Theme.Px(14), a.Theme.TextMuted)
-				search := ui.TextInputBase(c, &v.Search).Label("Filter " + kind).Placeholder(a.text("usage.search", "Search…")).Grow(1).MinWidth(0).FontSize(a.Theme.Px(14)).FocusRing(false)
+				search := ui.TextInputBase(c, &v.Search).Label("Filter " + kind).Placeholder(a.text("page.filter", "Filter…")).Grow(1).MinWidth(0).FontSize(a.Theme.Px(14)).FocusRing(false)
 				if v.FocusSearch {
 					search.Focus()
 					v.FocusSearch = false
@@ -255,7 +259,7 @@ func (a *App) usageDimensionFilter(c *ui.Context, kind string) {
 			}
 			a.usageMenuFooter(c, func() {
 				if a.usageFooterButton(c, a.text("usage.select_all", "Select all")).Clicked() {
-					s.selectFilterOptions(kind, all)
+					s.selectFilterOptions(kind, s.allFilterOptions(kind))
 				}
 				if a.usageFooterButton(c, a.text("usage.clear", "Clear")).Clicked() {
 					s.clearDimension(kind)
@@ -330,40 +334,92 @@ func (a *App) usageActiveFilters(c *ui.Context) {
 	if !active {
 		return
 	}
-	ui.Row(c).Wrap().Gap(6).Children(func() {
-		for _, kind := range []string{"workspaces", "providers", "models"} {
-			for _, o := range s.filterOptions(kind, "") {
-				if s.filterChecked(kind, o) {
-					if a.button(c, o.Label+" ×", "", true).Clicked() {
-						s.toggleFilter(kind, o)
-					}
+	ui.Row(c).Wrap().Gap(a.Theme.Space(6)).AlignItems(ui.Center).Label("Usage active filters").Children(func() {
+		ui.Text(c, a.text("view.filters", "Filters")).FontSize(a.Theme.Px(12)).FontWeight(500).TextColor(a.Theme.TextMuted).Margin(0, a.Theme.Space(2), 0, 0)
+		if !f.FocusStart.IsZero() {
+			a.usageNarrowingChip(c.Key("focus"), a.usageStamp(f.FocusStart, s.projection.Granularity), func() { f.FocusStart, f.FocusEnd = time.Time{}, time.Time{} })
+		}
+		if f.Session != "" || f.SessionPath != "" {
+			for _, entry := range s.index.Sessions {
+				if (f.SessionPath != "" && entry.Path == f.SessionPath) || (f.SessionPath == "" && entry.ID == f.Session) {
+					label := a.usageText("usage.chip_session", "Session: %{name}", map[string]string{"name": a.usageSessionTitle(entry.Title, entry.ID)})
+					a.usageNarrowingChip(c.Key("session"), label, func() { f.Session, f.SessionPath = "", "" })
+					break
 				}
 			}
 		}
-		if f.Session != "" || f.SessionPath != "" {
-			if a.button(c, "Session scope ×", "", true).Clicked() {
-				f.Session, f.SessionPath = "", ""
-			}
-		}
-		if !f.FocusStart.IsZero() {
-			if a.button(c, "Bucket "+f.FocusStart.Local().Format("Jan 2 15:04")+" ×", "", true).Clicked() {
-				f.FocusStart, f.FocusEnd = time.Time{}, time.Time{}
+		for _, kind := range []string{"workspaces", "providers", "models"} {
+			for _, o := range s.selectedFilterOptions(kind) {
+				singular := strings.TrimSuffix(kind, "s")
+				label := a.usageText("usage.chip_"+singular, titleCase(singular)+": %{name}", map[string]string{"name": o.Label})
+				a.usageNarrowingChip(c.Key(kind+":"+o.Key), label, func() { s.toggleFilter(kind, o) })
 			}
 		}
 		if f.ErrorsOnly {
-			if a.button(c, "Failed requests ×", "", true).Clicked() {
-				f.ErrorsOnly = false
-			}
+			a.usageNarrowingChip(c.Key("errors"), a.text("usage.chip_failed_requests", "Failed requests"), func() { f.ErrorsOnly = false })
 		}
 		if f.CachedOnly {
-			if a.button(c, "Cached requests ×", "", true).Clicked() {
-				f.CachedOnly = false
-			}
+			a.usageNarrowingChip(c.Key("cached"), a.text("usage.chip_cached_only", "Cached only"), func() { f.CachedOnly = false })
 		}
-		if a.button(c, "Clear filters", "icons/x.svg", false).Clicked() {
+		if a.button(c, a.text("usage.clear_all", "Clear all"), "", false).Height(a.Theme.Px(28)).Clicked() {
 			start, end := f.Start, f.End
 			*f = workbench.UsageFilter{Start: start, End: end}
 			s.calendarRestore = nil
+		}
+	})
+}
+
+// Source chips follow selection insertion order, unlike the menu's ranked,
+// selected-first order. Keep the legacy scalar filters interoperable.
+func (s *usageState) selectedFilterOptions(kind string) []usageFilterOption {
+	options := s.filterOptions(kind, "")
+	var out []usageFilterOption
+	add := func(match func(usageFilterOption) bool) {
+		for _, o := range options {
+			if match(o) && !slices.ContainsFunc(out, func(v usageFilterOption) bool { return v.Key == o.Key }) {
+				out = append(out, o)
+			}
+		}
+	}
+	f := s.filter
+	switch kind {
+	case "workspaces":
+		for _, id := range f.Workspaces {
+			add(func(o usageFilterOption) bool { return o.Key == id })
+		}
+		if f.Workspace != "" {
+			add(func(o usageFilterOption) bool { return o.Key == f.Workspace })
+		}
+	case "providers":
+		for _, id := range f.Providers {
+			add(func(o usageFilterOption) bool { return o.Key == id })
+		}
+		if f.Provider != "" {
+			add(func(o usageFilterOption) bool { return o.Key == f.Provider })
+		}
+	case "models":
+		for _, ref := range f.ModelRefs {
+			add(func(o usageFilterOption) bool { return o.Model == ref })
+		}
+		for _, id := range f.Models {
+			add(func(o usageFilterOption) bool { return o.Model.Model == id })
+		}
+		if f.Model != "" {
+			add(func(o usageFilterOption) bool { return o.Model.Model == f.Model })
+		}
+	}
+	return out
+}
+func (a *App) usageNarrowingChip(c *ui.Context, label string, clear func()) {
+	ui.Row(c).Height(a.Theme.Px(28)).Shrink(0).Padding(0, a.Theme.Space(6), 0, a.Theme.Space(8)).Gap(a.Theme.Space(4)).Radius(a.Theme.Px(8)).Border(1, a.Theme.BorderStrong()).Background(a.Theme.Active).AlignItems(ui.Center).Label(label).Children(func() {
+		ui.Text(c, label).SingleLine().FontSize(a.Theme.Px(14)).TextColor(a.Theme.Text)
+		b := ui.ButtonBase(c).Size(a.Theme.Px(16), a.Theme.Px(16)).Radius(a.Theme.Px(6)).Center().Label("Clear " + label).Tooltip(a.text("usage.clear_filter", "Clear filter"))
+		if b.Hovered() {
+			b.Background(a.Theme.OverlayStrong())
+		}
+		b.Children(func() { a.icon(c, "icons/x.svg", a.Theme.Px(10), a.Theme.Text) })
+		if b.Clicked() {
+			clear()
 		}
 	})
 }
@@ -422,8 +478,7 @@ func (a *App) usageRangeControl(c *ui.Context) {
 	if s.preset == "custom" {
 		label = usageCustomLabel(s.filter.Start, s.filter.End.Add(-time.Nanosecond))
 	}
-	anchor := a.button(c, label, "icons/clock.svg", s.preset != "last7").AlignSelf(ui.Start).Border(1, a.Theme.Border)
-	anchor.Children(func() { a.icon(c, "icons/chevron-down.svg", 12, a.Theme.TextMuted) })
+	anchor := a.usageChip(c, label, "icons/clock.svg", s.preset != "last7", false).AlignSelf(ui.Start)
 	if anchor.Clicked() {
 		s.closeUsagePopovers("range")
 		s.rangeOpen = !s.rangeOpen
@@ -586,6 +641,10 @@ func pruneUsageFilter(index workbench.UsageIndex, f *workbench.UsageFilter) bool
 		paths[r.Path] = true
 		workspaces[r.Workspace] = true
 	}
+	for _, ref := range index.UsageModels() {
+		models[ref] = true
+		providers[ref.Provider] = true
+	}
 	cleared := false
 	if f.SessionPath != "" && !paths[f.SessionPath] {
 		f.SessionPath = ""
@@ -617,4 +676,25 @@ func pruneUsageFilter(index workbench.UsageIndex, f *workbench.UsageFilter) bool
 		f.Model = ""
 	}
 	return cleared
+}
+
+func (s *usageState) allFilterOptions(kind string) []usageFilterOption {
+	options := s.filterOptionsRanked(kind, "", false)
+	if kind == "models" {
+		return options
+	}
+	order := s.projection.ProviderOptions
+	if kind == "workspaces" {
+		order = s.projection.WorkspaceOptions
+	}
+	var out []usageFilterOption
+	for _, id := range order {
+		for _, o := range options {
+			if o.Key == id {
+				out = append(out, o)
+				break
+			}
+		}
+	}
+	return out
 }

@@ -26,6 +26,9 @@ func TestAgentProcess(t *testing.T) {
 	running := false
 	compacted := false
 	retryRequests := 0
+	var heldAbortClear map[string]any
+	var heldAbortResponse map[string]any
+	queuePending, clearHeld := false, false
 	var mu sync.Mutex
 	write := func(value any) {
 		mu.Lock()
@@ -41,6 +44,31 @@ func TestAgentProcess(t *testing.T) {
 		kind, _ := c["type"].(string)
 		response := map[string]any{"type": "response", "id": c["id"], "command": kind, "success": true}
 		switch kind {
+		case "emit_abort_queue":
+			queuePending = true
+			write(map[string]any{"type": "queue_update", "steering": []string{"old steer"}, "followUp": []string{"old follow"}})
+		case "emit_fresh_queue":
+			write(map[string]any{"type": "queue_update", "steering": []string{}, "followUp": []string{"new queued text"}})
+		case "clear_queue":
+			response["data"] = map[string]any{"steering": []string{}, "followUp": []string{}}
+			if queuePending {
+				response["data"] = map[string]any{"steering": []string{"old steer"}, "followUp": []string{"old follow"}}
+				queuePending = false
+			}
+			if os.Getenv("ORBIT_CLEAR_UNTIL_ABORT") == "1" && !clearHeld {
+				heldAbortClear = response
+				clearHeld = true
+				continue
+			}
+		case "release_abort_clear":
+			if !running && heldAbortClear != nil {
+				write(heldAbortClear)
+				heldAbortClear = nil
+			}
+			if !running && heldAbortResponse != nil {
+				write(heldAbortResponse)
+				heldAbortResponse = nil
+			}
 		case "emit_stderr":
 			for i := 0; i < 12; i++ {
 				fmt.Fprintf(os.Stderr, "line-%d %s\n", i, os.Getenv("ORBIT_DYNAMIC_SECRET"))
@@ -126,7 +154,13 @@ func TestAgentProcess(t *testing.T) {
 			continue
 		case "abort":
 			running = false
-			write(response)
+			if os.Getenv("ORBIT_ABORT_REJECT") == "1" {
+				response["success"] = false
+				response["error"] = "original task abort rejection"
+				heldAbortResponse = response
+			} else {
+				write(response)
+			}
 			write(map[string]any{"type": "agent_settled", "aborted": true})
 			continue
 		case "emit_dialog":

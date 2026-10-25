@@ -20,12 +20,12 @@ import (
 )
 
 type Theme struct {
-	ReduceMotion                                                          bool
-	CodePx                                                                func(float32) float32
-	Elevated, Secondary, Active, Hover, BorderStrong, AccentText, Overlay ui.Color
-	CodeFont                                                              string
-	Px                                                                    func(float32) float32
-	Space                                                                 func(int) float32
+	ReduceMotion                                                                            bool
+	CodePx                                                                                  func(float32) float32
+	Elevated, SurfaceSecondary, Secondary, Active, Hover, BorderStrong, AccentText, Overlay ui.Color
+	CodeFont                                                                                string
+	Px                                                                                      func(float32) float32
+	Space                                                                                   func(int) float32
 }
 type Options struct {
 	Theme  func() Theme

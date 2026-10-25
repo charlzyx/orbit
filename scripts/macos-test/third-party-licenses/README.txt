@@ -1,0 +1,3 @@
+These notices accompany the code/resources actually distributed or the relevant upstream static-runtime dependency set. Apple system frameworks are not redistributed. Pi, Node, Git, gh, Rust/GPUI binaries and user data are not bundled. The original Orbit NOTICE is retained for derived source/resource attribution, not as a claim that the historical Rust renderer is linked.
+
+Ghostty is the unchanged hash-pinned upstream binary. Its build definition enables the VT/Unicode, uucode, SIMD (simdutf/Highway) and Kitty-pixel (Wuffs/pixels) paths. Their notices and Zig runtime notice are preserved. This is not a claim of a fully audited upstream binary SBOM.

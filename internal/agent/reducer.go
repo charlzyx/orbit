@@ -11,6 +11,11 @@ import (
 )
 
 type sessionState struct {
+	uiResponses    []pirpc.UIResponse
+	askToolID      string
+	askQuestions   []AskQuestion
+	askReplay      *askReplay
+	noticeSequence uint64
 	requestStarted time.Time
 	streamClock    streamClock
 	snapshot       Snapshot
@@ -63,6 +68,7 @@ func (s *sessionState) applyRecord(event pirpc.Event) {
 	case "message_update":
 		s.updateMessage(event)
 	case "tool_execution_start", "tool_execution_update", "tool_execution_end":
+		s.askToolEvent(event)
 		s.toolEvent(event)
 	case "queue_update":
 		_ = event.Decode(&s.snapshot.Queue)
@@ -94,6 +100,7 @@ func (s *sessionState) applyRecord(event pirpc.Event) {
 			s.snapshot.ConnectionError = event.String("message")
 		}
 	case "process_exited", "transport_error":
+		s.clearExtensionUI()
 		s.snapshot.Connected = false
 		s.snapshot.Running = false
 		s.snapshot.Compacting = false
@@ -165,7 +172,8 @@ func (s *sessionState) applyResponse(event pirpc.Event) {
 			s.snapshot.CheckpointRecoveryError = ""
 			s.snapshot.Messages = nil
 			s.snapshot.Queue = Queue{}
-			s.snapshot.Dialogs = nil
+			s.cancelExtensionUI()
+			s.clearExtensionUI()
 			s.entriesCursor = ""
 			s.activeMessage = -1
 		}
@@ -486,6 +494,15 @@ func (s *sessionState) extensionUI(event pirpc.Event) {
 	method, id := event.String("method"), event.ID
 	switch method {
 	case "select", "confirm", "input", "editor", "custom":
+		if method != "custom" {
+			if s.routeSpecialDialog(event) {
+				return
+			}
+			if s.blockingDialog() {
+				s.cancelUI(id)
+				return
+			}
+		}
 		var value struct {
 			Title, Message, Placeholder, Prefill, Phase string
 			Options, Lines                              []string
@@ -494,19 +511,28 @@ func (s *sessionState) extensionUI(event pirpc.Event) {
 			Cursor                                      json.RawMessage
 		}
 		_ = event.Decode(&value)
+		value.Options = extensionStringOptions(event.Fields["options"])
 		if method == "custom" && value.Phase == "close" {
 			s.removeDialog(id)
 			return
 		}
-		dialog := PendingDialog{ID: id, Method: method, Title: value.Title, Message: value.Message, Value: value.Prefill, Options: value.Options, Timeout: time.Duration(value.Timeout) * time.Millisecond, ReceivedAt: time.Now(), Phase: value.Phase, Lines: value.Lines, Width: value.Width, Height: value.Height, Cursor: value.Cursor, Raw: bytes.Clone(event.Raw)}
+		dialog := PendingDialog{ID: id, Method: method, Title: value.Title, Message: value.Message, Value: value.Prefill, Placeholder: value.Placeholder, Options: value.Options, Timeout: time.Duration(value.Timeout) * time.Millisecond, ReceivedAt: event.ReceivedAt, Phase: value.Phase, Lines: value.Lines, Width: value.Width, Height: value.Height, Cursor: value.Cursor, Raw: bytes.Clone(event.Raw)}
 		for i := range s.snapshot.Dialogs {
 			if s.snapshot.Dialogs[i].ID == id {
 				s.snapshot.Dialogs[i] = dialog
 				return
 			}
 		}
+		if method == "custom" && value.Phase != "open" {
+			return
+		}
 		s.snapshot.Dialogs = append(s.snapshot.Dialogs, dialog)
 	case "setStatus":
+		var statusText *string
+		if event.DecodeField("statusText", &statusText) == nil && statusText != nil {
+			s.snapshot.ExtensionStatusText = *statusText
+			s.snapshot.ExtensionStatusAt = event.ReceivedAt
+		}
 		key := event.String("statusKey")
 		if value := event.String("statusText"); value != "" {
 			s.snapshot.StatusEntries[key] = value
@@ -514,12 +540,33 @@ func (s *sessionState) extensionUI(event pirpc.Event) {
 			delete(s.snapshot.StatusEntries, key)
 		}
 	case "set_editor_text":
-		s.snapshot.ComposerText = event.String("text")
+		var text *string
+		if event.DecodeField("text", &text) == nil && text != nil {
+			s.setComposerText(*text)
+		}
 	case "notify":
-		s.snapshot.Status = event.String("message")
+		var message *string
+		if event.DecodeField("message", &message) == nil && message != nil {
+			s.noticeSequence++
+			s.snapshot.ExtensionNotices = append(s.snapshot.ExtensionNotices, ExtensionNotice{event.ID, s.noticeSequence, *message})
+			if len(s.snapshot.ExtensionNotices) > 64 {
+				s.snapshot.ExtensionNotices = s.snapshot.ExtensionNotices[1:]
+			}
+		}
+	case "setWidget":
+		s.applyWidget(event)
 	}
 }
 func (s *sessionState) removeDialog(id string) {
+	if p := s.snapshot.Approval; p != nil && p.ID == id {
+		s.snapshot.Approval = nil
+		return
+	}
+	if p := s.snapshot.Ask; p != nil && p.ID == id {
+		s.snapshot.Ask = nil
+		s.askReplay = nil
+		return
+	}
 	for i := range s.snapshot.Dialogs {
 		if s.snapshot.Dialogs[i].ID == id {
 			s.snapshot.Dialogs = append(s.snapshot.Dialogs[:i], s.snapshot.Dialogs[i+1:]...)

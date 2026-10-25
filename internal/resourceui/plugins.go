@@ -10,19 +10,22 @@ import (
 
 func (s *State) pluginsView(c *ui.Context) ui.Element {
 	a := s.appearance(c)
-	root := ui.Column(c).Grow(1).MinWidth(0).MinHeight(0).AlignSelf(ui.Stretch).Background(a.native.Background)
+	root := ui.Column(c).Grow(1).MinWidth(0).MinHeight(0).AlignSelf(ui.Stretch).Background(a.native.Background).LineHeight(1.618034)
 	root.Children(func() {
 		ui.Column(c.Key("pinned-header")).AlignSelf(ui.Center).WidthPercent(100).MaxWidth(960).Shrink(0).Padding(a.Space(20), a.Space(24), a.Space(12)).Gap(a.Space(12)).Children(func() {
 			ui.Column(c).Gap(a.Space(4)).Children(func() {
-				ui.Text(c, s.label("settings.plugins", "Plugins")).FontSize(a.Px(16)).FontWeight(500)
+				ui.Text(c, s.label("settings.plugins", "Plugins")).FontSize(a.Px(16)).LineHeight(1.3).FontWeight(500)
 				ui.Text(c, s.label("settings.plugins_description", "pi packages for this machine and this project. pi loads them at startup. Restart pi to apply changes.")).FontSize(a.Px(12)).TextColor(a.native.TextMuted)
 			})
-			ui.Row(c.Key("filter-row")).Gap(a.Space(8)).AlignItems(ui.Center).BorderWidth(0, 0, 1, 0).BorderColor(a.native.Border).Children(func() {
+			ui.Row(c.Key("filter-row")).Height(a.Px(36)).Shrink(0).Padding(0, a.Px(10)).Gap(a.Px(4)).AlignItems(ui.Center).BorderWidth(0, 0, 1, 0).BorderColor(a.native.Border).Children(func() {
 				icon(c, "search", a.Px(14), a.native.TextMuted)
-				ui.TextInput(c.Key("filter"), &s.PluginQuery).Placeholder(s.label("app.search_installed_plugins", "Search installed plugins…")).Label(s.label("resources.search_plugins", "Search installed plugins")).Grow(1).Height(a.Px(32)).Border(0, a.native.Border).Background(a.native.Background)
+				ui.TextInput(c.Key("filter"), &s.PluginQuery).Placeholder(s.label("app.search_installed_plugins", "Search installed plugins…")).Label(s.label("app.search_installed_plugins", "Search installed plugins")).Grow(1).Height(a.Px(36)).Padding(0).Border(0, ui.Color{}).Background(ui.Color{}).FocusRing(false)
 			})
 			ui.Row(c.Key("install-row")).Gap(a.Space(8)).AlignItems(ui.Center).Children(func() {
-				ui.TextInput(c.Key("source"), &s.InstallSource).Placeholder(s.label("app.plugin_source_placeholder", "npm:@scope/pkg, git:github.com/owner/repo, or ./path")).Label(s.label("resources.package_source", "Package source")).Grow(1).MinWidth(32).Height(a.Px(36)).Disabled(s.Busy)
+				ui.Row(c.Key("source-frame")).Grow(1).MinWidth(32).Height(a.Px(36)).Padding(0, a.Px(8)).Gap(a.Px(4)).Border(1, a.native.Border).Radius(a.Px(8)).AlignItems(ui.Center).Children(func() {
+					icon(c, "extensions", a.Px(14), a.native.TextMuted)
+					ui.TextInput(c.Key("source"), &s.InstallSource).Placeholder(s.label("app.plugin_source_placeholder", "npm:@scope/pkg, git:github.com/owner/repo, or ./path")).Label(s.label("resources.package_source", "Package source")).Grow(1).MinWidth(0).Height(a.Px(36)).Padding(0).Border(0, ui.Color{}).Background(ui.Color{}).FocusRing(false).Disabled(s.Busy)
+				})
 				ui.Row(c.Key("scope")).Gap(a.Space(4)).Shrink(0).Children(func() {
 					for _, scope := range []string{"global", "project"} {
 						label := s.label("settings.global", "Global")
@@ -41,7 +44,7 @@ func (s *State) pluginsView(c *ui.Context) ui.Element {
 						}
 					}
 				})
-				if s.button(c, "install", s.label("settings.install", "Install"), "plus", true).Height(a.Px(32)).Disabled(s.Busy || strings.TrimSpace(s.InstallSource) == "").Clicked() {
+				if s.button(c, "install", s.label("settings.install", "Install"), "plus", true).Height(a.Px(32)).Disabled(s.Busy).Clicked() {
 					s.Install()
 				}
 			})
@@ -101,14 +104,20 @@ func (s *State) pluginsView(c *ui.Context) ui.Element {
 
 func (s *State) pluginEmpty(c *ui.Context, glyph, title, hint string) {
 	a := s.appearance(c)
-	ui.Column(c.Key("empty")).Padding(a.Space(32)).Gap(a.Space(8)).Radius(a.Px(12)).Border(1, a.native.Border).AlignItems(ui.Center).Children(func() {
-		if s.Busy {
-			ui.Spinner(c).Size(a.Px(22), a.Px(22))
-		} else {
-			icon(c, glyph, a.Px(26), a.native.TextMuted)
-		}
-		ui.Text(c, title).FontSize(a.Px(14)).FontWeight(500)
-		ui.Text(c, hint).FontSize(a.Px(12)).TextColor(a.native.TextMuted)
+	// Loading is an operation status, never a claim that discovery is empty.
+	if s.Busy && !s.loaded {
+		ui.Row(c.Key("loading")).Label("Plugin loading state").Padding(a.Space(12)).Gap(a.Space(8)).AlignItems(ui.Center).Children(func() {
+			ui.Spinner(c).Size(a.Px(16), a.Px(16))
+			ui.Text(c, s.activity).FontSize(a.Px(12)).TextColor(a.Secondary)
+		})
+		return
+	}
+	ui.Column(c.Key("empty")).Label("Plugin empty state").AlignSelf(ui.Stretch).Padding(a.Space(40), a.Space(12)).Gap(a.Space(12)).Radius(a.Px(12)).Background(a.SurfaceSecondary).Border(1, a.native.Border).AlignItems(ui.Center).Children(func() {
+		ui.Box(c.Key("glyph-tile")).Label("Plugin empty glyph tile").Size(64, 64).Shrink(0).Radius(a.Px(12)).Border(1, a.native.Border).Background(a.Elevated).Center().Children(func() {
+			icon(c, glyph, a.Px(32), a.Secondary)
+		})
+		ui.Text(c, title).FontSize(a.Px(14)).FontWeight(500).TextColor(a.native.Text)
+		ui.Text(c, hint).MaxWidth(420).FontSize(a.Px(12)).TextColor(a.Secondary)
 	})
 }
 func (s *State) pluginRow(c *ui.Context, p workbench.Plugin) {

@@ -1,0 +1,121 @@
+Orbit Go + MyGo experimental macOS test
+CI version __VERSION__ / source __SOURCE_COMMIT__ / __ARCHLABEL__ (__ARCH__) / 2026-10-25
+
+THIS IS NOT A RELEASE, NOT FEATURE-COMPLETE, AND NOT NATIVE-MAC-ACCEPTED.
+It is a download for later manual testing, assembled in GitHub Actions Linux.
+No user's Mac was accessed. No signing key or security workaround is included.
+
+Read KNOWN-LIMITS.txt first for concrete implementation gaps in this fixed build.
+
+QUICK START
+1. Use Apple Silicon (arm64) for M-series Macs, Intel (amd64) for Intel Macs.
+   These exact binaries declare macOS 13.0 minimum; actual OS compatibility
+   has not been established. Do not select an older OS or rely on Rosetta.
+2. Extract the ZIP. Keep its folder and .app contents together.
+3. Optional: run Verify.command. It checks all bundled file hashes and inspects
+   the architecture. It does not launch Orbit or change macOS security.
+4. Open Launch.command. This starts the .app through the isolated launcher,
+   prints the temporary test-data and log locations, then opens the native UI.
+   Alternatively open Orbit Go Test.app; it uses the same isolated defaults,
+   but Finder will not show the printed log path. Use Launch.command first.
+5. No Pi runtime is selected by default. A missing-Pi/connection error is
+   expected, not hidden by a fake server. You can inspect the native shell,
+   settings, the synthetic Files workspace and integrated terminal without
+   connecting an AI provider. Successful LLM inference is NOT established.
+
+This app is not Developer ID signed or notarized. macOS may refuse to run it.
+Stop and report the exact security/error message if blocked. Do not remove
+quarantine, disable Gatekeeper, change OS security, or re-sign this package
+as a workaround. Signing/notarization and native acceptance remain open work.
+The Go/ upstream arm64 bytes contain code-signature commands, but that is NOT
+Developer ID identity verification, notarization, or validation by this task.
+
+ISOLATION AND SIDE EFFECTS
+Every launch creates a new mode-0700 /tmp/orbit-go-test.XXXXXXXX directory.
+It gets a synthetic HOME, .pi/agent, cache/config/temp directories and a small
+workspace copied from the bundle. Existing credentials, session histories,
+SSH_AUTH_SOCK and environment API keys are not inherited. The launcher does
+not install Pi, Node, Git or gh; does not import auth; and does not auto-delete
+its test data. Temporary test data may be removed by macOS/reboot. Do not use
+this location for important work. To clean up, quit Orbit and move only the
+printed test-data folder and extracted package to Trash yourself.
+
+THIS IS NOT A SECURITY SANDBOX. The app, tools and terminal still run with your
+normal user permissions. macOS may create ordinary LaunchServices/app metadata
+or request permissions. Bundled test data is disposable; do not open important
+projects or supply credentials for the first smoke test. The integrated zsh
+can read system-wide shell startup files. Native open/reveal/browser actions
+can affect other apps. '--offline' suppresses catalog/startup-update checks,
+not every network request and not model inference after explicit setup.
+The app's release updater is unconfigured for these development binaries.
+This test .app has the distinct identifier dev.orbit.go.experimental.__APP_SUFFIX__,
+not the original Rust Orbit identifier. Native app/notification identity
+behavior may therefore differ from the production reference.
+
+OPTIONAL REAL PI RPC TEST (SEPARATE RUNTIME)
+Pi 1.4.0 is the protocol-test pin; Pi is not included in this ZIP. If you already
+have an appropriate Pi runtime, use an absolute path. In Terminal, change to
+this extracted directory, then run:
+  ./Launch.command --pi "/absolute/path/to/pi"
+If Pi is a Node-script installation, Pi 1.4.0 requires Node >=22.19.0, which
+must be available to that installation (standard Homebrew/system paths are
+provided). No dependency is
+automatically installed. Prefer the official standalone Pi distribution where
+available. See https://github.com/earendil-works/pi for official instructions.
+No existing ~/.pi data is copied: logging in is a separate, explicit action.
+For an expendable copy of a project only:
+  ./Launch.command --pi "/absolute/path/to/pi" --workspace "/absolute/path/to/disposable-copy"
+That project is real, and editor autosave, Git, terminal or agent actions may
+change it. Configuration isolation does not protect workspace files.
+Do not point this initial test at your original working project.
+
+WHAT WAS VERIFIED HERE
+- Binaries were built from the recorded Git commit by GitHub Actions, with
+  Go 1.27.3, CGO_ENABLED=0 and the canonical compatibility wrapper.
+- Default runtime inputs are fingerprint-checked against frozen a7aa6cf.
+  Packaging/version metadata differs; actual new executable hashes are recorded.
+- Both dylibs match the SHA-256 pins in mygo-plugin.json from MyGo 9c69cf8.
+- Thin Mach-O architecture, macOS deployment metadata, dynamic link paths and
+  all 92 Ghostty functions required by the Go binding were checked statically.
+- The dylib links only macOS libSystem. MyGo core/editor are Go code plus
+  macOS system frameworks; no separate core/editor dylib is missing.
+- Icons, fonts, locales and Orbit Pi extensions are embedded in orbit-bin.
+- Linux aggregate tests and six cross-builds are recorded in provenance.
+  Pi 1.4.0 is a top-level npm test dependency pin, not a repository-locked
+  transitive graph; its resolved package-lock hash is recorded. Pi is not bundled.
+
+WHAT WAS NOT VERIFIED
+- macOS launch, dyld load, runtime ABI layout check, Metal/CoreText drawing,
+  notifications, IME, clipboard, file panels, PTY, native keyboard/focus,
+  actual Pi inference or feature/pixel parity on either Mac architecture.
+- Native Mac CI/startup acceptance. GitHub Actions Linux aggregate tests and
+  cross-builds are recorded separately; those do not establish Mac execution.
+- Developer ID signing/notarization, app distribution acceptance, update feed.
+Compilation, static validation and Linux testing are not native Mac acceptance.
+
+SUGGESTED MANUAL SMOKE TEST
+- Launch the matching architecture; record macOS version, architecture and error.
+- Confirm window/chrome, resize, Cmd+, settings, Cmd+P palette, close/reopen, quit.
+- Open the sample README.md and hello.go. Type/undo/redo and confirm autosave
+  only changes the temporary sample workspace. Try IME and selection separately.
+- Open terminal with Cmd+J. Check that 'pwd' and 'printf "%s\n" "$HOME"' point
+  to the temporary test tree before running only harmless test commands.
+- Check text rendering and screenshot mismatches without claiming parity.
+- If you explicitly selected Pi, check get_state/start, streaming, cancellation,
+  session reload and errors using a disposable project. No live inference has
+  been pre-validated, and provider use can cost money.
+
+For feedback, share the architecture, macOS version, launch error and relevant
+log excerpt. Inspect logs/screenshots and redact personal data before sharing.
+No telemetry or automatic log upload is added by this package.
+
+PACKAGE CONTENTS
+Orbit Go Test.app: launcher + exact Go binary + pinned Ghostty dylib + test data.
+Launch.command: isolated launcher entry point.
+Verify.command: read-only package integrity check (hashes are not signatures).
+provenance/: source/binary linkage, actual build-info and static audit.
+licenses/: Go/runtime, MyGo/Ghostty, third-party and embedded-resource notices,
+including the unresolved historical Waku-attribution caveat. No legal clearance
+for the historical Rust reference is asserted.
+SHA256SUMS: all distributed files except itself. Outer ZIP hash is supplied
+separately with delivery metadata.

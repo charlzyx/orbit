@@ -1,0 +1,225 @@
+//go:build linux && (amd64 || arm64)
+
+package text
+
+import (
+	"sync"
+	"testing"
+
+	"github.com/ebitengine/purego"
+	"golang.org/x/image/font/gofont/goregular"
+)
+
+type orbitMetricOptions struct {
+	round             func(uintptr) int32
+	metrics, hint, aa func(uintptr) int32
+}
+
+func orbitMetricQuery(t *testing.T) orbitMetricOptions {
+	t.Helper()
+	var q orbitMetricOptions
+	bind := func(lib, name string, fn any) {
+		h, err := purego.Dlopen(lib, purego.RTLD_NOW|purego.RTLD_GLOBAL)
+		if err != nil {
+			t.Fatal(err)
+		}
+		sym, err := purego.Dlsym(h, name)
+		if err != nil || sym == 0 {
+			t.Fatalf("%s: %v", name, err)
+		}
+		purego.RegisterFunc(fn, sym)
+	}
+	bind("libpango-1.0.so.0", "pango_context_get_round_glyph_positions", &q.round)
+	bind("libcairo.so.2", "cairo_font_options_get_hint_metrics", &q.metrics)
+	bind("libcairo.so.2", "cairo_font_options_get_hint_style", &q.hint)
+	bind("libcairo.so.2", "cairo_font_options_get_antialias", &q.aa)
+	return q
+}
+
+func orbitMetricSystem(t *testing.T) *System {
+	t.Helper()
+	s := newSystem()
+	if err := s.RegisterFont(goregular.TTF, "Orbit Metric Fixture"); err != nil {
+		t.Fatal(err)
+	}
+	if _, ok := s.eng.(*pangoEngine); !ok {
+		t.Fatal("native Pango required")
+	}
+	return s
+}
+
+func orbitMetricParams() Params {
+	return Params{Text: "General office 0123456789", Style: Style{Family: "Orbit Metric Fixture", Size: 14, LineHeight: 1.3}}
+}
+
+func orbitMetricCheck(t *testing.T, s *System, round, metrics, hint, aa int32) {
+	t.Helper()
+	e := s.eng.(*pangoEngine)
+	q := orbitMetricQuery(t)
+	if got := q.round(e.context); got != round {
+		t.Fatalf("round positions: %d, want %d", got, round)
+	}
+	f := s.font(orbitMetricParams().Style)
+	if f == nil {
+		t.Fatal("font unavailable")
+	}
+	sf := e.scaledFont(f, 1, false)
+	if sf == 0 {
+		t.Fatal("scaled font unavailable")
+	}
+	opts := pangoLib.cairoFontOptionsCreate()
+	defer pangoLib.cairoFontOptionsDestroy(opts)
+	pangoLib.cairoScaledFontOptions(sf, opts)
+	if got := q.metrics(opts); got != metrics {
+		t.Fatalf("hint metrics: %d, want %d", got, metrics)
+	}
+	if got := q.hint(opts); got != hint {
+		t.Fatalf("outline hint style: %d, want %d", got, hint)
+	}
+	if got := q.aa(opts); got != aa {
+		t.Fatalf("antialias: %d, want %d", got, aa)
+	}
+}
+
+func TestOrbitTextMetricsDefaultUnchanged(t *testing.T) {
+	t.Setenv("ORBIT_METRIC_EXPERIMENT", "fractional_both_quarter") // not a production switch
+	s := orbitMetricSystem(t)
+	orbitMetricCheck(t, s, 1, cairoHintMetricsOn, cairoHintStyleMedium, cairoAntialiasGray)
+	if s.eng.(*pangoEngine).orbitFractionalMetrics {
+		t.Fatal("default enabled")
+	}
+	if n, round := s.eng.positions(nil, 1, false); n != 1 || round {
+		t.Fatal("raster phase policy changed")
+	}
+	if got := s.Baseline(14.9995); got != 15 {
+		t.Fatalf("baseline policy changed: %g", got)
+	}
+}
+
+func TestOrbitTextMetricsEnableAfterRegistration(t *testing.T) {
+	s := orbitMetricSystem(t)
+	_ = s.FontFamilies()
+	if err := s.EnableOrbitFractionalTextMetrics(); err != nil {
+		t.Fatal(err)
+	}
+	orbitMetricCheck(t, s, 0, cairoHintMetricsOff, cairoHintStyleMedium, cairoAntialiasGray)
+	before := s.Layout(orbitMetricParams())
+	generation := s.Generation()
+	if err := s.EnableOrbitFractionalTextMetrics(); err != nil {
+		t.Fatal(err)
+	}
+	if s.Generation() != generation || s.Layout(orbitMetricParams()) != before {
+		t.Fatal("idempotent enable invalidated caches")
+	}
+}
+
+func TestOrbitTextMetricsRejectLateEnable(t *testing.T) {
+	for _, kind := range []string{"layout", "shape", "metrics", "preload"} {
+		t.Run(kind, func(t *testing.T) {
+			s := orbitMetricSystem(t)
+			switch kind {
+			case "layout":
+				s.Layout(orbitMetricParams())
+			case "shape":
+				s.Shape(orbitMetricParams())
+			case "metrics":
+				s.Metrics(orbitMetricParams().Style)
+			case "preload":
+				s.Preload()
+			}
+			generation := s.Generation()
+			if err := s.EnableOrbitFractionalTextMetrics(); err == nil {
+				t.Fatal("late enable accepted")
+			}
+			if s.Generation() != generation || s.eng.(*pangoEngine).orbitFractionalMetrics {
+				t.Fatal("failed enable changed state")
+			}
+			orbitMetricCheck(t, s, 1, cairoHintMetricsOn, cairoHintStyleMedium, cairoAntialiasGray)
+		})
+	}
+}
+
+func TestOrbitTextMetricsRejectAfterFontEviction(t *testing.T) {
+	s := orbitMetricSystem(t)
+	s.Metrics(orbitMetricParams().Style)
+	e := s.eng.(*pangoEngine)
+	clear(s.fonts)
+	e.forgetFonts() // reproduce an empty native cache, not a fresh engine
+	if s.made != 0 || len(e.fonts) != 0 {
+		t.Fatal("fixture did not isolate metrics-only lifetime")
+	}
+	if err := s.EnableOrbitFractionalTextMetrics(); err == nil {
+		t.Fatal("eviction bypassed first-use guard")
+	}
+}
+
+func TestOrbitTextMetricsGTKReapplicationAndCaches(t *testing.T) {
+	s := orbitMetricSystem(t)
+	if err := s.EnableOrbitFractionalTextMetrics(); err != nil {
+		t.Fatal(err)
+	}
+	for _, setting := range []struct {
+		hint  string
+		value int32
+	}{{"slight", cairoHintStyleSlight}, {"full", cairoHintStyleFull}, {"medium", cairoHintStyleMedium}} {
+		old := s.Layout(orbitMetricParams())
+		g := old.Lines[0].Glyphs[0]
+		if !s.Glyph(g.Font, g.ID, 1, .75, 0, false).OK {
+			t.Fatal("glyph unavailable")
+		}
+		if len(s.layouts) == 0 || len(s.fonts) == 0 || len(s.glyphs) == 0 || len(s.places) == 0 {
+			t.Fatal("cache fixture empty")
+		}
+		generation := s.Generation()
+		s.SetFontRendering("gray", setting.hint, "rgb")
+		if s.Generation() != generation+1 || len(s.layouts) != 0 || len(s.fonts) != 0 || len(s.glyphs) != 0 || len(s.places) != 0 || len(s.eng.(*pangoEngine).scaled) != 0 {
+			t.Fatal("GTK update retained a stale cache")
+		}
+		orbitMetricCheck(t, s, 0, cairoHintMetricsOff, setting.value, cairoAntialiasGray)
+		if s.Layout(orbitMetricParams()) == old {
+			t.Fatal("layout object retained after settings update")
+		}
+		stable := s.Generation()
+		s.SetFontRendering("gray", setting.hint, "rgb")
+		if s.Generation() != stable {
+			t.Fatal("unchanged settings invalidated caches")
+		}
+	}
+}
+
+func TestOrbitTextMetricsMissingAPIFailsClosed(t *testing.T) {
+	s := orbitMetricSystem(t)
+	original := pangoLib.contextSetRoundPositions
+	pangoLib.contextSetRoundPositions = nil
+	defer func() { pangoLib.contextSetRoundPositions = original }()
+	if err := s.EnableOrbitFractionalTextMetrics(); err == nil {
+		t.Fatal("missing API accepted")
+	}
+	if s.eng.(*pangoEngine).orbitFractionalMetrics {
+		t.Fatal("partial policy enabled")
+	}
+}
+
+func TestOrbitTextMetricsConcurrentFirstUse(t *testing.T) {
+	for i := 0; i < 20; i++ {
+		s := orbitMetricSystem(t)
+		start := make(chan struct{})
+		result := make(chan error, 1)
+		var done sync.WaitGroup
+		done.Add(2)
+		go func() { defer done.Done(); <-start; result <- s.EnableOrbitFractionalTextMetrics() }()
+		go func() { defer done.Done(); <-start; s.Layout(orbitMetricParams()) }()
+		close(start)
+		done.Wait()
+		err := <-result
+		e := s.eng.(*pangoEngine)
+		if (err == nil) != e.orbitFractionalMetrics || !e.orbitMetricsStarted {
+			t.Fatal("first-use race left inconsistent policy")
+		}
+		if e.orbitFractionalMetrics {
+			orbitMetricCheck(t, s, 0, cairoHintMetricsOff, cairoHintStyleMedium, cairoAntialiasGray)
+		} else {
+			orbitMetricCheck(t, s, 1, cairoHintMetricsOn, cairoHintStyleMedium, cairoAntialiasGray)
+		}
+	}
+}

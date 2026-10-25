@@ -187,35 +187,116 @@ func (a *App) extensionDialog(c *ui.Context) {
 				ui.Text(c, "Native extension UI renderer is not connected.").TextColor(a.Theme.Error)
 			}
 		case "select":
-			for _, choice := range d.Options {
-				if a.button(c, choice, "", false).AlignSelf(ui.Stretch).Clicked() {
-					a.Dispatch(Action{Kind: "RespondDialog", Value: choice, Data: map[string]any{"id": d.ID}})
+			if len(d.Options) == 0 {
+				ui.Text(c, a.text("dialog.no_options_were_provided", "No options were provided.")).TextColor(a.Theme.TextMuted)
+			}
+			choices := ui.Column(c.Key("dialog-options")).Focusable().AutoFocus().AlignSelf(ui.Stretch)
+			pointerMoved := a.extensionDialogPointer(choices)
+			choices.Children(func() {
+				ui.Scroll(c).MaxHeight(320).AlignSelf(ui.Stretch).Children(func() {
+					for i, choice := range d.Options {
+						b := a.button(c.Key(i), choice, "", i == a.extensionUI.dialogCursor).KeepFocus().AlignSelf(ui.Stretch)
+						_, _, over := b.PointerPosition()
+						if over {
+							if pointerMoved && a.extensionUI.dialogCursor != i {
+								a.extensionUI.dialogCursor = i
+								c.Invalidate()
+							}
+						}
+						if b.Clicked() {
+							a.respondExtensionDialog(d, choice, nil, false)
+						}
+						if a.extensionUI.dialogReveal && i == a.extensionUI.dialogCursor {
+							b.ScrollIntoView()
+							a.extensionUI.dialogReveal = false
+						}
+					}
+				})
+			})
+			if choices.Shortcut(0, ui.KeyDown) && len(d.Options) > 0 {
+				a.extensionUI.dialogCursor = (a.extensionUI.dialogCursor + 1) % len(d.Options)
+				a.extensionUI.dialogReveal = true
+			}
+			if choices.Shortcut(0, ui.KeyUp) && len(d.Options) > 0 {
+				a.extensionUI.dialogCursor = (a.extensionUI.dialogCursor + len(d.Options) - 1) % len(d.Options)
+				a.extensionUI.dialogReveal = true
+			}
+			if choices.Shortcut(0, ui.KeyEnter) {
+				if len(d.Options) == 0 {
+					open = false
+				} else {
+					a.respondExtensionDialog(d, d.Options[a.extensionUI.dialogCursor], nil, false)
 				}
 			}
 		case "input":
-			ui.TextInput(c, &a.dialogValue).Label(d.Title).Placeholder(d.Placeholder).AutoFocus().AlignSelf(ui.Stretch)
+			in := ui.TextInput(c.Key("dialog-input"), &a.dialogValue).Label(d.Title).Placeholder(d.Placeholder).AutoFocus().AlignSelf(ui.Stretch).OnTextKey(func(k ui.TextKey) bool {
+				if composing, ok := any(k).(interface{ Composing() bool }); ok && composing.Composing() {
+					return true
+				}
+				return false
+			})
+			if in.Submitted() {
+				a.respondExtensionDialog(d, a.dialogValue, nil, false)
+			}
 		case "editor":
-			ui.TextArea(c, &a.dialogValue).Label(d.Title).Placeholder(d.Placeholder).Height(240).AutoFocus().AlignSelf(ui.Stretch)
+			ui.TextArea(c.Key("dialog-editor"), &a.dialogValue).Label(d.Title).Placeholder(d.Placeholder).Height(240).AutoFocus().AlignSelf(ui.Stretch).OnTextKey(func(k ui.TextKey) bool {
+				if composing, ok := any(k).(interface{ Composing() bool }); ok && composing.Composing() {
+					return true
+				}
+				if k.Key == ui.KeyEnter && k.Mods == 0 {
+					a.respondExtensionDialog(d, k.Text(), nil, false)
+					return true
+				}
+				return false
+			})
 		}
-		ui.Row(c).Justify(ui.End).Gap(8).Children(func() {
-			if a.button(c, "Cancel", "", false).Clicked() {
+		controls := ui.Row(c).Justify(ui.End).Gap(8)
+		if d.Method == "confirm" {
+			controls.Focusable().AutoFocus()
+		}
+		confirmPointerMoved := false
+		if d.Method == "confirm" {
+			confirmPointerMoved = a.extensionDialogPointer(controls)
+		}
+		controls.Children(func() {
+			if a.button(c, a.text("common.cancel", "Cancel"), "", false).Clicked() {
 				open = false
 			}
 			if d.Method == "confirm" {
-				if a.button(c, "Confirm", "icons/check.svg", true).Clicked() {
-					a.Dispatch(Action{Kind: "RespondDialog", Data: map[string]any{"id": d.ID, "confirmed": true}})
+				no, yes := false, true
+				noButton := a.button(c, a.text("common.no", "No"), "", !a.extensionUI.dialogConfirmed).KeepFocus()
+				yesButton := a.button(c, a.text("common.yes", "Yes"), "icons/check.svg", a.extensionUI.dialogConfirmed).KeepFocus()
+				if noButton.Clicked() {
+					a.respondExtensionDialog(d, "", &no, false)
+				}
+				if yesButton.Clicked() {
+					a.respondExtensionDialog(d, "", &yes, false)
+				}
+				for i, b := range []ui.Element{noButton, yesButton} {
+					_, _, over := b.PointerPosition()
+					if over {
+						if confirmPointerMoved && a.extensionUI.dialogConfirmed != (i == 1) {
+							a.extensionUI.dialogConfirmed = i == 1
+							c.Invalidate()
+						}
+					}
 				}
 			} else if d.Method == "input" || d.Method == "editor" {
-				if a.button(c, "Submit", "", true).Clicked() {
-					a.Dispatch(Action{Kind: "RespondDialog", Value: a.dialogValue, Data: map[string]any{"id": d.ID}})
+				if a.button(c, a.text("common.submit", "Submit"), "", true).Clicked() {
+					a.respondExtensionDialog(d, a.dialogValue, nil, false)
 				}
 			}
 		})
+		if d.Method == "confirm" && controls.Shortcut(0, ui.KeyEnter) {
+			confirmed := a.extensionUI.dialogConfirmed
+			a.respondExtensionDialog(d, "", &confirmed, false)
+		}
 	})
 	if !open {
-		a.Dispatch(Action{Kind: "RespondDialog", Data: map[string]any{"id": d.ID, "cancelled": true}})
+		a.respondExtensionDialog(d, "", nil, true)
 	}
 }
+
 func (a *App) prompt(c *ui.Context) {
 	if !a.promptOpen {
 		return
@@ -285,4 +366,18 @@ func (a *App) commandSession(id string, s SessionRow) {
 	default:
 		a.Dispatch(Action{Kind: id, Value: s.Path, SessionID: s.ID})
 	}
+}
+
+// Compare viewport coordinates once per frame, including outside the choices.
+// Row-relative coordinates change when keyboard reveal scrolls a row under a
+// stationary pointer; that must not hijack the source's arrow-key navigation.
+func (a *App) extensionDialogPointer(container ui.Element) bool {
+	st := &a.extensionUI
+	x, y, _ := container.PointerPosition()
+	box := container.Bounds()
+	x, y = x+box.X, y+box.Y
+	changed := st.dialogPointerValid && (st.dialogPointerX != x || st.dialogPointerY != y)
+	st.dialogPointerValid = true
+	st.dialogPointerX, st.dialogPointerY = x, y
+	return changed
 }

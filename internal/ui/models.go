@@ -23,7 +23,7 @@ func (a *App) initModels() {
 			if t.Dark {
 				alpha = .14
 			}
-			return modelui.Theme{Elevated: t.Elevated, Secondary: t.TextSecondary, Active: t.Active, Hover: t.Hover, BorderStrong: t.Text.Alpha(alpha), AccentText: t.AccentText, Overlay: t.Text.Alpha(.05), CodeFont: a.Fonts.CodeFamily, ReduceMotion: a.Prefs.ReduceMotion, CodePx: func(n float32) float32 { return n * t.CodeSize / 13 }, Px: t.Px, Space: t.Space}
+			return modelui.Theme{Elevated: t.Elevated, SurfaceSecondary: t.SurfaceSecondary, Secondary: t.TextSecondary, Active: t.Active, Hover: t.Hover, BorderStrong: t.Text.Alpha(alpha), AccentText: t.AccentText, Overlay: t.Text.Alpha(.05), CodeFont: a.Fonts.CodeFamily, ReduceMotion: a.Prefs.ReduceMotion, CodePx: func(n float32) float32 { return n * t.CodeSize / 13 }, Px: t.Px, Space: t.Space}
 		},
 		Text: a.text, Notify: a.Notify,
 		OnSelectModel: func(provider, id string) error {

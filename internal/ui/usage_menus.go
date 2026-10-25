@@ -40,12 +40,15 @@ func (s *usageState) closeUsagePopovers(except string) {
 func (a *App) usagePopover(c *ui.Context, key, label, icon string, enabled bool, width float32, body func(func())) {
 	s := &a.usageState
 	m := s.menu(key)
-	anchor := a.button(c, label, icon, false).AlignSelf(ui.Start).Border(1, a.Theme.Border).Disabled(!enabled)
+	var anchor ui.Element
+	if key == "export" {
+		anchor = a.usageTextButton(c, label, icon, enabled)
+	} else {
+		anchor = a.usageChip(c, label, icon, false, true).Disabled(!enabled)
+	}
+	anchor.AlignSelf(ui.Start)
 	if strings.HasPrefix(key, "page-size:") {
 		anchor.Label("Rows per page " + strings.TrimPrefix(key, "page-size:"))
-	}
-	if key != "export" {
-		anchor.Children(func() { a.icon(c, "icons/chevron-down.svg", 12, a.Theme.TextMuted) })
 	}
 	if anchor.Clicked() {
 		m.Open = !m.Open
@@ -91,7 +94,7 @@ func (a *App) usageExportControl(c *ui.Context) {
 			hint := a.text("usage.export_"+format+"_hint", "")
 			if a.usagePickerRow(c.Key(format), title, hint, false).Label(title).Clicked() {
 				closeMenu()
-				a.Dispatch(Action{Kind: "ExportUsage", Value: format, Data: map[string]any{"index": s.index, "filter": cloneUsageFilter(s.filter), "options": workbench.UsageExportOptions{Preset: s.preset, Granularity: s.granularity, SessionSearch: s.table("sessions").Search, Location: time.Local, Now: s.now(), Insights: a.usageInsightTexts(usageInsights(s.projection, s.preset == "all"))}}})
+				a.Dispatch(Action{Kind: "ExportUsage", Value: format, Data: map[string]any{"index": s.index, "filter": cloneUsageFilter(s.filter), "options": a.usageExportOptions()}})
 			}
 		}
 	})
@@ -111,7 +114,7 @@ func (a *App) usageColumnControl(c *ui.Context, kind string, all []ui.TableColum
 			if col.ID == required || col.ID == "open" || (kind == "sessions" && col.ID == "tools") {
 				continue
 			}
-			if a.usagePickerRow(c.Key(col.ID), col.Title, "", !slices.Contains(t.Hidden, col.ID)).Label("Toggle " + kind + " column " + col.ID).Clicked() {
+			if a.usagePickerRow(c.Key(col.ID), a.usageColumnTitle(kind, col.ID, s.metric, true), "", !slices.Contains(t.Hidden, col.ID)).Label("Toggle " + kind + " column " + col.ID).Clicked() {
 				t.toggleColumn(col.ID, required)
 				persist()
 			}
@@ -159,4 +162,26 @@ func (a *App) usageFooterButton(c *ui.Context, label string) ui.Element {
 	}
 	button.Children(func() { ui.Text(c, label).SingleLine().FontSize(a.Theme.Px(14)).TextColor(color) })
 	return button
+}
+
+// Resolve display titles on the UI thread. Export runs on a detached snapshot
+// and must not consult mutable locale/UI state from the file writer.
+func (a *App) usageExportOptions() workbench.UsageExportOptions {
+	s := &a.usageState
+	titles := map[string]string{}
+	for _, r := range s.index.Records {
+		key := r.SessionPath
+		if key == "" {
+			key = r.Session
+		}
+		titles[key] = a.usageSessionTitle(r.SessionTitle, r.Session)
+	}
+	for _, r := range s.index.Sessions {
+		key := r.Path
+		if key == "" {
+			key = r.ID
+		}
+		titles[key] = a.usageSessionTitle(r.Title, r.ID)
+	}
+	return workbench.UsageExportOptions{Preset: s.preset, Granularity: s.granularity, SessionSearch: s.table("sessions").Search, Location: time.Local, Now: s.now(), Insights: a.usageInsightTexts(usageInsights(s.projection, s.preset == "all")), SessionTitles: titles}
 }

@@ -65,6 +65,10 @@ func (s *usageState) table(kind string) *usageTableState {
 	}
 	if strings.HasPrefix(kind, "breakdown:") && kind != "breakdown:tools" {
 		t.Sort = ui.SortOrder{Column: s.breakdownSort, Descending: s.breakdownDescending}
+		if s.breakdownWidths == nil {
+			s.breakdownWidths = map[string]float32{}
+		}
+		t.List.Columns.Widths = s.breakdownWidths
 	}
 	t.observedSort = t.Sort
 	s.tables[kind] = t
@@ -105,7 +109,7 @@ func usageRowFields(r usageTableRow, kind string) []string {
 	if r.Errors+r.ToolFailures > 0 {
 		status = "error failed"
 	}
-	return []string{r.Name, r.ID, usageWorkspaceLabel(r.Workspace), r.Workspace, usageProviderLabel(r.Provider), usageModelPair(r.Provider, r.Model), status}
+	return []string{r.Name, r.ID, usageWorkspaceLabel(r.Workspace), r.Workspace, usageProviderLabel(r.Provider), usageSessionModel(r.usageAggregate), status}
 }
 func usageRowText(r usageTableRow, kind string) string {
 	return strings.Join(usageRowFields(r, kind), " ")
@@ -145,7 +149,7 @@ func usageRowField(r usageTableRow, id, metric, latency string) (string, float64
 	case "provider":
 		return usageProviderLabel(r.Provider), 0, true
 	case "model":
-		return usageModelPair(r.Provider, r.Model), 0, true
+		return usageSessionModel(r.usageAggregate), 0, true
 	case "started":
 		return "", float64(r.Ended.UnixMilli()), false
 	case "date", "time", "latest":
@@ -343,6 +347,7 @@ func (a *App) usageTableRows(kind string) []usageTableRow {
 	case "failures":
 		for i := range p.Errors[:min(400, len(p.Errors))] {
 			e := p.Errors[i]
+			e.SessionTitle = a.usageSessionTitle(e.SessionTitle, e.Session)
 			out = append(out, usageTableRow{usageAggregate: usageAggregate{Key: fmt.Sprintf("%s|%s|%d|%s", e.SessionPath, e.Kind, e.At.UnixNano(), e.Message), Name: e.SessionTitle, ID: e.Session, Path: e.SessionPath, Provider: e.Provider, Model: e.Model, Workspace: e.Workspace, At: e.At}, Failure: &e})
 		}
 	case "breakdown:models":
@@ -355,6 +360,9 @@ func (a *App) usageTableRows(kind string) []usageTableRow {
 		groups = p.ToolGroups
 	}
 	for _, r := range groups {
+		if kind == "sessions" && r.Untitled {
+			r.Name = a.usageSessionTitle("", r.ID)
+		}
 		out = append(out, usageTableRow{usageAggregate: r})
 	}
 	return out
@@ -384,8 +392,8 @@ func (a *App) usageCell(r usageTableRow, id, kind string) string {
 	case "provider":
 		return usageProviderLabel(r.Provider)
 	case "model":
-		if kind == "sessions" && r.Model != "" {
-			return usageModelPair(r.Provider, r.Model)
+		if kind == "sessions" {
+			return usageSessionModel(r.usageAggregate)
 		}
 		return r.Model
 	case "time", "date":
@@ -451,14 +459,18 @@ func (a *App) usageCell(r usageTableRow, id, kind string) string {
 func (a *App) usageTable(c *ui.Context, kind string) {
 	s := &a.usageState
 	t := s.table(kind)
-	all := usageTableColumns(kind, s.metric)
+	all := a.usageColumns(kind, s.metric)
 	required := all[0].ID
-	ui.Row(c.Key("usage-toolbar:" + kind)).Wrap().Gap(8).Children(func() {
-		if ui.TextInput(c, &t.Search).Label("Search " + kind).Placeholder("Search…").Width(200).Changed() {
-			t.Page = 1
-			t.Selected = -1
-		}
-		ui.Spacer(c)
+	ui.Row(c.Key("usage-toolbar:" + kind)).Gap(a.Theme.Space(8)).AlignItems(ui.Center).Children(func() {
+		ui.Row(c).Grow(1).MinWidth(180).Height(a.Theme.Px(36)).Padding(0, a.Theme.Px(10)).Gap(a.Theme.Space(8)).AlignItems(ui.Center).BorderWidth(0, 0, 1, 0).BorderColor(a.Theme.Border).Clip().Label("Usage table search head " + kind).Children(func() {
+			a.icon(c, "icons/search.svg", a.Theme.Px(14), a.Theme.TextMuted)
+			if ui.TextInputBase(c, &t.Search).Label("Search " + kind).Placeholder(a.usageSearchPlaceholder(kind)).Grow(1).MinWidth(0).FontSize(a.Theme.Px(14)).FocusRing(false).Changed() {
+				if !strings.HasPrefix(kind, "breakdown:") {
+					t.Page = 1
+				}
+				t.Selected = -1
+			}
+		})
 		a.usageColumnControl(c, kind, all, required)
 	})
 	probe := ui.Box(c.Key("usage-table-width:" + kind)).Height(0).AlignSelf(ui.Stretch)

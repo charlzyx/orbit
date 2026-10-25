@@ -111,8 +111,8 @@ func (a *App) providerToolbar(c *ui.Context) {
 		}
 	}
 	ui.Column(c).AlignSelf(ui.Stretch).Gap(t.Space(12)).Children(func() {
-		ui.Row(c).Height(t.Px(36)).PaddingX(t.Space(10)).Gap(t.Space(8)).AlignItems(ui.Center).BorderWidth(0, 0, 1, 0).BorderColor(t.Border).Children(func() {
-			a.icon(c, "icons/search.svg", 16, t.TextMuted)
+		ui.Row(c).Height(t.Px(36)).PaddingX(t.Space(10)).Gap(t.Px(4)).AlignItems(ui.Center).BorderWidth(0, 0, 1, 0).BorderColor(t.Border).Children(func() {
+			a.icon(c, "icons/search.svg", t.Px(14), t.TextMuted)
 			ui.TextInputBase(c, &a.providerState.query).Label("Search providers").Placeholder(a.Tr("app.search_providers")).Grow(1)
 		})
 		ui.Row(c).AlignSelf(ui.Stretch).Gap(t.Space(8)).AlignItems(ui.Center).Children(func() {

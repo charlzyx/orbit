@@ -1,8 +1,9 @@
 package orbitui
 
 import (
-	"github.com/egoist/mygo/ui"
 	"testing"
+
+	"github.com/egoist/mygo/ui"
 )
 
 func TestNativeReviewFullWidthRestoreAndViewport(t *testing.T) {
@@ -354,5 +355,37 @@ func TestNativeReviewHiddenContentDoesNotRequestFrames(t *testing.T) {
 	}
 	if tt.FramePending() {
 		t.Fatal("invisible transcript/composer still requests animation frames")
+	}
+}
+
+func TestNativeReviewRetainedUndoWithSidebarReparent(t *testing.T) {
+	for _, initiallyHidden := range []bool{false, true} {
+		t.Run(map[bool]string{true: "initially_hidden", false: "toggle_while_full"}[initiallyHidden], func(t *testing.T) {
+			a, tt := mountedReview(t)
+			a.SidebarVisible = !initiallyHidden
+			a.Draft = "original"
+			tt.Frame()
+			if e := tt.Click("Message"); e != nil {
+				t.Fatal(e)
+			}
+			tt.Key(ui.Cmd, ui.KeyA)
+			tt.Type("replacement")
+			if e := tt.Click("Full width review"); e != nil {
+				t.Fatal(e)
+			}
+			if !initiallyHidden {
+				a.command("ToggleSidebar", "")
+				tt.Frame()
+				a.command("ToggleSidebar", "")
+				tt.Frame()
+			}
+			if e := tt.Click("Restore review width"); e != nil {
+				t.Fatal(e)
+			}
+			tt.Key(ui.Cmd, ui.KeyZ)
+			if a.Draft != "original" {
+				t.Fatal("root sidebar reparent discarded retained undo", a.Draft)
+			}
+		})
 	}
 }

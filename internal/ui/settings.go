@@ -36,7 +36,7 @@ func (a *App) settings(c *ui.Context) {
 		ui.Column(c).AlignSelf(ui.Stretch).Padding(0, t.Space(8), t.Space(12)).Children(func() {
 			ui.Row(c).Height(t.Px(36)).PaddingX(t.Px(10)).Gap(t.Space(6)).AlignItems(ui.Center).BorderWidth(0, 0, 1, 0).BorderColor(t.Border).Children(func() {
 				a.icon(c, "icons/search.svg", 14, t.TextMuted)
-				ui.TextInputBase(c, &a.settingsSearch).Label("Search settings").Placeholder(a.text("settings.search_settings", "Search settings…")).Grow(1)
+				ui.TextInputBase(c, &a.settingsSearch).Label("Search settings").Placeholder(a.text("app.search_settings", "Search settings…")).Grow(1)
 			})
 		})
 		ui.Text(c, a.text("settings.settings", "SETTINGS")).FontSize(t.Px(10)).FontWeight(600).TextColor(t.TextMuted).Padding(0, 0, t.Space(6), t.Space(16))
@@ -92,23 +92,23 @@ func (a *App) settings(c *ui.Context) {
 	}
 	ui.Column(c.Key("settings-main")).Grow(1).FillHeight().MinWidth(0).LineHeight(sourceDefaultLineHeight).Children(func() {
 		ui.Column(c).WidthPercent(100).MaxWidth(ContentMaxWidth).AlignSelf(ui.Center).Children(func() {
-			ui.Column(c).AlignSelf(ui.Stretch).Padding(t.Space(20), t.Space(24), t.Space(12)).Gap(t.Space(4)).Children(func() {
-				if a.settingsPage == "about" {
-					ui.Image(c, logos["app-icon.png"]).Size(48, 48)
-				}
-				for _, cat := range settingsCategories {
-					if cat.ID == a.settingsPage {
-						ui.Text(c, a.settingsTitle(cat.ID, cat.Title)).Label("Settings page title").FontSize(t.Px(16)).LineHeight(1.3).Height(sourceTextHeight(t.Px(16), 1.3)).FontWeight(500)
-						ui.Text(c, a.settingsDescription(cat.ID, cat.Description)).FontSize(t.Px(12)).Height(sourceTextHeight(t.Px(12), sourceDefaultLineHeight)).TextColor(t.TextMuted)
-						break
+			ui.Column(c).AlignSelf(ui.Stretch).Padding(t.Space(20), t.Space(24), t.Space(12)).Gap(t.Space(12)).Children(func() {
+				ui.Column(c.Key("settings-header")).AlignSelf(ui.Stretch).Gap(t.Space(4)).Children(func() {
+					if a.settingsPage == "about" {
+						ui.Image(c, logos["app-icon.png"]).Size(48, 48)
 					}
-				}
+					for _, cat := range settingsCategories {
+						if cat.ID == a.settingsPage {
+							ui.Text(c, a.settingsTitle(cat.ID, cat.Title)).Label("Settings page title").FontSize(t.Px(16)).LineHeight(1.3).Height(sourceTextHeight(t.Px(16), 1.3)).FontWeight(500)
+							ui.Text(c, a.settingsDescription(cat.ID, cat.Description)).FontSize(t.Px(12)).Height(sourceTextHeight(t.Px(12), sourceDefaultLineHeight)).TextColor(t.TextMuted)
+							break
+						}
+					}
+				})
 				if a.settingsPage == "providers" {
-					ui.Box(c).Height(a.Theme.Space(8))
 					a.providerToolbar(c)
 				}
 				if a.settingsPage == "models" && a.Models != nil {
-					ui.Box(c).Height(a.Theme.Space(8))
 					a.Models.Toolbar(c)
 				}
 			})

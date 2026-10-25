@@ -210,6 +210,7 @@ func TestUsagePaintedSessionContextRowScopeAndLifetime(t *testing.T) {
 	for i := range s.projection.Sessions {
 		if s.projection.Sessions[i].ID == "79" {
 			s.projection.Sessions[i].Model = ""
+			s.projection.Sessions[i].HasModel = false
 		}
 	}
 	tt.Frame()

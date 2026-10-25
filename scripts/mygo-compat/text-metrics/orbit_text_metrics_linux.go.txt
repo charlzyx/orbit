@@ -1,0 +1,39 @@
+//go:build linux && (amd64 || arm64)
+
+package text
+
+import "errors"
+
+// EnableOrbitFractionalTextMetrics selects fractional Pango positions and Cairo
+// metrics for Orbit. It is opt-in, process-local, and must precede the first
+// layout, metrics lookup, preload, or native font use. Font registration and
+// family enumeration are permitted before this call. Repeated enablement is
+// idempotent, but switching back after font use is deliberately unsupported.
+//
+// Outline hinting, antialiasing, glyph raster phases, baseline snapping, fallback
+// and every other platform retain their existing policies. GTK rendering-option
+// updates reapply this engine-owned policy through applyOptions.
+func (s *System) EnableOrbitFractionalTextMetrics() error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	e, ok := s.engine().(*pangoEngine)
+	if !ok {
+		return errors.New("orbit text metrics: native Pango text engine is unavailable")
+	}
+	if e.orbitFractionalMetrics {
+		return nil
+	}
+	if s.made != 0 || e.orbitMetricsStarted {
+		return errors.New("orbit text metrics: enable before the first layout, metrics lookup, preload, or font use")
+	}
+	if pangoLib.contextSetRoundPositions == nil {
+		return errors.New("orbit text metrics: Pango 1.44 round-glyph-position API is required")
+	}
+	// No native font or layout has been made, so no live cache entry can retain
+	// the old policy. The permanent started flag survives cache eviction and
+	// GTK changes, preventing a late switch after those caches become empty.
+	e.orbitFractionalMetrics = true
+	e.applyOptions()
+	return nil
+}

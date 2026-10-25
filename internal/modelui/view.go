@@ -33,6 +33,9 @@ func (s *State) appearance(c *ui.Context) appearance {
 	if a.Elevated == (ui.Color{}) {
 		a.Elevated = a.native.Surface
 	}
+	if a.SurfaceSecondary == (ui.Color{}) {
+		a.SurfaceSecondary = a.native.Surface
+	}
 	if a.Secondary == (ui.Color{}) {
 		a.Secondary = a.native.Text.Alpha(.82)
 	}
@@ -138,14 +141,28 @@ func (s *State) notice(c *ui.Context, key, title, detail string, isError bool) {
 	})
 }
 
+// emptyResource mirrors settings.rs::empty_resource_card, not the compact
+// loading/error notice. The 64-DIP tile and 420-DIP copy width are fixed source
+// layout dimensions; typography and spacing still follow the current theme.
+func (s *State) emptyResource(c *ui.Context, key, glyph, title, detail string) {
+	a := s.appearance(c)
+	ui.Column(c.Key(key)).Label("Model empty state").AlignSelf(ui.Stretch).Padding(a.Space(40), a.Space(12)).Gap(a.Space(12)).Radius(a.Px(12)).Border(1, a.native.Border).Background(a.SurfaceSecondary).AlignItems(ui.Center).Children(func() {
+		ui.Box(c.Key("glyph-tile")).Label("Model empty glyph tile").Size(64, 64).Shrink(0).Radius(a.Px(12)).Border(1, a.native.Border).Background(a.Elevated).Center().Children(func() {
+			icon(c, glyph, a.Px(32), a.Secondary).Label("Model empty glyph")
+		})
+		ui.Text(c, title).FontSize(a.Px(14)).FontWeight(500).TextColor(a.native.Text)
+		ui.Text(c, detail).MaxWidth(420).FontSize(a.Px(12)).TextColor(a.Secondary)
+	})
+}
+
 // Toolbar mounts in the host's fixed Models header. It adds no page title or
 // competing scroll container; View supplies the scrolling body separately.
 func (s *State) Toolbar(c *ui.Context) ui.Element {
 	c = c.Key("models-toolbar")
 	a := s.appearance(c)
 	return ui.Column(c).AlignSelf(ui.Stretch).Gap(a.Space(12)).Children(func() {
-		ui.Row(c.Key("search-row")).AlignSelf(ui.Stretch).Height(a.Px(36)).Padding(0, a.Px(10)).BorderWidth(0, 0, 1, 0).BorderColor(a.native.Border).AlignItems(ui.Center).Gap(a.Space(8)).Children(func() {
-			icon(c, "icons/search.svg", a.Px(16), a.native.TextMuted)
+		ui.Row(c.Key("search-row")).AlignSelf(ui.Stretch).Height(a.Px(36)).Shrink(0).Padding(0, a.Px(10)).BorderWidth(0, 0, 1, 0).BorderColor(a.native.Border).AlignItems(ui.Center).Gap(a.Px(4)).Children(func() {
+			icon(c, "icons/search.svg", a.Px(14), a.native.TextMuted)
 			ui.TextInput(c.Key("query"), &s.Query).Border(0, ui.Color{}).Background(ui.Color{}).FocusRing(false).Padding(0).Label("Search model catalog").Placeholder(s.label("app.search_models", "Search models…")).Grow(1).Height(a.Px(36))
 		})
 		ui.Row(c.Key("status-actions")).AlignSelf(ui.Stretch).AlignItems(ui.Center).Gap(a.Space(8)).Children(func() {
@@ -205,7 +222,7 @@ func (s *State) View(c *ui.Context) ui.Element {
 				if !s.Snapshot.Connected {
 					hint = s.label("models.disconnected", "Start or reconnect pi to load its available model catalog.")
 				}
-				s.notice(c, "empty", s.label("settings.no_models_reported", "No models reported"), hint, false)
+				s.emptyResource(c, "empty", "icons/tag-01.svg", s.label("settings.no_models_reported", "No models reported"), hint)
 			}
 			return
 		}
@@ -237,7 +254,7 @@ func (s *State) View(c *ui.Context) ui.Element {
 			if s.FavoritesOnly {
 				hint = s.label("settings.no_models_match_favorites_hint", "Nothing favorited matches this search — star a model, or turn the filter off.")
 			}
-			s.notice(c, "no-matches", s.label("settings.no_models_match", "No models match"), hint, false)
+			s.emptyResource(c, "no-matches", "icons/search.svg", s.label("settings.no_models_match", "No models match"), hint)
 		}
 	})
 }
@@ -253,7 +270,7 @@ func (s *State) card(c *ui.Context, index int) {
 	c = c.Key("model:" + m.Provider + ":" + m.ID)
 	active := s.IsActive(m)
 	meta := a.native.TextMuted
-	card := ui.ButtonBase(c).Column().AlignItems(ui.Stretch).AlignSelf(ui.Stretch).MinWidth(0).Label("Select model "+m.Provider+" / "+m.ID).Padding(a.Space(12)).Gap(a.Space(8)).Radius(a.Px(12)).Border(1, a.native.Border).Background(a.native.Surface)
+	card := ui.ButtonBase(c).Column().AlignItems(ui.Stretch).AlignSelf(ui.Stretch).MinWidth(0).Label("Select model "+m.Provider+" / "+m.ID).Padding(a.Space(12)).Gap(a.Space(8)).Radius(a.Px(12)).Border(1, a.native.Border).Background(a.SurfaceSecondary)
 	if active {
 		card.Background(a.Active).Border(1, a.BorderStrong)
 		meta = a.native.Text.Alpha(.72)

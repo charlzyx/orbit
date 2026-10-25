@@ -1,0 +1,16 @@
+KNOWN LIMITS / 已知差异 — fixed a7aa6cf experimental package
+
+This is not full Orbit parity; all 139 feature scopes remain subject to full acceptance.
+本包不是完整验收版，139 项功能范围的全面验收仍未完成。
+
+- Docked Uncommitted Review can duplicate a file that is both staged and edited, and its toolbar differs from the reference. A later fix is NOT in this bundle.
+  停靠的 Uncommitted Review 对同时已暂存并再次修改的文件仍可能重复显示，工具栏也有差异；后续修复未包含。
+- The pinned stock Ghostty terminal retains scrollback/reflow fidelity gaps. The experimental native-history proof is NOT shipped here.
+  固定版 Ghostty 的历史保留/重排仍有差异；原生历史实验补丁未打包。
+- Pixel parity is unestablished. All 16 older published-state Rust/Go native comparison pairs differed. Corrected Usage geometry in this code has no fresh native comparison pair.
+  尚未达到像素一致；此前 16 组原生对比均有差异。本代码的 Usage 几何修正还没有新原生对比图。
+- The hidden-window heartbeat is fixed at 90 ms, rather than the reference's 16/90 ms behavior. A later fix is NOT included.
+  隐藏窗口心跳仍固定为 90 ms，未对齐参考的 16/90 ms；后续修复未包含。
+
+macOS startup, native dependency loading, IME, clipboard, Metal/CoreText, PTY and live model inference are NOT RUN/NOT ESTABLISHED for this package. Cross-compilation and Linux tests do not close these gates.
+本包尚未完成 Mac 启动及原生运行验证，交叉编译和 Linux 测试不等于这些验收已通过。

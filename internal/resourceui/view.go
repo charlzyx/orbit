@@ -30,6 +30,9 @@ func (s *State) appearance(c *ui.Context) appearance {
 	if a.Elevated == (ui.Color{}) {
 		a.Elevated = a.native.Surface
 	}
+	if a.SurfaceSecondary == (ui.Color{}) {
+		a.SurfaceSecondary = a.native.Surface
+	}
 	if a.Secondary == (ui.Color{}) {
 		a.Secondary = a.native.Text.Alpha(.82)
 	}

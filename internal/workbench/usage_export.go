@@ -7,7 +7,6 @@ import (
 	"sort"
 	"strings"
 	"time"
-	"unicode"
 )
 
 // UsageExportOptions identifies the view without persisting transient scopes.
@@ -17,6 +16,9 @@ type UsageExportOptions struct {
 	Location                           *time.Location
 	Now                                time.Time
 	Insights                           []string
+	// SessionTitles contains UI-resolved localized display titles, keyed by
+	// exact session path (or ID when the index has no path). Never exported.
+	SessionTitles map[string]string `json:"-"`
 }
 
 func usageProviderLabel(id string) string {
@@ -27,8 +29,8 @@ func usageProviderLabel(id string) string {
 		return "ChatGPT"
 	}
 	r := []rune(strings.NewReplacer("_", " ", "-", " ").Replace(id))
-	if len(r) > 0 {
-		r[0] = unicode.ToUpper(r[0])
+	if len(r) > 0 && r[0] >= 'a' && r[0] <= 'z' {
+		r[0] -= 'a' - 'A'
 	}
 	return string(r)
 }
@@ -270,6 +272,7 @@ func (index UsageIndex) ExportJSON(w io.Writer, filter UsageFilter, options Usag
 		perSessionTools[key] = n
 	}
 	sessions := make([]map[string]any, 0, len(groups[0]))
+	modelOrder := index.UsageModelOrder()
 	needle := strings.ToLower(strings.TrimSpace(options.SessionSearch))
 	for key, rows := range groups[0] {
 		s := usageTotals(rows)
@@ -281,6 +284,17 @@ func (index UsageIndex) ExportJSON(w io.Writer, filter UsageFilter, options Usag
 			title, workspace = meta.Title, meta.Workspace
 			started, ended = meta.Started.UnixMilli(), meta.Ended.UnixMilli()
 		}
+		if display, ok := options.SessionTitles[key]; ok && display != "" {
+			title = display
+		}
+		if title == "" {
+			runes := []rune(first.Session)
+			title = "Session " + string(runes[:min(8, len(runes))])
+		}
+		workspaceLabel := filepath.Base(workspace)
+		if workspace == "" {
+			workspaceLabel = "unknown"
+		}
 		models := map[[2]string]uint64{}
 		for _, r := range rows {
 			pair := [2]string{r.Provider, r.Model}
@@ -288,22 +302,28 @@ func (index UsageIndex) ExportJSON(w io.Writer, filter UsageFilter, options Usag
 		}
 		top := [2]string{}
 		var max uint64
+		firstModel := true
 		for pair, tokens := range models {
-			if tokens > max || (tokens == max && pair[1] > top[1]) {
+			if firstModel || tokens > max || (tokens == max && modelOrder[UsageModelRef{Provider: pair[0], Model: pair[1]}] > modelOrder[UsageModelRef{Provider: top[0], Model: top[1]}]) {
+				firstModel = false
 				top, max = pair, tokens
 			}
 		}
 		topModel := usageModelLabel(top[1]) + " · " + usageProviderLabel(top[0])
-		if needle != "" && !strings.Contains(strings.ToLower(title+" "+workspace+" "+topModel), needle) {
+		if needle != "" && !strings.Contains(strings.ToLower(title), needle) && !strings.Contains(strings.ToLower(workspaceLabel), needle) && !strings.Contains(strings.ToLower(topModel), needle) {
 			continue
 		}
 		counts := perSessionTools[key]
-		sessions = append(sessions, map[string]any{"session_id": first.Session, "title": title, "workspace": filepath.Base(workspace), "top_model": topModel, "models": len(models), "started_ms": started, "ended_ms": ended, "requests": s.Requests, "input": s.Tokens.Input, "output": s.Tokens.Output, "cache_read": s.Tokens.CacheRead, "cache_write": s.Tokens.CacheWrite, "total": s.Tokens.Total, "cost_usd": s.Cost, "errors": s.Errors, "tool_calls": counts[0], "tool_errors": counts[1]})
+		sessions = append(sessions, map[string]any{"session_id": first.Session, "title": title, "workspace": workspaceLabel, "top_model": topModel, "models": len(models), "started_ms": started, "ended_ms": ended, "requests": s.Requests, "input": s.Tokens.Input, "output": s.Tokens.Output, "cache_read": s.Tokens.CacheRead, "cache_write": s.Tokens.CacheWrite, "total": s.Tokens.Total, "cost_usd": s.Cost, "errors": s.Errors, "tool_calls": counts[0], "tool_errors": counts[1]})
 	}
 	sort.Slice(sessions, func(a, b int) bool {
 		aa, bb := sessions[a]["total"].(uint64), sessions[b]["total"].(uint64)
 		if aa != bb {
 			return aa > bb
+		}
+		at, bt := sessions[a]["title"].(string), sessions[b]["title"].(string)
+		if at != bt {
+			return at < bt
 		}
 		return sessions[a]["session_id"].(string) < sessions[b]["session_id"].(string)
 	})

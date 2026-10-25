@@ -7,6 +7,9 @@ import tempfile
 import hashlib
 import json
 import copy
+from unittest import mock
+import shutil
+import subprocess
 
 spec = importlib.util.spec_from_file_location("overlay", Path(__file__).with_name("go-native-overlay.py"))
 overlay = importlib.util.module_from_spec(spec)
@@ -96,5 +99,141 @@ class SelectionManifest(unittest.TestCase):
         outside.write_bytes(source.read_bytes())
         source.unlink(); source.symlink_to(outside)
         with self.assertRaises(RuntimeError): self.verify()
+
+class DiagnosticModes(unittest.TestCase):
+    def test_normal_does_not_import_diagnostic_assets(self):
+        with mock.patch.object(overlay, "import_verifier", side_effect=AssertionError("must not import")):
+            self.assertEqual(overlay.verify_diagnostic(Path("/absent"), None), {})
+        for flags, args in [([], ["build", "./cmd/orbit"]), (["-tags=user"], ["test", "-tags=last", "./..."])]:
+            self.assertEqual(overlay.diagnostic_flags(flags, args, None), (flags, args))
+        self.assertEqual(overlay.diagnostic_mode(["-C", "third_party/mygo-terminal", "test"]), (None, ["-C", "third_party/mygo-terminal", "test"]))
+
+    def test_explicit_modes_and_unknowns(self):
+        for mode in overlay.DIAGNOSTIC_MODES:
+            self.assertEqual(overlay.diagnostic_mode([mode, "build"]), (mode, ["build"]))
+        for args in [["--diagnostic-unreviewed", "build"], ["build", "--diagnostic-text-metrics"], ["--diagnostic-text-metrics", "--diagnostic-text-metrics-observed", "build"], ["--diagnostic-text-metrics"]]:
+            with self.assertRaises(RuntimeError): overlay.diagnostic_mode(args)
+        with self.assertRaises(RuntimeError): overlay.verify_diagnostic(Path("/absent"), "unknown")
+
+    def test_tag_preserves_effective_caller_choice(self):
+        mode = "--diagnostic-text-metrics"
+        tag = overlay.DIAGNOSTIC_TAG
+        self.assertEqual(overlay.diagnostic_flags([], ["build"], mode), (["-tags=" + tag], ["build"]))
+        self.assertEqual(overlay.diagnostic_flags(["-tags=inherited"], ["test", "-tags", "caller,other"], mode),
+                         (["-tags=inherited"], ["test", "-tags", "caller,other," + tag]))
+        self.assertEqual(overlay.diagnostic_flags(["-tags=inherited"], ["test"], mode),
+                         (["-tags=inherited," + tag], ["test"]))
+        for mode in [None, "--diagnostic-text-metrics"]:
+            with self.assertRaises(RuntimeError): overlay.diagnostic_flags(["-tags=other," + tag], ["test"], mode)
+        with self.assertRaises(RuntimeError): overlay.diagnostic_flags([], ["build", "-tags"], mode)
+
+    def test_startup_is_explicit_and_pre_asset_not_init(self):
+        root = overlay.ROOT / "internal/ui"
+        production = (root / "diagnostic_text_metrics_default.go").read_text()
+        enabled = (root / "diagnostic_text_metrics_linux.go").read_text()
+        unsupported = (root / "diagnostic_text_metrics_unsupported.go").read_text()
+        self.assertIn("!" + overlay.DIAGNOSTIC_TAG, production)
+        self.assertNotIn("EnableOrbitFractionalTextMetrics", production)
+        self.assertIn("ui.EnableOrbitFractionalTextMetrics()", enabled)
+        self.assertIn("no fallback", unsupported)
+        for text in (production, enabled, unsupported):
+            self.assertNotIn("func init(", text)
+            self.assertNotIn("os.Getenv", text)
+        run = (root / "run.go").read_text().split("func Run(o RunOptions) error {", 1)[1]
+        self.assertLess(run.index("configureDiagnosticTextMetrics()"), run.index("LoadAssets()"))
+        tests = (root / "snapshot_test.go").read_text().split("func TestMain(m *testing.M) {", 1)[1]
+        self.assertLess(tests.index("configureDiagnosticTextMetrics()"), tests.index("m.Run()"))
+
+    def test_any_unreviewed_collision_or_escape_fails(self):
+        self.assertEqual(overlay.merge_reviewed([{"ui/a.go":Path("a")}, {"ui/b.go":Path("b")}]),
+                         {"ui/a.go":Path("a"), "ui/b.go":Path("b")})
+        for maps in [[{"ui/a.go":Path("a")}, {"ui/a.go":Path("a")}], [{"../escape.go":Path("a")}], [{"/absolute.go":Path("a")}]]:
+            with self.assertRaises(RuntimeError): overlay.merge_reviewed(maps)
+
+
+class CombinedDiagnosticVerification(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        self.source = self.root / "source"
+        self.assets = self.root / "assets"
+        root = overlay.ROOT / "scripts/font-fidelity"
+        shutil.copytree(root, self.assets, ignore=shutil.ignore_patterns("__pycache__"))
+        self.verifier = overlay.import_verifier(root / "combined-verify.py")
+        self.candidate_root = overlay.ROOT / "scripts/mygo-compat/text-metrics"
+        self.candidate = overlay.import_verifier(self.candidate_root / "prepare.py")
+        # Reconstruct only the reviewed pristine files, without module cache or
+        # a particular checkout. Reverse patch also verifies exact derivation.
+        for target, filename in self.verifier.FILES.items():
+            path = self.source / target
+            path.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(self.assets / filename, path)
+        subprocess.run(["git", "apply", "--reverse", str(self.assets / "combined-observer.patch")], cwd=self.source, check=True, capture_output=True)
+        _, self.mapping = self.candidate.verify(self.source)
+
+    def verify(self):
+        return self.verifier.verify(self.source, self.mapping, self.candidate_root / "baseline.json", self.assets)
+
+    def mutate(self, fn):
+        p = self.assets / "combined-baseline.json"
+        m = json.loads(p.read_text()); fn(m); p.write_text(json.dumps(m))
+
+    def test_exact_composed_paths_preserve_both_components(self):
+        before = {str(p.relative_to(self.source)): overlay.sha(p) for p in self.source.rglob("*") if p.is_file()}
+        result = self.verify()
+        self.assertEqual(len(result), 11)
+        self.assertEqual(set(result), set(self.mapping) | set(self.verifier.FILES))
+        for target, source in self.mapping.items():
+            if target != "internal/text/pango_linux.go": self.assertEqual(result[target], source)
+        pango = result["internal/text/pango_linux.go"].read_text()
+        self.assertIn("orbitFractionalMetrics", pango)
+        self.assertIn("e.orbitShape(", pango)
+        self.assertIn("e.orbitScaled(", pango)
+        observer = result["internal/text/orbit_mygo_pango_trace.go"].read_text()
+        self.assertIn("pango_context_get_round_glyph_positions", observer)
+        self.assertIn("pango_cairo_context_get_font_options", observer)
+        self.assertNotIn('"round_positions": pangoLib.contextSetRoundPositions != nil', observer)
+        self.assertNotIn('"context_hint_metrics": cairoHintMetricsOn', observer)
+        after = {str(p.relative_to(self.source)): overlay.sha(p) for p in self.source.rglob("*") if p.is_file()}
+        self.assertEqual(before, after)
+
+    def test_reject_unknown_overlay_paths(self):
+        self.mutate(lambda m: m["overlays"].update({"ui/unreviewed.go": {}}))
+        with self.assertRaises(ValueError): self.verify()
+
+    def test_reject_collision_manifest_expansion(self):
+        self.mutate(lambda m: m["intentional_collisions"].append("ui/paint.go"))
+        with self.assertRaises(ValueError): self.verify()
+
+    def test_reject_input_and_candidate_drift(self):
+        p = self.assets / "mygo_pango_trace.go.txt"
+        p.write_text(p.read_text() + "\n")
+        with self.assertRaises(ValueError): self.verify()
+        self.mapping["ui/unreviewed.go"] = p
+        with self.assertRaises(ValueError): self.verify()
+
+    def test_reject_candidate_source_substitution(self):
+        p = self.root / "different-candidate.go"
+        target = "ui/orbit_text_metrics_linux.go"
+        p.write_bytes(self.mapping[target].read_bytes())
+        self.mapping[target] = p
+        with self.assertRaises(ValueError): self.verify()
+
+    def test_reject_combined_source_drift(self):
+        p = self.assets / "combined_pango_linux.go.txt"
+        p.write_text(p.read_text() + "\n")
+        with self.assertRaises(ValueError): self.verify()
+
+    def test_reject_additive_collision(self):
+        p = self.source / "internal/text/orbit_mygo_trace.go"
+        p.write_text("already here")
+        with self.assertRaises(ValueError): self.verify()
+
+    def test_reject_symlink_escape(self):
+        p = self.assets / "combined_pango_linux.go.txt"
+        outside = self.root / "outside.txt"; outside.write_bytes(p.read_bytes())
+        p.unlink(); p.symlink_to(outside)
+        with self.assertRaises(ValueError): self.verify()
 
 if __name__ == '__main__': unittest.main()

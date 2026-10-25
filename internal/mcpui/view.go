@@ -5,8 +5,10 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 
+	orbitassets "github.com/charlzyx/orbit"
 	"github.com/charlzyx/orbit/internal/workbench"
 	"github.com/egoist/mygo/ui"
 )
@@ -30,27 +32,66 @@ func (s *State) appearance(c *ui.Context) appearance {
 	if a.Elevated == (ui.Color{}) {
 		a.Elevated = a.native.Surface
 	}
+	if a.Secondary == (ui.Color{}) {
+		a.Secondary = a.native.Text.Alpha(.82)
+	}
+	if a.Action == (ui.Color{}) {
+		a.Action = a.native.Accent
+	}
+	if a.ActionText == (ui.Color{}) {
+		a.ActionText = a.native.AccentText
+	}
 	return a
 }
+
+var iconOnce sync.Once
+var mcpIcons map[string]*ui.SVG
+
+func icon(c *ui.Context, name string, size float32, color ui.Color) ui.Element {
+	iconOnce.Do(func() {
+		mcpIcons = map[string]*ui.SVG{}
+		for _, name := range []string{"search", "refresh", "plus", "tools/mcp"} {
+			if data, err := orbitassets.Asset("icons/" + name + ".svg"); err == nil {
+				if svg, err := ui.ParseSVG(data); err == nil {
+					mcpIcons[name] = svg
+				}
+			}
+		}
+	})
+	if svg := mcpIcons[name]; svg != nil {
+		return ui.Icon(c, svg).Size(size, size).Shrink(0).TextColor(color)
+	}
+	return ui.Element{}
+}
+
 func (s *State) button(c *ui.Context, key, label string, primary bool) ui.Element {
 	a := s.appearance(c)
-	b := ui.ButtonBase(c.Key(key)).Label(label).Height(a.Px(28)).Padding(0, a.Space(10)).Radius(a.Px(6)).Background(a.native.Surface).Border(1, a.native.Border)
+	b := ui.ButtonBase(c.Key(key)).Label(label).Height(a.Px(28)).Shrink(0).Padding(0, a.Space(8)).Gap(a.Px(4)).Radius(a.Px(8)).AlignItems(ui.Center).Background(a.Elevated).Border(1, a.native.Border)
 	if primary {
-		b.Background(a.native.Accent).Border(1, a.native.Accent)
+		b.Background(a.Action).Border(1, a.Action)
 	}
 	b.Children(func() {
-		color := a.native.Text
+		color := a.Secondary
 		if primary {
-			color = a.native.AccentText
+			color = a.ActionText
 		}
-		ui.Text(c, label).FontSize(a.Px(12)).TextColor(color).SingleLine()
+		if key == "add" {
+			icon(c, "plus", a.Px(16), color)
+		}
+		ui.Text(c, label).FontSize(a.Px(14)).LineHeight(1).FontWeight(500).TextColor(color).SingleLine()
 	})
 	return b
 }
 func (s *State) iconButton(c *ui.Context, key, glyph, label string) ui.Element {
 	a := s.appearance(c)
 	b := ui.ButtonBase(c.Key(key)).Size(a.Px(26), a.Px(26)).Center().Radius(a.Px(5)).Label(label).Tooltip(label)
-	b.Children(func() { ui.Text(c, glyph).FontSize(a.Px(14)).TextColor(a.native.TextMuted) })
+	b.Children(func() {
+		if glyph == "↻" {
+			icon(c, "refresh", a.Px(16), a.Secondary)
+		} else {
+			ui.Text(c, glyph).FontSize(a.Px(14)).TextColor(a.native.TextMuted)
+		}
+	})
 	return b
 }
 func (s *State) chip(c *ui.Context, key, label string, color ui.Color) {
@@ -76,23 +117,28 @@ func (s *State) View(c *ui.Context) ui.Element {
 	}
 	c = c.Key("mcp-settings")
 	a := s.appearance(c)
-	root := ui.Column(c).Grow(1).MinHeight(0).MinWidth(0).AlignSelf(ui.Stretch)
+	root := ui.Column(c).Grow(1).MinHeight(0).MinWidth(0).AlignSelf(ui.Stretch).LineHeight(1.618034)
 	root.Children(func() {
 		ui.Column(c.Key("pinned-header")).AlignSelf(ui.Center).WidthPercent(100).MaxWidth(960).Shrink(0).Padding(a.Space(20), a.Space(24), a.Space(12)).Gap(a.Space(12)).Children(func() {
 			ui.Column(c.Key("title")).Gap(a.Space(4)).Children(func() {
-				ui.Text(c, s.label("settings.mcp", "MCP")).FontSize(a.Px(20)).FontWeight(500)
+				ui.Text(c, s.label("settings.mcp", "MCP")).FontSize(a.Px(16)).LineHeight(1.3).FontWeight(500)
 				ui.Text(c, s.label("settings.mcp_description", "Model Context Protocol servers Orbit manages for the agent.")).FontSize(a.Px(12)).TextColor(a.native.TextMuted)
 			})
-			ui.Row(c.Key("toolbar")).Shrink(0).Gap(a.Space(8)).AlignItems(ui.Center).Children(func() {
-				ui.TextInput(c.Key("filter"), &s.Query).Placeholder(s.label("mcp.search_servers", "Search MCP servers…")).Label(s.label("mcp.search", "Search MCP servers")).Grow(1).MinWidth(40).Height(a.Px(32))
-				if s.iconButton(c, "refresh", "↻", s.label("mcp.refresh", "Refresh")).Size(a.Px(32), a.Px(32)).Background(a.Elevated).Border(1, a.native.Border).Disabled(s.Busy).Clicked() {
-					s.Refresh()
-				}
-				if s.button(c, "add", s.label("mcp.add_server", "Add server"), true).Height(a.Px(32)).Disabled(s.Busy && !s.Probing).Clicked() {
-					s.BeginAdd()
-				}
+			ui.Column(c.Key("toolbar-and-status")).Gap(a.Space(8)).Children(func() {
+				ui.Row(c.Key("toolbar")).Shrink(0).Gap(a.Space(8)).AlignItems(ui.Center).Children(func() {
+					ui.Row(c.Key("search-row")).Grow(1).MinWidth(40).Height(a.Px(36)).Shrink(0).Padding(0, a.Px(10)).Gap(a.Px(4)).BorderWidth(0, 0, 1, 0).BorderColor(a.native.Border).AlignItems(ui.Center).Children(func() {
+						icon(c, "search", a.Px(14), a.native.TextMuted)
+						ui.TextInput(c.Key("filter"), &s.Query).Placeholder(s.label("mcp.search_servers", "Search MCP servers…")).Label(s.label("mcp.search_servers", "Search MCP servers")).Grow(1).MinWidth(0).Height(a.Px(36)).Padding(0).Border(0, ui.Color{}).Background(ui.Color{}).FocusRing(false)
+					})
+					if s.iconButton(c, "refresh", "↻", s.label("mcp.refresh", "Refresh")).Size(a.Px(32), a.Px(32)).Background(a.Elevated).Border(1, a.native.Border).Disabled(s.Busy).Clicked() {
+						s.Refresh()
+					}
+					if s.button(c, "add", s.label("mcp.add_server", "Add server"), true).Height(a.Px(32)).Disabled(s.Busy && !s.Probing).Clicked() {
+						s.BeginAdd()
+					}
+				})
+				s.statusLine(c)
 			})
-			s.statusLine(c)
 		})
 		ui.Box(c).AlignSelf(ui.Center).WidthPercent(100).MaxWidth(912).Height(1).Shrink(0).Background(a.native.Border)
 		ui.Scroll(c.Key("body")).Grow(1).MinHeight(0).Children(func() {
@@ -127,18 +173,12 @@ func (s *State) View(c *ui.Context) ui.Element {
 				}
 				visible := s.visibleServers()
 				if len(s.Servers) == 0 {
-					ui.Column(c.Key("empty")).Padding(a.Space(32)).Gap(a.Space(12)).Radius(a.Px(10)).Border(1, a.native.Border).AlignItems(ui.Center).Children(func() {
-						if s.Busy {
-							ui.Spinner(c).Size(a.Px(20), a.Px(20))
-						}
-						ui.Text(c, s.label("mcp.empty_title", "Connect your tools with MCP")).FontSize(a.Px(16)).FontWeight(600)
-						ui.Text(c, s.label("mcp.empty_hint", "Add a local stdio server or a remote streamable HTTP server. Pi owns the connection and tool discovery.")).TextColor(a.native.TextMuted).FontSize(a.Px(13))
-						if s.button(c, "empty-add", s.label("mcp.add_server", "Add server"), true).Disabled(s.Busy && !s.Probing).Clicked() {
-							s.BeginAdd()
-						}
-					})
+					s.emptyState(c)
 				} else if len(visible) == 0 {
-					ui.Text(c, s.label("mcp.no_matches", "No matching servers")).TextColor(a.native.TextMuted)
+					ui.Column(c.Key("no-matches")).Padding(a.Space(12), a.Space(16)).Gap(a.Space(3)).Children(func() {
+						ui.Text(c, s.label("mcp.no_matches", "No matching servers")).FontSize(a.Px(14)).FontWeight(500)
+						ui.Text(c, s.label("mcp.no_matches_hint", "Try a server name, a command, or a URL.")).FontSize(a.Px(12)).TextColor(a.Secondary)
+					})
 				} else {
 					for _, scope := range []string{"global", "project"} {
 						var scoped []workbench.MCPServer
@@ -238,25 +278,47 @@ func (s *State) moveSelection(delta int) {
 	i = max(0, min(len(visible)-1, i+delta))
 	s.Selected = visible[i].Name
 }
+
+// Source mcp_empty_card is deliberately unboxed; unlike Models and Plugins,
+// it has no filled card or 64-DIP tile. Loading omits the empty claim and CTA.
+func (s *State) emptyState(c *ui.Context) {
+	a := s.appearance(c)
+	loading := s.Probing || (!s.loaded && s.Busy)
+	ui.Column(c.Key("empty")).Label("MCP empty state").AlignSelf(ui.Stretch).Padding(a.Space(24), a.Space(16)).Gap(a.Space(6)).AlignItems(ui.Center).Children(func() {
+		if loading {
+			ui.Spinner(c).Size(a.Px(48), a.Px(48))
+			ui.Text(c, s.label("mcp.checking", "Checking connections…")).FontSize(a.Px(14)).FontWeight(500)
+			return
+		}
+		icon(c, "tools/mcp", a.Px(48), a.native.TextMuted).Label("MCP empty glyph")
+		ui.Text(c, s.label("mcp.empty_title", "No MCP servers configured.")).FontSize(a.Px(14)).FontWeight(500)
+		ui.Text(c, s.label("mcp.empty_hint", "Connect an MCP server to give your agent additional tools.")).FontSize(a.Px(12)).TextColor(a.Secondary)
+		if s.button(c, "empty-add", s.label("mcp.add_server", "Add server"), true).Disabled(s.Busy && !s.Probing).Clicked() {
+			s.BeginAdd()
+		}
+	})
+}
 func (s *State) statusLine(c *ui.Context) {
 	a := s.appearance(c)
 	status := s.label("mcp.not_checked", "Not checked yet")
-	if s.Probing {
+	if s.Probing || (!s.loaded && s.Busy) {
 		status = s.label("mcp.checking", "Checking connections…")
 	} else if !s.checkedAt.IsZero() {
-		status = s.label("mcp.checked", "Last checked") + " " + s.checkedAt.Format("15:04:05")
+		status = s.label("mcp.checked_ago", "Checked %{seconds}s ago", "seconds", fmt.Sprint(max(1, int(time.Since(s.checkedAt).Seconds()))))
+	} else if len(s.Servers) == 0 {
+		status = s.label("mcp.no_servers", "No MCP servers configured.")
 	}
 	ui.Row(c.Key("status-line")).Gap(a.Space(8)).AlignItems(ui.Center).Children(func() {
-		if s.Busy {
-			ui.Spinner(c).Size(a.Px(12), a.Px(12))
+		ui.Text(c, status).FontSize(a.Px(12)).TextColor(a.native.TextMuted).SingleLine().Shrink(0)
+		if len(s.Servers) > 0 {
+			ui.Text(c, s.label("mcp.server_count", "%{count} server(s)", "count", fmt.Sprint(len(s.Servers)))).FontSize(a.Px(12)).TextColor(a.native.TextMuted).Grow(1).MinWidth(0).SingleLine()
+			ui.Text(c, s.label("mcp.keys_hint", "↑↓ Navigate · ⏎ Edit · Space Enable/Disable")).FontSize(a.Px(12)).TextColor(a.native.TextMuted).SingleLine().MinWidth(0)
 		}
-		ui.Text(c, status).FontSize(a.Px(11)).TextColor(a.native.TextMuted).SingleLine()
-		ui.Text(c, fmt.Sprintf("%d %s", len(s.Servers), s.label("mcp.servers", "servers"))).FontSize(a.Px(11)).TextColor(a.native.TextMuted).Grow(1).MinWidth(0).SingleLine()
-		path := filepath.Join(s.service.Preferences.PiDir, "mcp.json")
-		ui.Text(c, path).FontSize(a.Px(11)).TextColor(a.native.TextMuted).SingleLine().MinWidth(0).Shrink(1).Tooltip(path)
+		path := s.service.Preferences.PiDir
+		ui.Text(c, path).FontSize(a.Px(12)).TextColor(a.native.TextMuted).SingleLine().MinWidth(0).Shrink(1).Tooltip(filepath.Join(path, "mcp.json"))
 		if s.Workspace != "" {
-			path := filepath.Join(s.Workspace, ".pi", "mcp.json")
-			ui.Text(c, path).FontSize(a.Px(11)).TextColor(a.native.TextMuted).SingleLine().MinWidth(0).Shrink(1).Tooltip(path)
+			path := filepath.Join(s.Workspace, ".pi")
+			ui.Text(c, s.label("mcp.project_dir_label", "· project: %{path}", "path", path)).FontSize(a.Px(12)).TextColor(a.native.TextMuted).SingleLine().MinWidth(0).Shrink(1).Tooltip(filepath.Join(path, "mcp.json"))
 		}
 	})
 }

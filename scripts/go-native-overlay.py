@@ -6,6 +6,7 @@ A caller overlay is merged only if it does not replace verified dependencies.
 """
 from __future__ import annotations
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -135,6 +136,79 @@ def verify_selection(module_dir: Path, compatibility: Path, expected: dict) -> d
     return result
 
 
+
+DIAGNOSTIC_MODES = frozenset({"--diagnostic-text-metrics", "--diagnostic-text-metrics-observed"})
+DIAGNOSTIC_TAG = "orbit_diagnostic_fractional_text_linux"
+
+
+def diagnostic_mode(arguments: list[str]) -> tuple[str | None, list[str]]:
+    args = list(arguments)
+    mode = args.pop(0) if args and args[0] in DIAGNOSTIC_MODES else None
+    if any(arg.startswith("--diagnostic-") for arg in args):
+        fail("Use exactly one recognized diagnostic mode before the Go arguments")
+    if not args:
+        fail("A Go command is required after the diagnostic mode")
+    return mode, args
+
+
+def diagnostic_flags(flags: list[str], arguments: list[str], mode: str | None) -> tuple[list[str], list[str]]:
+    # Preserve Go's last command-line -tags override of GOFLAGS, rather than
+    # silently dropping caller tags or permitting them to drop our startup tag.
+    flags, arguments = list(flags), list(arguments)
+    locations = []
+    for tokens in (flags, arguments):
+        for index, token in enumerate(tokens):
+            if token == "-tags":
+                if index + 1 == len(tokens):
+                    fail("-tags requires a value")
+                locations.append((tokens, index + 1, "", tokens[index + 1]))
+            elif token.startswith("-tags="):
+                locations.append((tokens, index, "-tags=", token.partition("=")[2]))
+    for _, _, _, value in locations:
+        if DIAGNOSTIC_TAG in value.replace(",", " ").split():
+            fail("The diagnostic startup build tag is owned by the explicit wrapper mode")
+    if mode:
+        if mode not in DIAGNOSTIC_MODES:
+            fail("Unknown diagnostic mode")
+        if locations:
+            tokens, index, prefix, value = locations[-1]
+            tokens[index] = prefix + value + ("," if value else "") + DIAGNOSTIC_TAG
+        else:
+            flags.append("-tags=" + DIAGNOSTIC_TAG)
+    return flags, arguments
+
+
+def merge_reviewed(mappings: list[dict[str, Path]]) -> dict[str, Path]:
+    out = {}
+    for mapping in mappings:
+        for relative, source in mapping.items():
+            path = Path(relative)
+            if path.is_absolute() or ".." in path.parts or relative in out:
+                fail("Unreviewed compatibility path/collision: " + relative)
+            out[relative] = source
+    return out
+
+
+def import_verifier(path: Path):
+    spec = importlib.util.spec_from_file_location("orbit_" + path.parent.name + "_" + path.stem, path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def verify_diagnostic(module_dir: Path, mode: str | None) -> dict[str, Path]:
+    if mode is None:
+        return {}  # Normal builds never load or apply candidate/observer assets.
+    if mode not in DIAGNOSTIC_MODES:
+        fail("Unknown diagnostic mode")
+    candidate_root = ROOT / "scripts/mygo-compat/text-metrics"
+    _, mapping = import_verifier(candidate_root / "prepare.py").verify(module_dir)
+    if mode == "--diagnostic-text-metrics-observed":
+        observer = ROOT / "scripts/font-fidelity/combined-verify.py"
+        mapping = import_verifier(observer).verify(module_dir, mapping, candidate_root / "baseline.json")
+    return mapping
+
+
 def main() -> int:
     if len(sys.argv) < 2:
         fail("Usage: scripts/go-native.sh <run|build|test|vet|other-go-command> [arguments...]")
@@ -142,7 +216,7 @@ def main() -> int:
     if not go:
         fail("Go 1.27.3 is required; set ORBIT_GO to its go executable")
     env = os.environ.copy()
-    args = sys.argv[1:]
+    mode, args = diagnostic_mode(sys.argv[1:])
     effective_cwd = Path.cwd()
     if args and args[0] == "-C":
         if len(args) < 3:
@@ -152,7 +226,7 @@ def main() -> int:
         effective_cwd = (effective_cwd / args[0][3:]).resolve()
     # Command-line -overlay would supersede our mandatory overlay. Explicitly
     # reject it, rather than silently building the unsafe fallback.
-    for arg in sys.argv[2:]:
+    for arg in args[1:]:
         if arg == "-overlay" or arg.startswith("-overlay="):
             fail("Pass a custom -overlay through GOFLAGS; the native wrapper merges it safely")
     inherited = env.get("GOFLAGS")
@@ -160,12 +234,15 @@ def main() -> int:
         inherited = subprocess.check_output([go, "env", "GOFLAGS"], text=True).strip()
     flags, previous_overlay = detach_overlay(split_flags(inherited))
     flags = default_trimpath(flags, args)
+    flags, args = diagnostic_flags(flags, args, mode)
     if any(f == "-modfile" or f.startswith("-modfile=") for f in flags + args):
         fail("The native wrapper owns its temporary -modfile; remove the conflicting flag")
     env["GOFLAGS"] = " ".join(quote_flag(f) for f in flags)
     def check_output(argv):
         return subprocess.check_output([go, *argv], env=env, text=True, cwd=effective_cwd)
-    selected = json.loads(check_output(["env", "-json", "GOMOD", "GOWORK"]))
+    selected = json.loads(check_output(["env", "-json", "GOMOD", "GOWORK", "GOOS", "GOARCH"]))
+    if mode and (selected.get("GOOS") != "linux" or selected.get("GOARCH") not in ("amd64", "arm64")):
+        fail("DIAGNOSTIC fractional text metrics require Linux amd64 or arm64; no fallback")
     if selected.get("GOWORK") not in (None, "", "off"):
         fail("Native compatibility builds require GOWORK=off, not a workspace override")
     main_mod = Path(selected.get("GOMOD", ""))
@@ -200,6 +277,7 @@ def main() -> int:
     if sha(source) != manifest["added_sha256"]:
         fail("Composer compatibility source hash mismatch; review/update the manifest")
     selection_overlays = verify_selection(module_dir, SELECTION, manifest)
+    diagnostic_overlays = verify_diagnostic(module_dir, mode)
     overlay: dict[str, str] = {}
     if previous_overlay:
         prior = json.loads((effective_cwd / previous_overlay).read_text())
@@ -221,17 +299,21 @@ def main() -> int:
     if test_source.exists():
         if sha(test_source) != manifest.get("tests_sha256"):
             fail("Composer compatibility test hash mismatch")
+    reviewed_overlays = merge_reviewed([
+        selection_overlays, {manifest["added_file"]: source},
+        {"ui/orbit_composer_test.go": test_source} if test_source.exists() else {},
+        diagnostic_overlays,
+    ])
     with tempfile.TemporaryDirectory(prefix="orbit-mygo-overlay-") as tmp:
         temp_root = Path(tmp)
         # Go 1.27 forbids overlays beneath GOMODCACHE. Isolate an unchanged,
         # verified source copy rather than relaxing/changing cache permissions.
         source_copy = temp_root / "mygo"
         shutil.copytree(module_dir, source_copy)
-        for relative, replacement in selection_overlays.items():
+        for relative, replacement in reviewed_overlays.items():
+            if str(source_copy / relative) in overlay:
+                fail("Caller overlay collides with a verified compatibility source")
             overlay[str(source_copy / relative)] = str(replacement)
-        overlay[str(source_copy / manifest["added_file"])] = str(source)
-        if test_source.exists():
-            overlay[str(source_copy / "ui/orbit_composer_test.go")] = str(test_source)
         temp_mod = temp_root / "orbit.mod"
         shutil.copyfile(main_mod, temp_mod)
         main_sum = main_mod.with_suffix(".sum")
@@ -251,6 +333,8 @@ def main() -> int:
         path.write_text(json.dumps({"Replace": overlay}, indent=2) + "\n")
         env["GOFLAGS"] = " ".join(quote_flag(f) for f in flags + [f"-modfile={temp_mod}", f"-overlay={path}"])
         print(f"go-native: verified {manifest['version']}; temporary source copy + composer range-edit and selection-retention overlays", file=sys.stderr)
+        if mode:
+            print(f"go-native: DIAGNOSTIC ONLY {mode}; startup fractional metrics enabled; not a parity claim", file=sys.stderr)
         process = subprocess.Popen([go, *args], env=env)
         def forward(signum, _frame):
             if process.poll() is None:
@@ -269,6 +353,6 @@ def main() -> int:
 if __name__ == "__main__":
     try:
         sys.exit(main())
-    except (RuntimeError, OSError, subprocess.CalledProcessError, json.JSONDecodeError) as exc:
+    except (RuntimeError, ValueError, OSError, subprocess.CalledProcessError, json.JSONDecodeError) as exc:
         print(f"go-native: {exc}", file=sys.stderr)
         sys.exit(2)

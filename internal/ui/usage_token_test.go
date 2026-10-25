@@ -3,6 +3,7 @@ package orbitui
 import (
 	"fmt"
 	"github.com/egoist/mygo/ui"
+	"math"
 	"testing"
 )
 
@@ -17,7 +18,7 @@ func TestUsageActualSourceFontTokens(t *testing.T) {
 				ui.Column(c).Fill().Children(func() {
 					a.usageCard(c, "Source title", "Source metadata", func() {})
 					ui.Text(c, "Source title").FontSize(16 * size / 14).FontWeight(500).AlignSelf(ui.Start).Label("Large reference")
-					ui.Text(c, "Source metadata").FontSize(12 * size / 14).AlignSelf(ui.Start).Label("Small reference")
+					ui.Text(c, "Source metadata").FontSize(12 * size / 14).FixedLineHeight(usageLineHeight(12 * size / 14)).AlignSelf(ui.Start).Label("Small reference")
 				})
 			}, 1000, 400)
 			tt.Frame()
@@ -25,7 +26,7 @@ func TestUsageActualSourceFontTokens(t *testing.T) {
 			meta, _ := tt.Find("Source metadata")
 			large, _ := tt.Find("Large reference")
 			small, _ := tt.Find("Small reference")
-			if title.W != large.W || meta.W != small.W || meta.H != small.H || title.H != 20*size/14 {
+			if title.W != large.W || meta.W != small.W || math.Abs(float64(meta.H-small.H)) > .0001 || title.H != 20*size/14 {
 				t.Fatalf("actual source token mismatch size%v title%#v large%#v meta%#v small%#v", size, title, large, meta, small)
 			}
 		})

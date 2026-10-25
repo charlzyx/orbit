@@ -235,60 +235,121 @@ func childEnvironment(config Config) []string {
 	return runtimepath.AugmentEnvironment(out, preferred)
 }
 
-func (c *Client) Call(ctx context.Context, command Command) (Response, error) {
+// beginCall registers and enqueues one responseful command synchronously.
+// Waiting is separate so ordered pipelines never wait for an earlier response
+// before putting the next command on the same FIFO writer. The caller must
+// release every successfully begun call, including on cancellation or panic.
+func (c *Client) beginCall(ctx context.Context, command Command) (await func() (Response, error), release func(), err error) {
 	if ctx == nil {
 		ctx = context.Background()
 	}
 	if err := ctx.Err(); err != nil {
-		return Response{}, err
+		return nil, nil, err
 	}
 	if isOneWay(command.Type) {
-		return Response{}, errors.New("extension UI records require SendOneWay, not Call")
+		return nil, nil, errors.New("extension UI records require SendOneWay, not Call")
 	}
 	if command.ID == "" {
 		command.ID = fmt.Sprintf("orbit-go-%d", c.nextID.Add(1))
 	}
 	wire, err := json.Marshal(command)
 	if err != nil {
-		return Response{}, err
+		return nil, nil, err
 	}
 	reply := make(chan result, 1)
 	c.mu.Lock()
 	if c.closing || c.terminalErr != nil {
 		c.mu.Unlock()
-		return Response{}, ErrClosed
+		return nil, nil, ErrClosed
 	}
 	if _, exists := c.pending[command.ID]; exists {
 		c.mu.Unlock()
-		return Response{}, fmt.Errorf("duplicate request ID %q", command.ID)
+		return nil, nil, fmt.Errorf("duplicate request ID %q", command.ID)
 	}
 	c.pending[command.ID] = pending{command: command.Type, reply: reply}
 	c.mu.Unlock()
-	defer func() {
+	release = func() {
 		c.mu.Lock()
 		if p, ok := c.pending[command.ID]; ok && p.reply == reply {
 			delete(c.pending, command.ID)
 		}
 		c.mu.Unlock()
-	}()
+	}
 	select {
 	case c.outgoing <- outgoing{ctx: ctx, wire: wire}:
 	case <-ctx.Done():
-		return Response{}, ctx.Err()
+		release()
+		return nil, nil, ctx.Err()
 	case <-c.done:
-		return Response{}, c.Err()
+		release()
+		return nil, nil, c.Err()
 	}
-	select {
-	case answer := <-reply:
-		return answer.response, answer.err
-	case <-ctx.Done():
-		return Response{}, ctx.Err()
-	case <-c.done:
+	await = func() (Response, error) {
+		// A later pipeline response may already be buffered when an earlier
+		// command times out. Preserve that completed result instead of racing
+		// its reply against the now-cancelled shared context.
 		select {
 		case answer := <-reply:
 			return answer.response, answer.err
 		default:
-			return Response{}, c.Err()
+		}
+		select {
+		case answer := <-reply:
+			return answer.response, answer.err
+		case <-ctx.Done():
+			return Response{}, ctx.Err()
+		case <-c.done:
+			select {
+			case answer := <-reply:
+				return answer.response, answer.err
+			default:
+				return Response{}, c.Err()
+			}
+		}
+	}
+	return await, release, nil
+}
+
+func (c *Client) Call(ctx context.Context, command Command) (Response, error) {
+	await, release, err := c.beginCall(ctx, command)
+	if err != nil {
+		return Response{}, err
+	}
+	defer release()
+	return await()
+}
+
+// CallOrdered enqueues responseful commands in slice order before awaiting any
+// responses. It invokes receive once per command, in that same order, including
+// individual enqueue/response errors. A failed earlier command does not suppress
+// later commands. All pending registrations are released on return or panic.
+// It does not make the commands atomic with respect to other concurrent callers.
+func (c *Client) CallOrdered(ctx context.Context, commands []Command, receive func(int, Response, error)) {
+	type call struct {
+		await   func() (Response, error)
+		release func()
+		err     error
+	}
+	calls := make([]call, len(commands))
+	defer func() {
+		for _, call := range calls {
+			if call.release != nil {
+				call.release()
+			}
+		}
+	}()
+	for i, command := range commands {
+		calls[i].await, calls[i].release, calls[i].err = c.beginCall(ctx, command)
+	}
+	for i, call := range calls {
+		var response Response
+		err := call.err
+		if err == nil {
+			response, err = call.await()
+			call.release()
+		}
+		if receive != nil {
+			receive(i, response, err)
 		}
 	}
 }

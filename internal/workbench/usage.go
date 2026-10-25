@@ -21,6 +21,8 @@ import (
 	"unicode/utf8"
 )
 
+const usageMaxFileBytes = 256 << 20
+
 type Tokens struct{ Input, Output, CacheRead, CacheWrite, Reasoning, Total uint64 }
 
 func (t Tokens) CacheRate() float64 {
@@ -61,6 +63,9 @@ type UsageSession struct {
 	Started, Ended             time.Time
 }
 type UsageIndex struct {
+	// ModelCatalog preserves source interning order, including assistant messages
+	// without billable usage. It is scanner metadata, never persisted/exported.
+	ModelCatalog           []UsageModelRef `json:"-"`
 	Sessions               []UsageSession
 	ScannedAt              time.Time
 	Errors                 []UsageError
@@ -91,7 +96,11 @@ func (s *UsageScanner) Scan(ctx context.Context) (UsageIndex, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	var out UsageIndex
+	if err := ctx.Err(); err != nil {
+		return out, err
+	}
 	seen := map[string]bool{}
+	modelSeen := map[UsageModelRef]bool{}
 	// Match usage/collect.rs::scan_store: one workspace-group level only.
 	// ReadDir intentionally follows a linked group, but never recursively walks
 	// nested session trees or includes a JSONL file directly in the store root.
@@ -128,7 +137,7 @@ func (s *UsageScanner) Scan(ctx context.Context) (UsageIndex, error) {
 			continue
 		}
 		out.Files++
-		if st.Size() > 256<<20 {
+		if st.Size() > usageMaxFileBytes {
 			out.Skipped++
 			out.Warnings = append(out.Warnings, filepath.Base(path)+": session exceeds 256 MiB")
 			continue
@@ -156,6 +165,12 @@ func (s *UsageScanner) Scan(ctx context.Context) (UsageIndex, error) {
 				out.Warnings = append(out.Warnings, f.warning)
 			}
 			continue
+		}
+		for _, ref := range f.index.ModelCatalog {
+			if !modelSeen[ref] {
+				modelSeen[ref] = true
+				out.ModelCatalog = append(out.ModelCatalog, ref)
+			}
 		}
 		out.Records = append(out.Records, f.index.Records...)
 		out.Tools = append(out.Tools, f.index.Tools...)
@@ -265,6 +280,9 @@ func (i *UsageIndex) markPricing() {
 	}
 }
 func readUsageFile(ctx context.Context, path string) (UsageIndex, error) {
+	if err := ctx.Err(); err != nil {
+		return UsageIndex{}, err
+	}
 	absolute, e := filepath.Abs(path)
 	if e != nil {
 		return UsageIndex{}, e
@@ -281,9 +299,12 @@ func readUsageFile(ctx context.Context, path string) (UsageIndex, error) {
 // The pinned collector retains a valid prefix after a reader failure. A missing
 // or wrong first valid JSON header is unreadable; malformed lines alone are not.
 func readUsageStream(ctx context.Context, path string, reader io.Reader) (UsageIndex, error) {
-	scanner := bufio.NewScanner(reader)
-	scanner.Buffer(make([]byte, 64<<10), 64<<20)
+	scanner := bufio.NewScanner(usageContextReader{ctx: ctx, Reader: reader})
+	// A valid file can contain one long JSONL line; do not impose a smaller
+	// record-size cap than the source file limit. One byte allows the delimiter.
+	scanner.Buffer(make([]byte, 64<<10), usageMaxFileBytes+1)
 	var out UsageIndex
+	modelSeen := map[UsageModelRef]bool{}
 	session, workspace, title := "", "", ""
 	var previous, ended, sessionStarted time.Time
 	type call struct {
@@ -292,7 +313,13 @@ func readUsageStream(ctx context.Context, path string, reader io.Reader) (UsageI
 	}
 	var calls []call
 	sawHeader := false
-	for scanner.Scan() {
+	for {
+		if err := ctx.Err(); err != nil {
+			return out, err
+		}
+		if !scanner.Scan() {
+			break
+		}
 		if ctx.Err() != nil {
 			return out, ctx.Err()
 		}
@@ -349,6 +376,11 @@ func readUsageStream(ctx context.Context, path string, reader io.Reader) (UsageI
 			out.Turns = append(out.Turns, UsageTurn{At: at, Session: session, Workspace: workspace, SessionPath: path})
 		case "assistant":
 			provider, model := stringValue(message["provider"]), stringValue(message["model"])
+			ref := UsageModelRef{Provider: provider, Model: model}
+			if !modelSeen[ref] {
+				modelSeen[ref] = true
+				out.ModelCatalog = append(out.ModelCatalog, ref)
+			}
 			if usage, ok := message["usage"].(map[string]any); ok {
 				tokens := Tokens{Input: count(usage["input"]), Output: count(usage["output"]), CacheRead: count(usage["cacheRead"]), CacheWrite: count(usage["cacheWrite"]), Reasoning: count(usage["reasoning"])}
 				total, valid := unsignedCount(usage["totalTokens"])
@@ -422,6 +454,9 @@ func readUsageStream(ctx context.Context, path string, reader io.Reader) (UsageI
 			}
 		}
 		previous = at
+	}
+	if err := ctx.Err(); err != nil {
+		return out, err
 	}
 	if !sawHeader {
 		return out, errors.New("missing session header")
@@ -735,4 +770,18 @@ func UsageRange(preset string, now time.Time) (time.Time, time.Time) {
 		return end.AddDate(0, -1, 0), end
 	}
 	return d.Add(-6 * 24 * time.Hour), now
+}
+
+// Check cancellation between bounded scanner reads as well as parsed entries.
+// Ordinary read failures still preserve the pinned collector's valid prefix.
+type usageContextReader struct {
+	ctx context.Context
+	io.Reader
+}
+
+func (r usageContextReader) Read(p []byte) (int, error) {
+	if err := r.ctx.Err(); err != nil {
+		return 0, err
+	}
+	return r.Reader.Read(p)
 }

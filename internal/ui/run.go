@@ -174,10 +174,10 @@ func NewController(o RunOptions) (*Controller, error) {
 		return bugreportui.Theme{SurfaceSecondary: t.SurfaceSecondary, Elevated: t.Elevated, TextSecondary: t.TextSecondary, Action: t.Action, ActionText: t.ActionFg, ActionHover: t.ActionHover, ActionPressed: t.ActionPressed, Px: t.Px, Space: t.Space}
 	}})
 	x.MCP = mcpui.New(s, o.Workspace, mcpui.Options{OnChange: invalidate, PiBinary: o.PiBinary, Text: x.UI.text, Theme: func() mcpui.Theme {
-		return mcpui.Theme{Elevated: x.UI.Theme.Elevated, CodeFont: x.UI.Fonts.CodeFamily, Px: x.UI.Theme.Px, Space: x.UI.Theme.Space}
+		return mcpui.Theme{Elevated: x.UI.Theme.Elevated, Secondary: x.UI.Theme.TextSecondary, Action: x.UI.Theme.Action, ActionText: x.UI.Theme.ActionFg, CodeFont: x.UI.Fonts.CodeFamily, Px: x.UI.Theme.Px, Space: x.UI.Theme.Space}
 	}, OnModified: func() { x.configApplyAfter = time.Now().Add(500 * time.Millisecond) }, OnApply: func() { x.configApplyAfter = time.Now() }})
 	x.Resources = resourceui.New(s, o.Workspace, resourceui.Options{Notify: x.UI.Notify, Offline: o.Offline, OnChange: invalidate, OnModified: func() { x.configApplyAfter = time.Now().Add(500 * time.Millisecond) }, Text: x.UI.text, PiBinary: o.PiBinary, Theme: func() resourceui.Theme {
-		return resourceui.Theme{Secondary: x.UI.Theme.TextSecondary, Action: x.UI.Theme.Action, ActionText: x.UI.Theme.ActionFg, SelectionText: x.UI.Theme.SelectionFg, Elevated: x.UI.Theme.Elevated, CodeFont: x.UI.Fonts.CodeFamily, Px: x.UI.Theme.Px, Space: x.UI.Theme.Space}
+		return resourceui.Theme{SurfaceSecondary: x.UI.Theme.SurfaceSecondary, Secondary: x.UI.Theme.TextSecondary, Action: x.UI.Theme.Action, ActionText: x.UI.Theme.ActionFg, SelectionText: x.UI.Theme.SelectionFg, Elevated: x.UI.Theme.Elevated, CodeFont: x.UI.Fonts.CodeFamily, Px: x.UI.Theme.Px, Space: x.UI.Theme.Space}
 	}, OpenFile: func(path string) { x.UI.save(native.OpenPath(path)) }, RevealPath: native.RevealPath, CopyText: func(text string) { x.Action(Action{Kind: "CopyText", Value: text}) }, InvokeSkill: func(command string) { x.UI.Navigate("chat"); x.UI.Draft = command + " "; x.UI.composer.Focus() }})
 	x.UI.Options.Overlay = x.Resources.Overlay
 	x.UI.Options.ToastBottom = func(c *ui.Context) float32 {
@@ -368,6 +368,10 @@ func (x *Controller) Close() {
 func adaptSnapshot(s agent.Snapshot, workspacePath string, pinned, archived map[string]bool) Snapshot {
 	v := Snapshot{ModelCatalog: s.Models, CurrentModel: s.Model, LatestTurn: s.LatestTurn, CommandsRaw: s.Commands, RawMessages: s.Messages, Turn: s.Turn, Connected: s.Connected, Running: s.Running, Error: s.ConnectionError, Status: s.Status, SessionID: s.ActiveSession.ID, SessionPath: s.ActiveSession.Path, SessionName: s.ActiveSession.Name, Workspace: workspacePath, ModelID: s.Model.ID, ModelProvider: s.Model.Provider, Thinking: s.ThinkingLevel, ThinkingLevels: s.ThinkingLevels, AuthProviders: s.Auth.Providers, AuthURL: s.Auth.URL, AuthStatus: s.Auth.Status, AuthCode: s.Auth.UserCode}
 	v.Auth, v.Retrying = s.Auth, s.Retrying
+	v.Approval, v.Ask = s.Approval, s.Ask
+	v.ComposerText, v.ComposerRevision, v.RuntimeID = s.ComposerText, s.ComposerRevision, s.RuntimeID
+	v.ExtensionWidgets, v.ExtensionNotices = s.ExtensionWidgets, s.ExtensionNotices
+	v.ExtensionStatusText, v.ExtensionStatusAt = s.ExtensionStatusText, s.ExtensionStatusAt
 	v.Extensions = s.Extensions
 	v.SteeringMode = s.SteeringMode
 	v.FollowUpMode = s.FollowUpMode
@@ -394,10 +398,19 @@ func adaptSnapshot(s agent.Snapshot, workspacePath string, pinned, archived map[
 	for _, r := range s.Sessions {
 		v.Sessions = append(v.Sessions, SessionRow{r.ID, r.Path, r.Name, r.Workspace, r.Summary, r.Updated, r.Running, pinned[r.Path], archived[r.Path]})
 	}
+	v.Queue = agent.Queue{Steering: append([]string{}, s.Queue.Steering...), FollowUp: append([]string{}, s.Queue.FollowUp...)}
 	v.Queued = append(append([]string{}, s.Queue.Steering...), s.Queue.FollowUp...)
 	if len(s.Dialogs) > 0 {
 		d := s.Dialogs[0]
-		v.Dialog = &DialogRequest{ID: d.ID, Method: d.Method, Title: d.Title, Message: d.Message, Default: d.Value, Options: d.Options, Lines: d.Lines, Width: d.Width, Height: d.Height, Cursor: d.Cursor}
+		// Source custom layers render after the generic modal, newest on top.
+		// A newer generic request must not steal input from an existing custom UI.
+		for i := len(s.Dialogs) - 1; i >= 0; i-- {
+			if s.Dialogs[i].Method == "custom" {
+				d = s.Dialogs[i]
+				break
+			}
+		}
+		v.Dialog = &DialogRequest{ID: d.ID, Method: d.Method, Title: d.Title, Message: d.Message, Placeholder: d.Placeholder, Default: d.Value, Options: d.Options, Lines: d.Lines, Width: d.Width, Height: d.Height, Cursor: d.Cursor}
 	}
 	for _, raw := range s.Commands {
 		var cmd struct {
@@ -583,6 +596,13 @@ func (x *Controller) Action(a Action) {
 				u.save(x.Store.Write("runtime.json", map[string]any{"piBinary": p}))
 			}
 		})
+	case "SubmitAsk":
+		answers, ok := a.Data["answers"].([]agent.AskAnswer)
+		if !ok {
+			e = errors.New("invalid questionnaire answers")
+		} else {
+			e = m.SubmitAsk(str("id"), answers)
+		}
 	case "RespondDialog":
 		var confirmed *bool
 		if _, ok := a.Data["confirmed"]; ok {
@@ -733,6 +753,9 @@ func (x *Controller) Action(a Action) {
 	}
 }
 func Run(o RunOptions) error {
+	if e := configureDiagnosticTextMetrics(); e != nil {
+		return e
+	}
 	if e := LoadAssets(); e != nil {
 		return e
 	}

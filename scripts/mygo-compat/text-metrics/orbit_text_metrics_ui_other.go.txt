@@ -1,0 +1,11 @@
+//go:build !linux || (!amd64 && !arm64)
+
+package ui
+
+import "errors"
+
+// EnableOrbitFractionalTextMetrics is unsupported outside the native Linux
+// Pango backend. It never substitutes a different platform's text policy.
+func EnableOrbitFractionalTextMetrics() error {
+	return errors.New("orbit text metrics: fractional Pango metrics require Linux amd64 or arm64")
+}

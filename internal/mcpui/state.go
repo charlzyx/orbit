@@ -20,10 +20,10 @@ import (
 // Theme supplies Orbit-specific geometry without creating an internal/ui cycle.
 // All other colors and font settings come from the current MyGo theme.
 type Theme struct {
-	Elevated ui.Color
-	CodeFont string
-	Px       func(float32) float32
-	Space    func(int) float32
+	Elevated, Secondary, Action, ActionText ui.Color
+	CodeFont                                string
+	Px                                      func(float32) float32
+	Space                                   func(int) float32
 }
 type Options struct {
 	// OnChange is a goroutine-safe request to invalidate the host window.
@@ -109,11 +109,15 @@ func New(p *preferences.Store, workspace string, o Options) *State {
 	}
 	return &State{Options: o, Workspace: workspace, service: service, Runtime: map[string]Runtime{}, results: make(chan completion, 16)}
 }
-func (s *State) label(key, fallback string) string {
+func (s *State) label(key, fallback string, values ...string) string {
+	text := fallback
 	if s.Options.Text != nil {
-		return s.Options.Text(key, fallback)
+		text = s.Options.Text(key, fallback)
 	}
-	return fallback
+	for i := 0; i+1 < len(values); i += 2 {
+		text = strings.ReplaceAll(text, "%{"+values[i]+"}", values[i+1])
+	}
+	return text
 }
 func (s *State) SetWorkspace(workspace string) {
 	if workspace == s.Workspace || s.closed {

@@ -43,7 +43,9 @@ class TraceTests(unittest.TestCase):
     def test_no_production_integration(self):
         repo=HERE.parent.parent
         self.assertNotIn('font-fidelity',(repo/'scripts/go-native.sh').read_text())
-        self.assertNotIn('font-fidelity',(repo/'scripts/go-native-overlay.py').read_text())
+        wrapper=(repo/'scripts/go-native-overlay.py').read_text()
+        self.assertIn('if mode is None:',wrapper)
+        self.assertIn('--diagnostic-text-metrics-observed',wrapper)
         for path in (repo/'crates/orbit-pi/src').rglob('*.rs'):
             self.assertNotIn('orbit_font_trace',path.read_text())
 if __name__=='__main__':unittest.main()

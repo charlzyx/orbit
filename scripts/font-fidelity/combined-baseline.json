@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "diagnostic": true,
+  "upstream_commit": "9c69cf829ece196c5b3a3601f1c7bbe70526376f",
+  "candidate_manifest_sha256": "ace5cfd93f51937369909b52cef5017e63c4695e2d4e3736d4f62952d0371a63",
+  "observer_inputs_sha256": {
+    "prepare.py": "227f4de874f6120a1f3e46bf2a537174da9ed06df75ff76df184699b7b007465",
+    "mygo_trace.go.txt": "7273dce12f73b6beac5f43c855c05bb899109b015d6fbbe3bc03fa7adec53e28",
+    "mygo_pango_trace.go.txt": "6aa63259580bc3dc1d37c13d84d3ed82e08dd6886dc87e9690de22cceae2ee29",
+    "mygo_specimen_test.go.txt": "5bf77af55d6c865ffac450ad66581ed171ac661204c9d05aa2690fa9f3c9d1d3"
+  },
+  "baseline_sha256": {
+    "internal/text/pango_linux.go": "2f260729c9321875c121f05b42a15116696d1cddc8a10dd0f79efd4ce8d57275",
+    "ui/paint.go": "b864926e69be1c2c08403c09af7601f942b0ecbdf5381b7e81d5a3b00352b29b",
+    "ui/runtime.go": "6631fdb20daf4a31a9abb579c150a414bc18888ad677b05ea931a4c788834463"
+  },
+  "intentional_collisions": [
+    "internal/text/pango_linux.go"
+  ],
+  "overlays": {
+    "internal/text/pango_linux.go": {
+      "source": "combined_pango_linux.go.txt",
+      "sha256": "c4b592e17b530d72722a379269a9cfb9e9f64060d4e77806520a4e6b2d213041"
+    },
+    "ui/paint.go": {
+      "source": "combined_paint.go.txt",
+      "sha256": "27d6cd5e24be4178815da675abf243e42c01ef3ea127861c31d12a543917c70a"
+    },
+    "ui/runtime.go": {
+      "source": "combined_runtime.go.txt",
+      "sha256": "7cb18d45bda936da8cb83ecaab3beed06ae891fdecf35d281ccf76ab37591f36"
+    },
+    "internal/text/orbit_mygo_pango_trace.go": {
+      "source": "combined_pango_trace.go.txt",
+      "sha256": "aa94eee7a53aefc4a5f1eec6979683a621d17e9a4f79c1df293d8254cfb3f6f8"
+    },
+    "internal/text/orbit_mygo_trace.go": {
+      "source": "mygo_trace.go.txt",
+      "sha256": "7273dce12f73b6beac5f43c855c05bb899109b015d6fbbe3bc03fa7adec53e28"
+    },
+    "internal/text/orbit_mygo_specimen_test.go": {
+      "source": "combined_specimen_test.go.txt",
+      "sha256": "488ca2855b97edf8ee041eef12fbc28aec41e779a41e09ae87f3009cd658f55f"
+    }
+  },
+  "patch_sha256": "eb7fbf28b2b19da63fc6d5567bedd1fb547912d28563c4caae7d4dcf2898e4d2"
+}

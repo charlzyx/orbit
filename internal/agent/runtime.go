@@ -147,7 +147,7 @@ func (m *Manager) Stop() error {
 	entry.state.snapshot.Retrying = false
 	entry.state.snapshot.ConnectionError = ""
 	entry.state.snapshot.Status = "Stopped"
-	entry.state.snapshot.Dialogs = nil
+	entry.state.clearExtensionUI()
 	client := entry.client
 	entry.stopping = client != nil && client.Alive()
 	m.mu.Unlock()

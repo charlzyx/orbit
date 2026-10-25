@@ -11,6 +11,7 @@ import (
 
 type usageAggregate struct {
 	Key, ID, Name, Sub, Path, Provider, Model, Workspace             string
+	HasModel, Untitled                                               bool
 	Requests, Errors, Aborted, Timed, Priced, ToolFailures, ToolRuns int
 	Tokens                                                           workbench.Tokens
 	Cost                                                             float64
@@ -121,67 +122,41 @@ func buildUsageProjection(index workbench.UsageIndex, filter workbench.UsageFilt
 			pricedModels[[2]string{r.Provider, r.Model}] = true
 		}
 	}
-	modelRefs := map[workbench.UsageModelRef]bool{}
+	// Preserve the source intern order beneath stable request-count/label ranking.
+	modelOrder := index.UsageModelOrder()
+	p.ModelRefOptions = index.UsageModels()
 	providers, models, workspaces := map[string]bool{}, map[string]bool{}, map[string]bool{}
+	for _, ref := range p.ModelRefOptions {
+		if !providers[ref.Provider] {
+			providers[ref.Provider] = true
+			p.ProviderOptions = append(p.ProviderOptions, ref.Provider)
+		}
+		if !models[ref.Model] {
+			models[ref.Model] = true
+			p.ModelOptions = append(p.ModelOptions, ref.Model)
+		}
+	}
+	workspace := func(path string) {
+		if !workspaces[path] {
+			workspaces[path] = true
+			p.WorkspaceOptions = append(p.WorkspaceOptions, path)
+		}
+	}
+	for _, session := range index.Sessions {
+		workspace(session.Workspace)
+	}
 	for _, r := range index.Records {
 		if (filter.Start.IsZero() || !r.At.Before(filter.Start)) && (filter.End.IsZero() || r.At.Before(filter.End)) {
 			p.RequestsInRange++
 		}
-		if r.Provider != "" {
-			providers[r.Provider] = true
-		}
-		if r.Model != "" {
-			models[r.Model] = true
-			modelRefs[workbench.UsageModelRef{Provider: r.Provider, Model: r.Model}] = true
-		}
-		if r.Workspace != "" {
-			workspaces[r.Workspace] = true
-		}
+		workspace(r.Workspace)
 	}
-	for _, e := range index.Errors {
-		if e.Provider != "" {
-			providers[e.Provider] = true
-		}
-		if e.Model != "" {
-			modelRefs[workbench.UsageModelRef{Provider: e.Provider, Model: e.Model}] = true
-		}
-		if e.Workspace != "" {
-			workspaces[e.Workspace] = true
-		}
+	for _, r := range index.Errors {
+		workspace(r.Workspace)
 	}
 	for _, r := range index.Tools {
-		if r.Provider != "" {
-			providers[r.Provider] = true
-		}
-		if r.Model != "" {
-			modelRefs[workbench.UsageModelRef{Provider: r.Provider, Model: r.Model}] = true
-		}
-		if r.Workspace != "" {
-			workspaces[r.Workspace] = true
-		}
+		workspace(r.Workspace)
 	}
-	for ref := range modelRefs {
-		p.ModelRefOptions = append(p.ModelRefOptions, ref)
-	}
-	sort.Slice(p.ModelRefOptions, func(i, j int) bool {
-		a, b := p.ModelRefOptions[i], p.ModelRefOptions[j]
-		if a.Model != b.Model {
-			return a.Model < b.Model
-		}
-		return a.Provider < b.Provider
-	})
-	for s := range providers {
-		p.ProviderOptions = append(p.ProviderOptions, s)
-	}
-	for s := range models {
-		p.ModelOptions = append(p.ModelOptions, s)
-	}
-	for s := range workspaces {
-		p.WorkspaceOptions = append(p.WorkspaceOptions, s)
-	}
-	sort.Strings(p.ProviderOptions)
-	sort.Strings(p.ModelOptions)
-	sort.Strings(p.WorkspaceOptions)
 	groups := []map[string]*usageAggregate{{}, {}, {}, {}}
 	series, daily := map[time.Time]*usagePoint{}, map[time.Time]*usagePoint{}
 	var durations, toolDurations []time.Duration
@@ -219,6 +194,7 @@ func buildUsageProjection(index workbench.UsageIndex, filter workbench.UsageFilt
 				g = &usageAggregate{Key: key, ID: r.Session, Name: key, Path: r.SessionPath, Provider: r.Provider, Model: r.Model, Workspace: r.Workspace}
 				if i == 0 {
 					g.Name = r.SessionTitle
+					g.Untitled = g.Name == ""
 					if g.Name == "" {
 						g.Name = r.Session
 					}
@@ -286,13 +262,14 @@ func buildUsageProjection(index workbench.UsageIndex, filter workbench.UsageFilt
 	for key, g := range groups[0] {
 		if m, ok := metadata[key]; ok {
 			g.ID = m.ID
+			g.Name, g.Untitled = m.Title, m.Title == ""
 			g.Started, g.Ended = m.Started, m.Ended
 		}
 		var maxTokens uint64
 		first := true
 		for ref, tokens := range sessionModels[key] {
-			if first || tokens > maxTokens || (tokens == maxTokens && ref.Provider+"/"+ref.Model > g.Provider+"/"+g.Model) {
-				g.Provider, g.Model = ref.Provider, ref.Model
+			if first || tokens > maxTokens || (tokens == maxTokens && modelOrder[ref] > modelOrder[workbench.UsageModelRef{Provider: g.Provider, Model: g.Model}]) {
+				g.Provider, g.Model, g.HasModel = ref.Provider, ref.Model, true
 				maxTokens = tokens
 				first = false
 			}
