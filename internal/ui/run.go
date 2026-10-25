@@ -232,6 +232,8 @@ func NewController(o RunOptions) (*Controller, error) {
 		}
 		return 16
 	}
+	x.MCP.ScheduleInitialProbe(time.Now())
+	x.UI.SetQuotaMCP(x.MCP)
 	x.UI.Options.RefreshMCP = x.MCP.Refresh
 	x.UI.Options.Resources = func(c *ui.Context, page string) { x.Resources.View(c, page).Fill() }
 	x.UI.Options.RefreshResources = func(page string) {
@@ -376,6 +378,7 @@ func (x *Controller) SetWorkspace(path string) {
 func (x *Controller) changeWorkspaceServices(path string) {
 	x.workspaceBrowse.epoch++
 	x.workspace = path
+	x.UI.invalidateWorkspaceMenu(path)
 	x.UI.Model.Workspace = path
 	x.Terminal.SetWorkspace(path)
 	x.Git.SetWorkspace(path)
@@ -424,6 +427,7 @@ func (x *Controller) Close() {
 func adaptSnapshot(s agent.Snapshot, workspacePath string, pinned, archived map[string]bool) Snapshot {
 	v := Snapshot{ModelCatalog: s.Models, CurrentModel: s.Model, LatestTurn: s.LatestTurn, CommandsRaw: s.Commands, RawMessages: s.Messages, Turn: s.Turn, Connected: s.Connected, Running: s.Running, Error: s.ConnectionError, Status: s.Status, SessionID: s.ActiveSession.ID, SessionPath: s.ActiveSession.Path, SessionName: s.ActiveSession.Name, Workspace: workspacePath, ModelID: s.Model.ID, ModelProvider: s.Model.Provider, Thinking: s.ThinkingLevel, ThinkingLevels: s.ThinkingLevels, AuthProviders: s.Auth.Providers, AuthURL: s.Auth.URL, AuthStatus: s.Auth.Status, AuthCode: s.Auth.UserCode}
 	v.Auth, v.Retrying = s.Auth, s.Retrying
+	v.RetryFailure = s.RetryFailure
 	v.Compacting, v.RetryDetail = s.Compacting, s.RetryDetail
 	v.Approval, v.Ask = s.Approval, s.Ask
 	v.ComposerText, v.ComposerRevision, v.RuntimeID = s.ComposerText, s.ComposerRevision, s.RuntimeID
@@ -711,11 +715,7 @@ func (x *Controller) Action(a Action) {
 	case "TerminalFontChanged":
 		x.Terminal.SetFont(ghostty.Font{Family: u.Fonts.CodeFamily, Size: float32(u.Prefs.TerminalFontSize), Features: []string{"-calt", "-liga", "-dlig"}})
 	case "ExportSession":
-		p, err := native.SaveFile(u.Window, "Export session", "session.html", []mygo.FileFilter{{Name: "HTML", Extensions: []string{"html"}}})
-		e = err
-		if p != "" {
-			e = m.Send(pirpc.ExportHTML, map[string]any{"outputPath": p})
-		}
+		x.exportSessionDialog()
 	case "ExportUsage":
 		x.exportUsageDialog(a)
 	case "BrowseBackground":

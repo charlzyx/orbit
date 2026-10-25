@@ -27,7 +27,7 @@ The added opt-in native API is:
 
 Call it on the shared Selectable container every build with the stable actual
 session/document identity. Removing the call, changing identity, removing or
-disabling/hiding the scope, or clicking outside clears the snapshot. Ordinary
+disabling/hiding the scope, or clicking outside clears the snapshot, except a designated same-window navigation interaction below. Ordinary
 Selectable containers are unchanged. A retained scope keeps only immutable
 strings and numeric IDs, never editors, nodes, layouts or callbacks. The initial
 mounted block count is the lifetime bound, independent of full transcript size.
@@ -94,3 +94,30 @@ expected ceiling of 2. The exact test was repeated on untouched pinned upstream
 and failed with the same steady/warm values (135.286s). This is not a claimed
 full-suite pass or a hidden skip. The short functional suite and all compatibility
 regressions are recorded separately from that upstream/environment budget failure.
+
+## Explicit navigation interaction (C08)
+
+Rust `transcript_view.rs:827–904, 1340–1383` starts selection only when the
+transcript canvas hitbox is hovered, and clears only when a press is outside
+the panel bounds. Its overlaid turn rail therefore preserves existing text
+selection while jumping. Ordinary controls must not gain that exception.
+
+    railShell.RetainTextSelectionInteraction(scope)
+
+This second opt-in registers only the shell's owner ID and current frame/pass.
+A pointer hit qualifies only if the actual hit chain includes that freshly
+registered shell, the retained selection belongs to that exact live owner,
+and neither the shell nor its ancestors nor the scope are disabled, hidden,
+or inert. Calling with another window's element is ignored. Removing the call,
+changing/removing the owner, and normal outside/control clicks retain their
+original strict clearing behavior. No nodes, clipboard copies or callbacks are
+stored; only IDs/build stamps are added to opted-in shells. The app registers
+only the turn rail and requires both compatibility APIs before startup.
+
+`TestOrbitSelectionNavigationInteractionIsNarrow` covers the positive action
+and non-registered, removed registration, wrong owner, disabled owner/shell,
+removed owner, changed identity, outside and ordinary-control negatives.
+The actual mounted app regression selects text, clicks a rail tick, unmounts
+that row, copies the same original selection, then switches sessions and proves
+that copy is cleared. These are native-toolkit/headless tests, not hosted OS
+input acceptance or proof of pixel parity.

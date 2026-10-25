@@ -147,7 +147,7 @@ func (m *Manager) Stop() error {
 	entry.state.manualCompactPending = false
 	entry.state.snapshot.Retrying = false
 	entry.state.snapshot.RetryDetail = RetryDetail{}
-	entry.state.snapshot.ConnectionError = ""
+	entry.state.snapshot.setConnectionError("")
 	entry.state.snapshot.Status = "Stopped"
 	entry.state.clearExtensionUI()
 	client := entry.client

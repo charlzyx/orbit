@@ -282,27 +282,56 @@ func quotaResetHint(epoch int64, now time.Time) string {
 // never the summary or the provider settings page.
 func (a *App) runtimeQuotaControl(c *ui.Context, open *bool, reports []agent.QuotaReport, support, provider string) {
 	reports = quotaReports(reports)
-	if len(reports) == 0 {
+	mcp := a.quotaMCP.state
+	chip, hasMCP := "", false
+	if mcp != nil {
+		mcp.PrepareQuotaPopup()
+		chip, hasMCP = mcp.QuotaChip()
+	}
+	if len(reports) == 0 && !hasMCP {
 		return
 	}
 	headline := quotaSummary(reports, provider)
 	label := strings.TrimSpace(strings.Join([]string{headline.Provider, headline.Window, headline.Text}, " "))
+	quiet := !headline.Meter && headline.Provider == ""
+	if quiet && hasMCP {
+		label = chip
+	}
 	anchor := a.button(c, label, "icons/spark.svg", *open).Height(28)
 	if anchor.Clicked() {
 		*open = !*open
+		if *open {
+			if quiet && hasMCP || a.quotaMCP.tab == "mcp" {
+				a.selectQuotaTab("mcp")
+			}
+		}
 	}
 	ui.Popover(c, anchor, open, func() {
 		ui.Column(c).Width(340).MaxHeight(540).Padding(12).Gap(10).Children(func() {
 			ui.Row(c).AlignItems(ui.Center).Gap(8).Children(func() {
-				ui.Text(c, "Provider usage").Grow(1).FontWeight(500)
+				if mcp != nil {
+					a.quotaTabs(c)
+				}
+				if mcp != nil && a.quotaMCP.tab == "mcp" {
+					mcp.QuotaHeader(c)
+					return
+				}
+				visible, _ := a.partitionQuotaReports(reports)
+				title := a.quotaProviderCount(len(visible))
+				if mcp == nil {
+					title = "Provider usage · " + title
+				}
+				ui.Text(c, title).Grow(1).FontWeight(500)
 				if a.iconButton(c, "Refresh provider usage", "icons/refresh.svg").Clicked() {
 					a.Dispatch(Action{Kind: "RefreshQuota"})
 				}
 			})
 			ui.Scroll(c).MaxHeight(460).Gap(10).Children(func() {
-				for _, report := range reports {
-					a.runtimeQuotaCard(c.Key(report.Provider), report, time.Now())
+				if mcp != nil && a.quotaMCP.tab == "mcp" {
+					mcp.QuotaPanel(c, func(name string) { *open = false; a.openQuotaMCPSettings(name) })
+					return
 				}
+				a.quotaPopupReports(c, reports, time.Now())
 				if support == "unsupported" {
 					ui.Text(c, "Showing extension-reported quota; direct quota RPC is unavailable.").FontSize(11).TextColor(a.Theme.TextMuted)
 				}
@@ -311,11 +340,17 @@ func (a *App) runtimeQuotaControl(c *ui.Context, open *bool, reports []agent.Quo
 	})
 }
 func (a *App) runtimeQuotaCard(c *ui.Context, report agent.QuotaReport, now time.Time) {
+	a.runtimeQuotaCardWithVisibility(c, report, now, nil)
+}
+func (a *App) runtimeQuotaCardWithVisibility(c *ui.Context, report agent.QuotaReport, now time.Time, visibility func()) {
 	ui.Column(c).Padding(10).Gap(6).Border(1, a.Theme.Border).Radius(8).Children(func() {
 		ui.Row(c).Gap(8).Children(func() {
 			ui.Text(c, report.Provider).Grow(1).FontWeight(500)
 			if report.Plan != "" {
 				ui.Text(c, report.Plan).TextColor(a.Theme.TextMuted)
+			}
+			if visibility != nil {
+				visibility()
 			}
 		})
 		for _, window := range report.Windows {

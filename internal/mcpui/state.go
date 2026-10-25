@@ -89,6 +89,9 @@ type State struct {
 	cancel                                                     context.CancelFunc
 	generation                                                 uint64
 	applyRevision                                              uint64
+	initialProbeWaiting                                        bool
+	initialProbeAt                                             time.Time
+	quotaProbeRequested                                        bool
 	hostVisibilityKnown, hostVisible                           bool
 	closed, loaded, pendingProbe, externalChange, applyPending bool
 	activity, authTarget                                       string
@@ -145,6 +148,9 @@ func (s *State) SetWorkspace(workspace string) {
 	s.removeTarget = ""
 	s.loaded = false
 	s.pendingProbe = false
+	s.quotaProbeRequested = false
+	s.initialProbeAt = time.Time{}
+	s.initialProbeWaiting = false
 	s.externalChange = false
 	s.applyPending = false
 	s.checkedAt = time.Time{}
@@ -161,6 +167,8 @@ func (s *State) cancelWork() {
 	s.authTarget = ""
 }
 func (s *State) Close() {
+	s.initialProbeAt = time.Time{}
+	s.initialProbeWaiting = false
 	s.cancelWork()
 	s.closed = true
 	s.Editor = nil
@@ -236,7 +244,9 @@ func (s *State) pollVisible() bool {
 }
 
 // Tick drains worker results on the main thread. It never reads files or runs Pi.
-func (s *State) Tick() bool {
+func (s *State) Tick() bool { return s.tickAt(time.Now()) }
+
+func (s *State) tickAt(now time.Time) bool {
 	changed := false
 	for {
 		select {
@@ -258,6 +268,11 @@ func (s *State) Tick() bool {
 			changed = true
 		default:
 			if !s.closed && !s.Busy {
+				s.tickInitialProbe(now)
+				if s.quotaProbeRequested {
+					s.pendingProbe = true
+					s.quotaProbeRequested = false
+				}
 				if s.pendingProbe {
 					s.pendingProbe = false
 					s.Probe()
@@ -355,6 +370,8 @@ func (s *State) Probe() {
 	if s.Busy || s.closed {
 		return
 	}
+	s.initialProbeAt = time.Time{}
+	s.initialProbeWaiting = false
 	service := s.service
 	s.start(s.label("mcp.checking", "Checking connections…"), func(ctx context.Context) (func(*State), error) {
 		ctx, cancel := context.WithTimeout(ctx, 120*time.Second)
@@ -630,12 +647,21 @@ func (s *State) SetPiBinary(binary string) {
 	s.cancelWork()
 	s.applyRevision++
 	s.Options.PiBinary = binary
+	// Probe data belongs to the old executable, not merely the server name.
+	s.Runtime = map[string]Runtime{}
+	s.checkedAt = time.Time{}
+	s.probeErrors = nil
+	s.probeNote = ""
+	s.Error, s.Status = "", ""
 	s.service = workbench.New(s.service.Preferences, s.Workspace)
 	if binary != "" {
 		s.service.PiBinary = binary
 	}
 	s.loaded = false
 	s.pendingProbe = false
+	s.quotaProbeRequested = false
+	s.initialProbeAt = time.Time{}
+	s.initialProbeWaiting = false
 }
 func (s *State) apply() {
 	if s.Options.OnApply != nil {

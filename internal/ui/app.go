@@ -60,6 +60,7 @@ type Usage struct {
 	InputAvailable, OutputAvailable, CacheReadAvailable, CacheWriteAvailable, TotalAvailable bool
 }
 type Snapshot struct {
+	RetryFailure                                                                                            agent.RetryFailure
 	ExtensionStatusText                                                                                     string
 	ExtensionStatusAt                                                                                       time.Time
 	RuntimeID, ComposerText                                                                                 string
@@ -138,6 +139,14 @@ type Notice struct {
 	Until time.Time
 }
 type App struct {
+	navigation        navigationState
+	transcriptScroll  ui.ScrollState
+	railHintDismissed bool
+	railHintSaving    bool
+	railHintAt        time.Time
+
+	retryStatusAt                                                   time.Time
+	retryFeedbackNow                                                func() time.Time
 	retryCancellation                                               retryCancellation
 	contextOpen                                                     bool
 	contextDismissed                                                time.Time
@@ -161,6 +170,7 @@ type App struct {
 	Model                                                           Snapshot
 	Prefs                                                           preferences.UI
 	Workspaces                                                      preferences.WorkspaceList
+	workspaceActions                                                workspaceMenuState
 	OpenApps                                                        []native.ExternalApp
 	OpenPrefs                                                       native.OpenInPrefs
 	Fonts                                                           preferences.Fonts
@@ -234,6 +244,8 @@ type App struct {
 	retention                                                       preferences.Retention
 	retentionBusy                                                   bool
 	quotaOpen                                                       bool
+	quotaVisibility                                                 quotaVisibilityState
+	quotaMCP                                                        quotaMCPState
 	modalWasOpen, restoreComposerAfterModal                         bool
 }
 
@@ -255,6 +267,7 @@ func New(o Options) *App {
 	a.settingsScroll = map[string]*ui.ScrollState{}
 	a.Model.Workspace = o.Workspace
 	a.retention = o.Store.Retention()
+	a.loadQuotaVisibility()
 	a.notificationPrefs = o.Store.Notifications()
 	a.sessionDefaultPrefs = o.Store.SessionDefault()
 	a.autoTitlePrefs = o.Store.AutoTitle()
@@ -262,6 +275,9 @@ func New(o Options) *App {
 	a.english, _ = orbitassets.Locale("en")
 	a.reloadLocale()
 	a.Theme = NewTheme(a.Appearance.DarkTheme, a.Prefs, a.Fonts)
+	var railHints map[string]bool
+	_ = o.Store.Read("hints.json", &railHints)
+	a.railHintDismissed = railHints["rail_hint_seen"]
 	a.transcript.FollowEnd = true
 	a.transcript.Key = func(i int) any { return a.Model.Messages[i].ID }
 	a.sessionList.Key = func(i int) any { return a.Model.Sessions[i].ID }
@@ -291,14 +307,19 @@ func (a *App) text(key, fallback string) string {
 	return s
 }
 func (a *App) SetSnapshot(s Snapshot) {
+	a.invalidateWorkspaceMenu(s.Workspace)
 	oldID, oldLatest := a.Model.SessionID, a.Model.LatestTurn
 	a.transcriptUI.Session(s.SessionID)
 	a.projectTranscript(&s)
+	a.navigation.turns = nil
 	if s.SessionID != a.Model.SessionID || s.RuntimeID != a.Model.RuntimeID {
+		a.navigation = navigationState{}
 		a.contextOpen = false
 		a.retryCancellation = retryCancellation{}
+		a.retryStatusAt = time.Time{}
 	}
 	if s.SessionID != a.Model.SessionID {
+		a.transcriptScroll = ui.ScrollState{}
 		a.messageImages = map[string]ui.ImageSource{}
 		a.imageLoading = map[string]bool{}
 		a.imageErrors = map[string]string{}
@@ -314,6 +335,13 @@ func (a *App) SetSnapshot(s Snapshot) {
 			a.Draft = d.Text
 			a.attachments = d.Attachments
 		}
+	}
+	if s.RetryFailure.Active {
+		message := s.RetryFailure.Message
+		if !s.RetryFailure.MessageProvided {
+			message = a.Tr("events.retries_exhausted")
+		}
+		s.Error = orbitassets.Translate(a.catalog, a.english, "events.auto_retry_failed", map[string]string{"error": message})
 	}
 	a.Model = s
 	a.syncExtensionUI(s)
@@ -402,7 +430,11 @@ func (a *App) flushFilesOnLeave(next string) {
 	}
 }
 func (a *App) View(c *ui.Context) {
+	a.workspaceActions.rendered = false
 	a.drainUpdates()
+	if target := a.workspaceActions.target; a.workspaceActions.open && (target == nil || a.workspaceEntry(target.Path) != target) {
+		a.workspaceActions.open = false
+	}
 	systemDark := c.Theme().Dark
 	id := a.Appearance.DarkTheme
 	if a.Appearance.Mode == "light" || (a.Appearance.Mode == "system" && !systemDark) {
@@ -446,6 +478,9 @@ func (a *App) View(c *ui.Context) {
 	}
 	if a.Options.Terminal != nil {
 		a.Options.Terminal.SetVisible(a.page == "chat" && !a.reviewFull())
+	}
+	if a.workspaceActions.open && !a.workspaceActions.rendered {
+		a.workspaceActions.open = false
 	}
 	a.shortcuts(c)
 	modalNow := a.modalOpen()
@@ -587,22 +622,7 @@ func (a *App) sidebar(c *ui.Context) {
 			r := rows[i]
 			c.Key(r.key)
 			if r.group {
-				b := a.button(c, r.label, "icons/folder.svg", false).AlignSelf(ui.Stretch).MarginX(8)
-				if b.Clicked() {
-					a.activateSidebarRow(r)
-				}
-				b.ContextMenu(func(m *ui.Menu) {
-					if m.Item("New task here").Chosen() {
-						a.Dispatch(Action{Kind: "SetWorkspace", Value: r.path})
-						a.Navigate("chat")
-					}
-					if m.Item("Open in file manager").Chosen() {
-						a.Dispatch(Action{Kind: "RevealPath", Value: r.path})
-					}
-					if m.Item("Worktrees").Chosen() {
-						a.Navigate("worktrees")
-					}
-				})
+				a.workspaceHeader(c, r)
 				return
 			}
 			if r.more > 0 || r.less {
@@ -619,7 +639,7 @@ func (a *App) sidebar(c *ui.Context) {
 			b.Children(func() {
 				ui.Column(c).Grow(1).MinWidth(0).Gap(2).Children(func() {
 					ui.Text(c, s.Name).MaxLines(1).FontSize(t.FontSize)
-					ui.Text(c, s.Summary).MaxLines(1).FontSize(t.Px(12)).TextColor(t.TextMuted)
+					a.workspaceSessionSummary(c, s)
 				})
 				if s.Running {
 					ui.Spinner(c).Size(12, 12)
@@ -628,13 +648,7 @@ func (a *App) sidebar(c *ui.Context) {
 			if b.Clicked() {
 				a.activateSidebarRow(r)
 			}
-			b.ContextMenu(func(m *ui.Menu) {
-				for _, cmd := range []struct{ id, label string }{{"RenameSession", "Rename…"}, {"PinSession", "Pin / Unpin"}, {"CloneSession", "Clone"}, {"ArchiveSession", "Archive"}, {"CopySessionId", "Copy session ID"}, {"DeleteSession", "Delete…"}} {
-					if m.Item(cmd.label).Chosen() {
-						a.commandSession(cmd.id, s)
-					}
-				}
-			})
+			b.ContextMenu(func(m *ui.Menu) { a.sessionRowMenu(m, s) })
 		}).Grow(1).MinHeight(0)
 		if len(rows) == 0 {
 			list.Grow(0).Height(0)

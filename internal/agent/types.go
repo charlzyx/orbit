@@ -86,6 +86,13 @@ type PendingDialog struct {
 	Raw                                            json.RawMessage
 }
 
+// RetryFailure owns the current connection error only while that error is a
+// retry exhaustion; generic error writes explicitly clear this metadata.
+type RetryFailure struct {
+	Active, MessageProvided bool
+	Message                 string
+}
+
 // RetryDetail is immutable snapshot data from auto_retry_start, not a local timer.
 type RetryDetail struct {
 	Revision      uint64
@@ -153,6 +160,7 @@ type ExtensionStatus struct {
 	Patches                       PatchStatus
 }
 type Snapshot struct {
+	RetryFailure        RetryFailure
 	RuntimeID           string
 	ComposerRevision    uint64
 	ExtensionStatusText string

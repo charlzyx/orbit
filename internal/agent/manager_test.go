@@ -46,6 +46,10 @@ func TestAgentProcess(t *testing.T) {
 		kind, _ := c["type"].(string)
 		response := map[string]any{"type": "response", "id": c["id"], "command": kind, "success": true}
 		switch kind {
+		case "emit_retry_start":
+			write(map[string]any{"type": "auto_retry_start", "attempt": 1})
+		case "emit_retry_failure":
+			write(map[string]any{"type": "auto_retry_end", "success": false, "finalError": "parked failure"})
 		case "emit_abort_queue":
 			queuePending = true
 			write(map[string]any{"type": "queue_update", "steering": []string{"old steer"}, "followUp": []string{"old follow"}})
@@ -152,6 +156,15 @@ func TestAgentProcess(t *testing.T) {
 			response["success"] = false
 			response["error"] = "Unknown command: " + kind
 		case "new_session":
+			if hold := os.Getenv("ORBIT_NEW_HOLD_FILE"); hold != "" {
+				_ = os.WriteFile(hold+".entered", []byte("ready"), 0600)
+				for {
+					if _, err := os.Stat(hold); err == nil {
+						break
+					}
+					time.Sleep(time.Millisecond)
+				}
+			}
 			if delay, _ := strconv.Atoi(os.Getenv("ORBIT_NEW_DELAY_MS")); delay > 0 {
 				time.Sleep(time.Duration(delay) * time.Millisecond)
 			}

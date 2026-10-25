@@ -67,32 +67,10 @@ func (s *State) paintDiffLine(c *ui.Context, line *workspace.ReviewLine, staged 
 		return
 	}
 	if line.Kind == "gap" {
-		if line.Gap == nil {
-			return
-		}
-		ui.Row(c).PaddingX(12).Gap(6).Children(func() {
-			muted(c, fmt.Sprintf("%d unchanged lines", line.Gap.Count)).Grow(1)
-			for _, choice := range []string{"above", "below", "both", "all"} {
-				if button(c, "Expand "+choice, !line.Gap.Expandable()).Clicked() {
-					snapshot := s.diffSnapshot(staged)
-					for i, row := range snapshot.Lines {
-						if row.File == line.File && row.Gap != nil && row.Gap.ID == line.Gap.ID {
-							direction := choice
-							if direction == "above" {
-								direction = "start"
-							}
-							if direction == "below" {
-								direction = "end"
-							}
-							snapshot.ExpandGap(i, direction)
-							break
-						}
-					}
-				}
-			}
-		})
+		s.embeddedGap(c, *line, staged)
 		return
 	}
+
 	bg, color, prefix := c.Theme().Background, c.Theme().Text, " "
 	switch line.Kind {
 	case "addition":
@@ -118,7 +96,7 @@ func (s *State) paintDiffLine(c *ui.Context, line *workspace.ReviewLine, staged 
 		ui.Text(c, prefix).Width(10).Font("monospace").TextColor(color)
 		text := ui.RichText(c, s.diffSpans(c, *line)...).Grow(1).MinWidth(0).Font("monospace").FontSize(12).TextColor(color).Selectable()
 		if !s.DiffWrap {
-			text.SingleLine()
+			text.NoWrap()
 		}
 	})
 }

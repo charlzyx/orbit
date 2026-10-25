@@ -43,7 +43,7 @@ func (a *App) reviewGap(c *ui.Context, line workspace.ReviewLine, index int) {
 			for i, direction := range directions {
 				b := ui.ButtonBase(c.Key(direction)).Label("Expand context " + direction).Tooltip("Expand context (Shift: all)").Grow(1).FillWidth().MinHeight(0).Center()
 				if len(directions) > 1 && i == 0 {
-					b.BorderWidth(0, 0, 1, 0).BorderColor(t.Border)
+					b.Height(16).MinHeight(16).MaxHeight(16).Grow(0).Shrink(0).BorderWidth(0, 0, 1, 0).BorderColor(t.Border)
 				}
 				if b.Hovered() {
 					b.Background(t.Hover)

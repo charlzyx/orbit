@@ -1,14 +1,23 @@
 --- a/ui/context.go
 +++ b/ui/context.go
-@@ -487,6 +487,8 @@
+@@ -487,10 +487,13 @@
  
  // state is what the runtime keeps about an element from frame to frame.
  type state struct {
+-	rt            *engine
+-	pendingSubmit bool
+-	pendingChange bool
+-	noticeQueued  bool
 +	// Opt-in immutable transcript selection; no virtual row/node retention.
-+	retainedText  *retainedTextScope
- 	rt            *engine
- 	pendingSubmit bool
- 	pendingChange bool
++	retainedText            *retainedTextScope
++	retainedTextInteraction *retainedTextInteraction
++	rt                      *engine
++	pendingSubmit           bool
++	pendingChange           bool
++	noticeQueued            bool
+ 
+ 	// rowPressed marks a row of a list the pointer pressed, until the
+ 	// release; pressChose, that the press chose it, so that its click does
 --- a/ui/textselection.go
 +++ b/ui/textselection.go
 @@ -15,6 +15,8 @@
@@ -172,27 +181,28 @@
  	if !rt.textSelectionVisible(s) || !selected || rt.compareTextPoints(p, a) < 0 || rt.compareTextPoints(p, b) > 0 {
 --- a/ui/input.go
 +++ b/ui/input.go
-@@ -308,6 +308,9 @@
+@@ -308,6 +308,10 @@
  	if button == 0 && rt.scrollbarPress(chain, x, y) {
  		return
  	}
-+	if button == 0 && rt.selection.blocks != nil && !slices.Contains(chain, rt.selection.scope) {
++	preserveRetained := button == 0 && rt.retainedTextInteractionHit(chain)
++	if button == 0 && !preserveRetained && rt.selection.blocks != nil && !slices.Contains(chain, rt.selection.scope) {
 +		rt.selection = textSelection{}
 +	}
  	var target, focus *state
  	for _, id := range chain {
  		s := rt.states[id]
-@@ -320,6 +323,9 @@
+@@ -320,6 +324,9 @@
  		if focus == nil && s.flags&(flagFocusable|flagEditable|flagSelectable) != 0 && s.flags&flagDisabled == 0 {
  			focus = s
  		}
 +	}
-+	if button == 0 && rt.selection.blocks != nil && target != nil && target.id != rt.selection.scope && target.textScope != rt.selection.scope {
++	if button == 0 && !preserveRetained && rt.selection.blocks != nil && target != nil && target.id != rt.selection.scope && target.textScope != rt.selection.scope {
 +		rt.selection = textSelection{} // A control owns this new press, not stale transcript text.
  	}
  	keep := slices.ContainsFunc(chain, func(id uint64) bool {
  		s := rt.states[id]
-@@ -691,6 +697,11 @@
+@@ -691,6 +698,11 @@
  	if rt.inspectKey(mods, key) {
  		return true
  	}
@@ -206,7 +216,7 @@
  		return true
 --- /dev/null
 +++ b/ui/orbit_selection.go
-@@ -0,0 +1,222 @@
+@@ -0,0 +1,274 @@
 +// Orbit's opt-in text selection snapshot compatibility for MyGo 9c69cf829ece.
 +// Original MyGo is MIT licensed; see LICENSE. This addition does not retain UI
 +// nodes or change default Selectable semantics. See README.md for attribution.
@@ -429,9 +439,61 @@
 +	}
 +	return selectionRuneAtByte(s.editor.source, selectionByteAtRune(rt.selection.blocks[i].Text, p.at))
 +}
++
++// retainedTextInteraction stores only IDs and build stamps, never node pointers.
++type retainedTextInteraction struct {
++	scope, frame uint64
++	pass         int
++}
++
++// RetainTextSelectionInteraction lets a designated non-text navigation control
++// interact without clearing this retained selection. Call every build on its
++// shell with the live retained scope from the SAME window. Only pointer hits
++// inside this shell qualify; ordinary controls/outside clicks remain unchanged.
++func (e Element) RetainTextSelectionInteraction(scope Element) Element {
++	n := e.node()
++	if n == nil {
++		return e
++	}
++	owner := scope.nodeFor(n.c.rt)
++	if owner == nil || !n.c.rt.retainsTextSelection(owner.id) {
++		return e
++	}
++	if n.st.retainedTextInteraction == nil {
++		n.st.retainedTextInteraction = new(retainedTextInteraction)
++	}
++	*n.st.retainedTextInteraction = retainedTextInteraction{owner.id, n.c.rt.frame, n.c.rt.pass}
++	return e
++}
++func (rt *engine) retainedTextInteractionHit(chain []uint64) bool {
++	if rt.selection.blocks == nil || !rt.retainsTextSelection(rt.selection.scope) {
++		return false
++	}
++	for _, id := range chain {
++		s := rt.states[id]
++		if s == nil || s.seen != rt.frame || s.pass != rt.pass {
++			continue
++		}
++		p := s.retainedTextInteraction
++		if p == nil || p.frame != rt.frame || p.pass != rt.pass || p.scope != rt.selection.scope {
++			continue
++		}
++		valid := true
++		for parent := s; parent != nil; parent = rt.states[parent.parent] {
++			if parent.flags&(flagDisabled|flagInvisible|flagInert) != 0 {
++				valid = false
++				break
++			}
++		}
++		if valid {
++			return true
++		}
++	}
++	return false
++}
 --- /dev/null
 +++ b/ui/orbit_selection_test.go
-@@ -0,0 +1,276 @@
+@@ -0,0 +1,394 @@
 +package ui
 +
 +import (
@@ -706,5 +768,123 @@
 +		if s.editor.source == text && (s.editor.anchor != 0 || s.editor.caret != 1) {
 +			t.Fatalf("UTF-8 range not source-clamped: %d %d", s.editor.anchor, s.editor.caret)
 +		}
++	}
++}
++
++func TestOrbitSelectionNavigationInteractionIsNarrow(t *testing.T) {
++	for _, mode := range []string{"enabled", "not-registered", "registration-removed", "wrong-owner", "disabled-owner", "disabled-shell", "removed-owner", "new-identity", "outside", "ordinary-control"} {
++		t.Run(mode, func(t *testing.T) {
++			identity := "session"
++			register, disabled := mode != "not-registered", false
++			disabledShell, showOwner := false, true
++			clicks := 0
++			tt := NewTester(func(c *Context) {
++				Column(c).Size(500, 300).Children(func() {
++					scope := Element{}
++					if showOwner {
++						scope = Column(c.Key("scope")).Size(500, 100).Selectable().Disabled(disabled).RetainTextSelection(identity)
++					}
++					scope.Children(func() { Text(c, "Selection must survive only designated navigation").Height(40) })
++					other := Column(c.Key("other")).Size(500, 40).Selectable().RetainTextSelection("unrelated")
++					other.Children(func() { Text(c, "Other scope") })
++					rail := Column(c.Key("rail")).Label("rail").Size(200, 40).Disabled(disabledShell)
++					if register {
++						owner := scope
++						if mode == "wrong-owner" {
++							owner = other
++						}
++						rail.RetainTextSelectionInteraction(owner)
++					}
++					rail.Children(func() {
++						if Button(c, "Navigation").Clicked() {
++							clicks++
++						}
++					})
++					if Button(c, "Ordinary action").Clicked() {
++						clicks++
++					}
++				})
++			}, 500, 300)
++			r, _ := tt.Find("Selection must survive only designated navigation")
++			tt.Press(r.X+1, r.Y+10)
++			tt.Move(r.X+r.W-1, r.Y+10)
++			tt.Release(r.X+r.W-1, r.Y+10)
++			tt.Key(Cmd, KeyC)
++			want := tt.Clipboard()
++			if !strings.Contains(want, "Selection") {
++				t.Fatal("selection fixture", want)
++			}
++			switch mode {
++			case "not-registered", "registration-removed":
++				register = false
++			case "disabled-owner":
++				disabled = true
++			case "disabled-shell":
++				disabledShell = true
++			case "removed-owner":
++				showOwner = false
++			case "new-identity":
++				identity = "changed"
++			}
++			tt.Frame()
++			switch mode {
++			case "disabled-shell":
++				r, _ := tt.Find("rail")
++				tt.Press(r.X+10, r.Y+10)
++				tt.Release(r.X+10, r.Y+10)
++			case "outside":
++				tt.Press(490, 290)
++				tt.Release(490, 290)
++			case "ordinary-control":
++				if e := tt.Click("Ordinary action"); e != nil {
++					t.Fatal(e)
++				}
++			default:
++				if e := tt.Click("Navigation"); e != nil && mode != "disabled-shell" {
++					t.Fatal(e)
++				}
++			}
++			tt.SetClipboard("sentinel")
++			tt.Key(Cmd, KeyC)
++			if mode == "enabled" {
++				if tt.Clipboard() != want || clicks != 1 {
++					t.Fatal("designated navigation lost selection/action", tt.Clipboard(), clicks)
++				}
++			} else if tt.Clipboard() != "sentinel" {
++				t.Fatal("broadened selection exception", mode, tt.Clipboard())
++			}
++		})
++	}
++}
++
++func TestOrbitSelectionInteractionRejectsForeignWindowBeforeLookup(t *testing.T) {
++	var foreign Element
++	other := NewTester(func(c *Context) { foreign = Column(c).Size(100, 100).RetainTextSelection("foreign") }, 100, 100)
++	other.Frame()
++	tt := NewTester(func(c *Context) {
++		Column(c).Size(300, 200).Children(func() {
++			scope := Column(c.Key("owner")).Size(300, 80).RetainTextSelection("local")
++			scope.Children(func() { Text(c, "Local text must not borrow foreign scope").Height(40) })
++			rail := Column(c.Key("rail")).Label("Foreign navigation").Size(300, 40)
++			rail.RetainTextSelectionInteraction(foreign)
++			if rail.Clicked() {
++			}
++		})
++	}, 300, 200)
++	r, _ := tt.Find("Local text must not borrow foreign scope")
++	tt.Press(r.X+1, r.Y+10)
++	tt.Move(r.X+r.W-1, r.Y+10)
++	tt.Release(r.X+r.W-1, r.Y+10)
++	tt.Key(Cmd, KeyC)
++	if !strings.Contains(tt.Clipboard(), "Local text") {
++		t.Fatal("selection fixture")
++	}
++	if e := tt.Click("Foreign navigation"); e != nil {
++		t.Fatal(e)
++	}
++	tt.SetClipboard("sentinel")
++	tt.Key(Cmd, KeyC)
++	if tt.Clipboard() != "sentinel" {
++		t.Fatal("foreign owner granted local selection exception")
 +	}
 +}

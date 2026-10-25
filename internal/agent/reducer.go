@@ -102,21 +102,18 @@ func (s *sessionState) applyRecord(event pirpc.Event) {
 		// Only an explicit false is exhaustion; cancellation/omitted success
 		// must not invent a terminal failure (pinned events.rs).
 		if string(event.Fields["success"]) == "false" {
-			message := "pi exhausted its automatic retries"
 			var reported string
-			if json.Unmarshal(event.Fields["finalError"], &reported) == nil && string(event.Fields["finalError"]) != "null" {
-				message = reported
-			}
-			s.snapshot.ConnectionError = "Automatic retry failed: " + message
+			provided := json.Unmarshal(event.Fields["finalError"], &reported) == nil && string(event.Fields["finalError"]) != "null"
+			s.snapshot.setRetryFailure(reported, provided)
 		}
 	case "session_info_changed":
 		s.snapshot.ActiveSession.Name = event.String("name")
 	case "extension_ui_request":
 		s.extensionUI(event)
 	case "extension_error":
-		s.snapshot.ConnectionError = event.String("error")
+		s.snapshot.setConnectionError(event.String("error"))
 		if s.snapshot.ConnectionError == "" {
-			s.snapshot.ConnectionError = event.String("message")
+			s.snapshot.setConnectionError(event.String("message"))
 		}
 	case "process_exited", "transport_error":
 		s.clearExtensionUI()
@@ -129,10 +126,10 @@ func (s *sessionState) applyRecord(event pirpc.Event) {
 		s.awaiting = false
 		s.snapshot.Status = "Disconnected"
 		if event.Type == "transport_error" || event.String("error") != pirpc.ErrClosed.Error() {
-			s.snapshot.ConnectionError = event.String("error")
+			s.snapshot.setConnectionError(event.String("error"))
 		}
 	case "protocol_error":
-		s.snapshot.ConnectionError = event.String("error")
+		s.snapshot.setConnectionError(event.String("error"))
 		s.rememberUnknown(event.Raw)
 	default:
 		if strings.HasPrefix(event.Type, "auth_") {
@@ -167,7 +164,7 @@ func (s *sessionState) applyResponse(event pirpc.Event) {
 			s.snapshot.QuotaSupport = "unsupported"
 			return
 		}
-		s.snapshot.ConnectionError = response.Error
+		s.snapshot.setConnectionError(response.Error)
 		if response.Command == pirpc.Prompt {
 			s.awaiting = false
 		}
@@ -439,7 +436,7 @@ func (s *sessionState) updateMessage(event pirpc.Event) {
 	}
 	message := &s.snapshot.Messages[index]
 	if delta.ContentIndex < 0 || delta.ContentIndex > 10000 {
-		s.snapshot.ConnectionError = "Pi content block index exceeds limit"
+		s.snapshot.setConnectionError("Pi content block index exceeds limit")
 		return
 	}
 	for len(message.Blocks) <= delta.ContentIndex {

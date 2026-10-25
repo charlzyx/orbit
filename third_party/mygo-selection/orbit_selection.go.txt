@@ -220,3 +220,55 @@ func (rt *engine) currentRetainedOffset(s *state, p textPoint) int {
 	}
 	return selectionRuneAtByte(s.editor.source, selectionByteAtRune(rt.selection.blocks[i].Text, p.at))
 }
+
+// retainedTextInteraction stores only IDs and build stamps, never node pointers.
+type retainedTextInteraction struct {
+	scope, frame uint64
+	pass         int
+}
+
+// RetainTextSelectionInteraction lets a designated non-text navigation control
+// interact without clearing this retained selection. Call every build on its
+// shell with the live retained scope from the SAME window. Only pointer hits
+// inside this shell qualify; ordinary controls/outside clicks remain unchanged.
+func (e Element) RetainTextSelectionInteraction(scope Element) Element {
+	n := e.node()
+	if n == nil {
+		return e
+	}
+	owner := scope.nodeFor(n.c.rt)
+	if owner == nil || !n.c.rt.retainsTextSelection(owner.id) {
+		return e
+	}
+	if n.st.retainedTextInteraction == nil {
+		n.st.retainedTextInteraction = new(retainedTextInteraction)
+	}
+	*n.st.retainedTextInteraction = retainedTextInteraction{owner.id, n.c.rt.frame, n.c.rt.pass}
+	return e
+}
+func (rt *engine) retainedTextInteractionHit(chain []uint64) bool {
+	if rt.selection.blocks == nil || !rt.retainsTextSelection(rt.selection.scope) {
+		return false
+	}
+	for _, id := range chain {
+		s := rt.states[id]
+		if s == nil || s.seen != rt.frame || s.pass != rt.pass {
+			continue
+		}
+		p := s.retainedTextInteraction
+		if p == nil || p.frame != rt.frame || p.pass != rt.pass || p.scope != rt.selection.scope {
+			continue
+		}
+		valid := true
+		for parent := s; parent != nil; parent = rt.states[parent.parent] {
+			if parent.flags&(flagDisabled|flagInvisible|flagInert) != 0 {
+				valid = false
+				break
+			}
+		}
+		if valid {
+			return true
+		}
+	}
+	return false
+}

@@ -35,3 +35,13 @@ held press crossing file identity, next-file push-off, and visible-edge scrollba
 Existing editor/transcript selection tests are run as adjacent regressions; dock Review
 RichText itself was not selectable before this change, so readable accessibility names
 are not evidence of new diff selection support. Native desktop recapture remains separate.
+
+## Directional gutter fixed-height correction
+
+Rust `sidepane.rs:1788–1794` explicitly fixes the first of two directional controls
+to 16px. A mounted geometry test showed that equal flex growth instead divided
+the 32px gutter into border-inclusive 16.5/15.5px controls. The first control now
+has an explicit 16px height/min/max and no flex grow/shrink, preserving a 16/16
+hit-target split. Width remains the source 46px gutter including its 1px border.
+This is a bounded geometry correction, not a new functional or native screenshot
+parity claim. The red evidence is `review-gap-height-red.log`.

@@ -1,0 +1,7 @@
+# MCP probe truth after switching Pi executable
+
+This corrects the Go-only runtime `ChoosePiBinary` path. The pinned Rust UI displays its fixed Pi binary (`app/settings.rs:5040–5043`); no equivalent live binary picker was found, so this is not claimed as a direct Rust feature port. Rust's MCP manager defaults unreported runtime to unknown and derives status from real probes (`mcp/manager.rs:runtime,apply_probe`).
+
+Go `SetPiBinary` now discards the old executable's runtime/tool cache, checked timestamp, probe errors/note and previous operation Error/Status. It retains configuration and selected server. Existing cancellation/generation invalidation remains authoritative. The earlier queued-intent fix and startup cancellation remain intact: switching does not quietly probe the new executable. A new explicit refresh or MCP-tab selection obtains new truth. Same-binary calls are no-ops. A failing new probe remains unknown/error, never falls back to old connected data; explicit retry can recover.
+
+Synthetic red-before test observed old connected status, tools, checked timestamp and operation messages surviving the switch. Regression tests cover no automatic probe, preserved selection, actual new response, same-binary no-op, failure/retry, and a held old-generation completion arriving after the switch. All configuration and executables are temporary fixtures; no user configuration, credentials or real endpoint are used.

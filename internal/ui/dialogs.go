@@ -357,6 +357,12 @@ func (a *App) confirm(c *ui.Context) {
 }
 func (a *App) commandSession(id string, s SessionRow) {
 	switch id {
+	case "CopySessionId":
+		a.Dispatch(Action{Kind: "CopyText", Value: s.ID})
+	case "CopySessionPath":
+		a.Dispatch(Action{Kind: "CopyText", Value: s.Path})
+	case "RevealSession":
+		a.Dispatch(Action{Kind: "RevealPath", Value: s.Path})
 	case "RenameSession":
 		a.Prompt("Rename task", s.Name, func(name string) {
 			a.Dispatch(Action{Kind: id, Value: name, SessionID: s.ID, Data: map[string]any{"path": s.Path}})

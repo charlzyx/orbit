@@ -13,6 +13,20 @@ import (
 )
 
 func (a *App) messages(c *ui.Context) {
+	panel := ui.Column(c.Key("transcript-panel")).Grow(1).MinHeight(0)
+	bounds, scrollMax := panel.Bounds(), a.transcriptScroll.MaxY
+	panel.Draw(func(_ *ui.Painter, r ui.Rect) {
+		if r.W != bounds.W || r.H != bounds.H || scrollMax != a.transcriptScroll.MaxY {
+			c.Invalidate()
+		}
+	})
+	panel.Children(func() {
+		scope := a.messageTranscript(c)
+		a.navigationRail(c, panel.Bounds(), scope)
+	})
+}
+
+func (a *App) messageTranscript(c *ui.Context) ui.Element {
 	t := a.Theme
 	hits := a.searchMatches()
 	active := -1
@@ -97,7 +111,7 @@ func (a *App) messages(c *ui.Context) {
 					}
 				})
 			})
-		}).Grow(1).MinHeight(0).Justify(ui.End)
+		}).Grow(1).MinHeight(0).Justify(ui.End).TrackScroll(&a.transcriptScroll)
 		if !a.transcript.AtEnd() {
 			ui.Row(c).AlignSelf(ui.Stretch).Justify(ui.Center).Children(func() {
 				if a.button(c, "Jump to latest", "icons/arrow-down.svg", false).Clicked() {
@@ -107,6 +121,7 @@ func (a *App) messages(c *ui.Context) {
 		}
 	})
 	transcriptui.SelectionMenu(c, scope, a.transcriptHover, a.transcriptOptions(c))
+	return scope
 }
 func (a *App) toolMessage(c *ui.Context, m Message) {
 	t := a.Theme
@@ -324,8 +339,9 @@ func (a *App) composerView(c *ui.Context) {
 					}
 				}
 				ui.Spacer(c)
-				a.extensionStatus(c)
-				a.contextControl(c)
+				if !a.retryCancellationStatus(c) {
+					a.extensionStatus(c)
+				}
 				if a.Model.Running {
 					primary, alternate := a.text("composer.queue", "Queue"), a.text("composer.steer", "Steer")
 					if a.Prefs.ComposerSendMode == "steer" {
@@ -333,6 +349,7 @@ func (a *App) composerView(c *ui.Context) {
 					}
 					ui.Text(c, shortcutLabel("enter")+" "+primary+"   "+shortcutLabel("alt-enter")+" "+alternate).TextColor(t.TextMuted).FontSize(t.Px(12))
 				}
+				a.contextControl(c)
 			})
 		})
 	})

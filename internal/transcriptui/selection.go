@@ -57,7 +57,10 @@ func SelectionMenu(c *ui.Context, scope ui.Element, messageText string, o Option
 // compatibility addition is present. Unpatched standalone tests may still
 // exercise mounted selection, but the application must fail before startup.
 func RetainedSelectionAvailable() bool {
-	_, ok := any(ui.Element{}).(interface{ RetainTextSelection(string) ui.Element })
+	_, ok := any(ui.Element{}).(interface {
+		RetainTextSelection(string) ui.Element
+		RetainTextSelectionInteraction(ui.Element) ui.Element
+	})
 	return ok
 }
 
@@ -77,4 +80,14 @@ func RequireCompatibility() error {
 		return fmt.Errorf("Orbit requires its pinned MyGo transcript selection compatibility patch; use scripts/go-native.sh run ./cmd/orbit or scripts/go-native.sh build ./cmd/orbit")
 	}
 	return nil
+}
+
+// RetainSelectionInteraction grants the rail's explicitly scoped pointer
+// interaction, not ordinary controls, the source's selection preservation.
+func RetainSelectionInteraction(control, scope ui.Element) bool {
+	if patched, ok := any(control).(interface{ RetainTextSelectionInteraction(ui.Element) ui.Element }); ok {
+		patched.RetainTextSelectionInteraction(scope)
+		return true
+	}
+	return false
 }

@@ -1,0 +1,35 @@
+{
+  "date": "2026-10-25T18:07:00Z",
+  "sourceFreeze": "f25b36547b889a527da59c438dc9ed5bada6b8a36823102223781ad1d3ed53a3",
+  "fingerprintedFileCount": 471,
+  "parent": "987eacb79805b46a2152fc5003f8eb7bc59d0598",
+  "releaseChanged": false,
+  "nativeAcceptance": "PENDING",
+  "gates": [
+    {
+      "name": "wave3-freeze-vet-1759.log",
+      "status": "PASS",
+      "sha256": "4563659a8e94e95f1c1fc623706f380d4e244d1b11c1b4b584ebcea7d1aaca08"
+    },
+    {
+      "name": "wave3-freeze-race-1759.log",
+      "status": "PASS",
+      "sha256": "899371795184f09d9eff6263edcaf4340a31b10cc53e1f9975a7918f817a87b0"
+    },
+    {
+      "name": "wave3-freeze-arm64-1759.log",
+      "status": "PASS",
+      "sha256": "4563659a8e94e95f1c1fc623706f380d4e244d1b11c1b4b584ebcea7d1aaca08"
+    },
+    {
+      "name": "wave3-toolkit-integration-1753.log",
+      "status": "PASS",
+      "sha256": "4fd53a49d376afea1dfa0843d32e19f25d7f3be1f5b25eafb94e16a043eb8638"
+    },
+    {
+      "name": "wave3-overlay-integration-1752.log",
+      "status": "PASS",
+      "sha256": "f73d4181a9003eb68b860ae428704d3a23a841716944a69b6a0ed06f441c6d85"
+    }
+  ]
+}

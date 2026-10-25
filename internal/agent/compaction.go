@@ -42,7 +42,7 @@ func (m *Manager) Compact() error {
 				entry.state.manualCompactPending = false
 			}
 			if err != nil && !errors.As(err, &rejected) {
-				entry.state.snapshot.ConnectionError = err.Error()
+				entry.state.snapshot.setConnectionError(err.Error())
 			}
 		}
 		m.mu.Unlock()

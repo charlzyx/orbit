@@ -67,6 +67,8 @@ type State struct {
 	ChangesFilter                                     string
 	DiffWrap, DiffSplit                               bool
 	diffExpanded                                      map[string]bool
+	diffView                                          diffViewportState
+	pendingHistory                                    *historyNavigation
 	Tree                                              bool
 	HistoryOptions                                    workspace.HistoryOptions
 	GraphLimit                                        int
@@ -156,12 +158,14 @@ func (s *State) SetWorkspace(dir string) {
 	s.ChangesFilter, s.branchQuery = "", ""
 	s.dialog, s.dialogOpen, s.confirmOpen = "", false, false
 	s.confirmAction = nil
+	s.pendingHistory = nil
 	s.confirmTitle, s.confirmDetail = "", ""
 	s.pendingCommit, s.pendingPush, s.refreshPending = false, false, false
 	s.title, s.body, s.labels, s.assignees, s.base, s.notes = "", "", "", "", "", ""
 	s.templateIndex, s.templateOriginal, s.attachments = -1, "", nil
 	s.basePickerOpen, s.baseQuery, s.baseDismissedAt = false, "", time.Time{}
 	s.list = ui.ListState{}
+	s.diffView = diffViewportState{}
 	s.initialized = false
 	s.collapsed = map[string]bool{}
 	s.diffExpanded = map[string]bool{}
@@ -517,6 +521,7 @@ func (s *State) SetTab(tab int) {
 	}
 	s.Tab = tab
 	s.list = ui.ListState{}
+	s.diffView = diffViewportState{}
 	if s.Busy {
 		s.refreshPending = true
 		return

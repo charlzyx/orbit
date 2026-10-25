@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### In progress
 
+- Integrate source-derived session metadata/delete ownership fences and target-bound async HTML export, workspace path/icon/color/sidebar-removal actions, embedded Git diff navigation and owner-bound menus, retry failure/cancellation feedback, hidden-provider grouping and MCP probe lifecycle. Preserve destructive confirmations, actual completion/timeout uncertainty, and unresolved native acceptance; see the third-wave migration audit.
+
+- Source-derived conversation navigation rail, hover snippets and one-time hint; correct previous/next user-turn anchoring at the live edge and within assistant rows. A narrowly scoped retained-selection compatibility interaction preserves selected text on rail navigation without relaxing ordinary controls/outside clicks. Combined/native acceptance remains pending; do not treat this batch as full parity.
+
 - Correct the experimental macOS app’s Pi configuration isolation: normal launches now use the existing user HOME and `PI_CODING_AGENT_DIR`/`~/.pi/agent`, while keeping Orbit test preferences and the copied runtime private. Align RPC/catalog/generator/MCP/resources, terminal sign-in and quota paths; retain explicit `--home` isolation and credential-free opt-in smoke instrumentation. Disposable offline Pi 1.4.0 RPC verifies existing model/default inheritance across repeated launches. Normal stock Pi writes remain enabled; no Orbit credential/config migration is added.
 
 - Native Skills/Plugins/MCP and Runtime process settings, source-correct Usage accounting/filters, procedural/photo backdrops, typed transcript/tool components, and composer autocomplete are implemented with scoped regressions. Additional interaction and visual gaps remain explicit in the source-first checklist.

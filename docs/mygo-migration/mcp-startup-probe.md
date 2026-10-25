@@ -1,0 +1,9 @@
+# MCP launch probe
+
+Rust `299a32b`, `crates/orbit-pi/src/app.rs:1284–1288`, loads configuration and schedules one status probe three seconds after launch when nonempty. `app/mcp_ui.rs:111–116` consumes it from heartbeat; Pi work runs off the owner thread.
+
+The Go controller registers a one-shot launch intent while its existing async configuration preload runs. The three-second deadline starts when successful configuration is adopted on the owner thread, matching the Rust post-load anchor; a slow load must still wait the full three seconds after adoption. `State.Tick` consumes the deadline on the owner thread only after loading and while idle. Empty configuration consumes it without invoking Pi. Existing explicit/tab probes consume the same launch intent instead of probing again. Configuration reads/Pi subprocesses remain in existing workers. There is no timer goroutine or rendering dependence. The separately delivered windowless heartbeat is needed to keep ticking with no visible window.
+
+Workspace changes, Pi binary replacement and Close invalidate the old deadline, and the existing operation generation rejects old asynchronous results. This bounded increment does not implement Rust's separate immediate workspace-switch probe scheduling; it avoids transferring a launch intent into a different workspace/binary. No auto-apply or runtime restart is added.
+
+Evidence: negative-before startup test fails because no subprocess runs at three seconds. Virtual owner clock tests cover the exact boundary, a held slow load and post-adoption delay, one-shot behavior, busy deferral, manual-probe coalescing, empty configuration and workspace/binary/Close cancellation. A real Controller test confirms registration and completion using only a temporary configuration and synthetic Pi executable. No real MCP endpoint, authentication or credentials are exercised. Native visual parity is not implied.

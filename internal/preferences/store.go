@@ -42,6 +42,8 @@ func (s *Store) path(name string) (string, error) {
 	return filepath.Join(s.RootDir, name), nil
 }
 func (s *Store) Read(name string, target any) error {
+	unlockWorkspace := s.lockWorkspaceFile(name)
+	defer unlockWorkspace()
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	return s.read(name, target)
@@ -61,6 +63,8 @@ func (s *Store) read(name string, target any) error {
 	return nil
 }
 func (s *Store) Write(name string, value any) error {
+	unlockWorkspace := s.lockWorkspaceFile(name)
+	defer unlockWorkspace()
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	return s.write(name, value)
@@ -74,12 +78,18 @@ func (s *Store) write(name string, value any) error {
 	if e != nil {
 		return e
 	}
-	return AtomicWrite(p, append(b, '\n'), 0600)
+	err := AtomicWrite(p, append(b, '\n'), 0600)
+	if err == nil && name == "workspaces.json" {
+		workspaceFiles.revision[s.workspaceFileKey()]++
+	}
+	return err
 }
 
 // Update reloads on every write, preserving keys written by Pi or another window.
 // A malformed file is not silently replaced: the caller must explicitly repair it.
 func (s *Store) Update(name string, edit func(map[string]json.RawMessage) error) error {
+	unlockWorkspace := s.lockWorkspaceFile(name)
+	defer unlockWorkspace()
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	m := map[string]json.RawMessage{}

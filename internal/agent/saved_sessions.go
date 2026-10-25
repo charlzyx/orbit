@@ -36,8 +36,8 @@ func (m *Manager) operationError(err error) {
 	m.changed()
 }
 
-// DeleteSession is for a UI-confirmed deletion. It stops the matching process,
-// then preserves a complete recoverable copy before unlinking the source.
+// DeleteSession is for a UI-confirmed deletion. Live runtime entries are
+// protected; inactive files retain a recoverable copy before source unlink.
 func (m *Manager) DeleteSession(path string) error {
 	if strings.TrimSpace(path) == "" {
 		return errors.New("session path is required")
@@ -51,30 +51,52 @@ func (m *Manager) DeleteSession(path string) error {
 			m.operationError(err)
 			return
 		}
+		canonical, err := canonicalSessionPath(absolute)
+		if err != nil {
+			m.operationError(err)
+			return
+		}
+		absolute = canonical
+		matches, err := m.reserveSessionDeletion(absolute)
+		if err != nil {
+			m.operationError(err)
+			return
+		}
 		m.mu.Lock()
-		var clients []*pirpc.Client
-		for key, entry := range m.sessions {
-			if entry.state.snapshot.ActiveSession.Path == absolute {
-				if entry.client != nil {
-					clients = append(clients, entry.client)
-				}
-				delete(m.sessions, key)
-				if m.active == key {
-					m.active = ""
-				}
-			}
-		}
+		expectedIdentity := m.deletingSessionInfo[absolute]
 		m.mu.Unlock()
-		for _, client := range clients {
-			_ = client.Close()
-		}
+		deleted := false
+		defer func() {
+			m.mu.Lock()
+			if deleted {
+				if m.deletedSessionSequence == nil {
+					m.deletedSessionSequence = map[string]uint64{}
+				}
+				m.deletedSessionSequence[absolute] = m.sequence
+				if m.deletedSessionInfo == nil {
+					m.deletedSessionInfo = map[string]os.FileInfo{}
+				}
+				m.deletedSessionInfo[absolute] = m.deletingSessionInfo[absolute]
+			}
+			delete(m.deletingSessions, absolute)
+			delete(m.deletingSessionInfo, absolute)
+			m.mu.Unlock()
+		}()
 		directory := filepath.Join(m.options.Home, ".orbit-pi", "deleted-sessions")
 		if err := os.MkdirAll(directory, 0700); err != nil {
 			m.operationError(err)
 			return
 		}
 		destination := filepath.Join(directory, fmt.Sprintf("%d_%s", time.Now().UnixNano(), filepath.Base(absolute)))
+		if err := verifyReservedSessionIdentity(absolute, expectedIdentity); err != nil {
+			m.operationError(err)
+			return
+		}
 		if err := copyExclusive(absolute, destination); err != nil {
+			m.operationError(err)
+			return
+		}
+		if err := verifyReservedSessionIdentity(absolute, expectedIdentity); err != nil {
 			m.operationError(err)
 			return
 		}
@@ -82,6 +104,16 @@ func (m *Manager) DeleteSession(path string) error {
 			m.operationError(err)
 			return
 		}
+		// The final defer records the completed-delete fence and releases the
+		// reservation together, including Opens queued during this cleanup.
+		deleted = true
+		m.mu.Lock()
+		for key, entry := range matches {
+			if current := m.sessions[key]; current == entry && key != m.active && !entry.busy() && !entry.restartClosing && (entry.client == nil || !entry.client.Alive()) {
+				delete(m.sessions, key)
+			}
+		}
+		m.mu.Unlock()
 		m.ReloadSessions()
 		m.changed()
 	}) {
@@ -227,21 +259,64 @@ func (m *Manager) RenameSavedSession(path, name string) error {
 		return err
 	}
 	if !m.launch(func() {
+		// Preserve the regular-JSONL admission rule, including leaf-symlink rejection.
+		info, statErr := os.Lstat(absolute)
+		if statErr != nil {
+			m.operationError(statErr)
+			return
+		}
+		if !info.Mode().IsRegular() || filepath.Ext(absolute) != ".jsonl" {
+			m.operationError(errors.New("select a regular Pi session JSONL file"))
+			return
+		}
+		canonical, targetInfo, canonicalErr := readSessionFileIdentity(absolute)
+		if canonicalErr != nil {
+			m.operationError(canonicalErr)
+			return
+		}
+		absolute = canonical
+
+		m.mu.Lock()
+		if reservedSessionFile(absolute, targetInfo, m.deletingSessions, m.deletingSessionInfo) || reservedSessionFile(absolute, targetInfo, m.metadataSessions, m.metadataSessionInfo) {
+			m.mu.Unlock()
+			m.operationError(errors.New("session file operation is in progress; try again when it finishes"))
+			return
+		}
+		if m.metadataSessions == nil {
+			m.metadataSessions = map[string]bool{}
+		}
+		m.metadataSessions[absolute] = true
+		if m.metadataSessionInfo == nil {
+			m.metadataSessionInfo = map[string]os.FileInfo{}
+		}
+		m.metadataSessionInfo[absolute] = targetInfo
+		m.mu.Unlock()
+		var target *metadataSessionTarget
+		defer func() {
+			m.mu.Lock()
+			delete(m.metadataSessions, absolute)
+			delete(m.metadataSessionInfo, absolute)
+			m.mu.Unlock()
+			// Cleanup is complete before restart's lease waiter is released.
+			if target != nil {
+				m.releaseSessionCommand(target.entry, target.lease)
+			}
+		}()
 		row, err := validateSessionFile(absolute)
 		if err != nil {
 			m.operationError(err)
 			return
 		}
-		m.mu.Lock()
-		var client *pirpc.Client
-		for _, entry := range m.sessions {
-			if entry.state.snapshot.ActiveSession.Path == absolute && entry.client != nil && entry.client.Alive() && !entry.loading {
-				client = entry.client
-				break
-			}
+		target, err = m.reserveMetadataSessionTarget(absolute, targetInfo)
+		if err != nil {
+			m.operationError(err)
+			return
 		}
-		m.mu.Unlock()
-		temporary := client == nil
+		temporary := target == nil
+		var client *pirpc.Client
+		if target != nil {
+			client = target.lease.client
+		}
 		if temporary {
 			// Metadata-only process: no project resources, model calls, network refresh,
 			// tools, auto-title, quota bridge, or persistent credential changes.
@@ -263,13 +338,32 @@ func (m *Manager) RenameSavedSession(path, name string) error {
 				return
 			}
 		}
-		_, err = m.callClient(client, pirpc.NewCommand(pirpc.SetSessionName, map[string]any{"name": name}))
+		command := pirpc.NewCommand(pirpc.SetSessionName, map[string]any{"name": name})
+		if target != nil {
+			_, err = m.callSessionCommand(target.entry, target.lease, command)
+		} else {
+			_, err = m.callClient(client, command)
+		}
 		if err != nil {
-			m.operationError(err)
+			if target == nil {
+				m.operationError(err)
+			} else {
+				m.mu.Lock()
+				if m.sessionCommandCurrentLocked(target.key, target.entry, target.lease) {
+					target.entry.localDiagnostics = append(target.entry.localDiagnostics, "Session rename failed: "+err.Error())
+				}
+				m.mu.Unlock()
+				m.changed()
+			}
 			return
 		}
-		if !temporary {
-			_, _ = m.callClient(client, pirpc.NewCommand(pirpc.GetState, nil))
+		if target != nil {
+			m.mu.Lock()
+			current := m.sessionCommandCurrentLocked(target.key, target.entry, target.lease)
+			m.mu.Unlock()
+			if current {
+				_, _ = m.callSessionCommand(target.entry, target.lease, pirpc.NewCommand(pirpc.GetState, nil))
+			}
 		}
 		m.ReloadSessions()
 		m.Tick()

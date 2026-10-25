@@ -15,6 +15,7 @@ type Workspace struct {
 	Tint    string `json:"tint,omitempty"`
 }
 type WorkspaceList struct {
+	Revision       uint64      `json:"-"`
 	Workspaces     []Workspace `json:"workspaces"`
 	Sort           string      `json:"sort"`
 	GroupBy        string      `json:"group_by"`
@@ -31,7 +32,17 @@ func CanonicalPath(path string) string {
 	return filepath.Clean(path)
 }
 func (s *Store) Workspaces() WorkspaceList {
-	return parseWorkspaces(s.raw("workspaces.json"))
+	unlock := s.lockWorkspaceFile("workspaces.json")
+	defer unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	m := map[string]json.RawMessage{}
+	if s.read("workspaces.json", &m) != nil || m == nil {
+		m = map[string]json.RawMessage{}
+	}
+	v := parseWorkspaces(m)
+	v.Revision = workspaceFiles.revision[s.workspaceFileKey()]
+	return v
 }
 func parseWorkspaces(m map[string]json.RawMessage) WorkspaceList {
 	v := WorkspaceList{Sort: str(m, "sort", "last_updated"), GroupBy: str(m, "group_by", "workspace"), ArchivedFilter: str(m, "archived_filter", "hide")}

@@ -133,3 +133,22 @@ func TestReviewGapIdentityUsesStableID(t *testing.T) {
 		t.Fatal("partial expansion changes gap identity")
 	}
 }
+
+func TestMountedReviewGapTwoControlsUseSourceFixedHalfHeight(t *testing.T) {
+	_, tt := mountedReviewGap(t, "between", 250)
+	top, ok := tt.Find("Expand context start")
+	if !ok {
+		t.Fatal("missing start")
+	}
+	bottom, ok := tt.Find("Expand context end")
+	if !ok {
+		t.Fatal("missing end")
+	}
+	row, ok := tt.Find("Review context gap 77")
+	if !ok {
+		t.Fatal("missing gap")
+	}
+	if row.H != 32 || top.H != 16 || bottom.H != 16 || top.Y+top.H != bottom.Y {
+		t.Fatal("source fixes first gutter control to16px, not flex-distributed border heights", row, top, bottom)
+	}
+}

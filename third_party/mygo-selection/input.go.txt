@@ -308,7 +308,8 @@ func (rt *engine) pointerDown(x, y float32, button int, mods Modifiers, clicks i
 	if button == 0 && rt.scrollbarPress(chain, x, y) {
 		return
 	}
-	if button == 0 && rt.selection.blocks != nil && !slices.Contains(chain, rt.selection.scope) {
+	preserveRetained := button == 0 && rt.retainedTextInteractionHit(chain)
+	if button == 0 && !preserveRetained && rt.selection.blocks != nil && !slices.Contains(chain, rt.selection.scope) {
 		rt.selection = textSelection{}
 	}
 	var target, focus *state
@@ -324,7 +325,7 @@ func (rt *engine) pointerDown(x, y float32, button int, mods Modifiers, clicks i
 			focus = s
 		}
 	}
-	if button == 0 && rt.selection.blocks != nil && target != nil && target.id != rt.selection.scope && target.textScope != rt.selection.scope {
+	if button == 0 && !preserveRetained && rt.selection.blocks != nil && target != nil && target.id != rt.selection.scope && target.textScope != rt.selection.scope {
 		rt.selection = textSelection{} // A control owns this new press, not stale transcript text.
 	}
 	keep := slices.ContainsFunc(chain, func(id uint64) bool {

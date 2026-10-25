@@ -1,0 +1,25 @@
+# Session HTML native dialog and target-bound RPC
+
+## Source and limits
+
+The existing Go `ExportSession` synchronously opened a native Save panel from the UI action. Pinned MyGo permits calling native dialogs from goroutines and posts native presentation to its owner; this increment uses the common native-dialog singleton/UI completion queue. Existing title, default `session.html`, HTML filter and native overwrite confirmation are preserved. This is not a claim that native confirmation or the user's exact hang was reproduced.
+
+Pi 1.4.0 `dist/modes/rpc/rpc-mode.js` binds `export_html` to the current `session` and accepts only an output path; there is no target-session identifier or remote export cancellation field. `new_session`, `switch_session`, `fork` and `clone` can rebind that session. `core/export-html/index.js::exportSessionToHtml` snapshots session header/entries/leaf and writes the HTML synchronously. The export content is live when Pi processes the command, not a transcript snapshot frozen at panel opening. A native panel alone cannot provide target-safe asynchronous export.
+
+## Admission and retained completion
+
+Before showing the panel, the host captures opaque task key/generation, exact child, and any known session ID/path. On UI completion it checks parent/window/close/workspace/task intent. The manager then validates the captured target and reserves that entry under its state lock in the same atomic admission. Normal empty-to-hydrated ID/path remains valid; known identity replacement does not.
+
+At most one export or identity operation is admitted per entry, with a total reservation cap of `MaxParked + 1`. A reservation participates in existing busy checks: direct NewSession parks an exporting child and opens a fresh task, idle MCP replacement defers, warm-pool eviction does not kill an unsettled operation. Explicit Open of the same path only selects the existing reserved entry and cannot bypass its guard. Fork/clone and generic new_session/switch_session cannot enter a reserved child; their own reservations invalidate old targets before queuing. Post-marshaling revalidation rejects an identity command captured before same-child NewSession. Ordinary prompt/abort commands are not serialized behind export.
+
+The command timeout reports a diagnostic, **not completion**. The worker uses manager lifetime context, retains the actual RPC waiter and reservation until response or child death, and does not hold the manager mutex across I/O. Repeated intents are rejected rather than adding an unbounded queue. Stop/Close or explicit Restart terminate the old child and its waiter; Restart/new task remains available. Cancelling a local context or restarting does not promise rollback of a remote file already written. Generic ExportHTML without outputPath retains Pi's default-path behavior.
+
+This covers manager-driven session identity transitions. Pi extensions expose their own newSession/fork/switchSession actions, outside the host's admission lock; observed identity changes are rejected, but this is not a protocol-level transaction against an extension changing identity before the host observes it. No remote capability or security policy was added or broadened.
+
+## Evidence
+
+Tests use disposable subprocesses and synthetic session IDs, never user files or credentials. Client retained-waiter race tests cover deadline notice, late response, process death, Close and context cancellation. Manager tests cover exact target, duplicate export, all four generic identity commands, same-child NewSession during Send marshaling, fresh task during overdue export, same-path Open, bounded pending pool, MCP idle replacement, late response, Stop/Close/Restart and normal identity hydration. UI tests hold the Save operation while its action returns, then test confirmation, cancellation, error, task change, window replacement and close against an existing output file. No tests force a native panel result. Combined integration/full gates remain the integrator's responsibility.
+
+Lifecycle review additionally guards direct NewSession defaults, cancelled-result restoration and hydration with the same exact entry/client/lease plus not-stopped/not-closed condition. Its I/O uses the captured child. A rejected worker launch cleans the lease and provisional loading/creating/connection flags. Held identity tests exercise direct NewSession and each generic identity command against Stop/Restart/Close; deterministic boundary tests cover a cancelled reply arriving after Stop admission and Close admission immediately before worker launch. These are host lifecycle guards, not remote rollback.
+
+Late GetState hydration is discarded for stopped entries, and identity workers do not request follow-up hydration after their lease owner is gone. When the global reservation cap is full, high-level NewSession still uses a fresh runtime rather than trapping the user in a pending operation; additional export/low-level identity commands remain bounded and rejected explicitly.

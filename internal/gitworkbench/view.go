@@ -20,6 +20,7 @@ func muted(c *ui.Context, text string) ui.Element {
 }
 func separator(c *ui.Context) { ui.Box(c).Height(1).AlignSelf(ui.Stretch).Background(c.Theme().Border) }
 func View(c *ui.Context, s *State) ui.Element {
+	s.applyPendingHistory()
 	s.Tick()
 	if !s.initialized {
 		s.Refresh()
@@ -243,105 +244,8 @@ func (s *State) changes(c *ui.Context) {
 		r := items[i]
 		return fmt.Sprintf("%t:%s:%s:%d", r.staged, r.header, r.path, r.diffIndex)
 	}
-	ui.List(c.Key("changes-list"), &s.list, len(items), func(i int) {
-		item := items[i]
-		if item.line != nil || item.split != nil {
-			s.embeddedDiffLine(c, item)
-			return
-		}
-		if item.folder {
-			if button(c, "▸ "+item.header, false).Clicked() {
-				s.collapsed[item.path] = !s.collapsed[item.path]
-			}
-			return
-		}
-		if item.header != "" {
-			ui.Row(c).Padding(8, 14).Children(func() {
-				ui.Text(c, fmt.Sprintf("%s (%d)", item.header, item.count)).Bold()
-				ui.Spacer(c)
-				if item.count > 0 && button(c, "Review", false).Clicked() {
-					source := "unstaged"
-					if item.staged {
-						source = "staged"
-					}
-					s.review(source, "", "")
-				}
-			})
-			if item.count == 0 {
-				muted(c, "No changes").Padding(8, 14)
-			}
-			return
-		}
-		r := item.row
-		ui.Row(c).Padding(4, 14).Gap(8).AlignItems(ui.Center).Children(func() {
-			code := r.Worktree
-			if item.staged {
-				code = r.Index
-			}
-			color := c.Theme().TextMuted
-			if r.Conflict() {
-				color = c.Theme().Danger
-			}
-			ui.Text(c, string(code)).Width(16).Font("monospace").TextColor(color)
-			label := r.Path
-			if s.Tree {
-				label = filepath.Base(label)
-			}
-			b := ui.ButtonBase(c).Grow(1).Label(r.Path).Padding(5).Children(func() { ui.Text(c, label).SingleLine() })
-			if b.Clicked() {
-				s.diffExpanded[fmt.Sprintf("%t:%s", item.staged, r.Path)] = !s.diffExpanded[fmt.Sprintf("%t:%s", item.staged, r.Path)]
-			}
-			b.ContextMenu(func(m *ui.Menu) {
-				if m.Item("Open in Review").Chosen() {
-					source := "unstaged"
-					if item.staged {
-						source = "staged"
-					}
-					s.review(source, "", r.Path)
-				}
-				if m.Item("Copy relative path").Chosen() {
-					c.WriteClipboard(r.Path)
-				}
-				if m.Item("Copy absolute path").Chosen() {
-					c.WriteClipboard(filepath.Join(s.Git.Dir, r.Path))
-				}
-				if s.Options.OpenFile != nil && m.Item("Open file").Chosen() {
-					s.Options.OpenFile(filepath.Join(s.Git.Dir, r.Path))
-				}
-				if s.Options.RevealFile != nil && m.Item("Reveal in file manager").Chosen() {
-					s.Options.RevealFile(filepath.Join(s.Git.Dir, r.Path))
-				}
-				if m.Item("File history").Chosen() {
-					s.HistoryOptions.Path = r.Path
-					s.SetTab(1)
-				}
-			})
-			adds, dels := r.UnstagedAdditions, r.UnstagedDeletions
-			if item.staged {
-				adds, dels = r.StagedAdditions, r.StagedDeletions
-			}
-			ui.Text(c, fmt.Sprintf("+%d", adds)).FontSize(12).TextColor(c.Theme().Success)
-			ui.Text(c, fmt.Sprintf("−%d", dels)).FontSize(12).TextColor(c.Theme().Danger)
-			if item.staged {
-				if button(c, "Unstage", s.Busy).Clicked() {
-					s.RunGit("Unstage", func(ctx context.Context, g workspace.Git) (string, error) { return "", g.Unstage(ctx, r.Path) })
-				}
-			} else {
-				if button(c, "Stage", s.Busy).Clicked() {
-					paths := []string{r.Path}
-					if r.OrigPath != "" {
-						paths = append(paths, r.OrigPath)
-					}
-					s.RunGit("Stage", func(ctx context.Context, g workspace.Git) (string, error) { return "", g.Stage(ctx, paths...) })
-				}
-				if button(c, "Discard…", s.Busy).Clicked() {
-					s.Confirm("Discard "+r.Path+"?", "Unstaged edits will be lost. Untracked files are permanently removed.", func() {
-						s.RunGit("Discard", func(ctx context.Context, g workspace.Git) (string, error) { return "", g.Discard(ctx, r.Path) })
-					})
-				}
-			}
-		})
-	}).Grow(1).MinHeight(0)
+	s.changesDiffViewport(c, items)
+
 	separator(c)
 	ui.Column(c).Padding(10, 14).Gap(8).Children(func() {
 		if s.commitBarMode() != "commit" {
@@ -452,7 +356,11 @@ func (s *State) history(c *ui.Context, graph bool) {
 			entry = s.Data.History[i]
 		}
 		ui.Column(c).AlignSelf(ui.Stretch).Children(func() {
-			b := ui.ButtonBase(c).AlignSelf(ui.Stretch).Height(56).Padding(4, 14).Gap(8).Label(entry.Subject)
+			dataset := any(menuDataset(s.Data.History))
+			if graph {
+				dataset = menuDataset(s.Data.Graph)
+			}
+			b := ui.ButtonBase(s.menuContext(c, "commit", entry.Hash, dataset)).AlignSelf(ui.Stretch).Height(56).Padding(4, 14).Gap(8).Label(entry.Subject)
 			if s.CommitDetail != nil && s.CommitDetail.Hash == entry.Hash {
 				b.Background(c.Theme().Selection)
 			}
@@ -560,7 +468,7 @@ func (s *State) commitView(c *ui.Context) {
 		separator(c)
 		for _, f := range d.Files[:min(300, len(d.Files))] {
 			ui.Row(c.Key(f.Path)).Gap(6).Children(func() {
-				b := button(c, f.Status+" "+f.Path, false).Grow(1)
+				b := button(s.menuContext(c, "commit-file", d.Hash+":"+f.Path, d), f.Status+" "+f.Path, false).Grow(1)
 				if b.Clicked() {
 					s.review("committed", d.Hash, f.Path)
 				}
@@ -584,9 +492,7 @@ func (s *State) commitView(c *ui.Context) {
 						c.WriteClipboard(filepath.Join(s.Git.Dir, f.Path))
 					}
 					if m.Item("File history (follow renames)").Chosen() {
-						s.HistoryOptions.Path, s.HistoryOptions.Follow = f.Path, true
-						s.HistoryOptions.Limit, s.Tab, s.CommitDetail = 80, 1, nil
-						s.Refresh()
+						s.queueFileHistory(c, f.Path, true)
 					}
 				})
 				muted(c, fmt.Sprintf("+%d −%d", f.Additions, f.Deletions))
@@ -594,6 +500,109 @@ func (s *State) commitView(c *ui.Context) {
 		}
 		if len(d.Files) > 300 {
 			muted(c, fmt.Sprintf("%d more files", len(d.Files)-300))
+		}
+	})
+}
+
+func (s *State) changeItem(c *ui.Context, item changeItem, sticky bool) {
+
+	if item.line != nil || item.split != nil {
+		s.embeddedDiffLine(c, item)
+		return
+	}
+	if item.folder {
+		if button(c, "▸ "+item.header, false).Clicked() {
+			s.collapsed[item.path] = !s.collapsed[item.path]
+		}
+		return
+	}
+	if item.header != "" {
+		row := ui.Row(c)
+		s.bindChangeHeader(c, row, item, sticky)
+		row.Padding(8, 14).Children(func() {
+			ui.Text(c, fmt.Sprintf("%s (%d)", item.header, item.count)).Bold()
+			ui.Spacer(c)
+			if item.count > 0 && button(c, "Review", false).Clicked() {
+				source := "unstaged"
+				if item.staged {
+					source = "staged"
+				}
+				s.review(source, "", "")
+			}
+		})
+		if item.count == 0 && !sticky {
+			muted(c, "No changes").Padding(8, 14)
+		}
+		return
+	}
+	r := item.row
+	row := ui.Row(c)
+	s.bindChangeHeader(c, row, item, sticky)
+	row.Padding(4, 14).Gap(8).AlignItems(ui.Center).Children(func() {
+		code := r.Worktree
+		if item.staged {
+			code = r.Index
+		}
+		color := c.Theme().TextMuted
+		if r.Conflict() {
+			color = c.Theme().Danger
+		}
+		ui.Text(c, string(code)).Width(16).Font("monospace").TextColor(color)
+		label := r.Path
+		if s.Tree {
+			label = filepath.Base(label)
+		}
+		b := ui.ButtonBase(s.menuContext(c, "change", fmt.Sprintf("%t:%s:%c:%c", item.staged, r.Path, r.Index, r.Worktree), menuDataset(s.Data.Changes))).Grow(1).Label(r.Path).Padding(5).Children(func() { ui.Text(c, label).SingleLine() })
+		if b.Clicked() {
+			s.diffExpanded[fmt.Sprintf("%t:%s", item.staged, r.Path)] = !s.diffExpanded[fmt.Sprintf("%t:%s", item.staged, r.Path)]
+		}
+		b.ContextMenu(func(m *ui.Menu) {
+			if m.Item("Open in Review").Chosen() {
+				source := "unstaged"
+				if item.staged {
+					source = "staged"
+				}
+				s.review(source, "", r.Path)
+			}
+			if m.Item("Copy relative path").Chosen() {
+				c.WriteClipboard(r.Path)
+			}
+			if m.Item("Copy absolute path").Chosen() {
+				c.WriteClipboard(filepath.Join(s.Git.Dir, r.Path))
+			}
+			if s.Options.OpenFile != nil && m.Item("Open file").Chosen() {
+				s.Options.OpenFile(filepath.Join(s.Git.Dir, r.Path))
+			}
+			if s.Options.RevealFile != nil && m.Item("Reveal in file manager").Chosen() {
+				s.Options.RevealFile(filepath.Join(s.Git.Dir, r.Path))
+			}
+			if m.Item("File history").Chosen() {
+				s.queueFileHistory(c, r.Path, true)
+			}
+		})
+		adds, dels := r.UnstagedAdditions, r.UnstagedDeletions
+		if item.staged {
+			adds, dels = r.StagedAdditions, r.StagedDeletions
+		}
+		ui.Text(c, fmt.Sprintf("+%d", adds)).FontSize(12).TextColor(c.Theme().Success)
+		ui.Text(c, fmt.Sprintf("−%d", dels)).FontSize(12).TextColor(c.Theme().Danger)
+		if item.staged {
+			if button(c, "Unstage", s.Busy).Clicked() {
+				s.RunGit("Unstage", func(ctx context.Context, g workspace.Git) (string, error) { return "", g.Unstage(ctx, r.Path) })
+			}
+		} else {
+			if button(c, "Stage", s.Busy).Clicked() {
+				paths := []string{r.Path}
+				if r.OrigPath != "" {
+					paths = append(paths, r.OrigPath)
+				}
+				s.RunGit("Stage", func(ctx context.Context, g workspace.Git) (string, error) { return "", g.Stage(ctx, paths...) })
+			}
+			if button(c, "Discard…", s.Busy).Clicked() {
+				s.Confirm("Discard "+r.Path+"?", "Unstaged edits will be lost. Untracked files are permanently removed.", func() {
+					s.RunGit("Discard", func(ctx context.Context, g workspace.Git) (string, error) { return "", g.Discard(ctx, r.Path) })
+				})
+			}
 		}
 	})
 }

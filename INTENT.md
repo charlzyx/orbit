@@ -25,6 +25,10 @@ application. Full parity is a target still under verification, not a completed c
 
 ### D15 — Fork target: Go + MyGo native reconstruction (in progress)
 
+**Third-wave implementation status:** Bounded session file/child ownership, async session export, workspace menu/revision fencing, embedded diff/context controls, quota/MCP lifecycle and typed retry feedback are integrated for final same-tree gates. See [scope/evidence](docs/mygo-migration/audits/2026-10-25/continued-wave3.md); external filesystem races, real provider/auth, Mac confirmation and full native pixel acceptance are not claimed closed. No new release is part of this batch.
+
+**Navigation implementation status:** Source-derived turn rail/preview/hint and corrected keyboard turn anchoring are implemented locally. A narrow opt-in compatibility interaction now preserves existing selection through rail clicks while retaining strict normal outside/control clearing; native paired visual and combined acceptance remain pending.
+
 This fork's requested implementation is **Go**, with MyGo's native GPU UI, not a
 Rust reskin, Rust backend sidecar, HTML/DOM app, or webview. The upstream Rust tree
 at `299a32bc87fe3d4851bdb902d9c03dcf9bf99cac` is retained as the behavioral and

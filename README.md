@@ -12,6 +12,8 @@ The canonical wrapper verifies the exact MyGo pin and applies the small, attribu
 
 The wrapper defaults to Go's `-trimpath` so temporary compatibility-copy paths do not invalidate dependency-cache reuse or leak into debug records. An explicit `-trimpath=false` remains available for local debugging; it does not disable either required compatibility patch.
 
+Latest source-only continuation: session ownership/export ordering, workspace actions, embedded diff navigation, retry feedback, quota/MCP and conversation rail work are tracked in the [third-wave evidence](docs/mygo-migration/audits/2026-10-25/continued-wave3.md). Full parity and native state coverage remain open; this does not replace the `.4` installer.
+
 ## Original Orbit reference
 
 [![CI](https://github.com/imrj05/orbit/actions/workflows/ci.yml/badge.svg)](https://github.com/imrj05/orbit/actions/workflows/ci.yml)
@@ -283,3 +285,5 @@ Something missing from this list is a bug. Open an issue and it gets fixed.
 ---
 
 Setup, checks, and commit conventions live in [CONTRIBUTING.md](CONTRIBUTING.md). Orbit is licensed under [Apache-2.0](LICENSE); report vulnerabilities per [SECURITY.md](SECURITY.md). Data handling is documented in [PRIVACY.md](PRIVACY.md).
+
+Conversation navigation rail is under source-first verification: mounted navigation/preview/hint tests pass, and a narrowly scoped, hash-verified selection interaction preserves selected text through rail clicks. Combined integration review, hosted native input and paired visual verification remain pending.

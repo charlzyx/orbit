@@ -117,7 +117,7 @@ func (a *App) shortcuts(c *ui.Context) {
 	}
 }
 func (a *App) modalOpen() bool {
-	return a.nativeSettings.selectMenu.id != "" || a.providerState.usageProvider != "" || (a.Models != nil && a.Models.HasModal()) || a.workspaceOpen || a.usageState.filterMenu != "" || a.providerState.editor != nil || (a.Options.HasModal != nil && a.Options.HasModal()) || a.promptOpen || a.confirmOpen || a.Model.Dialog != nil || a.paletteOpen || a.modelOpen || a.jsonOpen || a.secretOpen || a.imageOpen || a.usageState.detailError != nil || a.usageState.customOpen || a.usageState.detailRecord != nil || a.usageState.detailSession != nil
+	return a.workspaceActions.open || a.nativeSettings.selectMenu.id != "" || a.providerState.usageProvider != "" || (a.Models != nil && a.Models.HasModal()) || a.workspaceOpen || a.usageState.filterMenu != "" || a.providerState.editor != nil || (a.Options.HasModal != nil && a.Options.HasModal()) || a.promptOpen || a.confirmOpen || a.Model.Dialog != nil || a.paletteOpen || a.modelOpen || a.jsonOpen || a.secretOpen || a.imageOpen || a.usageState.detailError != nil || a.usageState.customOpen || a.usageState.detailRecord != nil || a.usageState.detailSession != nil
 }
 
 // Native menu accelerators arrive outside MyGo's modal shortcut scope. Apply
@@ -273,7 +273,7 @@ func (a *App) command(id, value string) {
 	case "RenameSession":
 		a.Prompt("Rename task", a.Model.SessionName, func(v string) { a.Dispatch(Action{Kind: id, Value: v}) })
 	case "DeleteSession":
-		a.Confirm("Delete task?", "This removes the saved session file. The active agent will be stopped.", func() { a.Dispatch(Action{Kind: id, Value: a.Model.SessionPath}) })
+		a.Confirm("Delete task?", "This removes the saved session file. Sessions with a live runtime cannot be deleted.", func() { a.Dispatch(Action{Kind: id, Value: a.Model.SessionPath}) })
 	case "CopySessionId":
 		a.Dispatch(Action{Kind: "CopyText", Value: a.Model.SessionID})
 	case "CopyLastResponse":
@@ -295,13 +295,8 @@ func (a *App) command(id, value string) {
 		if id == "PrevTurn" {
 			delta = -1
 		}
-		first, _ := a.transcript.Visible()
-		for i := first + delta; i >= 0 && i < len(a.Model.Messages); i += delta {
-			if a.Model.Messages[i].Role == "user" {
-				a.transcript.ScrollTo(i, ui.Start)
-				break
-			}
-		}
+		a.jumpTurn(delta)
+		a.dismissRailHint()
 	case "OpenMcpSettings":
 		a.settingsPage = "mcp"
 		a.Navigate("settings")

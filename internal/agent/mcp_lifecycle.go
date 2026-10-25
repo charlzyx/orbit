@@ -42,7 +42,7 @@ func (m *Manager) readMCPStamp(workspace string) [32]byte {
 func (m *Manager) newEntryLocked(workspace, path, workflow string) (string, *liveSession) {
 	m.sequence++
 	key := fmt.Sprintf("live-%d", m.sequence)
-	entry := &liveSession{state: newState(workspace, path), loading: true, launcher: m.PiBinary()}
+	entry := &liveSession{birthSequence: m.sequence, state: newState(workspace, path), loading: true, launcher: m.PiBinary()}
 	if validWorkflow(workflow) {
 		entry.workflowPending = workflow
 		entry.state.snapshot.WorkflowMode = workflow

@@ -89,7 +89,7 @@ func (s *State) issues(c *ui.Context) {
 			s.list.Key = func(i int) any { return s.Data.Issues[i].Number }
 			ui.List(c.Key("issues-list"), &s.list, len(s.Data.Issues), func(i int) {
 				issue := s.Data.Issues[i]
-				b := ui.ButtonBase(c).Height(70).AlignSelf(ui.Stretch).Padding(8, 14).Label(issue.Title).Children(func() {
+				b := ui.ButtonBase(s.menuContext(c, "issue", fmt.Sprintf("%d:%s", issue.Number, issue.URL), menuDataset(s.Data.Issues))).Height(70).AlignSelf(ui.Stretch).Padding(8, 14).Label(issue.Title).Children(func() {
 					if issue.Author != nil {
 						s.avatar(c, issue.Author.Login, "")
 					}
@@ -233,7 +233,7 @@ func (s *State) pulls(c *ui.Context) {
 			s.list.Key = func(i int) any { return s.Data.Pulls[i].Number }
 			ui.List(c.Key("pull-list"), &s.list, len(s.Data.Pulls), func(i int) {
 				pr := s.Data.Pulls[i]
-				b := ui.ButtonBase(c).Height(72).AlignSelf(ui.Stretch).Padding(8, 14).Gap(8).Label(pr.Title).Children(func() {
+				b := ui.ButtonBase(s.menuContext(c, "pull", fmt.Sprintf("%d:%s", pr.Number, pr.URL), menuDataset(s.Data.Pulls))).Height(72).AlignSelf(ui.Stretch).Padding(8, 14).Gap(8).Label(pr.Title).Children(func() {
 					if pr.Author != nil {
 						s.avatar(c, pr.Author.Login, "")
 					}

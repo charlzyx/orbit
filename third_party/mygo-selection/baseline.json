@@ -12,7 +12,7 @@
   "overlays": {
     "ui/context.go": {
       "source": "context.go.txt",
-      "sha256": "bf2dfff70b7de34eafba16b3783acca7ba781c1840de301d8455a0cf8e472939",
+      "sha256": "47918d3b46a58ff70ca209c0badad563592bf77f800a88e3cdc440d4168a571a",
       "added": false
     },
     "ui/textselection.go": {
@@ -22,19 +22,19 @@
     },
     "ui/input.go": {
       "source": "input.go.txt",
-      "sha256": "c63f7d4d4e07aab122699392c3a51ef5a349c725bbfa1313246856e5275d9c99",
+      "sha256": "a421dcb51c812f263e3b9d02d784325a3cb617213d20a01123e942543a599c99",
       "added": false
     },
     "ui/orbit_selection.go": {
       "source": "orbit_selection.go.txt",
-      "sha256": "aef70013b682ccdbdac2e7d13148ce41614d24245c7f2ed4280031b3056aaa9f",
+      "sha256": "7fc8efda000cb1eba972169fbdb932be13b7c8703d0fbf010d1bf739412033a1",
       "added": true
     },
     "ui/orbit_selection_test.go": {
       "source": "orbit_selection_test.go.txt",
-      "sha256": "883bdb82578fd6286955b21cfe59f93bb80364873730144b393c2ee3b03353e1",
+      "sha256": "323a5d480ed89d0e2554f556380610e03ae51df7ac443f73bb5b780d365f5dbf",
       "added": true
     }
   },
-  "patch_sha256": "843ff64c703a5552fdd43690e768c62cb0b960335ad59d6b093c32aa003ca847"
+  "patch_sha256": "2b7438244db85cf67ce90a160f873c0ada010b2ea3b9fc1faf7151052bbe348c"
 }
