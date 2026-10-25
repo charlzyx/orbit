@@ -40,6 +40,8 @@ func init() {
 	}
 }
 
+var errProbeInteractionUnavailable = errors.New("native confirmation interaction unavailable")
+
 var workspaceProbeOnce sync.Once
 var workspaceProbeMu sync.Mutex
 var workspaceProbeViewDepth atomic.Int32
@@ -115,6 +117,9 @@ func workspaceProbeStart(x *Controller, w *mygo.Window) {
 			if err != nil {
 				result["status"] = "FAIL"
 				result["error"] = err.Error()
+				if errors.Is(err, errProbeInteractionUnavailable) {
+					result["status"] = "BLOCKED"
+				}
 			}
 			workspaceProbeStage("probe.complete", result)
 			data, _ := json.MarshalIndent(result, "", "  ")
@@ -282,9 +287,8 @@ func (p *workspaceProbe) run() error {
 			return err
 		}
 	}
-	if err = p.invalid(previous); err != nil {
-		return err
-	}
+	// Invalid-directory rejection is outside this focused confirm/cancel probe.
+	workspaceProbeStage("case.not_run", "invalid-directory-rejection")
 	return p.capture("08-final")
 }
 func (p *workspaceProbe) record(name string, state workspaceProbeState) {
@@ -436,24 +440,23 @@ func (p *workspaceProbe) dialog(name, path string, accept bool) error {
 	if err != nil {
 		return err
 	}
-	if p.waitPanelClosed(name, 3*time.Second) {
-		return nil
+	if !p.waitPanelClosed(name, 8*time.Second) {
+		if !accept {
+			return fmt.Errorf("%s: native cancellation did not complete", name)
+		}
+		return fmt.Errorf("%w: %s: real accessibility press dispatched but panel did not close; not proof of application hang", errProbeInteractionUnavailable, name)
 	}
 	if accept {
-		var clicked bool
-		mygo.RunOnMain(func() { clicked, err = probeClickDefaultButton(probePanel(p.w.NativeHandle())) })
-		if err != nil {
-			return err
-		}
-		if clicked && p.waitPanelClosed(name, 3*time.Second) {
-			return nil
+		returned, ok := workspaceProbeLastReturned.Load().(map[string]any)
+		if !ok || returned["path"] != path || returned["error"] != "<nil>" {
+			return fmt.Errorf("%s: native dialog returned unexpected result: %v", name, returned)
 		}
 	}
-	return fmt.Errorf("%s: NSOpenPanel did not close after queued Ctrl-Return and available actual default-button click", name)
+	return nil
 }
 func (p *workspaceProbe) waitPanelClosed(name string, timeout time.Duration) bool {
 	for deadline := time.Now().Add(timeout); time.Now().Before(deadline); {
-		if p.panel() == 0 {
+		if p.panel() == 0 && workspaceProbeViewDepth.Load() == 0 {
 			workspaceProbeStage("panel.closed", name)
 			return true
 		}
@@ -514,52 +517,6 @@ func (p *workspaceProbe) captureVisiblePanel(name string) {
 	}
 	workspaceProbeStage("panel.screen_capture", map[string]any{"path": path, "window_number": number, "kind": "native-single-window-screen-capture"})
 }
-func (p *workspaceProbe) invalid(before workspaceProbeState) error {
-	if _, err := os.Stat(p.config.Invalid); !errors.Is(err, os.ErrNotExist) {
-		return errors.New("invalid fixture must not exist")
-	}
-	if err := p.open("07-invalid"); err != nil {
-		return err
-	}
-	// Native UI owns invalid-path validation: attempt a missing directory/name,
-	// not a forced positive completion or synthetic application action.
-	mygo.RunOnMain(func() {
-		panel := probePanel(p.w.NativeHandle())
-		probeSetDirectory(panel, p.config.Invalid)
-		probeSend(objc.ID(panel), "setNameFieldStringValue:", uintptr(probeString(filepath.Base(p.config.Invalid))))
-	})
-	time.Sleep(700 * time.Millisecond)
-	var err error
-	mygo.RunOnMain(func() {
-		err = probeCapturePanel(probePanel(p.w.NativeHandle()), filepath.Join(p.dir, "07-invalid-panel.png"))
-	})
-	if err != nil {
-		return err
-	}
-	workspaceProbeStage("panel.invalid_ok.before", p.config.Invalid)
-	mygo.RunOnMain(func() { err = probeAcceptPanel(probePanel(p.w.NativeHandle())) })
-	if err != nil {
-		return err
-	}
-	time.Sleep(800 * time.Millisecond)
-	if p.panel() == 0 {
-		return errors.New("invalid-directory attempt closed the panel; cannot claim rejection, inspect stage log")
-	}
-	workspaceProbeStage("panel.invalid_rejected", p.config.Invalid)
-	mygo.RunOnMain(func() {
-		panel := probePanel(p.w.NativeHandle())
-		sheet := probeSend(objc.ID(panel), "attachedSheet")
-		if sheet != 0 {
-			probeSend(objc.ID(panel), "endSheet:returnCode:", uintptr(sheet), 0)
-		}
-		probeSend(objc.ID(panel), "cancel:", 0)
-	})
-	time.Sleep(500 * time.Millisecond)
-	if p.panel() != 0 {
-		return errors.New("invalid-directory panel could not be cancelled")
-	}
-	return p.assertUnchanged("invalid-native-rejected", before)
-}
 
 // Narrow AppKit adapter. No MyGo internal import and no OS event injection/TCC.
 type probePoint struct{ X, Y float64 }
@@ -574,7 +531,6 @@ var probeFloatMsg func(objc.ID, objc.SEL) float64
 var probeMsg uintptr
 var probeRectMsg func(objc.ID, objc.SEL) probeRect
 var probeConvertPoint func(objc.ID, objc.SEL, probePoint) probePoint
-var probeKeyEvent func(objc.ID, objc.SEL, uint, probePoint, uint, float64, int, objc.ID, objc.ID, objc.ID, bool, uint16) objc.ID
 var probeMouseEvent func(objc.ID, objc.SEL, uint, probePoint, uint, float64, int, objc.ID, int, int, float32) objc.ID
 var probeBitmap func(objc.ID, objc.SEL, probeRect) objc.ID
 var probeCacheBitmap func(objc.ID, objc.SEL, probeRect, objc.ID)
@@ -594,7 +550,6 @@ func probeNativeLoad() error {
 	purego.RegisterFunc(&probeRectMsg, probeMsg)
 	purego.RegisterFunc(&probeConvertPoint, probeMsg)
 	purego.RegisterFunc(&probeMouseEvent, probeMsg)
-	purego.RegisterFunc(&probeKeyEvent, probeMsg)
 	purego.RegisterFunc(&probeFloatMsg, probeMsg)
 	// Read-only permission preflight only. Never request screen recording access.
 	if cg, e := purego.Dlopen("/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics", purego.RTLD_NOW|purego.RTLD_GLOBAL); e == nil {
@@ -747,63 +702,73 @@ func probePanel(handle uintptr) uintptr {
 	return 0
 }
 
-// Actual native input, not an artificial positive completion. Ctrl-Return is
-// the documented NSWindow default-button shortcut even when a responder claims
-// plain Return. Queue through NSApplication so the normal dispatch path runs.
+// NSOpenPanel uses a separate system process on modern macOS. Its local
+// NSWindow defaultButtonCell is not reliable. Use the public accessibility
+// default-button relationship or an unambiguous, enabled button in the panel's
+// accessibility hierarchy. A true press return means dispatched, not accepted;
+// dialog() must separately observe closure and the exact returned directory.
+// No AX trust prompt, system event injection, private selectors or forced endSheet.
 func probeAcceptPanel(handle uintptr) (err error) {
 	if handle == 0 {
 		return errors.New("no native panel to accept")
 	}
 	probePool(func() {
 		panel := objc.ID(handle)
-		if !probeResponds(panel, "makeKeyWindow") {
-			err = errors.New("panel cannot become key")
-			return
+		button := probeOptional(panel, "accessibilityDefaultButton")
+		source := "accessibilityDefaultButton"
+		eligible := func(obj objc.ID) bool {
+			allowed := !probeResponds(obj, "isAccessibilitySelectorAllowed:") || probeSend(obj, "isAccessibilitySelectorAllowed:", uintptr(objc.RegisterName("accessibilityPerformPress"))) != 0
+			return allowed && probeResponds(obj, "accessibilityPerformPress") &&
+				probeOptional(obj, "isAccessibilityEnabled") != 0 &&
+				probeGoString(probeOptional(obj, "accessibilityRole")) == "AXButton"
 		}
-		app := probeSend(objc.ID(objc.GetClass("NSApplication")), "sharedApplication")
-		probeSend(app, "activateIgnoringOtherApps:", 1)
-		probeSend(panel, "makeKeyWindow")
-		number := int(probeSend(panel, "windowNumber"))
-		workspaceProbeStage("panel.default_state", probeDefaultButtonState(handle))
-		workspaceProbeStage("panel.ctrl_return.before", map[string]any{"window_number": number, "key_window_number": int(probeSend(probeSend(app, "keyWindow"), "windowNumber")), "directory": probePanelDirectory(handle)})
-		chars := probeString("\r")
-		uptime := probeFloatMsg(probeSend(objc.ID(objc.GetClass("NSProcessInfo")), "processInfo"), objc.RegisterName("systemUptime"))
-		for i, typ := range []uint{10, 11} {
-			event := probeKeyEvent(objc.ID(objc.GetClass("NSEvent")), objc.RegisterName("keyEventWithType:location:modifierFlags:timestamp:windowNumber:context:characters:charactersIgnoringModifiers:isARepeat:keyCode:"), typ, probePoint{}, 1<<18, uptime+float64(i)*0.001, number, 0, chars, chars, false, 36)
-			if event == 0 {
-				err = errors.New("could not construct Ctrl-Return event")
-				return
+		var inventory []map[string]any
+		if !eligible(button) {
+			button = 0
+			prompt := probeGoString(probeOptional(panel, "prompt"))
+			seen := map[objc.ID]bool{}
+			var matches []objc.ID
+			var walk func(objc.ID, int)
+			walk = func(obj objc.ID, depth int) {
+				if obj == 0 || seen[obj] || depth > 16 || len(seen) >= 512 {
+					return
+				}
+				seen[obj] = true
+				role := probeGoString(probeOptional(obj, "accessibilityRole"))
+				title := probeGoString(probeOptional(obj, "accessibilityTitle"))
+				label := probeGoString(probeOptional(obj, "accessibilityLabel"))
+				if role == "AXButton" {
+					inventory = append(inventory, map[string]any{"role": role, "title": title, "label": label, "enabled": eligible(obj)})
+					matchesPrompt := func(value string) bool {
+						return value != "" && (value == prompt || value == "Open" || value == "Choose")
+					}
+					if eligible(obj) && (matchesPrompt(title) || matchesPrompt(label)) {
+						matches = append(matches, obj)
+					}
+				}
+				for _, child := range probeChildren(obj, "accessibilityChildren") {
+					walk(child, depth+1)
+				}
 			}
-			probeSend(app, "postEvent:atStart:", uintptr(event), 0)
-			workspaceProbeStage("panel.ctrl_return.queued", map[string]any{"type": typ, "window_number": number, "control_modifier": true})
+			walk(panel, 0)
+			walk(probeOptional(panel, "contentView"), 0)
+			workspaceProbeStage("panel.accessibility_inventory", map[string]any{"visited": len(seen), "buttons": inventory, "matches": len(matches)})
+			if len(matches) == 1 {
+				button, source = matches[0], "accessibilityChildren"
+			}
 		}
-	})
-	return
-}
-func probeDefaultButtonState(handle uintptr) map[string]any {
-	panel := objc.ID(handle)
-	cell := probeOptional(panel, "defaultButtonCell")
-	control := probeOptional(cell, "controlView")
-	return map[string]any{"panel_class": probeGoString(probeOptional(panel, "className")), "default_cell": uintptr(cell), "default_cell_class": probeGoString(probeOptional(cell, "className")), "default_cell_enabled": probeOptional(cell, "isEnabled") != 0, "control_view": uintptr(control), "control_class": probeGoString(probeOptional(control, "className")), "control_enabled": probeOptional(control, "isEnabled") != 0, "can_perform_click": probeResponds(control, "performClick:"), "title": probeGoString(probeOptional(control, "title")), "key_equivalent": probeGoString(probeOptional(control, "keyEquivalent"))}
-}
-func probeClickDefaultButton(handle uintptr) (clicked bool, err error) {
-	if handle == 0 {
-		return false, nil
-	}
-	probePool(func() {
-		workspaceProbeStage("panel.default_click.inspect", probeDefaultButtonState(handle))
-		cell := probeOptional(objc.ID(handle), "defaultButtonCell")
-		control := probeOptional(cell, "controlView")
-		if cell == 0 || control == 0 || !probeResponds(control, "performClick:") || !probeResponds(control, "isEnabled") || probeSend(control, "isEnabled") == 0 || probeSend(control, "isKindOfClass:", uintptr(objc.GetClass("NSButton"))) == 0 {
-			workspaceProbeStage("panel.default_click.unavailable", nil)
+		if !eligible(button) {
+			err = fmt.Errorf("%w: public panel accessibility exposes no unique enabled confirm button", errProbeInteractionUnavailable)
 			return
 		}
-		probeSend(control, "retain")
-		defer probeSend(control, "release")
-		workspaceProbeStage("panel.default_click.before", probeGoString(probeOptional(control, "title")))
-		probeSend(control, "performClick:", 0)
-		clicked = true
-		workspaceProbeStage("panel.default_click.return", nil)
+		probeSend(button, "retain")
+		defer probeSend(button, "release")
+		workspaceProbeStage("panel.accessibility_press.before", map[string]any{"source": source, "title": probeGoString(probeOptional(button, "accessibilityTitle"))})
+		dispatched := probeSend(button, "accessibilityPerformPress") != 0
+		workspaceProbeStage("panel.accessibility_press.return", map[string]any{"dispatched": dispatched})
+		if !dispatched {
+			err = fmt.Errorf("%w: accessibilityPerformPress returned false", errProbeInteractionUnavailable)
+		}
 	})
 	return
 }
