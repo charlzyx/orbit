@@ -7,12 +7,17 @@ import unittest
 
 HERE=Path(__file__).resolve().parent
 ROOT=HERE.parent.parent
+MANUAL_EXPRESSION="github.event_name == 'workflow_dispatch' && inputs.capture_chat_stage1 && '1' || '0'"
+ONE_SHOT_EXPRESSION="((github.event_name == 'workflow_dispatch' && inputs.capture_chat_stage1) || (github.event_name == 'push' && github.event.before == '00e685d1c0b13eebba068ab5119be0ef258ca59c' && github.event.head_commit.message == 'Capture static Chat stage 1 once (2026-10-25 verified wave4)')) && '1' || '0'"
 class Wiring(unittest.TestCase):
     def test_workflow_is_opt_in_and_same_two_renderers(self):
         s=(ROOT/'.github/workflows/go-native.yml').read_text()
         self.assertIn('capture_chat_stage1:',s);self.assertIn('default: false',s)
-        expression="ORBIT_CAPTURE_CHAT_STAGE1: ${{ github.event_name == 'workflow_dispatch' && inputs.capture_chat_stage1 && '1' || '0' }}"
-        self.assertEqual(s.count(expression),2)
+        expressions=[line.split('${{',1)[1].rsplit('}}',1)[0].strip()
+                     for line in s.splitlines() if 'ORBIT_CAPTURE_CHAT_STAGE1:' in line]
+        self.assertEqual(len(expressions),2)
+        self.assertEqual(expressions[0],expressions[1])
+        self.assertIn(expressions[0],(MANUAL_EXPRESSION,ONE_SHOT_EXPRESSION))
         self.assertEqual(s.count('"scripts/chat-native/**"'),2)
         self.assertEqual(s.count('"testdata/chat-native/**"'),2)
         self.assertIn("python3 -m unittest discover -s scripts/chat-native",s)
@@ -44,3 +49,36 @@ class Wiring(unittest.TestCase):
             waiter.join(2);self.assertEqual(matching.returncode,0);self.assertIsNotNone(child.poll())
         finally:
             if child.poll() is None:child.terminate();child.wait()
+
+
+class OneShotEventMatrix(unittest.TestCase):
+    def test_exact_workflow_expression_event_matrix(self):
+        source=(ROOT/'.github/workflows/go-native.yml').read_text()
+        expressions=[line.split('${{',1)[1].rsplit('}}',1)[0].strip()
+                     for line in source.splitlines() if 'ORBIT_CAPTURE_CHAT_STAGE1:' in line]
+        self.assertEqual(len(expressions),2)
+        self.assertEqual(expressions[0],expressions[1])
+        self.assertIn(expressions[0],(MANUAL_EXPRESSION,ONE_SHOT_EXPRESSION))
+        parent='00e685d1c0b13eebba068ab5119be0ef258ca59c'
+        title='Capture static Chat stage 1 once (2026-10-25 verified wave4)'
+        cases=[
+            ('planned push','push',False,parent,title,'1' if expressions[0]==ONE_SHOT_EXPRESSION else '0'),
+            ('normal push','push',False,'another-parent','Ordinary change','0'),
+            ('wrong parent','push',False,'another-parent',title,'0'),
+            ('wrong title','push',False,parent,'Ordinary change','0'),
+            ('title suffix','push',False,parent,title+' extra','0'),
+            ('manual false','workflow_dispatch',False,parent,title,'0'),
+            ('manual true','workflow_dispatch',True,'','', '1'),
+            ('pull request','pull_request',True,parent,title,'0'),
+            ('push ignores manual input','push',True,parent,'Ordinary change','0'),
+        ]
+        for label,event,manual,before,message,want in cases:
+            with self.subTest(label=label):
+                # Evaluate the actual YAML predicate, not a copied Python rule.
+                # Vocabulary is fixed above by the exact-expression assertion.
+                expression=expressions[0]
+                values={'github.event_name':event,'inputs.capture_chat_stage1':manual,
+                        'github.event.before':before,'github.event.head_commit.message':message}
+                for name,value in values.items(): expression=expression.replace(name,repr(value))
+                expression=expression.replace('&&',' and ').replace('||',' or ')
+                self.assertEqual(eval(expression,{'__builtins__':{}},{}),want)

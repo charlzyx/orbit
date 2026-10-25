@@ -91,3 +91,19 @@ app. Current local evidence uses Pi1.4.0 on Node24.22.1; the approved hosted
 Node22.23.4 combination still needs execution after review. No native window
 capture has been executed by this worker. The reviewed opt-in workflow is included in this source batch; an exact-commit
 hosted run is still pending. A passing fixture/protocol test is not native rendering acceptance.
+
+## Temporary single-push capture exception
+
+A separate test-only commit temporarily also enables both renderers when the
+push's exact `before` SHA is `00e685d1c0b13eebba068ab5119be0ef258ca59c` and its exact
+head commit message is `Capture static Chat stage 1 once (2026-10-25 verified wave4)`.
+All other pushes and PRs remain off; manual boolean dispatch is unchanged.
+This does not authorize a rerun, provider calls, Context, hover or selection.
+
+After this one hosted run is recorded and inspected, the next ordinary source
+commit must remove the push disjunct from both renderer env values, restoring
+`github.event_name == 'workflow_dispatch' && inputs.capture_chat_stage1 && '1' || '0'`.
+Keep the event-matrix tests: they accept the restored manual-only expression
+and then require the former matching push to be off too. The marker is test
+history, not a permanent enabled path. Record the actual run URL and outcome
+in the migration evidence; no run has been dispatched by this local diff.
