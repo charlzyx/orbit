@@ -52,3 +52,42 @@ Pi 启动时仍可执行正常配置迁移、认证刷新及设置/模型缓存�
 选择工作区后无响应的问题尚未确认修复，整体迁移和像素对齐仍未完成。
 测试版未进行 Developer ID 签名和公证；如果系统阻止打开，请停止并反馈提示，
 不要降低系统安全设置。
+
+Publisher safety preflight and diagnostics (offline-tested candidate)
+-----------------------------------------------------------------
+Before its first write, publish-prerelease.py reads the exact feature ref
+refs/heads/redesign/mygo-rpc and requires a commit object whose SHA equals
+GITHUB_SHA. A failed read, malformed ref or moved head stops without writing.
+The check is repeated immediately before publishing the owned draft. An already
+complete exact release still follows the existing read-only idempotent path.
+These GETs are not an atomic lock: keep the feature branch frozen/serialized
+through publication. A later head move or API error can leave a draft/uploads;
+there is no automatic retry, resume, cleanup, permission change or ref force.
+
+HTTP diagnostics report only the initiating request's fixed stage, method,
+allowlisted host/path, HTTP status and fixed error category. Query strings,
+headers, tokens, arbitrary response messages/errors/documentation URLs, raw
+bodies and gh stderr are never echoed. HTTP error JSON is read at most4097bytes
+and used only for a fixed-message category allowlist; oversize/malformed/unknown
+content yields a generic category. gh stderr is captured, not inherited.
+
+Immediately after a create response passes exact draft/prerelease/tag/source,
+empty-assets and positive-integer-ID checks, a flushed publisher_owned_draft JSON
+line records only repository, exact returned ID and the validated local tag/SHA.
+This precedes uploads, so a later failure retains an inspectable owned ID in logs.
+Malformed or identity-mismatched responses never claim ownership or log a remote
+object; absence of this receipt does NOT prove the create request had no effect.
+Inspect uncertain outcomes before another action. Original source/checksum,
+asset ID, tag/ref, fingerprint and final readback checks remain in force.
+
+This change does not establish why an earlier publish request returned403 and
+does not grant or repair workflow/token permissions. A moved branch was only a
+hypothesis. No live publishing operation is part of these tests.
+
+Offline coverage: the existing CI entry test_app_package.py now executes all
+39 tests (all previous31 retained, eight additions); discovery includes five
+Go-icon tests for44 total. Separate legacy package tests21PASS. Exact recording
+fixtures cover no-write head failures, moved head after verified uploads stopping
+PATCH, immediate valid-ID receipt, invalid response rejection, and poisoned
+HTTP/CLI/transport errors with no secret output. No new workflow trigger or
+permission, credentials, marker, auxiliary ref, Go build or full suite is added.

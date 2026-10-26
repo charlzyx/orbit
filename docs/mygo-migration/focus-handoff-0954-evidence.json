@@ -1,0 +1,160 @@
+{
+  "base_commit": "565b3592fc7c092573374f8f8ba78402cac7f678",
+  "package": "github.com/charlzyx/orbit/internal/ui",
+  "focused_log": "/tmp/orbit-focus-handoff-final-0954.jsonl",
+  "expected_source_test_names": [
+    "TestAuditPaletteEscapeFromSidebarHandsFocusToComposer",
+    "TestAuditSidebarHideHandsFocusToComposer",
+    "TestFocusHandoffPaletteCommandKeepsDestination",
+    "TestFocusHandoffPaletteOffChatDoesNotNavigate",
+    "TestFocusHandoffSidebarDoesNotStealOtherInput",
+    "TestFocusHandoffSidebarPointerAndEmpty",
+    "TestFocusHandoffSidebarPreservesNativeComposition",
+    "TestFocusHandoffSidebarPreservesRealTerminal",
+    "TestModalTransitionRestoresComposerFocus",
+    "TestNativeMenuCannotMutateBehindModal",
+    "TestSourceSidebarMountedShortcutsUseDisplayedFilteredOrder",
+    "TestWorkbenchEmptySidebarRemainsReachable",
+    "TestWorkbenchModalAndAutocompleteOwnTab",
+    "TestWorkbenchSurfaceReturnPreservesComposerSelection",
+    "TestWorkbenchTerminalOwnsTabAndBacktabInRealPTY"
+  ],
+  "actual_counts": {
+    "TestAuditSidebarHideHandsFocusToComposer": {
+      "run": 3,
+      "output": 9,
+      "pass": 3
+    },
+    "TestAuditPaletteEscapeFromSidebarHandsFocusToComposer": {
+      "run": 3,
+      "output": 9,
+      "pass": 3
+    },
+    "TestFocusHandoffSidebarPointerAndEmpty": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestFocusHandoffSidebarPointerAndEmpty/list": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestFocusHandoffSidebarPointerAndEmpty/empty": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestFocusHandoffSidebarDoesNotStealOtherInput": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestFocusHandoffPaletteCommandKeepsDestination": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestFocusHandoffPaletteOffChatDoesNotNavigate": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestFocusHandoffSidebarPreservesNativeComposition": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestFocusHandoffSidebarPreservesRealTerminal": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestWorkbenchModalAndAutocompleteOwnTab": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestWorkbenchTerminalOwnsTabAndBacktabInRealPTY": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestWorkbenchEmptySidebarRemainsReachable": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestWorkbenchSurfaceReturnPreservesComposerSelection": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestNativeMenuCannotMutateBehindModal": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestNativeMenuCannotMutateBehindModal/prompt": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestNativeMenuCannotMutateBehindModal/confirm": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestNativeMenuCannotMutateBehindModal/custom": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestNativeMenuCannotMutateBehindModal/secret": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestNativeMenuCannotMutateBehindModal/json": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestNativeMenuCannotMutateBehindModal/image": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestNativeMenuCannotMutateBehindModal/palette": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestNativeMenuCannotMutateBehindModal/model": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestModalTransitionRestoresComposerFocus": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestSourceSidebarMountedShortcutsUseDisplayedFilteredOrder": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    }
+  },
+  "top_level_count": 15,
+  "with_subtests": 25,
+  "skip": 0,
+  "fail": 0,
+  "vet_exit": 0,
+  "vet_log": "/tmp/orbit-focus-handoff-vet-0954.log",
+  "darwin_arm64_exit": 0,
+  "arm64_log": "/tmp/orbit-focus-handoff-arm64-0954.log",
+  "arm64_sha256": "f2f927499d570b855a5a67396d360702c7829e903d516b8d255e380e9143c807",
+  "full_suite": "NOT_RUN",
+  "physical_native_input": "NOT_RUN"
+}

@@ -181,6 +181,9 @@ func (a *App) command(id, value string) {
 		a.composer.Focus()
 	case "ToggleCommandPalette":
 		a.paletteOpen = !a.paletteOpen
+		if !a.paletteOpen {
+			a.focusAfterPaletteDismiss()
+		}
 		a.paletteQuery = ""
 		a.commandCursor = 0
 	case "ToggleSearch":

@@ -1,0 +1,76 @@
+// Withdrawn diagnostic expectation: baseline and CancelFocus also fail due to default Chat AutoFocus. Not a production regression contract. Exact original assertions retained.
+
+func TestFocusHandoffQueuedPageDoesNotLeaveDeferredOldFocus(t *testing.T) {
+	a := sourceSidebarFixture(t)
+	showNew := false
+	other := ""
+	a.Options.Overlay = func(c *ui.Context) {
+		if showNew {
+			ui.TextInput(c, &other).Label("Persistent new owner input").AutoFocus().Absolute().Left(900).Top(40).Size(180, 26)
+		}
+	}
+	tt := ui.NewTester(a.View, 1470, 922)
+	tt.Key(ui.Cmd|ui.Shift, ui.KeyB)
+	tt.Frame()
+	a.SidebarVisible = false
+	a.updates <- func() {
+		s := a.Model
+		s.RuntimeID = "new-runtime"
+		s.SessionID = "new-owner"
+		a.SetSnapshot(s)
+		a.Navigate("settings")
+		showNew = true
+	}
+	tt.Frame()
+	tt.Frame()
+	if !tt.Focused("Persistent new owner input") {
+		t.Fatal("new owner input not focused")
+	}
+	// The destination input remains mounted and focused while the underlying
+	// page changes; an old hidden handle request must not steal it later.
+	a.Navigate("chat")
+	tt.Frame()
+	tt.Frame()
+	tt.Type("new input")
+	if !tt.Focused("Persistent new owner input") || other != "new input" || a.Draft != "" {
+		t.Fatalf("deferred old focus retargeted: focused=%v other=%q draft=%q", tt.Focused("Persistent new owner input"), other, a.Draft)
+	}
+}
+
+func TestFocusHandoffQueuedPageCancelFocusControl(t *testing.T) {
+	a := sourceSidebarFixture(t)
+	showNew := false
+	other := ""
+	a.Options.Overlay = func(c *ui.Context) {
+		if showNew {
+			ui.TextInput(c, &other).Label("Persistent new owner input").AutoFocus().Absolute().Left(900).Top(40).Size(180, 26)
+		}
+	}
+	tt := ui.NewTester(a.View, 1470, 922)
+	tt.Key(ui.Cmd|ui.Shift, ui.KeyB)
+	tt.Frame()
+	a.SidebarVisible = false
+	a.updates <- func() {
+		s := a.Model
+		s.RuntimeID = "new-runtime"
+		s.SessionID = "new-owner"
+		a.SetSnapshot(s)
+		a.Navigate("settings")
+		showNew = true
+	}
+	tt.Frame()
+	tt.Frame()
+	if !tt.Focused("Persistent new owner input") {
+		t.Fatal("new owner input not focused")
+	}
+	// The destination input remains mounted and focused while the underlying
+	// page changes; an old hidden handle request must not steal it later.
+	a.composer.CancelFocus()
+	a.Navigate("chat")
+	tt.Frame()
+	tt.Frame()
+	tt.Type("new input")
+	if !tt.Focused("Persistent new owner input") || other != "new input" || a.Draft != "" {
+		t.Fatalf("deferred old focus retargeted: focused=%v other=%q draft=%q", tt.Focused("Persistent new owner input"), other, a.Draft)
+	}
+}

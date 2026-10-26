@@ -36,6 +36,7 @@ func (a *App) customModal(c *ui.Context, open *bool, width float32, fn func()) {
 	})
 }
 func (a *App) commandPalette(c *ui.Context) {
+	selectedCommand := false
 	a.modal(c.Key("command-palette"), &a.paletteOpen, 620, func() {
 		type result struct{ title, icon, command, value string }
 		var results []result
@@ -56,7 +57,8 @@ func (a *App) commandPalette(c *ui.Context) {
 				if a.commandCursor >= 0 && a.commandCursor < len(results) {
 					r := results[a.commandCursor]
 					a.paletteOpen = false
-					a.command(r.command, r.value)
+					selectedCommand = true
+					a.runPaletteCommand(r.command, r.value)
 				}
 				return true
 			}
@@ -92,17 +94,51 @@ func (a *App) commandPalette(c *ui.Context) {
 			r := results[i]
 			b := a.button(c, r.title, r.icon, i == a.commandCursor).AlignSelf(ui.Stretch).Height(36)
 			if b.Clicked() {
-				a.command(r.command, r.value)
+				selectedCommand = true
+				a.runPaletteCommand(r.command, r.value)
 				a.paletteOpen = false
 			}
 		}).Height(420)
 		if list.Submitted() && a.commandCursor >= 0 && a.commandCursor < len(results) {
 			r := results[a.commandCursor]
-			a.command(r.command, r.value)
+			selectedCommand = true
+			a.runPaletteCommand(r.command, r.value)
 			a.paletteOpen = false
 		}
 	})
+	if !a.paletteOpen {
+		if !selectedCommand {
+			// Rust pickers.rs: dismiss returns to composer, even from sidebar.
+			a.focusAfterPaletteDismiss()
+		}
+	}
 }
+
+// Rust focuses its current composer immediately; MyGo Handle.Focus waits
+// for hidden bindings. Do not turn a dismissal into a future-page request.
+func (a *App) composerVisibleForFocus() bool {
+	return a.page == "chat" && !a.reviewFull() && !a.setupBlocked()
+}
+
+func (a *App) focusAfterPaletteDismiss() {
+	a.restoreComposerAfterModal = false
+	if a.composerVisibleForFocus() {
+		a.composer.Focus()
+	}
+}
+
+// TextKey callbacks run after the view builder; revoke the old palette's
+// restoration in the actual dispatch, not only after building the dialog.
+func (a *App) runPaletteCommand(id, value string) {
+	restore := a.restoreComposerAfterModal
+	a.paletteOpen = false
+	a.restoreComposerAfterModal = false
+	a.command(id, value)
+	if a.modalOpen() {
+		a.restoreComposerAfterModal = restore
+	}
+}
+
 func (a *App) modelPicker(c *ui.Context) {
 	a.modal(c.Key("model-picker"), &a.modelOpen, 620, func() {
 		ui.Text(c, "Choose model").FontSize(18).FontWeight(600)

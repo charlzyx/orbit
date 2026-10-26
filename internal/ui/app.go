@@ -459,9 +459,24 @@ func (a *App) flushFilesOnLeave(next string) {
 	}
 }
 func (a *App) View(c *ui.Context) {
+	// Observe the hide intent before owner completions, but never leave a
+	// deferred focus request on a composer belonging to a replacement page/task.
+	sidebarFocused := func() bool { return a.sessionList.Handle.FocusWithin(c) || a.surfaceFocus.emptySidebar.Focused(c) }
+	handoff := !a.SidebarVisible && sidebarFocused()
+	var handoffOwner inlineImageToken
+	handoffPage := a.page
+	if handoff {
+		handoffOwner = a.inlineImageToken()
+	}
 	a.pruneComposerModeMenu()
 	a.workspaceActions.rendered = false
 	a.drainUpdates()
+	if handoff && !a.SidebarVisible && a.page == handoffPage && a.ownsInlineImage(handoffOwner) && sidebarFocused() {
+		a.sessionCursor = -1
+		if a.composerVisibleForFocus() {
+			a.composer.Focus()
+		}
+	}
 	a.pruneAttachmentPaths()
 	a.pruneAttachmentImages()
 	if target := a.workspaceActions.target; a.workspaceActions.open && (target == nil || a.workspaceEntry(target.Path) != target) {
@@ -596,7 +611,7 @@ func (a *App) sidebar(c *ui.Context) {
 	sidebar.Children(func() {
 		ui.Row(c).DragWindow().Height(HeaderHeight).PaddingX(12).Gap(8).AlignItems(ui.Center).Children(func() {
 			ui.Spacer(c)
-			if a.iconButton(c, "Toggle sidebar", "icons/layout-left.svg").Clicked() {
+			if a.iconButton(c, "Toggle sidebar", "icons/layout-left.svg").KeepFocus().Clicked() {
 				a.SidebarVisible = false
 			}
 			if a.iconButton(c, "Back", "icons/arrow-left.svg").Clicked() {

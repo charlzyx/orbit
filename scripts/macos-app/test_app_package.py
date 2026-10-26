@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Offline contract tests. No remote writes and no native macOS execution."""
-import unittest,tempfile,json,hashlib,os,subprocess,importlib.util
+import unittest,tempfile,json,hashlib,os,subprocess,importlib.util,contextlib,io,urllib.error
 from pathlib import Path
 from common import LEGACY
 import bundle,smoke
-from unittest.mock import patch
+from unittest.mock import patch,Mock
 import common as package
 spec=importlib.util.spec_from_file_location('publisher',Path(__file__).with_name('publish-prerelease.py'));pub=importlib.util.module_from_spec(spec);spec.loader.exec_module(pub)
 spec=importlib.util.spec_from_file_location('assembler',Path(__file__).with_name('assemble-release.py'));assembler=importlib.util.module_from_spec(spec);spec.loader.exec_module(assembler)
@@ -149,7 +149,7 @@ class PackagingTests(unittest.TestCase):
  def lifecycle(self,mode):
   import contextlib,copy
   with tempfile.TemporaryDirectory() as d:
-   r=Path(d);commit,version=self.fixture_assets(r);expected=pub.local_assets(r,commit,version);tag='macos-test-v'+version;calls=[];uploaded=[];api_reads=0
+   r=Path(d);commit,version=self.fixture_assets(r);expected=pub.local_assets(r,commit,version);tag='macos-test-v'+version;calls=[];uploaded=[];api_reads=0;head_reads=0
    empty={'id':17,'tag_name':tag,'target_commitish':commit,'draft':True,'prerelease':True,'assets':[],'html_url':'https://github.com/charlzyx/orbit/releases/tag/'+tag}
    def mutation(method,path,payload):
     calls.append((method,path,payload))
@@ -160,7 +160,10 @@ class PackagingTests(unittest.TestCase):
     if mode=='upload-failure' and uploaded:raise RuntimeError('Synthetic upload failed')
     a={'id':100+len(uploaded),'name':path.name,'size':path.stat().st_size,'updated_at':'fixed','state':'uploaded'};uploaded.append(a);return dict(a)
    def read(path):
-    nonlocal api_reads
+    nonlocal api_reads,head_reads
+    if path=='repos/charlzyx/orbit/git/ref/heads/redesign/mygo-rpc':
+     head_reads+=1
+     return {'ref':'refs/heads/redesign/mygo-rpc','object':{'type':'commit','sha':'b'*40 if mode=='head-moved' and head_reads==2 else commit}}
     self.assertTrue(path.endswith('/releases/17'));api_reads+=1;snapshot=copy.deepcopy(empty);snapshot['assets']=copy.deepcopy(uploaded)
     if api_reads==2 and mode=='replacement':snapshot['id']=99
     if api_reads==2 and mode=='asset-tamper':snapshot['assets'][0]['id']=999
@@ -171,10 +174,16 @@ class PackagingTests(unittest.TestCase):
    with contextlib.ExitStack() as stack:
     for ctx in [patch.dict(os.environ,{'GITHUB_EVENT_NAME':'push','GITHUB_REF':'refs/heads/redesign/mygo-rpc','GITHUB_REPOSITORY':'charlzyx/orbit','GITHUB_SHA':commit}),patch.object(pub,'git',side_effect=[commit,'']),patch.object(pub,'marker',return_value={'version':version}),patch.object(pub,'find_release',return_value=None),patch.object(pub,'optional_ref',side_effect=refs),patch.object(pub,'rest_json',side_effect=mutation),patch.object(pub,'upload_asset',side_effect=upload),patch.object(pub,'api',side_effect=read),patch.object(pub,'download_asset',side_effect=download)]:stack.enter_context(ctx)
     if mode=='success':pub.main(r,r)
+    elif mode=='head-moved':
+     output=io.StringIO()
+     with contextlib.redirect_stdout(output),self.assertRaisesRegex(RuntimeError,'head-mismatch'):pub.main(r,r)
+     self.assertEqual(json.loads(output.getvalue()),{'publisher_owned_draft':{'repository':'charlzyx/orbit','id':17,'source_commit':commit,'tag':tag}})
+     self.assertEqual(head_reads,2);self.assertEqual(api_reads,2);self.assertEqual(len(uploaded),len(expected))
     else:
      with self.assertRaises(RuntimeError):pub.main(r,r)
    self.assertEqual([c[0] for c in calls],['POST','PATCH'] if mode=='success' else ['POST'])
    self.assertTrue(all('/releases/99' not in c[1] for c in calls))
+ def test_head_move_after_upload_stops_publication(self):self.lifecycle('head-moved')
  def test_new_release_success_by_owned_id(self):self.lifecycle('success')
  def test_replacement_draft_never_published(self):self.lifecycle('replacement')
  def test_asset_tamper_stops_before_publish(self):self.lifecycle('asset-tamper')
@@ -236,5 +245,88 @@ class PackagingTests(unittest.TestCase):
    with self.assertRaisesRegex(ValueError,'Audit-only'):bundle.verify_runtime(r,'arm64')
  def test_runtime_safe_extraction(self):
   subprocess.run([os.sys.executable,str(HERE/'runtime/test_prepare_runtime.py')],check=True)
+class PublishSafetyTests(unittest.TestCase):
+ def setup_main(self,stack,root,head):
+  commit,version=PackagingTests().fixture_assets(root)
+  (root/'RELEASE-NOTES.md').write_text('fixture notes')
+  for item in [patch.dict(os.environ,{'GITHUB_EVENT_NAME':'push','GITHUB_REF':'refs/heads/redesign/mygo-rpc','GITHUB_REPOSITORY':'charlzyx/orbit','GITHUB_SHA':commit}),patch.object(pub,'git',side_effect=[commit,'']),patch.object(pub,'marker',return_value={'version':version}),patch.object(pub,'find_release',return_value=None),patch.object(pub,'optional_ref',return_value=None)]:stack.enter_context(item)
+  read=stack.enter_context(patch.object(pub,'api',side_effect=head))
+  return commit,version,read
+ def test_mismatched_or_failed_head_never_writes(self):
+  for answer in [RuntimeError('SECRET-read-detail'),{'ref':'refs/heads/redesign/mygo-rpc','object':{'type':'commit','sha':'b'*40}}, {'ref':'refs/heads/other','object':{'type':'commit','sha':'a'*40}}, {'ref':'refs/heads/redesign/mygo-rpc','object':{'type':'tag','sha':'a'*40}},None]:
+   with self.subTest(answer=type(answer).__name__),tempfile.TemporaryDirectory() as folder,contextlib.ExitStack() as stack:
+    def head(path):
+     if isinstance(answer,Exception):raise answer
+     return answer
+    self.setup_main(stack,Path(folder),head)
+    mutate=stack.enter_context(patch.object(pub,'rest_json',side_effect=AssertionError('write forbidden')))
+    upload=stack.enter_context(patch.object(pub,'upload_asset',side_effect=AssertionError('upload forbidden')))
+    with self.assertRaises(pub.SafeAPIError) as error:pub.main(Path(folder),Path(folder))
+    self.assertNotIn('SECRET',str(error.exception));self.assertIn('feature-head-preflight',str(error.exception));mutate.assert_not_called();upload.assert_not_called()
+ def test_owned_draft_receipt_precedes_upload_failure(self):
+  with tempfile.TemporaryDirectory() as folder,contextlib.ExitStack() as stack:
+   root=Path(folder);events=[];output=io.StringIO()
+   def head(path):events.append('head');return {'ref':'refs/heads/redesign/mygo-rpc','object':{'type':'commit','sha':'a'*40}}
+   commit,version,_=self.setup_main(stack,root,head)
+   def create(method,path,payload):
+    events.append('create');return {'id':17,'draft':True,'prerelease':True,'tag_name':'macos-test-v'+version,'target_commitish':commit,'assets':[],'private-detail':'SECRET'}
+   def upload(*args):
+    events.append('upload');self.assertIn('"id": 17',output.getvalue());raise RuntimeError('synthetic upload failure')
+   stack.enter_context(patch.object(pub,'rest_json',side_effect=create));stack.enter_context(patch.object(pub,'upload_asset',side_effect=upload));stack.enter_context(contextlib.redirect_stdout(output))
+   with self.assertRaisesRegex(RuntimeError,'synthetic upload failure'):pub.main(root,root)
+   receipt=json.loads(output.getvalue())['publisher_owned_draft']
+   self.assertEqual(receipt,{'repository':'charlzyx/orbit','id':17,'source_commit':commit,'tag':'macos-test-v'+version});self.assertNotIn('SECRET',output.getvalue());self.assertEqual(events,['head','create','upload'])
+ def test_invalid_draft_id_or_identity_is_not_recorded_or_uploaded(self):
+  for field,value in [('id',True),('id',0),('id',-1),('id','17'),('id',None),('draft',False),('draft','true'),('prerelease','true'),('assets',None),('target_commitish','b'*40)]:
+   with self.subTest(field=field,value=value),tempfile.TemporaryDirectory() as folder,contextlib.ExitStack() as stack:
+    commit,version,_=self.setup_main(stack,Path(folder),lambda p:{'ref':'refs/heads/redesign/mygo-rpc','object':{'type':'commit','sha':'a'*40}})
+    draft={'id':17,'draft':True,'prerelease':True,'tag_name':'macos-test-v'+version,'target_commitish':commit,'assets':[]};draft[field]=value
+    stack.enter_context(patch.object(pub,'rest_json',return_value=draft));upload=stack.enter_context(patch.object(pub,'upload_asset',side_effect=AssertionError('no upload')));out=stack.enter_context(contextlib.redirect_stdout(io.StringIO()))
+    with self.assertRaisesRegex(RuntimeError,'draft could not be established'):pub.main(Path(folder),Path(folder))
+    self.assertEqual(out.getvalue(),'');upload.assert_not_called()
+ def test_http_diagnostics_do_not_echo_any_secret_fields(self):
+  secret='SYNTHETIC-TOKEN-PRIVATE'
+  for message,category in [('Resource not accessible by integration','integration-permission'),(secret,'http-error')]:
+   for method,url,stage in [('POST','https://api.github.com/repos/charlzyx/orbit/releases?secret='+secret,'create-draft'),('POST','https://uploads.github.com/repos/charlzyx/orbit/releases/17/assets?name='+secret,'upload-asset'),('PATCH','https://api.github.com/repos/charlzyx/orbit/releases/17','publish-prerelease')]:
+    with self.subTest(method=method,stage=stage,message=category):
+     body=io.BytesIO(json.dumps({'message':message,'errors':[secret],'documentation_url':'https://private/'+secret}).encode())
+     error=urllib.error.HTTPError('https://private/'+secret,403,secret,{'Secret':secret},body)
+     with patch.dict(os.environ,{'GH_TOKEN':secret}),patch.object(pub.urllib.request,'build_opener',return_value=Mock(open=Mock(side_effect=error))),contextlib.redirect_stdout(io.StringIO()) as out,contextlib.redirect_stderr(io.StringIO()) as err:
+      with self.assertRaises(pub.SafeAPIError) as failure:pub.request(method,url)
+     text=str(failure.exception)+out.getvalue()+err.getvalue();self.assertNotIn(secret,text);self.assertNotIn('?',text);self.assertIn('stage='+stage,text);self.assertIn('status=403',text);self.assertIn('category='+category,text)
+ def test_error_body_is_bounded_and_arbitrary_paths_redacted(self):
+  class Body(io.BytesIO):
+   def read(self,size=-1):
+    if size!=4097:raise AssertionError('unbounded body read')
+    return super().read(size)
+  error=urllib.error.HTTPError('https://private',403,'SECRET',{},Body(b'x'*10000))
+  self.assertEqual(pub.http_category(error),'http-error')
+  self.assertNotIn('SECRET',pub.diagnostic('GET','https://api.github.com/SECRET?token=SECRET',403,'SECRET'))
+ def test_gh_read_diagnostics_capture_stderr_without_echo(self):
+  secret='SYNTHETIC-SECRET'
+  failure=subprocess.CalledProcessError(1,['gh','api'],output=secret,stderr='HTTP 403 '+secret)
+  with patch.object(pub.subprocess,'check_output',side_effect=failure) as command:
+   with self.assertRaises(pub.SafeAPIError) as error:pub.api('repos/charlzyx/orbit/git/ref/heads/redesign/mygo-rpc')
+  self.assertEqual(command.call_args.kwargs['stderr'],subprocess.PIPE);self.assertNotIn(secret,str(error.exception));self.assertIn('status=403',str(error.exception))
+  with patch.object(pub.subprocess,'run',return_value=Mock(returncode=1,stdout=secret,stderr='HTTP 403 '+secret)):
+   with self.assertRaises(pub.SafeAPIError) as error:pub.optional_ref('charlzyx/orbit','macos-test-v0.2.12-go-test.20261026.4')
+  self.assertNotIn(secret,str(error.exception));self.assertIn('tag-lookup',str(error.exception))
+
+
+ def test_transport_failure_and_userinfo_never_echo_secrets(self):
+  secret='SYNTHETIC-TRANSPORT-SECRET'
+  with patch.dict(os.environ,{'GH_TOKEN':secret}),patch.object(pub.urllib.request,'build_opener',return_value=Mock(open=Mock(side_effect=urllib.error.URLError(secret)))):
+   with self.assertRaises(pub.SafeAPIError) as error:pub.request('POST','https://api.github.com/repos/charlzyx/orbit/releases')
+  self.assertNotIn(secret,str(error.exception));self.assertIn('transport-error',str(error.exception))
+  with patch.object(pub.urllib.request,'build_opener',side_effect=AssertionError('no connection')):
+   with self.assertRaisesRegex(RuntimeError,'Unexpected GitHub API destination'):pub.request('GET','https://'+secret+'@api.github.com/repos/charlzyx/orbit/releases')
+
+ def test_explicit_destination_ports_rejected_before_connection(self):
+  for host in ['api.github.com','uploads.github.com']:
+   for port in [443,8443]:
+    with self.subTest(host=host,port=port),patch.object(pub.urllib.request,'build_opener') as opener:
+     with self.assertRaisesRegex(RuntimeError,'Unexpected GitHub API destination'):pub.request('POST',f'https://{host}:{port}/repos/charlzyx/orbit/releases')
+     opener.assert_not_called()
+
 if __name__=='__main__':unittest.main(verbosity=2)
 

@@ -1,0 +1,234 @@
+{
+  "base_commit": "565b3592fc7c092573374f8f8ba78402cac7f678",
+  "package": "github.com/charlzyx/orbit/internal/ui",
+  "expected_source_test_names": [
+    "TestAuditPaletteEscapeFromSidebarHandsFocusToComposer",
+    "TestAuditSidebarHideHandsFocusToComposer",
+    "TestFocusHandoffHiddenComposerSidebarLeavesNoDeferredRequest",
+    "TestFocusHandoffOffChatPaletteLeavesNoDeferredRequest",
+    "TestFocusHandoffPaletteCommandKeepsDestination",
+    "TestFocusHandoffPaletteDispatchExactlyOnce",
+    "TestFocusHandoffPaletteOffChatDoesNotNavigate",
+    "TestFocusHandoffQueuedOwnerDoesNotApplyOldHideIntent",
+    "TestFocusHandoffQueuedPageLeavesNoPendingHandleRequest",
+    "TestFocusHandoffQueuedPagePreservesCurrentInput",
+    "TestFocusHandoffSidebarDoesNotStealOtherInput",
+    "TestFocusHandoffSidebarPointerAndEmpty",
+    "TestFocusHandoffSidebarPreservesNativeComposition",
+    "TestFocusHandoffSidebarPreservesRealTerminal",
+    "TestModalTransitionRestoresComposerFocus",
+    "TestNativeMenuCannotMutateBehindModal",
+    "TestSourceSidebarMountedShortcutsUseDisplayedFilteredOrder",
+    "TestWorkbenchEmptySidebarRemainsReachable",
+    "TestWorkbenchModalAndAutocompleteOwnTab",
+    "TestWorkbenchSurfaceReturnPreservesComposerSelection",
+    "TestWorkbenchTerminalOwnsTabAndBacktabInRealPTY"
+  ],
+  "count": 3,
+  "focused_log": "/tmp/orbit-focus-handoff-final-v4-1017.jsonl",
+  "actual_counts": {
+    "TestAuditPaletteEscapeFromSidebarHandsFocusToComposer": {
+      "run": 3,
+      "output": 9,
+      "pass": 3
+    },
+    "TestAuditSidebarHideHandsFocusToComposer": {
+      "run": 3,
+      "output": 9,
+      "pass": 3
+    },
+    "TestFocusHandoffHiddenComposerSidebarLeavesNoDeferredRequest": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestFocusHandoffHiddenComposerSidebarLeavesNoDeferredRequest/full_Review": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestFocusHandoffHiddenComposerSidebarLeavesNoDeferredRequest/setup": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestFocusHandoffOffChatPaletteLeavesNoDeferredRequest": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestFocusHandoffPaletteCommandKeepsDestination": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestFocusHandoffPaletteDispatchExactlyOnce": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestFocusHandoffPaletteDispatchExactlyOnce/Enter": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestFocusHandoffPaletteDispatchExactlyOnce/pointer": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestFocusHandoffPaletteOffChatDoesNotNavigate": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestFocusHandoffQueuedOwnerDoesNotApplyOldHideIntent": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestFocusHandoffQueuedPageLeavesNoPendingHandleRequest": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestFocusHandoffQueuedPageLeavesNoPendingHandleRequest/CancelFocus_negative": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestFocusHandoffQueuedPageLeavesNoPendingHandleRequest/candidate": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestFocusHandoffQueuedPageLeavesNoPendingHandleRequest/explicit_Focus_positive": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestFocusHandoffQueuedPagePreservesCurrentInput": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestFocusHandoffSidebarDoesNotStealOtherInput": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestFocusHandoffSidebarPointerAndEmpty": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestFocusHandoffSidebarPointerAndEmpty/empty": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestFocusHandoffSidebarPointerAndEmpty/list": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestFocusHandoffSidebarPreservesNativeComposition": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestFocusHandoffSidebarPreservesRealTerminal": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestModalTransitionRestoresComposerFocus": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestNativeMenuCannotMutateBehindModal": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestNativeMenuCannotMutateBehindModal/confirm": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestNativeMenuCannotMutateBehindModal/custom": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestNativeMenuCannotMutateBehindModal/image": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestNativeMenuCannotMutateBehindModal/json": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestNativeMenuCannotMutateBehindModal/model": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestNativeMenuCannotMutateBehindModal/palette": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestNativeMenuCannotMutateBehindModal/prompt": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestNativeMenuCannotMutateBehindModal/secret": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestSourceSidebarMountedShortcutsUseDisplayedFilteredOrder": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestWorkbenchEmptySidebarRemainsReachable": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestWorkbenchModalAndAutocompleteOwnTab": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestWorkbenchSurfaceReturnPreservesComposerSelection": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestWorkbenchTerminalOwnsTabAndBacktabInRealPTY": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    }
+  },
+  "actual_top_level_names": 21,
+  "actual_total_names": 38,
+  "elapsed_seconds": 45.022,
+  "statuses": "focused:0\nvet:0\narm64:0\n",
+  "scope": "Focused mounted tests only; no full suite or hosted-native run",
+  "supersedes": "Initial a42 and v2/v3 focus candidates; historical logs remain preserved",
+  "logs_sha256": {
+    "/tmp/orbit-focus-handoff-final-v4-1017.jsonl": "837e736d98b91150eed8346ea3d900d301f8d451d4a3c04e48c6ae38516a5e76",
+    "/tmp/orbit-focus-handoff-final-v4-1017.status": "d68d6bd807836ddd527201d1a819c2c4f07c15c1d15f06264392d4dd75969f3c",
+    "/tmp/orbit-focus-handoff-vet-v4-1017.log": "9da2d27b7ee72dd6c6d7e2ae1b7563cfb188c722afb006b10f70efacf395b90a",
+    "/tmp/orbit-focus-handoff-arm64-v4-1017.log": "9da2d27b7ee72dd6c6d7e2ae1b7563cfb188c722afb006b10f70efacf395b90a",
+    "/tmp/orbit-focus-hidden-sidebar-red-1016.jsonl": "9dafdba87548f0d698596da034d0d37881ad5e322556478a5f45cf6568ee1497"
+  }
+}

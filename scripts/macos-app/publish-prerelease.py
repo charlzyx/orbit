@@ -4,11 +4,64 @@ No replacement, tag force, asset clobber, deletion, stable/latest publication,
 credential creation, settings changes, signing, or automatic retry is supported.
 """
 from pathlib import Path
-import argparse,hashlib,json,os,re,subprocess,tempfile,urllib.request,urllib.parse
+import argparse,hashlib,json,os,re,subprocess,tempfile,urllib.request,urllib.parse,urllib.error
 from common import COMMIT_RE,VERSION_RE,digest,marker,git,ARCHITECTURES
 
-def command(*args):return subprocess.check_output(['gh',*args],text=True)
-def api(path):return json.loads(command('api',path))
+class SafeAPIError(RuntimeError):pass
+
+# Diagnostics contain only locally recognized routes and fixed classifications.
+# Never echo response messages, query parameters, headers, stderr or URL userinfo.
+def diagnostic(method,url,status=None,category='request-failed'):
+ parsed=urllib.parse.urlparse(url)
+ if category not in ('request-failed','integration-permission','authentication','not-found','validation','http-error','read-failed','invalid-json','head-mismatch','transport-error'):category='request-failed'
+ host=parsed.hostname if parsed.hostname in ('api.github.com','uploads.github.com') else 'unapproved-host'
+ path=parsed.path
+ routes=[('feature-head-preflight',r'/repos/charlzyx/orbit/git/ref/heads/redesign/mygo-rpc'),
+ ('tag-lookup',r'/repos/charlzyx/orbit/git/ref/tags/macos-test-v0\.2\.12-go-test\.[0-9]{8}\.[1-9][0-9]*'),
+ ('tag-object',r'/repos/charlzyx/orbit/git/tags/[0-9a-f]{40}'),
+ ('download-asset',r'/repos/charlzyx/orbit/releases/assets/[0-9]+'),
+ ('upload-asset',r'/repos/charlzyx/orbit/releases/[0-9]+/assets'),
+ ('publish-prerelease' if method=='PATCH' else 'read-release',r'/repos/charlzyx/orbit/releases/[0-9]+'),
+ ('create-draft' if method=='POST' else 'list-releases',r'/repos/charlzyx/orbit/releases')]
+ stage='unrecognized-route';safe_path='[redacted]'
+ for label,pattern in routes:
+  if re.fullmatch(pattern,path):stage=label;safe_path=path;break
+ method=method if method in ('GET','POST','PATCH') else 'OTHER'
+ status=str(status) if type(status) is int and 100<=status<=599 else 'unavailable'
+ return f'GitHub request failed: stage={stage} method={method} host={host} path={safe_path} status={status} category={category}'
+
+def http_category(error):
+ # Bounded parse only; every emitted category is a literal, never remote text.
+ try:
+  body=error.read(4097)
+  payload=json.loads(body) if len(body)<=4096 else {}
+  message=payload.get('message') if isinstance(payload,dict) else None
+  return {'Resource not accessible by integration':'integration-permission',
+          'Bad credentials':'authentication', 'Not Found':'not-found',
+          'Validation Failed':'validation'}.get(message,'http-error') if isinstance(message,str) else 'http-error'
+ except Exception:return 'http-error'
+
+def command(*args):
+ try:return subprocess.check_output(['gh',*args],text=True,stderr=subprocess.PIPE)
+ except subprocess.CalledProcessError as error:
+  match=re.search(r'HTTP ([0-9]{3})',error.stderr or '')
+  status=int(match.group(1)) if match else None
+  path=args[-1] if args and isinstance(args[-1],str) else ''
+  raise SafeAPIError(diagnostic('GET','https://api.github.com/'+path,status,'read-failed')) from None
+
+def api(path):
+ try:return json.loads(command('api',path))
+ except SafeAPIError:raise
+ except (ValueError,TypeError):raise SafeAPIError(diagnostic('GET','https://api.github.com/'+path,category='invalid-json')) from None
+
+def ensure_feature_head(repo,commit):
+ path=f'repos/{repo}/git/ref/heads/redesign/mygo-rpc'
+ try:head=api(path)
+ except SafeAPIError:raise
+ except Exception:raise SafeAPIError(diagnostic('GET','https://api.github.com/'+path,category='read-failed')) from None
+ if not isinstance(head,dict) or head.get('ref')!='refs/heads/redesign/mygo-rpc' or not isinstance(head.get('object'),dict) or head['object'].get('type')!='commit' or head['object'].get('sha')!=commit:
+  raise SafeAPIError(diagnostic('GET','https://api.github.com/'+path,category='head-mismatch'))
+
 class SafeRedirect(urllib.request.HTTPRedirectHandler):
  def redirect_request(self,req,fp,code,msg,headers,newurl):
   if not newurl.startswith('https://'):raise RuntimeError('Non-HTTPS GitHub asset redirect rejected')
@@ -18,12 +71,14 @@ class SafeRedirect(urllib.request.HTTPRedirectHandler):
   return redirected
 
 def request(method,url,data=None,accept='application/vnd.github+json',content_type='application/json'):
- host=urllib.parse.urlparse(url).hostname
- if host not in ('api.github.com','uploads.github.com') or not url.startswith('https://'):raise RuntimeError('Unexpected GitHub API destination')
+ parsed=urllib.parse.urlparse(url);host=parsed.hostname
+ if parsed.netloc not in ('api.github.com','uploads.github.com') or parsed.scheme!='https':raise RuntimeError('Unexpected GitHub API destination')
  token=os.environ.get('GH_TOKEN')
  if not token:raise RuntimeError('Missing ephemeral Actions token')
  req=urllib.request.Request(url,data=data,method=method,headers={'Authorization':'Bearer '+token,'Accept':accept,'Content-Type':content_type,'X-GitHub-Api-Version':'2022-11-28','User-Agent':'orbit-test-prerelease'})
- return urllib.request.build_opener(SafeRedirect()).open(req,timeout=180)
+ try:return urllib.request.build_opener(SafeRedirect()).open(req,timeout=180)
+ except urllib.error.HTTPError as error:raise SafeAPIError(diagnostic(method,url,error.code,http_category(error))) from None
+ except (urllib.error.URLError,TimeoutError,OSError):raise SafeAPIError(diagnostic(method,url,category='transport-error')) from None
 
 def rest_json(method,path,payload):
  with request(method,'https://api.github.com/'+path,json.dumps(payload).encode()) as response:return json.load(response)
@@ -49,7 +104,8 @@ def optional_ref(repo,tag):
  r=subprocess.run(['gh','api',f'repos/{repo}/git/ref/tags/{tag}'],text=True,capture_output=True)
  if r.returncode==0:return json.loads(r.stdout)
  if 'HTTP 404' in r.stderr:return None
- raise RuntimeError('Tag lookup failed; no write is safe: '+r.stderr)
+ match=re.search(r'HTTP ([0-9]{3})',r.stderr or '')
+ raise SafeAPIError(diagnostic('GET',f'https://api.github.com/repos/{repo}/git/ref/tags/{tag}',int(match.group(1)) if match else None,'read-failed'))
 def resolve_ref(repo,ref):
  obj=ref['object']
  for _ in range(5):
@@ -107,11 +163,13 @@ def main(root,folder):
   verify_release(repo,tag,existing,expected,commit,True)
   print('Exact prerelease and hashes already exist; no writes:',existing['html_url']);return
  if ref:raise RuntimeError('Tag already exists without matching complete release; refusing to modify it')
+ ensure_feature_head(repo,commit)
  # Create once and retain the exact ID returned by GitHub. Never resolve
  # a mutable tag to choose the release to upload into or publish.
  created=rest_json('POST',f'repos/{repo}/releases',{'tag_name':tag,'target_commitish':commit,'name':'Orbit Go macOS test '+version,'body':(folder/'RELEASE-NOTES.md').read_text(),'draft':True,'prerelease':True,'make_latest':'false'})
- if not created.get('draft') or not created.get('prerelease') or created.get('tag_name')!=tag or created.get('target_commitish')!=commit or created.get('assets'):raise RuntimeError('New empty exact-commit draft could not be established; stop without retry')
+ if not isinstance(created,dict) or type(created.get('id')) is not int or created['id']<=0 or created.get('draft') is not True or created.get('prerelease') is not True or created.get('tag_name')!=tag or created.get('target_commitish')!=commit or created.get('assets')!=[]:raise RuntimeError('New empty exact-commit draft could not be established; stop without retry')
  created_id=created['id'];uploaded_ids={}
+ print(json.dumps({'publisher_owned_draft':{'repository':repo,'id':created_id,'source_commit':commit,'tag':tag}},sort_keys=True),flush=True)
  for name in expected:
   asset=upload_asset(repo,created_id,folder/name)
   if asset.get('name')!=name or asset.get('size')!=(folder/name).stat().st_size or asset.get('state')!='uploaded':raise RuntimeError('Upload outcome mismatch; inspect exact draft before retry')
@@ -125,6 +183,7 @@ def main(root,folder):
  if fingerprints(check)!=fingerprints(created):raise RuntimeError('Draft assets changed concurrently; stop')
  draft_ref=optional_ref(repo,tag)
  if draft_ref and resolve_ref(repo,draft_ref)!=commit:raise RuntimeError('Tag changed concurrently before publication; stop')
+ ensure_feature_head(repo,commit)
  # GitHub has no transaction spanning every check. Publish this same owned ID,
  # never another draft discovered by tag, and verify exact state afterward.
  rest_json('PATCH',f'repos/{repo}/releases/{created_id}',{'tag_name':tag,'target_commitish':commit,'draft':False,'prerelease':True,'make_latest':'false'})
