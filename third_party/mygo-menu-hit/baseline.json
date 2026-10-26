@@ -1,0 +1,34 @@
+{
+  "upstream_commit": "9c69cf829ece196c5b3a3601f1c7bbe70526376f",
+  "module": "github.com/egoist/mygo",
+  "version": "v0.6.4-0.20261025001514-9c69cf829ece",
+  "module_sum": "h1:zKaW0m3ftywWzdR18dv/b+MKgS+iKTu7HF5twRZtSvs=",
+  "go_mod_sum": "h1:dVav53PwF2xEotjf4oA5lTY2Jp2exgzyjLhbSXhbMwE=",
+  "baseline_sha256": {
+    "ui/runtime.go": "6631fdb20daf4a31a9abb579c150a414bc18888ad677b05ea931a4c788834463",
+    "ui/menu.go": "61c0e12813035516c66af294272db487c0c9db175a64c9cd0fcaf809e416e8e3"
+  },
+  "overlays": {
+    "ui/runtime.go": {
+      "source": "runtime.go.txt",
+      "sha256": "9ce80d5500f689f6a858d43c8b44289f1f79edf7203c1261e7ef8b5cac0f599d",
+      "added": false
+    },
+    "ui/menu.go": {
+      "source": "menu.go.txt",
+      "sha256": "3a6f283222b1bff877986553d4a1fbea39673b41354af8637cd5c64dc699991c",
+      "added": false
+    },
+    "ui/orbit_menu_hit.go": {
+      "source": "orbit_menu_hit.go.txt",
+      "sha256": "14947b692678b1b8712b1447afc74d00f2f51be2ce21aa9ccf5d5e747cb3d852",
+      "added": true
+    },
+    "ui/orbit_menu_hit_test.go": {
+      "source": "orbit_menu_hit_test.go.txt",
+      "sha256": "0a9be30a36c42a099ef1ccc76a02564b0e898fdf0e563754f3a5d34283178393",
+      "added": true
+    }
+  },
+  "patch_sha256": "91fc49ee7d8c8ce20ad0b4a7101e54d1ddf7adbc6d2ec4b2c53b2423087d99ce"
+}

@@ -1,0 +1,671 @@
+diff --git a/ui/menu.go b/ui/menu.go
+index 41b88a6..23a0f42 100644
+--- a/ui/menu.go
++++ b/ui/menu.go
+@@ -85 +85,3 @@ func (e *node) buildMenu(button bool, build func(m *Menu)) {
+-		build(&Menu{run: run, menu: pm, rt: rt, text: rt.states[mr.text]})
++		hit := rt.textMenuOpening
++		rt.textMenuOpening = nil // release even when the callback returns empty or panics
++		build(&Menu{run: run, menu: pm, rt: rt, text: rt.states[mr.text], textHit: hit})
+@@ -105,3 +107,4 @@ type Menu struct {
+-	run  *menuRun
+-	menu *platform.Menu // what the menu shows, when it opens
+-	rt   *engine
++	textHit *textMenuEvent
++	run     *menuRun
++	menu    *platform.Menu // what the menu shows, when it opens
++	rt      *engine
+@@ -300,0 +304 @@ func (rt *engine) askMenu(s *state, x, y float32, button bool) {
++	rt.captureTextMenuTarget(s, x, y, button)
+@@ -396,0 +401 @@ func (rt *engine) menuKey() bool {
++	rt.textMenuOpening = nil // keyboard origin is not a pointer hit
+@@ -433,0 +439 @@ func (rt *engine) resolveMenu() {
++	defer func() { rt.textMenuOpening = nil }()
+diff --git a/ui/orbit_menu_hit.go b/ui/orbit_menu_hit.go
+new file mode 100644
+index 0000000..f34cec5
+--- /dev/null
++++ b/ui/orbit_menu_hit.go
+@@ -0,0 +1,215 @@
++// Optional committed-geometry context targets for the pinned Orbit build.
++// Default menus/selection are unchanged when no target is registered.
++package ui
++
++import "math"
++
++const textMenuTargetLimit = 1024
++const textMenuBlockLimit = 4096
++
++type textMenuTarget struct {
++	scope, row uint64
++	token      any
++}
++type textMenuBlock struct {
++	id     uint64
++	bounds Rect
++	token  any
++}
++type textMenuFrame struct {
++	scope, frame uint64
++	visible      Rect
++	blocks       []textMenuBlock
++}
++type textMenuEvent struct {
++	scope, frame uint64
++	distance     float32
++	token        any
++}
++
++// RegisterTextMenuTarget associates selectable descendants of this row with an
++// immutable application token within scope. Call each build, on the same window
++// and pass. Tokens are opaque references: never formatted, logged or interpreted.
++// Only current visible committed rows are retained, with bounded target/block
++// counts. Overflow fails closed for that frame. Do not mutate token contents.
++func (e Element) RegisterTextMenuTarget(scope Element, token any) Element {
++	n := e.node()
++	if n == nil || token == nil {
++		return e
++	}
++	rt := n.c.rt
++	owner := scope.nodeFor(rt)
++	if owner == nil || owner.kind != kindBox || owner.flags&flagSelectable == 0 {
++		return e
++	}
++	valid := false
++	for p, depth := n, 0; p != nil && depth < 64; p, depth = p.parent, depth+1 {
++		if p == owner {
++			valid = true
++			break
++		}
++	}
++	if !valid {
++		return e
++	}
++	if len(rt.textMenuTargets) >= textMenuTargetLimit {
++		rt.textMenuOverflow = true
++		return e
++	}
++	rt.textMenuTargets = append(rt.textMenuTargets, textMenuTarget{owner.id, n.id, token})
++	return e
++}
++
++func (rt *engine) resetTextMenuTargets() {
++	clear(rt.textMenuTargets)
++	rt.textMenuTargets = rt.textMenuTargets[:0]
++	rt.textMenuOverflow = false
++}
++func (rt *engine) commitTextMenuTargets() {
++	rt.textMenuFrames = nil
++	if rt.textMenuOverflow || len(rt.textMenuTargets) == 0 {
++		rt.resetTextMenuTargets()
++		return
++	}
++	targets := make(map[uint64]textMenuTarget, len(rt.textMenuTargets))
++	for _, t := range rt.textMenuTargets {
++		if _, dup := targets[t.row]; dup {
++			rt.resetTextMenuTargets()
++			return
++		}
++		targets[t.row] = t
++	}
++	frames := make(map[uint64]*textMenuFrame)
++	count := 0
++	for _, s := range rt.texts {
++		if s.seen != rt.frame || s.textScope == 0 || s.editor == nil || !s.editor.laidOut() || s.vw <= 0 || s.vh <= 0 {
++			continue
++		}
++		scope := rt.states[s.textScope]
++		if scope == nil || scope.seen != rt.frame || scope.vw <= 0 || scope.vh <= 0 {
++			continue
++		}
++		var target textMenuTarget
++		valid := false
++		for p, depth := s, 0; p != nil && depth < 64; p, depth = rt.states[p.parent], depth+1 {
++			if p.seen != rt.frame || p.flags&(flagDisabled|flagInvisible|flagInert) != 0 {
++				break
++			}
++			if t, ok := targets[p.id]; ok && t.scope == s.textScope && target.token == nil {
++				target = t
++			}
++			if p.id == scope.id {
++				valid = true
++				break
++			}
++		}
++		if !valid || target.token == nil {
++			continue
++		}
++		// Registered text-block geometry, not glyph-line nearest selection. Code
++		// renderer chunk grouping and GPUI partial clipping are caller-visible limits.
++		world := s.world
++		if !finiteMenuNumber(world.A) || !finiteMenuNumber(world.B) || !finiteMenuNumber(world.C) || !finiteMenuNumber(world.D) || !finiteMenuNumber(world.X) || !finiteMenuNumber(world.Y) || !finiteMenuNumber(world.G) || !finiteMenuNumber(world.H) {
++			continue
++		}
++		raw := transformRect(world, Rect{s.x, s.y, s.w, s.h})
++		clip := Rect{s.vx, s.vy, s.vw, s.vh}
++		if !finiteMenuRect(raw) || !finiteMenuRect(clip) || !finiteMenuRect(Rect{scope.vx, scope.vy, scope.vw, scope.vh}) {
++			continue
++		}
++		box := intersect(raw, clip)
++		if !finiteMenuRect(box) {
++			continue
++		}
++		count++
++		if count > textMenuBlockLimit {
++			rt.resetTextMenuTargets()
++			return
++		}
++		f := frames[scope.id]
++		if f == nil {
++			f = &textMenuFrame{scope: scope.id, frame: rt.frame, visible: Rect{scope.vx, scope.vy, scope.vw, scope.vh}}
++			frames[scope.id] = f
++		}
++		f.blocks = append(f.blocks, textMenuBlock{s.id, box, target.token})
++	}
++	rt.textMenuFrames = frames
++	rt.resetTextMenuTargets()
++}
++func (rt *engine) captureTextMenuTarget(s *state, x, y float32, button bool) {
++	rt.textMenuOpening = nil
++	if button || s == nil || rt.closed || !finiteMenuNumber(x) || !finiteMenuNumber(y) {
++		return
++	}
++	f := rt.textMenuFrames[s.id]
++	if f == nil || f.frame != rt.frame {
++		return
++	}
++	rt.textMenuOpening = resolveTextMenuTarget(f, x, y, rt.hitChain)
++}
++
++// Resolve scans at most the bounded block set and performs at most ONE full
++// hit-chain walk. An occluded closest block fails closed; no farther fallback.
++func resolveTextMenuTarget(f *textMenuFrame, x, y float32, hitChain func(float32, float32) []uint64) *textMenuEvent {
++	if f == nil || len(f.blocks) > textMenuBlockLimit || !finiteMenuNumber(x) || !finiteMenuNumber(y) || !finiteMenuRect(f.visible) || !f.visible.Contains(x, y) {
++		return nil
++	}
++	best := float32(math.Inf(1))
++	var candidate *textMenuBlock
++	for i := range f.blocks {
++		b := &f.blocks[i]
++		r := b.bounds
++		if !finiteMenuRect(r) {
++			continue
++		}
++		d := max(r.X-x, x-r.X-r.W, 0) + max(r.Y-y, y-r.Y-r.H, 0)
++		if !finiteMenuNumber(d) || d < 0 || d >= best {
++			continue
++		}
++		best = d
++		candidate = b
++	}
++	if candidate == nil || candidate.token == nil {
++		return nil
++	}
++	r := candidate.bounds
++	px := min(max(x, r.X), r.X+r.W-min(float32(.001), r.W/2))
++	py := min(max(y, r.Y), r.Y+r.H-min(float32(.001), r.H/2))
++	if !finiteMenuNumber(px) || !finiteMenuNumber(py) {
++		return nil
++	}
++	for _, id := range hitChain(px, py) {
++		if id == candidate.id {
++			return &textMenuEvent{scope: f.scope, frame: f.frame, distance: best, token: candidate.token}
++		}
++	}
++	return nil
++}
++func finiteMenuRect(r Rect) bool {
++	return finiteMenuNumber(r.X) && finiteMenuNumber(r.Y) && finiteMenuNumber(r.W) && finiteMenuNumber(r.H) && finiteMenuNumber(r.X+r.W) && finiteMenuNumber(r.Y+r.H) && r.W > 0 && r.H > 0
++}
++func finiteMenuNumber(v float32) bool { return !math.IsNaN(float64(v)) && !math.IsInf(float64(v), 0) }
++
++// TextMenuHit returns an opaque registered target only while collecting this
++// scope's pointer context menu. Uses the original event and committed geometry,
++// never a later pointer position; strictly distance < maxGap. Negative, NaN or
++// infinite limits fail closed. Keyboard/menu-button and chosen replay return no
++// hit. Default unregistered menus are unaffected. No selection is changed.
++func (m *Menu) TextMenuHit(scope Element, maxGap float32) (any, bool) {
++	if m == nil || m.rt == nil || m.run == nil || !m.run.collect || m.rt.closed || !finiteMenuNumber(maxGap) || maxGap < 0 {
++		return nil, false
++	}
++	n := scope.nodeFor(m.rt)
++	hit := m.textHit
++	if n == nil || hit == nil || hit.scope != n.id || hit.frame+1 != m.rt.frame || hit.token == nil || n.disabled() || n.flags&(flagInvisible|flagInert) != 0 {
++		return nil, false
++	}
++	if !finiteMenuNumber(hit.distance) || hit.distance < 0 || hit.distance >= maxGap {
++		return nil, false
++	}
++	return hit.token, true
++}
++
++// Collecting reports the existing menu opening phase, not chosen replay.
++// It is a read-only observation and does not add or remove menu items.
++func (m *Menu) Collecting() bool { return m != nil && m.run != nil && m.run.collect }
+diff --git a/ui/orbit_menu_hit_test.go b/ui/orbit_menu_hit_test.go
+new file mode 100644
+index 0000000..92ae208
+--- /dev/null
++++ b/ui/orbit_menu_hit_test.go
+@@ -0,0 +1,403 @@
++package ui
++
++import (
++	"fmt"
++	"math"
++	"testing"
++)
++
++func menuHitFixture(t *testing.T, maxGap float32) (*Tester, *any) {
++	t.Helper()
++	var got any
++	tt := NewTester(func(c *Context) {
++		scope := Column(c).Key("scope").Selectable().Size(300, 200)
++		scope.Children(func() {
++			Row(c).RegisterTextMenuTarget(scope, "A").Children(func() { Text(c, "paragraph").Width(40).Height(20) })
++		})
++		scope.ContextMenu(func(m *Menu) {
++			var ok bool
++			got, ok = m.TextMenuHit(scope, maxGap)
++			if ok {
++				m.Item("hit")
++			}
++		})
++	}, 400, 250)
++	return tt, &got
++}
++func TestTextMenuHitStrictManhattanAndFinite(t *testing.T) {
++	for _, tc := range []struct {
++		name      string
++		x, y, gap float32
++		want      bool
++	}{
++		{"inside", 10, 10, 24, true}, {"near", 10, 43.999, 24, true}, {"boundary", 10, 44, 24, false}, {"outside", 10, 44.001, 24, false},
++		{"diagonal", 51, 32, 24, true}, {"diagonal-boundary", 52, 32, 24, false}, {"zero", 10, 10, 0, false}, {"negative", 10, 10, -1, false},
++		{"nan", 10, 10, float32(math.NaN()), false}, {"inf", 10, 10, float32(math.Inf(1)), false},
++	} {
++		t.Run(tc.name, func(t *testing.T) {
++			tt, got := menuHitFixture(t, tc.gap)
++			tt.RightClickAt(tc.x, tc.y)
++			if (*got != nil) != tc.want {
++				t.Fatalf("got=%v want=%v", *got, tc.want)
++			}
++		})
++	}
++}
++func TestTextMenuHitOpeningSnapshotAndCancel(t *testing.T) {
++	value := "A"
++	var got any
++	tt := NewTester(func(c *Context) {
++		scope := Column(c).Selectable().Size(300, 200)
++		scope.Children(func() {
++			Row(c).RegisterTextMenuTarget(scope, value).Children(func() { Text(c, value).Width(40).Height(20) })
++		})
++		scope.ContextMenu(func(m *Menu) {
++			if v, ok := m.TextMenuHit(scope, 24); ok {
++				got = v
++			}
++			m.Item("choice")
++		})
++	}, 400, 250)
++	tt.RightClickAt(10, 10)
++	if got != "A" {
++		t.Fatal(got)
++	}
++	if tt.rt.textMenuOpening != nil {
++		t.Fatal("opening retained past collect")
++	}
++	tt.Move(280, 180)
++	tt.CloseMenu()
++	value = "B"
++	tt.Frame()
++	got = nil
++	tt.RightClickAt(10, 150)
++	if got != nil {
++		t.Fatal("cancel then blank reused opening")
++	}
++	tt.CloseMenu()
++	tt.RightClickAt(10, 10)
++	if got != "B" {
++		t.Fatal("reopen not fresh", got)
++	}
++	_ = tt.ChooseMenuItem("choice")
++	if tt.rt.textMenuOpening != nil {
++		t.Fatal("chosen replay retained event")
++	}
++}
++func TestTextMenuHitOwnerAndWindow(t *testing.T) {
++	var foreign Element
++	b := NewTester(func(c *Context) { foreign = Column(c).Selectable().Size(300, 200) }, 400, 250)
++	_ = b
++	owner := "a"
++	got := false
++	tt := NewTester(func(c *Context) {
++		s := Column(c).Key(owner).Selectable().Size(300, 200)
++		s.Children(func() { Row(c).RegisterTextMenuTarget(s, "A").Children(func() { Text(c, "A") }) })
++		s.ContextMenu(func(m *Menu) {
++			if _, ok := m.TextMenuHit(foreign, 24); ok {
++				t.Fatal("foreign window accepted")
++			}
++			_, got = m.TextMenuHit(s, 24)
++			m.Item("item")
++		})
++	}, 400, 250)
++	owner = "b"
++	tt.RightClickAt(10, 10)
++	if got {
++		t.Fatal("owner replacement accepted previous commit")
++	}
++	tt.Frame()
++	tt.RightClickAt(10, 10)
++	if !got {
++		t.Fatal("new current owner not accepted")
++	}
++	tt.rt.close()
++	if tt.rt.textMenuFrames != nil || tt.rt.textMenuOpening != nil || tt.rt.textMenuTargets != nil {
++		t.Fatal("window close retained tokens")
++	}
++}
++func TestTextMenuHitDefaultEmptyAndKeyboard(t *testing.T) {
++	tt := NewTester(func(c *Context) {
++		s := Column(c).Selectable().Size(300, 200)
++		s.Children(func() { Text(c, "default") })
++		s.ContextMenu(func(m *Menu) {
++			if _, ok := m.TextMenuHit(s, 24); ok {
++				t.Fatal("unregistered scope hit")
++			}
++			m.Item("unchanged")
++		})
++	}, 400, 250)
++	tt.RightClickAt(10, 10)
++	if len(tt.Menu()) != 1 {
++		t.Fatal("default menu changed")
++	}
++	registered, _ := menuHitFixture(t, 24)
++	registered.RightClickAt(10, 150)
++	if len(registered.Menu()) != 0 || registered.rt.textMenuOpening != nil {
++		t.Fatal("empty result did not consume/release")
++	}
++	registered.ClickAt(10, 10)
++	registered.Key(0, KeyContextMenu)
++	if len(registered.Menu()) != 0 {
++		t.Fatal("keyboard incorrectly treated as pointer origin")
++	}
++}
++func TestTextMenuHitClipDisabledOcclusionAndList(t *testing.T) {
++	var list ListState
++	disabled, hidden, cover := false, false, false
++	var got any
++	tt := NewTester(func(c *Context) {
++		s := Column(c).Selectable().Size(300, 120).Disabled(disabled)
++		if hidden {
++			s.Invisible()
++		}
++		s.Children(func() {
++			List(c, &list, 100, func(i int) {
++				Row(c).RegisterTextMenuTarget(s, fmt.Sprint(i)).Children(func() { Text(c, fmt.Sprintf("row %d", i)).Height(30) })
++			}).Grow(1)
++		})
++		s.ContextMenu(func(m *Menu) {
++			if v, ok := m.TextMenuHit(s, 24); ok {
++				got = v
++				m.Item("hit")
++			}
++		})
++		if cover {
++			Box(c).Absolute().Left(0).Top(0).Size(300, 120).Background(RGB(0, 0, 0)).Focusable()
++		}
++	}, 400, 200)
++	tt.RightClickAt(10, 10)
++	if got != "0" {
++		t.Fatal(got)
++	}
++	tt.CloseMenu()
++	got = nil
++	list.ScrollTo(80, Start)
++	tt.Frame()
++	tt.RightClickAt(10, 10)
++	if got == nil || got == "0" {
++		t.Fatal("List eviction failed", got)
++	}
++	tt.CloseMenu()
++	got = nil
++	for _, f := range tt.rt.textMenuFrames {
++		for _, b := range f.blocks {
++			if b.bounds.Y < 0 || b.bounds.Y+b.bounds.H > 120 {
++				t.Fatal("clip not applied", b.bounds)
++			}
++		}
++	}
++	cover = true
++	tt.Frame()
++	tt.RightClickAt(10, 10)
++	if got != nil {
++		t.Fatal("occluded scope hit")
++	}
++	cover = false
++	disabled = true
++	tt.Frame()
++	if len(tt.rt.textMenuFrames) != 0 {
++		t.Fatal("disabled scope retained tokens")
++	}
++	disabled = false
++	hidden = true
++	tt.Frame()
++	if len(tt.rt.textMenuFrames) != 0 {
++		t.Fatal("hidden scope retained tokens")
++	}
++}
++func TestTextMenuHitTargetLimitAndPassPruning(t *testing.T) {
++	count := textMenuTargetLimit + 1
++	tt := NewTester(func(c *Context) {
++		s := Column(c).Selectable().Size(300, 200)
++		s.Children(func() {
++			for i := 0; i < count; i++ {
++				Row(c.Key(i)).RegisterTextMenuTarget(s, i).Children(func() { Text(c, "A").Height(1) })
++			}
++		})
++	}, 400, 250)
++	if len(tt.rt.textMenuFrames) != 0 {
++		t.Fatal("overflow kept partial targets")
++	}
++	count = 1
++	tt.Frame()
++	if len(tt.rt.textMenuFrames) != 1 {
++		t.Fatal("normal frame did not recover")
++	}
++	count = 0
++	tt.Frame()
++	if len(tt.rt.textMenuFrames) != 0 {
++		t.Fatal("removed targets retained")
++	}
++}
++
++func TestTextMenuHitCollectPanicReleasesEvent(t *testing.T) {
++	tt := NewTester(func(c *Context) {
++		s := Column(c).Selectable().Size(300, 200)
++		s.Children(func() { Row(c).RegisterTextMenuTarget(s, "A").Children(func() { Text(c, "A").Size(40, 20) }) })
++		s.ContextMenu(func(m *Menu) {
++			if _, ok := m.TextMenuHit(s, 24); ok {
++				panic("fixture collection error")
++			}
++		})
++	}, 400, 250)
++	func() {
++		defer func() {
++			if recover() == nil {
++				t.Error("expected fixture panic")
++			}
++		}()
++		tt.RightClickAt(10, 10)
++	}()
++	if tt.rt.textMenuOpening != nil {
++		t.Fatal("panic retained opening event")
++	}
++}
++func TestTextMenuHitFinalPassRegistrationOnly(t *testing.T) {
++	value := "A"
++	tt := NewTester(func(c *Context) {
++		s := Column(c).Selectable().Size(300, 200)
++		s.Children(func() { Row(c).RegisterTextMenuTarget(s, value).Children(func() { Text(c, value).Size(40, 20) }) })
++		if Button(c, "change").Clicked() {
++			value = "B"
++		}
++	}, 400, 250)
++	if err := tt.Click("change"); err != nil {
++		t.Fatal(err)
++	}
++	if value != "B" {
++		t.Fatal("button not consumed")
++	}
++	if len(tt.rt.textMenuFrames) != 1 {
++		t.Fatal("duplicate or missing final pass")
++	}
++	for _, f := range tt.rt.textMenuFrames {
++		for _, b := range f.blocks {
++			if b.token != "B" {
++				t.Fatalf("earlier pass retained %v", b.token)
++			}
++		}
++	}
++}
++func TestTextMenuHitWindowsReleaseOrigin(t *testing.T) {
++	tt, got := menuHitFixture(t, 24)
++	var scope uint64
++	for id := range tt.rt.textMenuFrames {
++		scope = id
++	}
++	// Exercise the unchanged Windows release path directly on every host.
++	tt.rt.menu.release = scope
++	tt.rt.pointerX = 10
++	tt.rt.pointerY = 150
++	if !tt.rt.menuRelease() {
++		t.Fatal("release not consumed")
++	}
++	tt.Frame()
++	if *got != nil || len(tt.Menu()) != 0 {
++		t.Fatal("blank release incorrectly used press/old target")
++	}
++	tt.rt.menu.release = scope
++	tt.rt.pointerX = 10
++	tt.rt.pointerY = 10
++	if !tt.rt.menuRelease() {
++		t.Fatal("second release not consumed")
++	}
++	tt.Frame()
++	if *got != "A" {
++		t.Fatal("valid release target missing", *got)
++	}
++}
++
++func TestTextMenuHitRejectsInvalidDerivedDistance(t *testing.T) {
++	for _, v := range []float32{float32(math.NaN()), float32(math.Inf(1)), float32(math.Inf(-1))} {
++		tt := NewTester(func(c *Context) {
++			s := Column(c).Selectable().Size(300, 200)
++			s.Children(func() { Row(c).RegisterTextMenuTarget(s, "A").Children(func() { Text(c, "A").Size(40, 20) }) })
++			s.ContextMenu(func(m *Menu) {
++				if m.textHit != nil {
++					m.textHit.distance = v
++				}
++				if _, ok := m.TextMenuHit(s, 24); ok {
++					t.Errorf("accepted nonfinite derived distance %v", v)
++				}
++			})
++		}, 400, 250)
++		tt.RightClickAt(10, 10)
++	}
++}
++func TestTextMenuHitActualBlockLimit(t *testing.T) {
++	count := textMenuBlockLimit
++	tt := NewTester(func(c *Context) {
++		s := Column(c).Selectable().Size(100, 5000)
++		s.Children(func() {
++			Column(c).RegisterTextMenuTarget(s, "A").Children(func() {
++				for i := 0; i < count; i++ {
++					Text(c.Key(i), "A").Size(40, 1)
++				}
++			})
++		})
++	}, 100, 5000)
++	blocks := 0
++	for _, f := range tt.rt.textMenuFrames {
++		blocks += len(f.blocks)
++	}
++	if blocks != textMenuBlockLimit {
++		t.Fatalf("actual mounted block count %d", blocks)
++	}
++	count++
++	tt.Frame()
++	if len(tt.rt.textMenuFrames) != 0 {
++		t.Fatal("4097 blocks kept partial frame")
++	}
++}
++
++func TestTextMenuHitBoundedNearestAndStableTie(t *testing.T) {
++	f := &textMenuFrame{scope: 1, frame: 1, visible: Rect{0, 0, 5000, 100}}
++	// Farthest-to-nearest order previously caused 4096 full hit-chain scans.
++	for i := textMenuBlockLimit; i > 0; i-- {
++		f.blocks = append(f.blocks, textMenuBlock{uint64(i), Rect{float32(i), 0, 1, 20}, i})
++	}
++	calls := 0
++	hit := func(x, y float32) []uint64 { calls++; return []uint64{1} }
++	e := resolveTextMenuTarget(f, 0, 10, hit)
++	if e == nil || e.token != 1 || calls != 1 {
++		t.Fatalf("worst-order token=%v calls=%d", e, calls)
++	}
++	calls = 0
++	e = resolveTextMenuTarget(f, 0, 10, func(x, y float32) []uint64 { calls++; return []uint64{2} })
++	if e != nil || calls != 1 {
++		t.Fatalf("occluded nearest must not choose farther: %v calls=%d", e, calls)
++	}
++	f.blocks = []textMenuBlock{{7, Rect{10, 0, 1, 20}, "first"}, {8, Rect{10, 0, 1, 20}, "second"}}
++	for i := 0; i < 10; i++ {
++		e = resolveTextMenuTarget(f, 0, 10, func(x, y float32) []uint64 { return []uint64{7, 8} })
++		if e == nil || e.token != "first" {
++			t.Fatal("unstable equal-distance registration order", e)
++		}
++	}
++}
++func TestTextMenuHitInvalidGeometryBeforeHitChain(t *testing.T) {
++	for _, r := range []Rect{{float32(math.NaN()), 0, 10, 10}, {0, 0, float32(math.Inf(1)), 10}, {math.MaxFloat32, 0, math.MaxFloat32, 10}, {0, 0, -1, 10}} {
++		f := &textMenuFrame{visible: Rect{0, 0, 100, 100}, blocks: []textMenuBlock{{1, r, "invalid"}}}
++		calls := 0
++		e := resolveTextMenuTarget(f, 5, 5, func(x, y float32) []uint64 { calls++; return []uint64{1} })
++		if e != nil || calls != 0 {
++			t.Fatalf("invalid rect %v reached hit-chain %d / %v", r, calls, e)
++		}
++	}
++}
++
++func TestTextMenuHitFinitePublicTransformsCanOverflowAtCommit(t *testing.T) {
++	// Both public transforms are legal. Reproduce commitElement's exact parent
++	// composition without painting or allocating a giant raster.
++	parent := node{transform: Scaling(1e20, 1e20)}
++	child := node{transform: Scaling(1e20, 1e20)}
++	world := parent.transformAt(0, 0).Mul(child.transformAt(0, 0))
++	if finiteMenuNumber(world.A) && finiteMenuNumber(world.D) {
++		t.Fatal("fixture did not reach derived overflow")
++	}
++	raw := transformRect(world, Rect{0, 0, 1, 1})
++	if finiteMenuRect(raw) {
++		t.Fatal("overflow geometry incorrectly finite", raw)
++	}
++}
+diff --git a/ui/runtime.go b/ui/runtime.go
+index dda28ff..bd3ed0e 100644
+--- a/ui/runtime.go
++++ b/ui/runtime.go
+@@ -87,0 +88,4 @@ type engine struct {
++	textMenuTargets  []textMenuTarget
++	textMenuFrames   map[uint64]*textMenuFrame
++	textMenuOpening  *textMenuEvent
++	textMenuOverflow bool
+@@ -530,0 +535 @@ func (rt *engine) runFrame() {
++		rt.resetTextMenuTargets()
+@@ -588,0 +594 @@ func (rt *engine) runFrame() {
++	rt.commitTextMenuTargets()
+@@ -909,0 +916,4 @@ func (rt *engine) close() {
++	clear(rt.textMenuTargets)
++	rt.textMenuTargets = nil
++	rt.textMenuFrames = nil
++	rt.textMenuOpening = nil

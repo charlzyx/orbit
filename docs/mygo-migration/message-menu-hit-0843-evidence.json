@@ -1,0 +1,307 @@
+{
+  "toolkit": {
+    "log": "/tmp/orbit-menu-canonical-toolkit-0842.jsonl",
+    "expected_top_level": [
+      "github.com/egoist/mygo/ui/TestContextMenu",
+      "github.com/egoist/mygo/ui/TestContextMenuFromTheKeyboard",
+      "github.com/egoist/mygo/ui/TestInnermostContextMenu",
+      "github.com/egoist/mygo/ui/TestTextMenuHitClipDisabledOcclusionAndList",
+      "github.com/egoist/mygo/ui/TestTextMenuHitCollectPanicReleasesEvent",
+      "github.com/egoist/mygo/ui/TestTextMenuHitDefaultEmptyAndKeyboard",
+      "github.com/egoist/mygo/ui/TestTextMenuHitFinalPassRegistrationOnly",
+      "github.com/egoist/mygo/ui/TestTextMenuHitOpeningSnapshotAndCancel",
+      "github.com/egoist/mygo/ui/TestTextMenuHitOwnerAndWindow",
+      "github.com/egoist/mygo/ui/TestTextMenuHitStrictManhattanAndFinite",
+      "github.com/egoist/mygo/ui/TestTextMenuHitTargetLimitAndPassPruning",
+      "github.com/egoist/mygo/ui/TestTextMenuHitWindowsReleaseOrigin"
+    ],
+    "all_exact_test_counts": {
+      "github.com/egoist/mygo/ui/TestContextMenu": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/egoist/mygo/ui/TestInnermostContextMenu": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/egoist/mygo/ui/TestContextMenuFromTheKeyboard": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/egoist/mygo/ui/TestTextMenuHitStrictManhattanAndFinite": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/egoist/mygo/ui/TestTextMenuHitStrictManhattanAndFinite/inside": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/egoist/mygo/ui/TestTextMenuHitStrictManhattanAndFinite/near": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/egoist/mygo/ui/TestTextMenuHitStrictManhattanAndFinite/boundary": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/egoist/mygo/ui/TestTextMenuHitStrictManhattanAndFinite/outside": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/egoist/mygo/ui/TestTextMenuHitStrictManhattanAndFinite/diagonal": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/egoist/mygo/ui/TestTextMenuHitStrictManhattanAndFinite/diagonal-boundary": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/egoist/mygo/ui/TestTextMenuHitStrictManhattanAndFinite/zero": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/egoist/mygo/ui/TestTextMenuHitStrictManhattanAndFinite/negative": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/egoist/mygo/ui/TestTextMenuHitStrictManhattanAndFinite/nan": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/egoist/mygo/ui/TestTextMenuHitStrictManhattanAndFinite/inf": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/egoist/mygo/ui/TestTextMenuHitOpeningSnapshotAndCancel": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/egoist/mygo/ui/TestTextMenuHitOwnerAndWindow": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/egoist/mygo/ui/TestTextMenuHitDefaultEmptyAndKeyboard": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/egoist/mygo/ui/TestTextMenuHitClipDisabledOcclusionAndList": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/egoist/mygo/ui/TestTextMenuHitTargetLimitAndPassPruning": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/egoist/mygo/ui/TestTextMenuHitCollectPanicReleasesEvent": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/egoist/mygo/ui/TestTextMenuHitFinalPassRegistrationOnly": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/egoist/mygo/ui/TestTextMenuHitWindowsReleaseOrigin": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      }
+    },
+    "top_level_count": 12,
+    "test_and_subtest_count": 22,
+    "skip": 0,
+    "fail": 0
+  },
+  "app": {
+    "log": "/tmp/orbit-menu-canonical-app-0842.jsonl",
+    "expected_top_level": [
+      "github.com/charlzyx/orbit/internal/transcriptui/TestSelectionMenuDisabledAndImmutableSelection",
+      "github.com/charlzyx/orbit/internal/transcriptui/TestSelectionMenuEmptyMessageRemainsDisabledWithSelection",
+      "github.com/charlzyx/orbit/internal/transcriptui/TestSelectionMenuOpeningSnapshotAndReopen",
+      "github.com/charlzyx/orbit/internal/ui/TestMessageMenuAuditActualServiceTaskAndClose",
+      "github.com/charlzyx/orbit/internal/ui/TestMessageMenuAuditCurrentHit",
+      "github.com/charlzyx/orbit/internal/ui/TestMessageMenuAuditOldOwner",
+      "github.com/charlzyx/orbit/internal/ui/TestMessageMenuAuditPointerMovesIntoNativeMenu",
+      "github.com/charlzyx/orbit/internal/ui/TestMessageMenuBlankPreservesActualSelection",
+      "github.com/charlzyx/orbit/internal/ui/TestMessageMenuCancelBlankAndOtherTextSelection",
+      "github.com/charlzyx/orbit/internal/ui/TestMessageMenuMeasuredBlankDoesNotReusePreviousHover",
+      "github.com/charlzyx/orbit/internal/ui/TestMessageMenuSameOwnerStreamUsesOpeningSnapshot"
+    ],
+    "all_exact_test_counts": {
+      "github.com/charlzyx/orbit/internal/transcriptui/TestSelectionMenuOpeningSnapshotAndReopen": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/charlzyx/orbit/internal/ui/TestMessageMenuAuditCurrentHit": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/charlzyx/orbit/internal/transcriptui/TestSelectionMenuDisabledAndImmutableSelection": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/charlzyx/orbit/internal/transcriptui/TestSelectionMenuEmptyMessageRemainsDisabledWithSelection": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/charlzyx/orbit/internal/ui/TestMessageMenuAuditOldOwner": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/charlzyx/orbit/internal/ui/TestMessageMenuAuditOldOwner/runtime": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/charlzyx/orbit/internal/ui/TestMessageMenuAuditOldOwner/runtime_ABA": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/charlzyx/orbit/internal/ui/TestMessageMenuAuditOldOwner/session": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/charlzyx/orbit/internal/ui/TestMessageMenuAuditOldOwner/workspace": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/charlzyx/orbit/internal/ui/TestMessageMenuAuditOldOwner/close": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/charlzyx/orbit/internal/ui/TestMessageMenuAuditPointerMovesIntoNativeMenu": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/charlzyx/orbit/internal/ui/TestMessageMenuAuditActualServiceTaskAndClose": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/charlzyx/orbit/internal/ui/TestMessageMenuAuditActualServiceTaskAndClose/service_ABA": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/charlzyx/orbit/internal/ui/TestMessageMenuAuditActualServiceTaskAndClose/new_task": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/charlzyx/orbit/internal/ui/TestMessageMenuAuditActualServiceTaskAndClose/close": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/charlzyx/orbit/internal/ui/TestMessageMenuMeasuredBlankDoesNotReusePreviousHover": {
+        "run": 3,
+        "output": 9,
+        "pass": 3
+      },
+      "github.com/charlzyx/orbit/internal/ui/TestMessageMenuBlankPreservesActualSelection": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/charlzyx/orbit/internal/ui/TestMessageMenuCancelBlankAndOtherTextSelection": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "github.com/charlzyx/orbit/internal/ui/TestMessageMenuSameOwnerStreamUsesOpeningSnapshot": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      }
+    },
+    "top_level_count": 11,
+    "test_and_subtest_count": 19,
+    "skip": 0,
+    "fail": 0
+  },
+  "default_editor": {
+    "package": "github.com/egoist/mygo/ui",
+    "log": "/tmp/orbit-menu-default-editor-0844.jsonl",
+    "expected_counts": {
+      "TestTextInputContextMenu": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "TestAccelerator": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "TestMenuButton": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "TestMenuButtonAccessibility": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "TestMenuAndContextMenuOfOneElement": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      }
+    },
+    "skip": 0,
+    "fail": 0
+  },
+  "other_gates": {
+    "wrapper_tests": {
+      "count": 25,
+      "result": "PASS",
+      "log": "/tmp/orbit-menu-wrapper-final-0845.log"
+    },
+    "vet": {
+      "packages": [
+        "./internal/ui",
+        "./internal/transcriptui"
+      ],
+      "exit_code": 0,
+      "log": "/tmp/orbit-menu-vet-0842.log"
+    },
+    "darwin_arm64": {
+      "exit_code": 0,
+      "log": "/tmp/orbit-menu-arm64-0843.log",
+      "sha256": "f3608548cc55cc1b2cf1567d5a6e1b25efbb5d26988a2e999609681d61f4e335"
+    },
+    "full_suite": "NOT_RUN; lead integration gate required",
+    "native_input": "NOT_RUN"
+  }
+}

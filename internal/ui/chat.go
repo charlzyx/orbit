@@ -47,8 +47,10 @@ func (a *App) messageTranscript(c *ui.Context) ui.Element {
 			m := a.Model.Messages[i]
 			ui.Column(c).AlignSelf(ui.Stretch).AlignItems(ui.Center).Padding(10, 24).Children(func() {
 				row := ui.Column(c).WidthPercent(100).MaxWidth(ContentMaxWidth).Gap(t.Space(8))
-				if row.Hovered() {
-					a.transcriptHover = m.Text
+				if register, ok := any(row).(interface {
+					RegisterTextMenuTarget(ui.Element, any) ui.Element
+				}); ok {
+					register.RegisterTextMenuTarget(scope, &transcriptMenuTarget{owner: owner, text: m.Text})
 				}
 				if a.searchOpen && strings.TrimSpace(a.Search) != "" && strings.Contains(strings.ToLower(messageSearchText(m)), strings.ToLower(strings.TrimSpace(a.Search))) {
 					alpha := float32(.07)
@@ -117,7 +119,23 @@ func (a *App) messageTranscript(c *ui.Context) ui.Element {
 			})
 		}
 	})
-	transcriptui.SelectionMenu(c, scope, a.transcriptHover, a.transcriptOptions(c))
+	transcriptui.SelectionMenuHit(c, scope, func(menu *ui.Menu) (string, bool) {
+		hit, ok := any(menu).(interface {
+			TextMenuHit(ui.Element, float32) (any, bool)
+		})
+		if !ok {
+			return "", false
+		}
+		token, ok := hit.TextMenuHit(scope, 24)
+		if !ok {
+			return "", false
+		}
+		target, ok := token.(*transcriptMenuTarget)
+		if !ok || target == nil || !a.ownsInlineImage(target.owner) {
+			return "", false
+		}
+		return target.text, true
+	}, a.transcriptOptions(c))
 	return scope
 }
 func (a *App) toolMessage(c *ui.Context, m Message) {

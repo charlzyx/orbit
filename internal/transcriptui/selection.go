@@ -40,6 +40,16 @@ type selectionMenuIntentKey struct{}
 // answer text, not a different nested selection container. The host identifies
 // the hovered logical row; the selected range may span several rows.
 func SelectionMenu(c *ui.Context, scope ui.Element, messageText string, o Options) {
+	selectionMenu(c, scope, messageText, nil, o)
+}
+
+// SelectionMenuHit resolves only the pointer opening, before creating any menu
+// item. A failed committed hit consumes the custom menu without a stale target.
+// Chosen replay retains the original two-item opening snapshot semantics.
+func SelectionMenuHit(c *ui.Context, scope ui.Element, resolve func(*ui.Menu) (string, bool), o Options) {
+	selectionMenu(c, scope, "", resolve, o)
+}
+func selectionMenu(c *ui.Context, scope ui.Element, messageText string, resolve func(*ui.Menu) (string, bool), o Options) {
 	// Local lifetime is the actual owner-keyed selectable/menu host. Retiring
 	// that host retires its sole intent; each new open replaces these strings.
 	intent := ui.Local(scope, selectionMenuIntentKey{}, func() selectionMenuIntent { return selectionMenuIntent{} })
@@ -51,6 +61,21 @@ func SelectionMenu(c *ui.Context, scope ui.Element, messageText string, o Option
 		}
 	}
 	scope.CopyData(SelectionData).ContextMenu(func(m *ui.Menu) {
+		if resolve != nil {
+			phase, ok := any(m).(interface{ Collecting() bool })
+			if !ok {
+				*intent = selectionMenuIntent{}
+				return
+			}
+			if phase.Collecting() {
+				text, hit := resolve(m)
+				if !hit {
+					*intent = selectionMenuIntent{}
+					return
+				}
+				messageText = text
+			}
+		}
 		// Keep indices and labels fixed across the public collect/Chosen phases.
 		selected := m.Item(o.tr("transcript.copy_selection", "Copy Selection"))
 		message := m.Item(o.tr("transcript.copy_message", "Copy Message"))

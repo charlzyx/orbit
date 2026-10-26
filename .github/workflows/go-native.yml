@@ -87,6 +87,23 @@ jobs:
           ORBIT_TERMINAL_TEST: "1"
       - name: Composer and selection compatibility toolkit regressions
         run: scripts/go-native.sh test -race github.com/egoist/mygo/ui -run "^TestOrbit(Composer|Selection)" -count=1
+      - name: Required committed menu-hit and default-menu regressions
+        run: |
+          python3 - <<'PYMENU'
+          import collections,json,os,pathlib,re,subprocess
+          names = ['TestAccelerator', 'TestContextMenu', 'TestContextMenuFromTheKeyboard', 'TestInnermostContextMenu', 'TestMenuAndContextMenuOfOneElement', 'TestMenuButton', 'TestMenuButtonAccessibility', 'TestTextInputContextMenu', 'TestTextMenuHitActualBlockLimit', 'TestTextMenuHitBoundedNearestAndStableTie', 'TestTextMenuHitClipDisabledOcclusionAndList', 'TestTextMenuHitCollectPanicReleasesEvent', 'TestTextMenuHitDefaultEmptyAndKeyboard', 'TestTextMenuHitFinalPassRegistrationOnly', 'TestTextMenuHitFinitePublicTransformsCanOverflowAtCommit', 'TestTextMenuHitInvalidGeometryBeforeHitChain', 'TestTextMenuHitOpeningSnapshotAndCancel', 'TestTextMenuHitOwnerAndWindow', 'TestTextMenuHitRejectsInvalidDerivedDistance', 'TestTextMenuHitStrictManhattanAndFinite', 'TestTextMenuHitTargetLimitAndPassPruning', 'TestTextMenuHitWindowsReleaseOrigin']
+          log = pathlib.Path(os.environ['RUNNER_TEMP'])/'orbit-menu-hit-required.jsonl'
+          with log.open('w') as f:
+              result = subprocess.run(['scripts/go-native.sh','test','-race','-json','github.com/egoist/mygo/ui','-run','^('+'|'.join(re.escape(n) for n in names)+')$','-count=1'],stdout=f,stderr=subprocess.STDOUT)
+          rows = [json.loads(s) for s in log.read_text().splitlines() if s.startswith('{')]
+          counts = collections.Counter((x.get('Test'),x.get('Action')) for x in rows)
+          valid = result.returncode == 0 and len(names) == 22 and all(counts[n,'run'] == counts[n,'pass'] == 1 for n in names) and not any(x.get('Action') in ('fail','skip') for x in rows)
+          if not valid:
+              print(log.read_text())
+              raise SystemExit('Required exact menu-hit/default-menu tests did not all run and pass without skip')
+          print('MENU_HIT_REQUIRED_22_TOP_LEVEL_ZERO_SKIP_VERIFIED')
+          print(json.dumps({n:{'run':counts[n,'run'],'pass':counts[n,'pass']} for n in names},sort_keys=True))
+          PYMENU
       - name: Verify canonical wrapper manifest boundaries
         run: python3 scripts/test-go-native-overlay.py
       - name: Source workbench and Usage fixture/capture safety regressions

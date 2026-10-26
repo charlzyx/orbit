@@ -49,6 +49,15 @@ func messageSearchText(m Message) string {
 	}
 	return m.Text + "\n" + m.Thinking + "\n" + m.ToolOutput
 }
+
+// A target is immutable and shares (does not copy) the model's source string.
+// Toolkit stores it only for visible committed rows, then releases event copy
+// immediately after opening collect. Existing menu intent owns one snapshot.
+type transcriptMenuTarget struct {
+	owner inlineImageToken
+	text  string
+}
+
 func (a *App) transcriptOptions(c *ui.Context) transcriptui.Options {
 	owner := a.inlineImageToken()
 	t := a.Theme

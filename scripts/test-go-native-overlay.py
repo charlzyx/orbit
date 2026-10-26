@@ -100,6 +100,68 @@ class SelectionManifest(unittest.TestCase):
         source.unlink(); source.symlink_to(outside)
         with self.assertRaises(RuntimeError): self.verify()
 
+class MenuHitManifest(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        self.module, self.compat = self.root / "module", self.root / "compat"
+        (self.module / "ui").mkdir(parents=True)
+        self.compat.mkdir()
+        self.identity = {k: "fixture-" + k for k in overlay.MENU_HIT_IDENTITIES}
+        self.manifest = dict(self.identity, baseline_sha256={}, overlays={})
+        for target in overlay.MENU_HIT_BASELINE | overlay.MENU_HIT_ADDED:
+            source = Path(target).name + ".txt"
+            added = target in overlay.MENU_HIT_ADDED
+            (self.compat / source).write_text("reviewed fixture overlay " + target)
+            if not added:
+                (self.module / target).write_text("upstream fixture " + target)
+                self.manifest["baseline_sha256"][target] = overlay.sha(self.module / target)
+            self.manifest["overlays"][target] = {"source":source, "sha256":overlay.sha(self.compat/source), "added":added}
+        (self.compat / "menu-hit.patch").write_text("fixture reviewed patch")
+        self.manifest["patch_sha256"] = overlay.sha(self.compat / "menu-hit.patch")
+        self.save()
+    def save(self):
+        (self.compat / "baseline.json").write_text(json.dumps(self.manifest))
+    def verify(self):
+        return overlay.verify_menu_hit(self.module, self.compat, self.identity)
+    def test_exact_explicit_files(self):
+        self.assertEqual(set(self.verify()), overlay.MENU_HIT_BASELINE | overlay.MENU_HIT_ADDED)
+        (self.compat / "unlisted.go.txt").write_text("must never be discovered")
+        self.assertEqual(len(self.verify()), 4)
+    def test_rejects_identity_hash_and_patch_mismatch(self):
+        original = copy.deepcopy(self.manifest)
+        for mutate in [
+            lambda m: m.update(version="unreviewed"),
+            lambda m: m["baseline_sha256"].update({"ui/menu.go":"bad"}),
+            lambda m: m["overlays"]["ui/menu.go"].update(sha256="bad"),
+            lambda m: m.update(patch_sha256="bad"),
+        ]:
+            self.manifest=copy.deepcopy(original); mutate(self.manifest); self.save()
+            with self.assertRaises(RuntimeError): self.verify()
+    def test_rejects_unknown_missing_traversal_and_kind(self):
+        original=copy.deepcopy(self.manifest)
+        for mutate in [
+            lambda m: m["overlays"].update({"ui/not_reviewed.go":{}}),
+            lambda m: m["baseline_sha256"].pop("ui/menu.go"),
+            lambda m: m["overlays"]["ui/menu.go"].update(source="../../outside.go"),
+            lambda m: m["overlays"]["ui/menu.go"].update(added=True),
+            lambda m: m["overlays"]["ui/menu.go"].update(added=0),
+            lambda m: m.update(unreviewed_key=True),
+        ]:
+            self.manifest=copy.deepcopy(original); mutate(self.manifest); self.save()
+            with self.assertRaises(RuntimeError): self.verify()
+    def test_rejects_existing_added_file_and_symlink_escape(self):
+        target=self.module / "ui/orbit_menu_hit.go"
+        target.write_text("unexpected cache mutation")
+        with self.assertRaises(RuntimeError): self.verify()
+        target.unlink()
+        source=self.compat / "menu.go.txt"
+        outside=self.root / "outside.txt"
+        outside.write_bytes(source.read_bytes())
+        source.unlink(); source.symlink_to(outside)
+        with self.assertRaises(RuntimeError): self.verify()
+
 class DiagnosticModes(unittest.TestCase):
     def test_normal_does_not_import_diagnostic_assets(self):
         with mock.patch.object(overlay, "import_verifier", side_effect=AssertionError("must not import")):

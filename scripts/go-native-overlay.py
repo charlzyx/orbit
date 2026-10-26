@@ -135,6 +135,43 @@ def verify_selection(module_dir: Path, compatibility: Path, expected: dict) -> d
         result[relative] = source
     return result
 
+MENU_HIT_BASELINE = frozenset({"ui/runtime.go", "ui/menu.go"})
+MENU_HIT_ADDED = frozenset({"ui/orbit_menu_hit.go", "ui/orbit_menu_hit_test.go"})
+MENU_HIT_IDENTITIES = SELECTION_IDENTITIES
+
+def verify_menu_hit(module_dir: Path, compatibility: Path, expected: dict) -> dict[str, Path]:
+    manifest = json.loads((compatibility / "baseline.json").read_text())
+    if set(manifest) != set(MENU_HIT_IDENTITIES) | {"baseline_sha256", "overlays", "patch_sha256"}:
+        fail("Unexpected menu-hit compatibility manifest schema")
+    if any(manifest.get(key) != expected.get(key) for key in MENU_HIT_IDENTITIES):
+        fail("Menu hit compatibility identity differs from the reviewed MyGo pin")
+    if set(manifest["baseline_sha256"]) != MENU_HIT_BASELINE:
+        fail("Menu hit baseline paths differ from the explicit reviewed set")
+    if set(manifest["overlays"]) != MENU_HIT_BASELINE | MENU_HIT_ADDED:
+        fail("Menu hit overlay paths differ from the explicit reviewed set")
+    if sha(compatibility / "menu-hit.patch") != manifest["patch_sha256"]:
+        fail("Menu hit compatibility patch hash mismatch")
+    for relative, digest in manifest["baseline_sha256"].items():
+        original = module_dir / relative
+        if not original.is_file() or sha(original) != digest:
+            fail(f"Pinned MyGo menu-hit baseline hash mismatch: {relative}")
+    result = {}
+    for relative, info in manifest["overlays"].items():
+        if set(info) != {"source", "sha256", "added"}:
+            fail(f"Unexpected menu-hit overlay schema: {relative}")
+        is_added = relative in MENU_HIT_ADDED
+        if type(info["added"]) is not bool or info["added"] != is_added:
+            fail(f"Menu hit additive/replacement kind mismatch: {relative}")
+        if info["source"] != Path(relative).name + ".txt":
+            fail(f"Menu hit source path differs from the reviewed file: {relative}")
+        source = compatibility / info["source"]
+        if source.resolve().parent != compatibility.resolve() or not source.is_file() or sha(source) != info["sha256"]:
+            fail(f"Menu hit compatibility source hash/path mismatch: {relative}")
+        if is_added and (module_dir / relative).exists():
+            fail(f"Unexpected menu-hit addition in module cache: {relative}")
+        result[relative] = source
+    return result
+
 
 
 DIAGNOSTIC_MODES = frozenset({"--diagnostic-text-metrics", "--diagnostic-text-metrics-observed"})
@@ -291,6 +328,7 @@ def main() -> int:
         fail("Composer compatibility source hash mismatch; review/update the manifest")
     selection_overlays = verify_selection(module_dir, SELECTION, manifest)
     review_overlays = verify_review_text(module_dir, manifest, mode)
+    menu_hit_overlays = verify_menu_hit(module_dir, ROOT / "third_party/mygo-menu-hit", manifest)
     diagnostic_overlays = {}
     overlay: dict[str, str] = {}
     if previous_overlay:
@@ -316,7 +354,7 @@ def main() -> int:
     reviewed_overlays = merge_reviewed([
         selection_overlays, {manifest["added_file"]: source},
         {"ui/orbit_composer_test.go": test_source} if test_source.exists() else {},
-        review_overlays, diagnostic_overlays,
+        review_overlays, menu_hit_overlays, diagnostic_overlays,
     ])
     with tempfile.TemporaryDirectory(prefix="orbit-mygo-overlay-") as tmp:
         temp_root = Path(tmp)
