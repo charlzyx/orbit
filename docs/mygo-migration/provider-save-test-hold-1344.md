@@ -1,0 +1,13 @@
+# Provider save completion fixture: deterministic hold (2026-10-26)
+
+Base: `e5c9fc87a6db173b74339b7629e90bf43bd73c84` (provider integration). Production bytes are unchanged.
+
+The first aggregate failed `TestAuditProviderFailedCompletionDoesNotApplyOrConsumeNewDraft` and `TestProviderFailedSaveKeepsOriginalErrorDraft` with “save not admitted”. This was not a passing aggregate. A diagnostic-only exact-base repetition found failures in 3/10 and 4/10 respectively. Every reproduced failure already had `busy=false`, `queued=0`, and the actual filesystem error `models.json: is a directory`. Save was admitted and its completion had already been applied: `ui.Tester.Click` sends down/up and settles frames, while App.View drains buffered completions. The old helper tried to hold the callback only after those frames. Diagnostic log: `/tmp/orbit-provider-completion-diagnosis-1339.jsonl`; original aggregate: `/workspace/shared/orbit-provider-gate-1321/full.jsonl`.
+
+The test-only helper now requires settled initial backdrop/settings loads and an empty queue, switches that fixture to an unbuffered completion queue before the real Save click, explicitly receives the actual filesystem completion, then restores the original buffered queue before any apply/refresh. App.drainUpdates snapshots `len(queue)`, so rendered frames cannot consume this held unbuffered send. Existing real filesystem success/error assertions, actual Escape/scrim/reopen actions, successful effect counters, unchanged replacement draft assertions, and the three-second failure deadline remain intact. No private save call, sleep, retry click, production hook, or business wait was added.
+
+On a true deadline failure the helper does not close or unsafely restore a queue a late sender may use. Cleanup may non-blockingly discard an arriving callback, otherwise explicitly records unsettled I/O and leaves the fixture queue unchanged. It adds no receiver goroutine or unlimited cleanup wait and does not claim that the existing Async filesystem operation is cancellable. Such a path remains a failed test; no success result is inferred from cleanup.
+
+First mechanism check: six top-level tests / twelve names including subtests, each ten run/pass, zero fail/skip (16.072 seconds). Final-byte broader gate and exact expected-set counts are recorded separately; a new aggregate is still required and supersedes neither the original failure nor historical logs.
+
+Final-byte gate: original eight top-level / fourteen names including subtests each ten run/pass, zero fail/skip; race 17.804 seconds, UI vet EXIT 0. `providers.go` SHA256 remains `9bffc06f8539d04a677de9d6013a3216e22d44fe1d7ad98d4a78361b019c5e9f`, identical to base.

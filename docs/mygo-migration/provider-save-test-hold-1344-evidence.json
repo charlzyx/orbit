@@ -1,0 +1,78 @@
+{
+  "base": "e5c9fc87a6db173b74339b7629e90bf43bd73c84",
+  "expected_top": [
+    "TestAuditProviderSavedCompletionSurvivesDismissal",
+    "TestAuditProviderFailedCompletionDoesNotApplyOrConsumeNewDraft",
+    "TestAuditProviderCancelBeforeSaveDoesNotWrite",
+    "TestProviderSavedCompletionPreservesWorkspaceBoundary",
+    "TestProviderSavedCompletionSameWorkspaceTaskChangeKeepsNewDraft",
+    "TestProviderFailedSaveKeepsOriginalErrorDraft",
+    "TestSourceProviderEditorModalChipsKeyboardAndPersistence",
+    "TestSourceCredentialSaveDoesNotDiscardReopenedDraft"
+  ],
+  "counts": {
+    "TestAuditProviderSavedCompletionSurvivesDismissal": {
+      "run": 10,
+      "pass": 10
+    },
+    "TestAuditProviderSavedCompletionSurvivesDismissal/escape": {
+      "run": 10,
+      "pass": 10
+    },
+    "TestAuditProviderSavedCompletionSurvivesDismissal/scrim": {
+      "run": 10,
+      "pass": 10
+    },
+    "TestAuditProviderSavedCompletionSurvivesDismissal/same-editor": {
+      "run": 10,
+      "pass": 10
+    },
+    "TestAuditProviderFailedCompletionDoesNotApplyOrConsumeNewDraft": {
+      "run": 10,
+      "pass": 10
+    },
+    "TestAuditProviderCancelBeforeSaveDoesNotWrite": {
+      "run": 10,
+      "pass": 10
+    },
+    "TestAuditProviderCancelBeforeSaveDoesNotWrite/escape": {
+      "run": 10,
+      "pass": 10
+    },
+    "TestAuditProviderCancelBeforeSaveDoesNotWrite/scrim": {
+      "run": 10,
+      "pass": 10
+    },
+    "TestAuditProviderCancelBeforeSaveDoesNotWrite/cancel-button": {
+      "run": 10,
+      "pass": 10
+    },
+    "TestProviderSavedCompletionPreservesWorkspaceBoundary": {
+      "run": 10,
+      "pass": 10
+    },
+    "TestProviderSavedCompletionSameWorkspaceTaskChangeKeepsNewDraft": {
+      "run": 10,
+      "pass": 10
+    },
+    "TestProviderFailedSaveKeepsOriginalErrorDraft": {
+      "run": 10,
+      "pass": 10
+    },
+    "TestSourceProviderEditorModalChipsKeyboardAndPersistence": {
+      "run": 10,
+      "pass": 10
+    },
+    "TestSourceCredentialSaveDoesNotDiscardReopenedDraft": {
+      "run": 10,
+      "pass": 10
+    }
+  },
+  "race_elapsed": 17.804,
+  "race_exit": 0,
+  "vet_exit": 0,
+  "production_sha256": "9bffc06f8539d04a677de9d6013a3216e22d44fe1d7ad98d4a78361b019c5e9f",
+  "original_fail_log": "/workspace/shared/orbit-provider-gate-1321/full.jsonl",
+  "diagnostic_log": "/tmp/orbit-provider-completion-diagnosis-1339.jsonl",
+  "final_log": "/tmp/orbit-provider-completion-final-1344.jsonl"
+}

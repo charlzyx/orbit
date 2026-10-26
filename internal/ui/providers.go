@@ -83,17 +83,26 @@ func (a *App) saveProviderDraft(d *providerDraft) {
 		e := svc.SaveProvider(edit)
 		return func() {
 			d.busy = false
-			if a.providerState.editor != d || root != a.Model.Workspace {
+			if e == nil {
+				d.key = ""
+			}
+			if root != a.Model.Workspace {
+				return
+			}
+			// Dismissing a modal does not undo its completed models.json write.
+			// Refresh its successful effect, but never consume a newer draft.
+			if e == nil {
+				a.Dispatch(Action{Kind: "RuntimeConfigChanged"})
+				a.refreshProviders()
+			}
+			if a.providerState.editor != d {
 				return
 			}
 			if e != nil {
 				d.error = e.Error()
 				return
 			}
-			d.key = ""
 			a.providerState.editor = nil
-			a.Dispatch(Action{Kind: "RuntimeConfigChanged"})
-			a.refreshProviders()
 		}
 	})
 }

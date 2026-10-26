@@ -1,0 +1,128 @@
+{
+  "base": "d05facafbbceddff535b764054925ea4a7195165",
+  "tree": "d0005488893adc8854a0d3724904aeb10db65083",
+  "expected_top": [
+    "TestAuditProviderSavedCompletionSurvivesDismissal",
+    "TestAuditProviderFailedCompletionDoesNotApplyOrConsumeNewDraft",
+    "TestAuditProviderCancelBeforeSaveDoesNotWrite",
+    "TestProviderSavedCompletionPreservesWorkspaceBoundary",
+    "TestProviderSavedCompletionSameWorkspaceTaskChangeKeepsNewDraft",
+    "TestProviderFailedSaveKeepsOriginalErrorDraft",
+    "TestSourceProviderEditorModalChipsKeyboardAndPersistence",
+    "TestSourceCredentialSaveDoesNotDiscardReopenedDraft"
+  ],
+  "counts": {
+    "TestAuditProviderSavedCompletionSurvivesDismissal": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestAuditProviderSavedCompletionSurvivesDismissal/escape": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestAuditProviderSavedCompletionSurvivesDismissal/scrim": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestAuditProviderSavedCompletionSurvivesDismissal/same-editor": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestAuditProviderFailedCompletionDoesNotApplyOrConsumeNewDraft": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestAuditProviderCancelBeforeSaveDoesNotWrite": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestAuditProviderCancelBeforeSaveDoesNotWrite/escape": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestAuditProviderCancelBeforeSaveDoesNotWrite/scrim": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestAuditProviderCancelBeforeSaveDoesNotWrite/cancel-button": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestProviderSavedCompletionPreservesWorkspaceBoundary": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestProviderSavedCompletionSameWorkspaceTaskChangeKeepsNewDraft": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestProviderFailedSaveKeepsOriginalErrorDraft": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestSourceProviderEditorModalChipsKeyboardAndPersistence": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestSourceCredentialSaveDoesNotDiscardReopenedDraft": {
+      "run": 3,
+      "pass": 3
+    }
+  },
+  "top_count": 8,
+  "including_subtests": 14,
+  "elapsed_seconds": 7.916,
+  "status": "FOCUSED_EXIT:0\nVET_EXIT:0\nARM64_EXIT:0\n",
+  "logs": {
+    "/tmp/orbit-provider-save-final-1317.jsonl": "2575b462fa09c0a106911515b3d64a84ef065f9f254c18cbe3fe5fd2949a0745",
+    "/tmp/orbit-provider-save-final-1317.status": "9f8bbfba07a4c5037fb8eb1599392e5c8d97bb96014ab564f6acdef93d03c5f4",
+    "/tmp/orbit-provider-save-vet-1317.log": "9da2d27b7ee72dd6c6d7e2ae1b7563cfb188c722afb006b10f70efacf395b90a",
+    "/tmp/orbit-provider-save-arm64-1317.log": "9da2d27b7ee72dd6c6d7e2ae1b7563cfb188c722afb006b10f70efacf395b90a",
+    "/tmp/orbit-provider-save-red-1314.jsonl": "4605b7b2cb067016b4815f0aa289c3f2dcc94224caff115059b78fc7bb194989"
+  },
+  "red": {
+    "base": "d05facafbbceddff535b764054925ea4a7195165",
+    "tree": "d0005488893adc8854a0d3724904aeb10db65083",
+    "result": "EXPECTED_RED",
+    "log": "/tmp/orbit-provider-save-red-1314.jsonl",
+    "sha256": "4605b7b2cb067016b4815f0aa289c3f2dcc94224caff115059b78fc7bb194989",
+    "counts": {
+      "TestAuditProviderSavedCompletionSurvivesDismissal": {
+        "run": 1,
+        "fail": 1
+      },
+      "TestAuditProviderSavedCompletionSurvivesDismissal/escape": {
+        "run": 1,
+        "fail": 1
+      },
+      "TestAuditProviderSavedCompletionSurvivesDismissal/scrim": {
+        "run": 1,
+        "fail": 1
+      },
+      "TestAuditProviderSavedCompletionSurvivesDismissal/same-editor": {
+        "run": 1,
+        "pass": 1
+      },
+      "TestAuditProviderFailedCompletionDoesNotApplyOrConsumeNewDraft": {
+        "run": 1,
+        "pass": 1
+      },
+      "TestAuditProviderCancelBeforeSaveDoesNotWrite": {
+        "run": 1,
+        "pass": 1
+      },
+      "TestAuditProviderCancelBeforeSaveDoesNotWrite/escape": {
+        "run": 1,
+        "pass": 1
+      },
+      "TestAuditProviderCancelBeforeSaveDoesNotWrite/scrim": {
+        "run": 1,
+        "pass": 1
+      },
+      "TestAuditProviderCancelBeforeSaveDoesNotWrite/cancel-button": {
+        "run": 1,
+        "pass": 1
+      }
+    }
+  }
+}
