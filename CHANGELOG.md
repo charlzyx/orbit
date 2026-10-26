@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### In progress
 
+- Add a commit-only native model picker and private preference, preserving follow-session/default behavior and explicit unknown-model identity. Apply a selected-window shared byte budget to commit context only; preserve isolated tool-free Pi generation, honest fallback/cancellation, and unchanged chat/Issue/PR models. Scoped source evidence remains separate from native/full-parity acceptance.
+
 - Integrate source-derived session metadata/delete ownership fences and target-bound async HTML export, workspace path/icon/color/sidebar-removal actions, embedded Git diff navigation and owner-bound menus, retry failure/cancellation feedback, hidden-provider grouping and MCP probe lifecycle. Preserve destructive confirmations, actual completion/timeout uncertainty, and unresolved native acceptance; see the third-wave migration audit.
 
 - Source-derived conversation navigation rail, hover snippets and one-time hint; correct previous/next user-turn anchoring at the live edge and within assistant rows. A narrowly scoped retained-selection compatibility interaction preserves selected text on rail navigation without relaxing ordinary controls/outside clicks. Combined/native acceptance remains pending; do not treat this batch as full parity.

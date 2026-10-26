@@ -3,9 +3,9 @@ name: Go native migration
 on:
   push:
     branches: ["redesign/mygo-rpc"]
-    paths: ["**/*.go", "**/*.go.txt", "**/go.mod", "**/go.sum", "scripts/go-native*", "scripts/capture-native-reference.sh", "scripts/usage-native/**", "testdata/usage-native/**", "scripts/chat-native/**", "testdata/chat-native/**", "scripts/workbench-native/**", "testdata/workbench-native/**", "third_party/mygo-composer/**", "third_party/mygo-selection/**", "assets/**", ".github/workflows/go-native.yml"]
+    paths: ["**/*.go", "**/*.go.txt", "**/go.mod", "**/go.sum", "scripts/go-native*", "scripts/ci/**", "scripts/capture-native-reference.sh", "scripts/usage-native/**", "testdata/usage-native/**", "scripts/chat-native/**", "testdata/chat-native/**", "scripts/workbench-native/**", "testdata/workbench-native/**", "third_party/mygo-composer/**", "third_party/mygo-selection/**", "assets/**", ".github/workflows/go-native.yml"]
   pull_request:
-    paths: ["**/*.go", "**/*.go.txt", "**/go.mod", "**/go.sum", "scripts/go-native*", "scripts/capture-native-reference.sh", "scripts/usage-native/**", "testdata/usage-native/**", "scripts/chat-native/**", "testdata/chat-native/**", "scripts/workbench-native/**", "testdata/workbench-native/**", "third_party/mygo-composer/**", "third_party/mygo-selection/**", "assets/**", ".github/workflows/go-native.yml"]
+    paths: ["**/*.go", "**/*.go.txt", "**/go.mod", "**/go.sum", "scripts/go-native*", "scripts/ci/**", "scripts/capture-native-reference.sh", "scripts/usage-native/**", "testdata/usage-native/**", "scripts/chat-native/**", "testdata/chat-native/**", "scripts/workbench-native/**", "testdata/workbench-native/**", "third_party/mygo-composer/**", "third_party/mygo-selection/**", "assets/**", ".github/workflows/go-native.yml"]
   workflow_dispatch:
     inputs:
       capture_chat_stage1:
@@ -22,6 +22,8 @@ jobs:
     timeout-minutes: 3
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Check dependency phase logging offline
+        run: python3 -m unittest discover -s scripts/ci -p 'test_install_native_deps.py' -v
       - name: Require real threaded child-process ownership regression
         env:
           ORBIT_REQUIRE_PROC_CHILDREN: "1"
@@ -143,9 +145,8 @@ jobs:
         with:
           node-version: '22.23.4'
       - name: Reference renderer and isolated display dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y clang cmake pkg-config libfontconfig-dev libvulkan1 mesa-vulkan-drivers vulkan-tools libwayland-dev libx11-xcb-dev libxi-dev libxtst-dev libxkbcommon-x11-dev libssl-dev libgtk-3-0 libpango-1.0-0 libcairo2 xvfb openbox xdotool wmctrl x11-utils imagemagick tesseract-ocr
+        timeout-minutes: 5
+        run: bash scripts/ci/install-native-deps.sh reference
       - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
         with:
           toolchain: '1.94.0'
@@ -187,9 +188,8 @@ jobs:
         with:
           node-version: '22.23.4'
       - name: Isolated native display dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libgtk-3-0 libpango-1.0-0 libcairo2 libfontconfig1 libgl1-mesa-dri mesa-vulkan-drivers vulkan-tools xvfb openbox xdotool wmctrl x11-utils imagemagick tesseract-ocr
+        timeout-minutes: 5
+        run: bash scripts/ci/install-native-deps.sh go
       - name: Build native Go app and pinned Pi fixture
         run: |
           CGO_ENABLED=0 scripts/go-native.sh build -o /tmp/orbit-go-native ./cmd/orbit

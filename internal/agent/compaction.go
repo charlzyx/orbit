@@ -41,7 +41,7 @@ func (m *Manager) Compact() error {
 				entry.state.snapshot.Compacting = false
 				entry.state.manualCompactPending = false
 			}
-			if err != nil && !errors.As(err, &rejected) {
+			if err != nil && !errors.As(err, &rejected) && !entry.observedTerminal(client) {
 				entry.state.snapshot.setCommandError(pirpc.Compact, err.Error())
 			}
 		}

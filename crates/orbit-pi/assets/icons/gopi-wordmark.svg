@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="74" height="26" viewBox="-1 -1 74 26" role="img" aria-label="GOPI">
+  <!-- Original geometric lettering: square counters, heavy pixel-grid stems.
+       G/O/P are 18x24; I is 6x24. No font or raster source is required. -->
+  <defs>
+    <g id="gopi" fill-rule="evenodd">
+      <path d="M0 0H18V6H6V18H12V15H9V10H18V24H0Z"/>
+      <path d="M22 0H40V24H22Z M28 6V18H34V6Z"/>
+      <path d="M44 0H62V16H50V24H44Z M50 6V10H56V6Z"/>
+      <path d="M66 0H72V24H66Z"/>
+    </g>
+  </defs>
+  <!-- A restrained edge, not an unsupported SVG blur filter. -->
+  <use href="#gopi" fill="currentColor" stroke="currentColor" stroke-width="1" opacity="0.10"/>
+  <use href="#gopi" fill="currentColor"/>
+</svg>

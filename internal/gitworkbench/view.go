@@ -253,11 +253,16 @@ func (s *State) changes(c *ui.Context) {
 			return
 		}
 		field := ui.TextArea(c, &s.CommitMessage).Placeholder("Commit message (leave blank to generate)…").Label("Commit message").Height(72).AlignSelf(ui.Stretch)
-		if !s.dialogOpen && !s.confirmOpen && field.Shortcut(ui.Cmd, ui.KeyEnter) {
+		if s.commitModel.focusMessage {
+			field.Focus()
+			s.commitModel.focusMessage = false
+		}
+		if !s.commitModel.open && !s.dialogOpen && !s.confirmOpen && field.Shortcut(ui.Cmd, ui.KeyEnter) {
 			s.Commit(false)
 		}
-		ui.Row(c).Gap(8).Children(func() {
+		ui.Row(c).Gap(8).Wrap().Children(func() {
 			ui.Checkbox(c, &s.IncludeUnstaged, "Include unstaged changes")
+			s.commitModelSelector(c)
 			ui.Spacer(c)
 			if s.HasGenerator() && button(c, "Generate message", s.Busy || len(s.Data.Changes) == 0).Clicked() {
 				s.RequestGenerate(false, false)

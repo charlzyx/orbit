@@ -1,5 +1,5 @@
 {
-  "design": "Go-only cyan OP with yellow GO badge; 824/1024 inset; vector outlined lettering",
+  "design": "Go-only pixel PI; stepped charcoal tile with silver square path glyphs shared with GOPI wordmark; no font or badge",
   "icns_slots": {
     "ic07": 128,
     "ic08": 256,
@@ -15,14 +15,14 @@
   },
   "outputs": {
     "assets/icons/go/orbit-go.icns": {
-      "bytes": 57527,
-      "sha256": "ab9cd4c6e3719223381cf75f140f335bd54b29f84b4fc1c5210d841837880936"
+      "bytes": 25050,
+      "sha256": "f724af64a751ef5e1d63cae5e6c3bfddb22ef6ec14da8693d99aef9558776656"
     },
     "crates/orbit-pi/assets/go-app-icon.png": {
-      "bytes": 9580,
-      "sha256": "507e8c373aa73e44482bea8eb0c1a81c7f597947d80151149254590ee5f88970"
+      "bytes": 3707,
+      "sha256": "279fb526db1dd42da72a43c39ecb18ad69c03042e479a5fa44c4d95afda8f7db"
     }
   },
   "source": "assets/icons/go/orbit-go.svg",
-  "source_sha256": "1845266abbd11ac16cb8ea7bc449a4b2c2ee127434c85daeb7491b8eed999f24"
+  "source_sha256": "98b2db727679ac56111a414542f0169a35d47375c73173db4f5c7dada781173c"
 }

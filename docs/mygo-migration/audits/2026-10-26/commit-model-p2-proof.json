@@ -1,0 +1,96 @@
+{
+  "base_commit": "5dbc486e33d6761fbd11ea85378794cc8ff1fa3b",
+  "base_tree": "05882441c24ad879aac0b94b68633f31b5cad9f0",
+  "source_upstream": "118aa2ecac871df37e4fa56bf9a2be4fa853e70d",
+  "not_run": [
+    "full Go suite",
+    "hosted native capture",
+    "real model/provider",
+    "release/ref write"
+  ],
+  "packages": {
+    "preferences": {
+      "actual_top_level": [
+        "TestCommitModelPrivateRoundtripAndFailures"
+      ],
+      "test_pass_events": 1,
+      "race": true,
+      "elapsed": 1.017,
+      "fail": 0,
+      "skip": 0
+    },
+    "workspace": {
+      "actual_top_level": [
+        "TestCommitContextBudgetsAndNoMutation",
+        "TestCommitContextWindowBudgetBoundaries",
+        "TestCommitRPCIsolatedAndNormalized",
+        "TestCommitSelectedWindowCapsActualMultiFilePrompt",
+        "TestCommitUnbornAndUntrackedContext",
+        "TestCommitUnknownSelectedModelFailureIsExplicit",
+        "TestCommitUnknownWindowSharesDiffBudget",
+        "TestDraftRPCFallbackTimeoutAndCancellation",
+        "TestGenerationParsersAndHeuristics",
+        "TestReportDraftRPCNotesOnlyFallbackAndCancellation"
+      ],
+      "test_pass_events": 10,
+      "race": true,
+      "elapsed": 2.259,
+      "fail": 0,
+      "skip": 0
+    },
+    "gitworkbench": {
+      "actual_top_level": [
+        "TestCancellationDoesNotApplyLateResults",
+        "TestCommitModelAdmissionFreezeAndLateResult",
+        "TestCommitModelMountedEscapeBusyAndWorkspace",
+        "TestCommitModelMountedKeyboardFocusAndFollow",
+        "TestCommitModelMountedOutsideAndKeyboardReveal",
+        "TestCommitModelResolveIdentityAndUnknown",
+        "TestCommitModelWriteFailureAppliesOnlyInMemory",
+        "TestGitHubBasePickerEmptyDismissRepeatAndErrorDoNotMutateDraft",
+        "TestGitHubNativeBasePickerFiltersLocalBranchesWithoutImplicitSelection"
+      ],
+      "test_pass_events": 11,
+      "race": true,
+      "elapsed": 1.662,
+      "fail": 0,
+      "skip": 0
+    },
+    "ui": {
+      "actual_top_level": [
+        "TestCommitDedicatedModelRealJSONL",
+        "TestCommitFollowAndDraftUseOnlyActiveModelJSONL"
+      ],
+      "test_pass_events": 4,
+      "race": true,
+      "elapsed": 12.272,
+      "fail": 0,
+      "skip": 0
+    }
+  },
+  "logs": {
+    "budget-red.jsonl": "52b2bf5297984a274941f40b3c02ed4478146d97c4c2c6f4bb7ff7c12c5ad736",
+    "rpc-red-settled.jsonl": "c1585fae76a6e70913555737b7a4a130710ac05606a2f5cdc69bb6b0d6982f9c",
+    "rpc-red.jsonl": "b3aa0c379cf370a9a254cb4d0f6b5667fa10c1788b0a80512324da30452b0fd7",
+    "final-preferences.jsonl": "d902285ab816aba508787d2bbfc83dc042a343fc34e6698bec56bb2f8baddee1",
+    "final-workspace.jsonl": "faa4a0a3c7b584ebdae9404416a8378dfb7b0db485de74bc0df0e49f761bcd04",
+    "final-gitworkbench.jsonl": "c2fbd668aca7a81960abe3c38b8e89638e1cc98ce381f944f8de5ba1a12cd269",
+    "final-ui.jsonl": "3d0b58373475851b60b1244ef2963d5570f87bfcb6bbb194fbc476dfadb4f0ec",
+    "final-vet.log": "9da2d27b7ee72dd6c6d7e2ae1b7563cfb188c722afb006b10f70efacf395b90a",
+    "final-arm-compile.log": "9da2d27b7ee72dd6c6d7e2ae1b7563cfb188c722afb006b10f70efacf395b90a",
+    "final-arm-vet.log": "9da2d27b7ee72dd6c6d7e2ae1b7563cfb188c722afb006b10f70efacf395b90a"
+  },
+  "red": {
+    "budget-red.jsonl": "1 actual FAIL: 788744-byte prompt exceeds unknown model total",
+    "rpc-red-settled.jsonl": "1 actual FAIL: child prompt without private explicit set_model",
+    "rpc-red.jsonl": "NOT valid behavioral evidence: initial refresh was not settled; retained, superseded"
+  },
+  "gates": {
+    "linux_vet": "PASS",
+    "darwin_arm64_vet": "PASS",
+    "darwin_arm64_ui_test_binary_compile": "PASS, not executed",
+    "diff_check": "PASS",
+    "chain_exit": 0
+  },
+  "limitations": "Partial #88 model selection + required budget; #87 hunk/body/attempt semantics not ported. Byte estimator not tokenizer guarantee. Extreme metadata list explicitly truncated by final ceiling."
+}

@@ -54,7 +54,7 @@ def rebuild():
     chunks=b''.join(kind.encode()+struct.pack('>I',8+len(images[size]))+images[size] for kind,size in SLOTS.items())
     ICNS.write_bytes(b'icns'+struct.pack('>I',8+len(chunks))+chunks)
     APP.write_bytes(images[512])
-    manifest={'source':str(SOURCE.relative_to(ROOT)),'source_sha256':digest(SOURCE.read_bytes()),'design':'Go-only cyan OP with yellow GO badge; 824/1024 inset; vector outlined lettering', 'icns_slots':SLOTS,'outputs':{str(p.relative_to(ROOT)):{'sha256':digest(p.read_bytes()),'bytes':p.stat().st_size} for p in (ICNS,APP)}}
+    manifest={'source':str(SOURCE.relative_to(ROOT)),'source_sha256':digest(SOURCE.read_bytes()),'design':'Go-only pixel PI; stepped charcoal tile with silver square path glyphs shared with GOPI wordmark; no font or badge', 'icns_slots':SLOTS,'outputs':{str(p.relative_to(ROOT)):{'sha256':digest(p.read_bytes()),'bytes':p.stat().st_size} for p in (ICNS,APP)}}
     MANIFEST.write_text(json.dumps(manifest,indent=2,sort_keys=True)+'\n')
     return manifest
 

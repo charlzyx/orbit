@@ -1,0 +1,9 @@
+# Bounded CI dependency setup (candidate)
+
+Hosted evidence: rename1f97 reference apt fetched54.8MB in40m21s; remaining45m job budget expired after the app's simple readiness, before complete capture. ecaa attempt2 native still fetched apt packages when its15m job cancelled; app capture never started. ecaa reference same75.4MB request fetched in2s. This is infrastructure variability, not proof of an application regression.
+
+This candidate adds Actions-native timeout-minutes:5 to each of the two existing dependency setup steps. Whole-job budgets stay15/45 minutes; required tests, package arguments, repositories, credentials, permissions, and capture assertions are unchanged. The bash helper only emits phase/start UTC, elapsed seconds and real exit status for original sudo apt-get update/install commands. Errors stop the job and are not converted to success. Cold slow infrastructure can still fail; this is bounded and correctly classified failure, not an availability guarantee.
+
+No custom supervisor, signal trap, process-tree killer, extra sudo scope, cache, mirror selection, network retry, or global apt change. Deadline/cancellation cleanup remains GitHub runner responsibility. END logs are best effort: hard runner cancellation can leave a START without END; interpret that as interrupted/unknown completion, never a successful phase. Offline mocked command tests verify successful exact argument vectors, update/install failures and a signalled command propagating143. They do not demonstrate actual hosted timeout or root-owned apt-child cleanup. No actual apt/network/GUI invocation was performed for this candidate.
+
+A new offline test step under the existing proc guard runs6 named tests, and scripts/ci changes participate in existing workflow path filters. Source syntax: bash -n. No second Go/full suite is required for this workflow-only candidate; actual hosted verification requires separate authorization after review.

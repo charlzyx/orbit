@@ -8,12 +8,17 @@ import (
 	"errors"
 	"time"
 
+	"github.com/charlzyx/orbit/internal/agent"
 	"github.com/charlzyx/orbit/internal/highlight"
+	"github.com/charlzyx/orbit/internal/preferences"
 	"github.com/charlzyx/orbit/internal/workspace"
 	"github.com/egoist/mygo/ui"
 )
 
 type Options struct {
+	CommitModelStore       *preferences.Store
+	CommitModelCatalog     func() ([]agent.ModelChoice, agent.ModelChoice)
+	GenerateSelectedCommit func(context.Context, bool, agent.ModelChoice) (workspace.GeneratedText, error)
 	// TokenColor is evaluated at paint time so changing palettes never re-lexes or reflows a diff.
 	TokenColor           func(highlight.Class) ui.Color
 	AvatarLoader         func(context.Context, string) ([]byte, error)
@@ -54,6 +59,7 @@ type Data struct {
 	Labels                        []workspace.GitHubLabel
 }
 type State struct {
+	commitModel                                       commitModelPicker
 	Git                                               workspace.Git
 	GitHub                                            workspace.GitHub
 	Options                                           Options
@@ -139,6 +145,7 @@ func (s *State) SetWorkspace(dir string) {
 	}
 	// Source GitPanel::set_context clears repository results/templates, not
 	// the independent ComposerInput drafts or its lazy issue-label cache.
+	s.commitModel.open, s.commitModel.focusMessage = false, false
 	s.rememberGitHubDraft()
 	labels := append([]workspace.GitHubLabel(nil), s.Data.Labels...)
 	s.Cancel()
@@ -470,12 +477,14 @@ func (s *State) SelectPull(number int) {
 	})
 }
 func (s *State) Confirm(title, detail string, action func()) {
+	s.commitModel.open = false
 	s.confirmTitle = title
 	s.confirmDetail = detail
 	s.confirmAction = action
 	s.confirmOpen = true
 }
 func (s *State) openDialog(kind string) {
+	s.commitModel.open = false
 	s.rememberGitHubDraft()
 	s.basePickerOpen, s.baseQuery = false, ""
 	s.dialog = kind
@@ -516,6 +525,7 @@ func (s *State) review(source, ref, path string) {
 	}
 }
 func (s *State) SetTab(tab int) {
+	s.commitModel.open = false
 	if tab < 0 || tab > 5 || tab == s.Tab {
 		return
 	}

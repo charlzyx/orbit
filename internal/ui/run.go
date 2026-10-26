@@ -891,12 +891,17 @@ func Run(o RunOptions) error {
 }
 
 func (x *Controller) bindGenerators(dir string) {
+	x.Git.Options.CommitModelStore = x.Store
+	x.Git.Options.CommitModelCatalog = func() ([]agent.ModelChoice, agent.ModelChoice) {
+		snap := x.Agent.Snapshot()
+		return snap.Models, snap.Model
+	}
 	config := func() (workspace.GenerationConfig, error) {
 		snap := x.Agent.Snapshot()
 		env, e := workbench.New(x.Store, dir).SecretEnv()
 		return workspace.GenerationConfig{Pi: pirpc.Config{Executable: x.Agent.PiBinary(), WorkspaceDir: dir, Environment: append(os.Environ(), env...), EnvOverrides: x.Store.PiEnvOverrides()}, Provider: snap.Model.Provider, Model: snap.Model.ID}, e
 	}
-	x.Git.Options.GenerateCommitResult = func(ctx context.Context, stagedOnly bool) (workspace.GeneratedText, error) {
+	x.Git.Options.GenerateSelectedCommit = func(ctx context.Context, stagedOnly bool, model agent.ModelChoice) (workspace.GeneratedText, error) {
 		if !x.sessionGate.TryRLock() {
 			return workspace.GeneratedText{}, errors.New("Runtime maintenance is in progress")
 		}
@@ -905,6 +910,7 @@ func (x *Controller) bindGenerators(dir string) {
 		if e != nil {
 			return workspace.GeneratedText{}, e
 		}
+		cfg.Provider, cfg.Model, cfg.ContextWindow = model.Provider, model.ID, model.ContextWindow
 		return workspace.GenerateCommitRPC(ctx, workspace.Git{Dir: dir}, cfg, stagedOnly)
 	}
 	x.Git.Options.GenerateDraft = func(ctx context.Context, request workspace.DraftRequest) (workspace.Draft, error) {

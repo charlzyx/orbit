@@ -1,15 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 64 64" role="img" aria-label="Orbit Go">
-  <!-- OP contours derived from marketing/src/app/icon.svg. Go-only artwork. -->
-  <defs><linearGradient id="tile" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#40E4EA"/><stop offset="1" stop-color="#00A9CB"/></linearGradient></defs>
-  <g transform="translate(6.25 6.25) scale(.8046875)">
-    <rect width="64" height="64" rx="14" fill="url(#tile)"/>
-    <g transform="translate(0 -5)" fill="#062A3A" fill-rule="evenodd">
-      <path d="M13 23h16v19H13V23Zm5 6h6v8h-6v-8Z"/>
-      <path d="M34 23h17v14H41v5h-7V23Zm5 5h6v4h-6v-4Z"/>
-    </g>
-    <rect x="28" y="42" width="31" height="17" rx="5" fill="#FFE45E"/>
-    <!-- GO badge is outlined geometry, never dependent on a system font. -->
-    <path d="M40 46H32V55H40V50H36V52H38V53H34V48H40Z" fill="#062A3A"/>
-    <path d="M43 46H54V55H43Z M46 48V53H51V48Z" fill="#062A3A" fill-rule="evenodd"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 64 64" role="img" aria-label="Gopi pixel PI">
+  <!-- Go-only PI mark. P/I share the sidebar wordmark's square glyph geometry.
+       Stepped pixel corners replace the former OP tile and yellow GO badge. -->
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#282B31"/><stop offset="1" stop-color="#101216"/></linearGradient>
+    <linearGradient id="ink" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#C9CDD4"/></linearGradient>
+  </defs>
+  <path d="M12 6H52V8H56V12H58V52H56V56H52V58H12V56H8V52H6V12H8V8H12Z" fill="url(#tile)" stroke="#454A54" stroke-width="0.5"/>
+  <g transform="translate(14.5 17) scale(1.25)" fill="url(#ink)" fill-rule="evenodd">
+    <path d="M0 0H18V16H6V24H0Z M6 6V10H12V6Z"/>
+    <path d="M22 0H28V24H22Z"/>
   </g>
 </svg>

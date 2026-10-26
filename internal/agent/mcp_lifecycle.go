@@ -72,8 +72,10 @@ func (m *Manager) validateParkedMCP(key string, entry *liveSession, workspace, p
 	}
 	// No prompt can start between the busy check and detachment. Only the stale
 	// idle target is removed; running and unrelated parked clients are preserved.
+	m.cancelRecoveryLocked()
 	delete(m.sessions, key)
 	nextKey, next := m.newEntryLocked(workspace, path, entry.workflowPending)
+	next.recovery.attempts = entry.recovery.attempts
 	m.mu.Unlock()
 	m.changed()
 	if entry.client != nil {

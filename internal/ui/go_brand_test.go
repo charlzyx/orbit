@@ -26,22 +26,39 @@ func TestGoBrandDedicatedIconAndLightDarkScreens(t *testing.T) {
 	if alpha != 0 {
 		t.Fatal("icon corners not transparent")
 	}
-	r, g, b, a := im.At(256, 90).RGBA()
-	if a == 0 || g <= r || b <= r {
-		t.Fatal("Go cyan identity missing")
+	r, g, b, a := im.At(144, 160).RGBA()
+	if a == 0 || r < 45000 || g < 45000 || b < 45000 {
+		t.Fatal("Pixel PI silver stem missing")
+	}
+	// The square P counter and the P/I gap must remain open, not a solid block.
+	for _, point := range [][2]int{{206, 216}, {316, 256}} {
+		r, g, b, alpha := im.At(point[0], point[1]).RGBA()
+		if alpha == 0 || r > 20000 || g > 20000 || b > 20000 {
+			t.Fatal("PI counter or letter spacing lost", point)
+		}
+	}
+	r, g, b, a = im.At(364, 256).RGBA()
+	if a == 0 || r < 45000 || g < 45000 || b < 45000 {
+		t.Fatal("separate pixel I stem missing")
 	}
 	for _, mode := range []string{"light", "dark"} {
 		t.Run(mode, func(t *testing.T) {
 			app := fixture(t)
 			app.Appearance.Mode = mode
+			wordmark := icons["icons/gopi-wordmark.svg"]
+			if wordmark == nil {
+				t.Fatal("GOPI vector not loaded through embedded asset path")
+			}
+			if w, h := wordmark.Size(); w != 74 || h != 26 {
+				t.Fatal("unexpected GOPI vector view box", w, h)
+			}
 			tt := ui.NewTester(app.View, 1470, 922)
 			tt.Frame()
-			badge, ok := tt.Find("Go implementation badge")
-			if !ok || badge.W <= 0 || badge.H <= 0 {
-				t.Fatal("Go badge not actually mounted", badge)
+			if _, ok := tt.Find("Go implementation badge"); ok {
+				t.Fatal("retired yellow GO badge still mounted")
 			}
 			if _, ok := tt.Find("Sidebar wordmark"); !ok {
-				t.Fatal("original wordmark missing")
+				t.Fatal("GOPI wordmark missing")
 			}
 			save := func(name string) {
 				if dir := os.Getenv("ORBIT_GO_BRAND_CAPTURE_DIR"); dir != "" {

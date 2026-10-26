@@ -23,7 +23,7 @@ func (s *State) CanCommit() bool {
 	return false
 }
 func (s *State) HasGenerator() bool {
-	return s.Options.GenerateCommitResult != nil || s.Options.GenerateCommit != nil
+	return s.Options.GenerateSelectedCommit != nil || s.Options.GenerateCommitResult != nil || s.Options.GenerateCommit != nil
 }
 func (s *State) RequestGenerate(commit, push bool) {
 	if s.Busy {
@@ -82,7 +82,9 @@ func (s *State) commitFlow(message string, include, push bool) {
 func (s *State) generateCommitFlow(stageAll, commit, push bool) {
 	spec := s.spec()
 	include := s.IncludeUnstaged
-	generate, typed := s.Options.GenerateCommit, s.Options.GenerateCommitResult
+	generate, typed, selected := s.Options.GenerateCommit, s.Options.GenerateCommitResult, s.Options.GenerateSelectedCommit
+	model := s.resolvedCommitModel()
+	s.commitModel.open = false
 	s.lastAction = nil
 	s.start("Generating commit message", func(ctx context.Context, g workspace.Git, h workspace.GitHub) (func(*State), string, error) {
 		if stageAll {
@@ -92,9 +94,13 @@ func (s *State) generateCommitFlow(stageAll, commit, push bool) {
 		}
 		var message, warning string
 		var e error
-		if typed != nil {
+		if selected != nil || typed != nil {
 			var result workspace.GeneratedText
-			result, e = typed(ctx, !include)
+			if selected != nil {
+				result, e = selected(ctx, !include, model)
+			} else {
+				result, e = typed(ctx, !include)
+			}
 			message = result.Text
 			if result.Fallback {
 				warning = "Editable fallback: " + result.Warning

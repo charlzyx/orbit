@@ -628,19 +628,12 @@ func (a *App) sidebar(c *ui.Context) {
 			}
 		})
 		ui.Column(c).Padding(2, 12, 12).AlignSelf(ui.Stretch).Center().Children(func() {
-			logo := "logo.png"
+			// Preserve the original light/dark wordmark slot and sidebar geometry.
+			height := float32(76 * 410.0 / 1892)
 			if !t.Dark {
-				logo = "logo-dark.png"
+				height = 76 * 453.0 / 1972
 			}
-			ui.Row(c).Width(76).AlignItems(ui.Center).Children(func() {
-				if im := logos[logo]; im != nil {
-					w, h := im.Size()
-					ui.Image(c, im).Width(76).Height(76 * float32(h) / float32(w)).Label("Sidebar wordmark")
-				} else {
-					ui.Text(c, "ORBIT PI").Bold().FontSize(t.Px(16))
-				}
-				ui.Text(c, "GO").Absolute().Left(82).Top(0).Label("Go implementation badge").FontSize(11).FontWeight(700).TextColor(ui.Hex("#062A3A")).Background(ui.Hex("#FFE45E")).Padding(2, 4).Radius(3).Unselectable()
-			})
+			ui.Image(c, icons["icons/gopi-wordmark.svg"]).Width(76).Height(height).TextColor(t.Text).Label("Sidebar wordmark")
 		})
 		ui.Column(c).Padding(4, 12, 8).AlignSelf(ui.Stretch).Children(func() {
 			b := ui.ButtonBase(c.Key("sidebar-new-task")).Justify(ui.Start).AlignItems(ui.Center).Height(t.Px(32)).AlignSelf(ui.Stretch).PaddingX(t.Space(8)).Gap(t.Space(4)).Radius(t.Px(8)).Background(t.Elevated).Border(1, t.Border).Label(a.text("menu.new_task", "New Task"))

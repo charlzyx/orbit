@@ -14,6 +14,8 @@ The wrapper defaults to Go's `-trimpath` so temporary compatibility-copy paths d
 
 Latest source-only continuation: session ownership/export ordering, workspace actions, embedded diff navigation, retry feedback, quota/MCP and conversation rail work are tracked in the [third-wave evidence](docs/mygo-migration/audits/2026-10-25/continued-wave3.md). Full parity and native state coverage remain open; this does not replace the `.4` installer.
 
+Commit generation can use an independent model preference without changing chat or Issue/PR models; selected-window byte budgets and limitations are documented in the [bounded P2 candidate](docs/mygo-migration/audits/2026-10-26/commit-model-p2.md). This is not a complete upstream #88 or native-parity claim.
+
 ## Original Orbit reference
 
 [![CI](https://github.com/imrj05/orbit/actions/workflows/ci.yml/badge.svg)](https://github.com/imrj05/orbit/actions/workflows/ci.yml)

@@ -126,11 +126,13 @@ func (m *Manager) Stop() error {
 		m.mu.Unlock()
 		return pirpc.ErrClosed
 	}
+	m.cancelRecoveryLocked()
 	entry := m.sessions[m.active]
 	if entry == nil {
 		m.mu.Unlock()
 		return nil
 	}
+	m.cancelRecoveryWaitLocked(entry)
 	if entry.stopped {
 		m.mu.Unlock()
 		return nil
@@ -177,6 +179,7 @@ func (m *Manager) Start() error {
 		m.mu.Unlock()
 		return pirpc.ErrClosed
 	}
+	m.cancelRecoveryLocked()
 	entry := m.sessions[m.active]
 	if entry == nil {
 		m.mu.Unlock()

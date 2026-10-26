@@ -30,6 +30,7 @@ type GenerationConfig struct {
 	Pi              pirpc.Config
 	Provider, Model string
 	Timeout         time.Duration
+	ContextWindow   int // Commit only; zero means unknown, not the active model window.
 }
 type GeneratedText struct {
 	Text     string
@@ -168,7 +169,7 @@ func isolatedRPC(ctx context.Context, cfg GenerationConfig, prompt GenerationPro
 // GenerateCommitRPC falls back to an explicitly marked, editable heuristic on
 // missing Pi/auth/model failures, but user cancellation never becomes success.
 func GenerateCommitRPC(ctx context.Context, g Git, cfg GenerationConfig, stagedOnly bool) (GeneratedText, error) {
-	prompt, rows, e := CommitGenerationPrompt(ctx, g, stagedOnly)
+	prompt, rows, e := commitGenerationPrompt(ctx, g, stagedOnly, cfg.ContextWindow)
 	if e != nil {
 		return GeneratedText{}, e
 	}
@@ -187,6 +188,9 @@ func GenerateCommitRPC(ctx context.Context, g Git, cfg GenerationConfig, stagedO
 	return GeneratedText{Text: HeuristicCommitMessage(rows), Fallback: true, Warning: e.Error()}, nil
 }
 func CommitGenerationPrompt(ctx context.Context, g Git, stagedOnly bool) (GenerationPrompt, []StatusRow, error) {
+	return commitGenerationPrompt(ctx, g, stagedOnly, 0)
+}
+func commitGenerationPrompt(ctx context.Context, g Git, stagedOnly bool, window int) (GenerationPrompt, []StatusRow, error) {
 	rows, e := g.Status(ctx)
 	if e != nil {
 		return GenerationPrompt{}, nil, e
@@ -223,12 +227,12 @@ func CommitGenerationPrompt(ctx context.Context, g Git, stagedOnly bool) (Genera
 		}
 		fmt.Fprintf(&b, "%c %s (+%d -%d)\n", badge, r.Path, adds, dels)
 	}
-	budget := MaxGenerationTotalOriginalBytes
+	budget := newCommitBudget(window, b.Len()+8*1024, len(selected))
 	hasHead, e := g.HasCommits(ctx)
 	if e != nil {
 		return GenerationPrompt{}, nil, e
 	}
-	for _, r := range selected {
+	for index, r := range selected {
 		if e := ctx.Err(); e != nil {
 			return GenerationPrompt{}, nil, e
 		}
@@ -240,15 +244,14 @@ func CommitGenerationPrompt(ctx context.Context, g Git, stagedOnly bool) (Genera
 		if hasHead {
 			original, err := g.FileAtRevision(ctx, "HEAD", originalPath)
 			if err == nil && utf8.Valid(original) && !strings.ContainsRune(string(original), 0) {
-				if budget > 0 {
-					limit := min(MaxGenerationOriginalBytes, budget)
-					text := boundedText(string(original), limit)
-					budget -= min(len(original), limit)
+				text := budget.takeOriginal(string(original), len(selected)-index)
+				if text != "" {
 					b.WriteString(text)
 					b.WriteByte('\n')
 				} else {
 					b.WriteString("// (original code omitted: prompt budget exhausted)\n")
 				}
+
 			} else {
 				b.WriteString("// (new file or binary original)\n")
 			}
@@ -283,7 +286,12 @@ func CommitGenerationPrompt(ctx context.Context, g Git, stagedOnly bool) (Genera
 			}
 			patch = []byte("New untracked file: " + r.Path + "\n" + raw)
 		}
-		b.WriteString(boundedText(string(patch), MaxGenerationDiffBytes))
+		excerpt := budget.takeDiff(string(patch), len(selected)-index)
+		if excerpt == "" && len(patch) > 0 {
+			b.WriteString("(diff omitted: shared prompt budget exhausted)")
+		} else {
+			b.WriteString(excerpt)
+		}
 		b.WriteString("\n```\n</code-changes>\n</file>\n")
 	}
 	if stagedOnly {
@@ -292,11 +300,15 @@ func CommitGenerationPrompt(ctx context.Context, g Git, stagedOnly bool) (Genera
 			return GenerationPrompt{}, nil, e
 		}
 		if strings.TrimSpace(unstaged) != "" {
-			b.WriteString("# UNSTAGED CHANGES (context only, not part of this commit):\n```diff\n" + boundedText(unstaged, MaxGenerationDiffBytes) + "\n```\n")
+			b.WriteString("# UNSTAGED CHANGES (context only, not part of this commit):\n```diff\n" + budget.takeDiff(unstaged, 1) + "\n```\n")
 		}
 	}
-	b.WriteString("</changes>\n\n<reminder>Describe only the CODE CHANGES, not context-only changes. Follow the recent author's/repository's conventions without copying their subjects. Return one text code fence containing a concise conventional-commit subject and optional past-tense bullet body. Do not add issue references, authors, explanations or unsupported claims.</reminder>")
-	return GenerationPrompt{System: "You help a developer write a precise Git commit message. Analyze the code changes using original code as context. Identify why the changes were made; use recent user and repository commits only for writing conventions. Never invent facts. Return only one fenced text block with the commit message, no commentary.", User: b.String()}, selected, nil
+	reminder := "</changes>\n\n<reminder>Describe only the CODE CHANGES, not context-only changes. Follow the recent author's/repository's conventions without copying their subjects. Return one text code fence containing a concise conventional-commit subject and optional past-tense bullet body. Do not add issue references, authors, explanations or unsupported claims.</reminder>"
+	system := "You help a developer write a precise Git commit message. Analyze the code changes using original code as context. Identify why the changes were made; use recent user and repository commits only for writing conventions. Never invent facts. Return only one fenced text block with the commit message, no commentary."
+	// Fixed metadata and markers also count. Oversized metadata is explicitly
+	// truncated; never silently send a multi-megabyte prompt from many paths.
+	user := commitBound(b.String(), budget.total-len(system)-len(reminder)) + reminder
+	return GenerationPrompt{System: system, User: user}, selected, nil
 }
 func appendCommitSubjects(b *strings.Builder, tag string, entries []CommitEntry) {
 	if len(entries) == 0 {

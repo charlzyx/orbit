@@ -1,0 +1,97 @@
+{
+  "base": "9194274f1f2b2151c80bc31283959ee94527f0ee",
+  "recovery": "Rebuilt final delta; NOT byte-identical 66dcbf/edd914 restoration. All results below newly executed.",
+  "packages": {
+    "preferences": {
+      "actual_top_level": [
+        "TestCommitModelPrivateRoundtripAndFailures"
+      ],
+      "pass_test_events": 1,
+      "elapsed": 1.027
+    },
+    "workspace": {
+      "actual_top_level": [
+        "TestCommitContextBudgetsAndNoMutation",
+        "TestCommitContextWindowBudgetBoundaries",
+        "TestCommitRPCIsolatedAndNormalized",
+        "TestCommitSelectedWindowCapsActualMultiFilePrompt",
+        "TestCommitUnbornAndUntrackedContext",
+        "TestCommitUnknownSelectedModelFailureIsExplicit",
+        "TestCommitUnknownWindowSharesDiffBudget",
+        "TestDraftRPCFallbackTimeoutAndCancellation",
+        "TestGenerationParsersAndHeuristics",
+        "TestReportDraftRPCNotesOnlyFallbackAndCancellation"
+      ],
+      "pass_test_events": 10,
+      "elapsed": 2.394
+    },
+    "gitworkbench": {
+      "actual_top_level": [
+        "TestCancellationDoesNotApplyLateResults",
+        "TestCommitModelAdmissionFreezeAndLateResult",
+        "TestCommitModelFirstRenderPreservesRealGitFailure",
+        "TestCommitModelMountedEscapeBusyAndWorkspace",
+        "TestCommitModelMountedKeyboardFocusAndFollow",
+        "TestCommitModelMountedOutsideAndKeyboardReveal",
+        "TestCommitModelResolveIdentityAndUnknown",
+        "TestCommitModelWriteFailureAppliesOnlyInMemory",
+        "TestGitHubBasePickerEmptyDismissRepeatAndErrorDoNotMutateDraft",
+        "TestGitHubNativeBasePickerFiltersLocalBranchesWithoutImplicitSelection"
+      ],
+      "pass_test_events": 14,
+      "elapsed": 1.786
+    },
+    "ui": {
+      "actual_top_level": [
+        "TestCommitDedicatedModelRealJSONL",
+        "TestCommitFollowAndDraftUseOnlyActiveModelJSONL",
+        "TestCommitModelFullWindowLayoutAndSafeClick",
+        "TestCommitPartialActiveIdentityIsAttemptedNotDefaultedJSONL"
+      ],
+      "pass_test_events": 11,
+      "elapsed": 19.833
+    }
+  },
+  "gates": {
+    "race": "PASS",
+    "linux_vet": "PASS",
+    "darwin_arm64_compile": "PASS (not executed)",
+    "darwin_arm64_vet": "PASS",
+    "chain_exit": 0
+  },
+  "red": {
+    "red.jsonl": "UI actual layout 2 narrow clipping FAIL and partial-ID JSONL FAIL; gitworkbench BUILD ERROR s.Dir is fixture setup, not behavioral evidence.",
+    "error-red.jsonl": "First load FAIL (both subcases reached load); superseded for independent select coverage.",
+    "error-separated-red.jsonl": "Independent first-render and successful-select GitError preservation both FAIL."
+  },
+  "not_run": [
+    "full suite",
+    "hosted native",
+    "real model/provider",
+    "release",
+    "remote publication"
+  ],
+  "files": {
+    "commit-window1024-sidebar248.png": "d594285dff5b2c7196f9ae49fc29f45db7be6f06a58160df22520579c1338c3a",
+    "commit-window1200-sidebar248.png": "1465084e299336d61bad90f7c310d0aff4021a90aefd954ddf54abf01910d7f5",
+    "commit-window1200-sidebar400.png": "f97e7fd856f33628c2f9eb294b2b9e589e16626b37c1cd30d9d6ff59a64c724b",
+    "commit-window1470-sidebar248.png": "987e467fa8d27ca6c6ac6f3ec21e7d168223c5e65e8a8144689d43319e815c5c",
+    "commit-window1470-sidebar400.png": "75ca3b8873d8b6ce9c1e0f3d65d30eac82de3e31969b30f49fefb637e6e90239",
+    "error-red.jsonl": "0850c76a6b9c6174761fd534bc2235811f8015882c14cdbc4115418859c65eb2",
+    "error-separated-red.jsonl": "8d3e6e0fcbb4f1439d6f01ebf882e0a83e6140cfba94988cdedc1eb34bf352e6",
+    "final-arm-compile.log": "9da2d27b7ee72dd6c6d7e2ae1b7563cfb188c722afb006b10f70efacf395b90a",
+    "final-arm-vet.log": "9da2d27b7ee72dd6c6d7e2ae1b7563cfb188c722afb006b10f70efacf395b90a",
+    "final-gitworkbench.jsonl": "06b3a5caf1794c01f353e9cc5746561163443c97cf9bd91821d008a313f7760d",
+    "final-preferences.jsonl": "856cc25c8d755b7872422764356735567ef6d67766967c97a5a6842cd6a43e6c",
+    "final-ui.jsonl": "5c21ae309c4aa70799f686077aa5062a50aeaed7ed0b3dcb99bee6324c827879",
+    "final-vet.log": "9da2d27b7ee72dd6c6d7e2ae1b7563cfb188c722afb006b10f70efacf395b90a",
+    "final-workspace.jsonl": "ed6a4a4621f023e4281bc61090e96e092e40d386fc573412cc505647c6aaf764",
+    "first-green.jsonl": "13ae3b2b635e8eec93b5100b5bee2ed33d073043b01e7090170cdaf65ac045dd",
+    "gitworkbench-expected.json": "589dd2e37e1516255799f50abe722148c78a954a39a6dffc2defb6255706fbc2",
+    "preferences-expected.json": "2f142fa85e39a38eea812ad54aef9556d1f4353e6aa6eb16c8f9df1ea9054d4b",
+    "red.jsonl": "57b5944da432de8422a3b28032af867246410d2d921cf2e807674579e7bab2ed",
+    "run-focused.sh": "f7aab5b4410e89f9c91bf75686d4412044bca079e85e984da226e74d832bb866",
+    "ui-expected.json": "e542ad2baea3dbfd5d2e71803d09f416be4826e34b9cefecdee74989d580565d",
+    "workspace-expected.json": "d7a44e1eb809a1eb3d33204c314cac8b1302338e38f80e362a09e44e27dc37b1"
+  }
+}

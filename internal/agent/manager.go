@@ -20,6 +20,8 @@ import (
 )
 
 type liveSession struct {
+	recovery             automaticRecovery
+	recoveryWaitCancel   chan struct{}
 	birthSequence        uint64
 	retiringSessionPaths map[string]bool
 	restartClosing       bool
@@ -59,12 +61,14 @@ type liveSession struct {
 }
 
 func (s *liveSession) busy() bool {
-	return s.sessionCommand != nil || s.stopping || s.loading || s.state.snapshot.CheckpointRecovering || s.state.awaiting || s.state.snapshot.Running || s.state.snapshot.Compacting || s.state.manualCompactPending || s.state.snapshot.Retrying
+	return !s.recovery.due.IsZero() || s.recovery.launching || s.sessionCommand != nil || s.stopping || s.loading || s.state.snapshot.CheckpointRecovering || s.state.awaiting || s.state.snapshot.Running || s.state.snapshot.Compacting || s.state.manualCompactPending || s.state.snapshot.Retrying
 }
 
 // Manager keeps active and background Pi processes alive independently of any
 // window. Tick is nonblocking; Open/Send/ReloadSessions perform I/O in workers.
 type Manager struct {
+	recoveryGeneration     uint64
+	recoveryRetiring       []recoveryRetirement
 	deletingSessions       map[string]bool
 	metadataSessions       map[string]bool
 	deletedSessionSequence map[string]uint64
@@ -175,6 +179,7 @@ func (m *Manager) open(workspace, sessionPath, pendingWorkflow string) error {
 		m.mu.Unlock()
 		return errors.New("session deletion is in progress")
 	}
+	m.cancelRecoveryLocked()
 	m.mcpSelection++
 	selection := m.mcpSelection
 	if sessionPath != "" {
@@ -222,6 +227,7 @@ func (m *Manager) open(workspace, sessionPath, pendingWorkflow string) error {
 		previous.parkedAt = time.Now()
 		previous.state.cancelExtensionUI()
 	}
+	m.retireDeadEntriesLocked(false)
 	key, entry := m.newEntryLocked(workspace, sessionPath, pendingWorkflow)
 	m.mu.Unlock()
 	m.changed()
@@ -229,6 +235,20 @@ func (m *Manager) open(workspace, sessionPath, pendingWorkflow string) error {
 	return nil
 }
 func (m *Manager) start(key string, entry *liveSession, workspace, path string) {
+	if err := m.waitRecoveryRetirements(entry); err != nil {
+		m.startFailed(key, err.Error())
+		return
+	}
+	m.mu.Lock()
+	currentStart := m.startCurrentLocked(key, entry)
+	m.mu.Unlock()
+	if !currentStart {
+		return
+	}
+	if err := m.captureRecoveryIdentity(key, entry, workspace, path); err != nil {
+		m.startFailed(key, err.Error())
+		return
+	}
 	if path != "" {
 		canonical, err := m.bindStartingSessionPath(key, entry, path)
 		if err != nil {
@@ -251,7 +271,7 @@ func (m *Manager) start(key string, entry *liveSession, workspace, path string) 
 		row, rowErr := ReadSession(path)
 		messages, messageErr := ReadSessionMessages(path)
 		m.mu.Lock()
-		if current := m.sessions[key]; current == entry {
+		if m.startCurrentLocked(key, entry) {
 			if rowErr == nil {
 				entry.state.snapshot.ActiveSession = row
 			}
@@ -316,7 +336,7 @@ func (m *Manager) start(key string, entry *liveSession, workspace, path string) 
 		config.SessionDir = ""
 	}
 	m.mu.Lock()
-	cancelled := m.closed || m.sessions[key] != entry || entry.stopped
+	cancelled := !m.startCurrentLocked(key, entry) || entry.recovery.launching && !entry.recovery.identityKnown
 	m.mu.Unlock()
 	if cancelled {
 		return
@@ -328,8 +348,7 @@ func (m *Manager) start(key string, entry *liveSession, workspace, path string) 
 		return
 	}
 	m.mu.Lock()
-	current, exists := m.sessions[key]
-	if m.closed || !exists || current != entry || entry.stopped {
+	if !m.startCurrentLocked(key, entry) {
 		m.mu.Unlock()
 		client.Close()
 		return
@@ -341,6 +360,13 @@ func (m *Manager) start(key string, entry *liveSession, workspace, path string) 
 	entry.state.snapshot.AccessMode = readAccess(m.options.Home)
 	m.mu.Unlock()
 	if path != "" {
+		m.mu.Lock()
+		current := m.startCurrentLocked(key, entry)
+		m.mu.Unlock()
+		if !current {
+			client.Close()
+			return
+		}
 		response, err := m.callClient(client, pirpc.NewCommand(pirpc.SwitchSession, map[string]any{"sessionPath": path}))
 		if err != nil {
 			m.startFailed(key, err.Error())
@@ -354,6 +380,13 @@ func (m *Manager) start(key string, entry *liveSession, workspace, path string) 
 		}
 	}
 	for _, kind := range []string{pirpc.GetState, pirpc.GetMessages, pirpc.GetAvailableModels, pirpc.GetAvailableThinkingLevels, pirpc.GetCommands, pirpc.GetSessionStats, pirpc.GetEntries} {
+		m.mu.Lock()
+		current := m.startCurrentLocked(key, entry)
+		m.mu.Unlock()
+		if !current {
+			client.Close()
+			return
+		}
 		if _, err = m.callClient(client, pirpc.NewCommand(kind, nil)); err != nil {
 			m.startFailed(key, err.Error())
 			return
@@ -361,12 +394,24 @@ func (m *Manager) start(key string, entry *liveSession, workspace, path string) 
 	}
 	m.Tick()
 	m.mu.Lock()
-	if current := m.sessions[key]; current == entry && !entry.stopped {
+	ownedCurrent := m.startCurrentLocked(key, entry)
+	readyCurrent := ownedCurrent && client.Alive() && client.ProcessSnapshot().Alive
+	if readyCurrent {
 		entry.loading = false
 		entry.state.snapshot.Status = "Ready"
 		entry.state.snapshot.Connected = true
+		entry.recovery.readyAt = time.Now()
+		entry.recovery.launching = false
 	}
 	m.mu.Unlock()
+	if !readyCurrent {
+		if ownedCurrent {
+			m.startFailed(key, "Pi exited during session bootstrap")
+		} else {
+			client.Close()
+		}
+		return
+	}
 	m.changed()
 	// Capability probes are independent of ordinary session bootstrap.
 	for _, kind := range []string{pirpc.AuthList, pirpc.QuotaList} {
@@ -376,15 +421,26 @@ func (m *Manager) start(key string, entry *liveSession, workspace, path string) 
 }
 func (m *Manager) startFailed(key, message string) {
 	m.mu.Lock()
-	if entry := m.sessions[key]; entry != nil {
-		if entry.stopped {
-			m.mu.Unlock()
-			return
-		}
-		entry.loading = false
-		entry.state.snapshot.Status = "Disconnected"
-		entry.state.snapshot.setConnectionError(message)
-		entry.state.snapshot.Connected = false
+	entry := m.sessions[key]
+	if entry == nil || !m.startCurrentLocked(key, entry) {
+		m.mu.Unlock()
+		return
+	}
+	entry.loading = false
+	entry.state.snapshot.Status = "Disconnected"
+	entry.state.snapshot.setConnectionError(message)
+	entry.state.snapshot.Connected = false
+	automatic := entry.recovery.launching
+	client := entry.client
+	m.mu.Unlock()
+	// A failed reattach/bootstrap must not leave its child alive. This method
+	// runs on the existing startup worker, never the UI thread.
+	if automatic && client != nil {
+		_ = client.Close()
+	}
+	m.mu.Lock()
+	if automatic && m.startCurrentLocked(key, entry) {
+		m.queueRecoveryLocked(key, entry, time.Now())
 	}
 	m.mu.Unlock()
 	m.changed()
@@ -403,6 +459,7 @@ func (m *Manager) NewSession(workspace string) error {
 		return err
 	}
 	m.mu.Lock()
+	m.cancelRecoveryLocked()
 	key := m.active
 	entry := m.sessions[key]
 	reusable := entry != nil && !entry.busy() && entry.client != nil && entry.client.Alive() && entry.state.snapshot.ActiveSession.Workspace == absolute
@@ -618,6 +675,7 @@ func (m *Manager) Send(kind string, params map[string]any) error {
 			return err
 		}
 		if sessionIdentityCommand(kind) {
+			m.cancelRecoveryLocked()
 			entry.workflowGeneration++
 		}
 	}
@@ -705,7 +763,7 @@ func (m *Manager) Send(kind string, params map[string]any) error {
 			var rejected *pirpc.CommandError
 			if !errors.As(err, &rejected) {
 				m.mu.Lock()
-				if current := m.sessions[key]; current == entry && !m.closed && !entry.stopped && (kind != pirpc.Prompt || current.state.ownsPrompt(command.ID)) {
+				if current := m.sessions[key]; current == entry && !m.closed && !entry.stopped && !entry.observedTerminal(client) && (kind != pirpc.Prompt || current.state.ownsPrompt(command.ID)) {
 					current.state.snapshot.setCommandError(kind, err.Error())
 					if kind != pirpc.Prompt || current.state.ownsPrompt(command.ID) {
 						current.state.awaiting = false
@@ -823,7 +881,7 @@ func (m *Manager) RespondDialog(id, value string, confirmed *bool, cancelled boo
 		defer cancel()
 		err := client.SendUI(ctx, response)
 		m.mu.Lock()
-		if err != nil {
+		if err != nil && !entry.observedTerminal(client) {
 			entry.state.snapshot.setConnectionError(err.Error())
 		}
 		m.mu.Unlock()
@@ -854,7 +912,9 @@ func (m *Manager) customUI(record map[string]any) error {
 		defer cancel()
 		if err := client.SendOneWay(ctx, record); err != nil {
 			m.mu.Lock()
-			entry.state.snapshot.setConnectionError(err.Error())
+			if !entry.observedTerminal(client) {
+				entry.state.snapshot.setConnectionError(err.Error())
+			}
 			m.mu.Unlock()
 			m.changed()
 		}
@@ -876,6 +936,7 @@ func (m *Manager) Tick() bool {
 	var closeClients []*pirpc.Client
 	var checkpoints []func()
 	var notifications []Notification
+	var recoveries []recoveryLease
 	changed, active := false, false
 	now := time.Now()
 	m.mu.Lock()
@@ -886,6 +947,10 @@ func (m *Manager) Tick() bool {
 	for key, entry := range m.sessions {
 		active = active || entry.busy()
 		if entry.client == nil {
+			lease := recoveryLease{key, entry, entry.recovery.generation, entry.recovery.due}
+			if !now.Before(lease.due) && m.recoveryLeaseValidLocked(lease) {
+				recoveries = append(recoveries, lease)
+			}
 			continue
 		}
 		for _, event := range entry.client.DrainEvents() {
@@ -899,12 +964,21 @@ func (m *Manager) Tick() bool {
 				continue
 			}
 			composerReply := event.Type == "response" && event.String("command") == pirpc.Prompt && entry.state.ownsPrompt(event.ID)
+			if entry.recovery.launching && !m.startCurrentLocked(key, entry) {
+				continue
+			}
 			wasRunning := entry.state.snapshot.Running
 			parkedRequest := key != m.active && event.Type == "extension_ui_request"
 			if parkedRequest {
 				entry.state.cancelUI(event.ID)
 			} else {
 				entry.state.apply(event)
+			}
+			if event.Type == "process_exited" || event.Type == "transport_error" {
+				m.clearDeadRuntimeLocked(entry)
+				if event.Type == "process_exited" {
+					m.observeRecoveryExitLocked(key, entry, now)
+				}
 			}
 			if event.Type == "response" && event.String("command") == pirpc.GetState && event.Bool("success") {
 				id := entry.state.snapshot.ActiveSession.ID
@@ -1027,6 +1101,10 @@ func (m *Manager) Tick() bool {
 			entry.entriesPending = true
 			operations = append(operations, operation{entry: entry, command: pirpc.NewCommand(pirpc.GetEntries, params)})
 		}
+		lease := recoveryLease{key, entry, entry.recovery.generation, entry.recovery.due}
+		if !now.Before(lease.due) && m.recoveryLeaseValidLocked(lease) {
+			recoveries = append(recoveries, lease)
+		}
 		busy := entry.busy()
 		active = active || busy
 		if key != m.active && !entry.loading && !busy && (!entry.client.Alive() || !entry.parkedAt.IsZero() && now.Sub(entry.parkedAt) >= m.options.ParkedTTL) {
@@ -1060,6 +1138,9 @@ func (m *Manager) Tick() bool {
 	}
 	scan := !m.scanning && now.Sub(m.lastScan) >= 2*time.Second
 	m.mu.Unlock()
+	for _, lease := range recoveries {
+		_ = m.restartWithRecovery("", "", "", false, &lease)
+	}
 	for _, checkpoint := range checkpoints {
 		if checkpoint != nil {
 			m.launch(checkpoint)
@@ -1077,7 +1158,9 @@ func (m *Manager) Tick() bool {
 				defer cancel()
 				if err := operation.entry.client.SendUI(ctx, *operation.uiResponse); err != nil {
 					m.mu.Lock()
-					operation.entry.state.snapshot.setConnectionError(err.Error())
+					if !operation.entry.observedTerminal(operation.entry.client) {
+						operation.entry.state.snapshot.setConnectionError(err.Error())
+					}
 					m.mu.Unlock()
 					m.changed()
 				}
@@ -1265,10 +1348,21 @@ func (m *Manager) RestartIdle(expectedRuntime, expectedPath, expectedSession str
 	return m.restart(expectedRuntime, expectedPath, expectedSession, true)
 }
 func (m *Manager) restart(expectedRuntime, expectedPath, expectedSession string, idleOnly bool) error {
+	return m.restartWithRecovery(expectedRuntime, expectedPath, expectedSession, idleOnly, nil)
+}
+func (m *Manager) restartWithRecovery(expectedRuntime, expectedPath, expectedSession string, idleOnly bool, automatic *recoveryLease) error {
 	m.mu.Lock()
 	if m.closed {
 		m.mu.Unlock()
 		return pirpc.ErrClosed
+	}
+	if automatic != nil {
+		if !m.recoveryLeaseValidLocked(*automatic) {
+			m.mu.Unlock()
+			return ErrReloadSuperseded
+		}
+	} else {
+		m.cancelRecoveryLocked()
 	}
 	if idleOnly && m.active != expectedRuntime {
 		m.mu.Unlock()
@@ -1294,11 +1388,20 @@ func (m *Manager) restart(expectedRuntime, expectedPath, expectedSession string,
 		m.mu.Unlock()
 		return ErrReloadSuperseded
 	}
+	m.cancelRecoveryWaitLocked(entry)
 	pendingWorkflow := entry.workflowPending
 	pendingLease := entry.sessionCommand
 	delete(m.sessions, m.active)
 	m.mcpSelection++
 	key, replacement := m.newEntryLocked(row.Workspace, row.Path, pendingWorkflow)
+	replacement.recovery.attempts = entry.recovery.attempts
+	if automatic != nil {
+		replacement.recovery.attempts++
+		replacement.recovery.launching = true
+		replacement.recovery.generation = m.recoveryGeneration
+		replacement.recovery.done = make(chan struct{})
+		replacement.localDiagnostics = recoveryDiagnostics(entry)
+	}
 	// Keep former file ownership visible until the old process is fully closed.
 	replacement.restartClosing = true
 	replacement.retiringSessionPaths = map[string]bool{}
@@ -1308,6 +1411,9 @@ func (m *Manager) restart(expectedRuntime, expectedPath, expectedSession string,
 	m.mu.Unlock()
 	m.changed()
 	if !m.launch(func() {
+		if done := replacement.recovery.done; done != nil {
+			defer func() { m.mu.Lock(); replacement.recovery.launching = false; m.mu.Unlock(); close(done) }()
+		}
 		if entry.client != nil {
 			_ = entry.client.Close()
 		}
@@ -1325,6 +1431,9 @@ func (m *Manager) restart(expectedRuntime, expectedPath, expectedSession string,
 		m.mu.Unlock()
 		m.start(key, replacement, row.Workspace, row.Path)
 	}) {
+		if replacement.recovery.done != nil {
+			close(replacement.recovery.done)
+		}
 		if entry.client != nil {
 			go entry.client.Close()
 		}
@@ -1338,6 +1447,7 @@ func (m *Manager) Close() error {
 		m.mu.Unlock()
 		return nil
 	}
+	m.cancelRecoveryLocked()
 	m.closed = true
 	m.cancel()
 	clients := []*pirpc.Client{}
@@ -1579,7 +1689,7 @@ func (m *Manager) Abort() error {
 				}
 			} else if err != nil {
 				m.mu.Lock()
-				if !m.closed && m.sessions[key] == entry && entry.client == client && origin.matches(entry) {
+				if !m.closed && m.sessions[key] == entry && entry.client == client && origin.matches(entry) && !entry.observedTerminal(client) {
 					entry.state.snapshot.setCommandError(pirpc.Abort, err.Error())
 				}
 				m.mu.Unlock()

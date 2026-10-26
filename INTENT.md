@@ -25,6 +25,8 @@ application. Full parity is a target still under verification, not a completed c
 
 ### D15 — Fork target: Go + MyGo native reconstruction (in progress)
 
+Bounded continuation: commit-only model selection and shared selected-window prompt budgets are implemented independently of chat and Issue/PR generation. See [P2 source contract and remaining scope](docs/mygo-migration/audits/2026-10-26/commit-model-p2.md); this does not mark all of upstream #88/#87 or native parity complete.
+
 **Third-wave implementation status:** Bounded session file/child ownership, async session export, workspace menu/revision fencing, embedded diff/context controls, quota/MCP lifecycle and typed retry feedback are integrated for final same-tree gates. See [scope/evidence](docs/mygo-migration/audits/2026-10-25/continued-wave3.md); external filesystem races, real provider/auth, Mac confirmation and full native pixel acceptance are not claimed closed. No new release is part of this batch.
 
 **Navigation implementation status:** Source-derived turn rail/preview/hint and corrected keyboard turn anchoring are implemented locally. A narrow opt-in compatibility interaction now preserves existing selection through rail clicks while retaining strict normal outside/control clearing; native paired visual and combined acceptance remain pending.
