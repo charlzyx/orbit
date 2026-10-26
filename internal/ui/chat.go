@@ -120,32 +120,35 @@ func (a *App) messageTranscript(c *ui.Context) ui.Element {
 			})
 			// Source message_scroller: a floating affordance must not shrink the
 			// transcript viewport. Only the child button receives pointer input.
-			ui.Row(c.Key("transcript-jump-layer")).Absolute().Left(0).Right(0).Bottom(8).Justify(ui.Center).PassThrough().Children(func() {
-				button := ui.ButtonBase(c.Key("transcript-jump")).Label("Jump to latest").Tooltip(a.Tr("message_scroller.jump_to_latest")).Height(t.Px(32)).Shrink(0).Center().Radius(t.Px(16)).Background(t.SurfaceSecondary).Border(1, t.BorderStrong()).Gap(t.Space(4)).FontSize(t.FontSize).LineHeight(t.FontSize)
-				button.Shadow(0, 2, 3, 0, ui.RGBA(0, 0, 0, .12))
-				contact := float32(.06)
-				if !t.Dark {
-					contact = .03
-				}
-				button.Shadow(0, 1, 0, 0, ui.RGBA(0, 0, 0, contact))
-				if unread {
-					button.PaddingX(t.Space(8))
-				} else {
-					button.Width(t.Px(32))
-				}
-				if button.Hovered() {
-					button.Background(t.Elevated)
-				}
-				button.Children(func() {
-					a.icon(c, "icons/arrow-down.svg", t.Px(16), t.Text)
+			// Match the source viewport clip without clipping List/selection ancestry.
+			ui.Box(c.Key("transcript-jump-clip")).Absolute().Left(0).Right(0).Top(0).Bottom(0).Clip().PassThrough().Children(func() {
+				ui.Row(c.Key("transcript-jump-layer")).Absolute().Left(0).Right(0).Bottom(8).Justify(ui.Center).PassThrough().Children(func() {
+					button := ui.ButtonBase(c.Key("transcript-jump")).Label("Jump to latest").Tooltip(a.Tr("message_scroller.jump_to_latest")).Height(t.Px(32)).Shrink(0).Center().Radius(t.Px(16)).Background(t.SurfaceSecondary).Border(1, t.BorderStrong()).Gap(t.Space(4)).FontSize(t.FontSize).LineHeight(t.FontSize)
+					button.Shadow(0, 2, 3, 0, ui.RGBA(0, 0, 0, .12))
+					contact := float32(.06)
+					if !t.Dark {
+						contact = .03
+					}
+					button.Shadow(0, 1, 0, 0, ui.RGBA(0, 0, 0, contact))
 					if unread {
-						ui.Text(c, a.Tr("message_scroller.new_activity")).FontWeight(500).TextColor(t.Text)
+						button.PaddingX(t.Space(8))
+					} else {
+						button.Width(t.Px(32))
+					}
+					if button.Hovered() {
+						button.Background(t.Elevated)
+					}
+					button.Children(func() {
+						a.icon(c, "icons/arrow-down.svg", t.Px(16), t.Text)
+						if unread {
+							ui.Text(c, a.Tr("message_scroller.new_activity")).FontWeight(500).TextColor(t.Text)
+						}
+					})
+					if button.Clicked() {
+						a.transcriptActivity.unread = false
+						a.transcript.ScrollToEnd()
 					}
 				})
-				if button.Clicked() {
-					a.transcriptActivity.unread = false
-					a.transcript.ScrollToEnd()
-				}
 			})
 		}
 	})

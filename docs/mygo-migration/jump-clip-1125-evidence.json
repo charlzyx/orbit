@@ -1,0 +1,106 @@
+{
+  "base": "d4b33caf0cdc5af2b6db8cf684e061ccea89da4a",
+  "rust": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "source_sha256": "17f4ee232ca453ec197f92c741bdb2722a9379161e2f305627c42aa04c7baa03",
+  "expected_top_level": [
+    "TestAuditTinyTranscriptJumpDoesNotPaintOrClickAboveViewport",
+    "TestJumpOwnClipWrapperPublicMechanism",
+    "TestJumpGeometryLightDarkAndUnread",
+    "TestJumpGeometryEmptyLayerPassesWheelSelectionAndMenu",
+    "TestJumpGeometryFocusedButtonKeyboardActivation",
+    "TestTranscriptFadeProductionOrderBoundsAndCapture",
+    "TestTranscriptFadeProductionTinyViewportClip"
+  ],
+  "all_tests": [
+    "TestAuditTinyTranscriptJumpDoesNotPaintOrClickAboveViewport",
+    "TestAuditTinyTranscriptJumpDoesNotPaintOrClickAboveViewport/dark",
+    "TestAuditTinyTranscriptJumpDoesNotPaintOrClickAboveViewport/light",
+    "TestJumpGeometryEmptyLayerPassesWheelSelectionAndMenu",
+    "TestJumpGeometryFocusedButtonKeyboardActivation",
+    "TestJumpGeometryLightDarkAndUnread",
+    "TestJumpGeometryLightDarkAndUnread/dark",
+    "TestJumpGeometryLightDarkAndUnread/light",
+    "TestJumpOwnClipWrapperPublicMechanism",
+    "TestJumpOwnClipWrapperPublicMechanism/24",
+    "TestJumpOwnClipWrapperPublicMechanism/80",
+    "TestTranscriptFadeProductionOrderBoundsAndCapture",
+    "TestTranscriptFadeProductionOrderBoundsAndCapture/dark",
+    "TestTranscriptFadeProductionOrderBoundsAndCapture/light",
+    "TestTranscriptFadeProductionTinyViewportClip"
+  ],
+  "count": 3,
+  "counts": {
+    "TestAuditTinyTranscriptJumpDoesNotPaintOrClickAboveViewport": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestJumpOwnClipWrapperPublicMechanism": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestJumpGeometryLightDarkAndUnread": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestJumpGeometryEmptyLayerPassesWheelSelectionAndMenu": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestJumpGeometryFocusedButtonKeyboardActivation": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestTranscriptFadeProductionOrderBoundsAndCapture": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestTranscriptFadeProductionTinyViewportClip": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    }
+  },
+  "skip": 0,
+  "fail": 0,
+  "elapsed": 18.288,
+  "vet_exit": 0,
+  "full_suite": "NOT_RUN; lead owns aggregate",
+  "red_log": {
+    "path": "/tmp/orbit-jump-clip-audit-1120.jsonl",
+    "sha256": "e285bd8ffe7574b218c2da27fd1983a4b25a276b9eb7b4a07dce1c7fce6f5aee"
+  },
+  "final_log": {
+    "path": "/tmp/orbit-jump-clip-final-1124.jsonl",
+    "sha256": "713b205b2af9686aef05334ebc929f0a4ec2533570d1fddcd489a12b238d4fe8"
+  },
+  "images": {
+    "dark-unread.png": "ee365da4ce51c99b7c67cbf6a3ea939461e853fc50e8115660d2573de9c10c5e",
+    "dark-idle.png": "2d3ae6a606fc609ad7e17e05b746a714ed725b7b95ec63dcbd1b6b7584bda96a",
+    "light-unread.png": "ad7441ec5fcc7fac7e78b8ceafe92326d3e45825d63c536be421dd2a0ab3ff43",
+    "light-idle.png": "d3596b0056f6cc4effb66881e93966be196d201aa4bac7a122a78912009f0313",
+    "tiny-dark.png": "3626b717784846931e1a8487fe22bf6aebeb44f5eb724c36f82f52a359cd3eeb",
+    "tiny-light.png": "9b5b023b636a374e3890916283caa63ea65bc69d6c58caab8408862ab92c56a6"
+  },
+  "arm64_exit": 0,
+  "arm64_status": "/tmp/orbit-jump-clip-arm64-1126.status",
+  "tooltip_additive": {
+    "expected": [
+      "TestAuditTinyTranscriptJumpDoesNotPaintOrClickAboveViewport",
+      "TestAuditTinyTranscriptJumpDoesNotPaintOrClickAboveViewport/light",
+      "TestAuditTinyTranscriptJumpDoesNotPaintOrClickAboveViewport/dark"
+    ],
+    "each_run_pass": 3,
+    "elapsed": 3.253,
+    "skip": 0,
+    "fail": 0,
+    "log": "/tmp/orbit-jump-clip-tooltip-v2-1128.jsonl",
+    "sha256": "633aa1ff8b8a44fb0208a5a3219f3ef93ca3a8b721993f785c82d160dc95d122",
+    "initial_fixture_failure": "1127 HasText also matched accessible button Label; retained, not production evidence"
+  }
+}
