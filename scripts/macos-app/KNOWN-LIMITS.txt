@@ -3,8 +3,9 @@ KNOWN LIMITS / 已知限制 — experimental Finder app
 - Future macOS builds support Apple Silicon (arm64) only. Existing Intel
   releases and assets remain unchanged.
 - The reported workspace-selection unresponsiveness is NOT confirmed fixed.
-  This .4 build restores ordinary Pi configuration inheritance and adds bounded
-  private diagnostic logs; it is not a verified workspace-hang repair.
+  This build includes asynchronous workspace/attachment dialogs and retains
+  ordinary Pi configuration inheritance and bounded private diagnostic logs;
+  these are not proof that the reported user-Mac hang is fixed.
 - Pi now uses the launch user's normal ~/.pi/agent (or PI_CODING_AGENT_DIR).
   Orbit does not copy credentials. Stock Pi may perform its normal configuration
   migrations, settings writes and OAuth refresh. Orbit preferences and the
@@ -37,5 +38,5 @@ KNOWN LIMITS / 已知限制 — experimental Finder app
   claim of exhaustive legal clearance. Read Resources/Licenses and provenance.
 
 这是便于直接安装启动的实验版，不等于全功能、像素一致或人工 Mac 验收完成。
-工作区选择后无响应的问题尚未确认修复；本次重新打包主要恢复 Pi 配置继承并增加有大小上限的本地诊断日志。
+工作区选择后无响应的问题尚未确认修复；本版包含已通过回归的迁移修正，保留 Pi 配置继承与有大小上限的本地诊断日志。
 已包含的 Review/心跳代码修复也不代表原生交互已经逐项验收。

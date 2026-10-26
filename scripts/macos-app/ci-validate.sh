@@ -15,7 +15,7 @@ VERSION="$(python3 -c 'import json; print(json.load(open(".github/macos-app-prer
 python3 scripts/macos-test/test_package.py 2>&1 | tee "$WORK/logs/legacy-packaging-tests.log"
 python3 scripts/macos-app/test_app_package.py 2>&1 | tee "$WORK/logs/packaging-tests.log"
 scripts/go-native.sh vet ./... 2>&1 | tee "$WORK/logs/vet.log"
-scripts/go-native.sh test -race -json ./... > "$WORK/logs/root-race.jsonl"
+scripts/go-native.sh test -race -p 1 -timeout 20m -json ./... > "$WORK/logs/root-race.jsonl"
 scripts/go-native.sh test -race github.com/egoist/mygo/ui -run '^TestOrbit(Composer|Selection)' -count=1 2>&1 | tee "$WORK/logs/toolkit.log"
 scripts/go-native.sh -C third_party/mygo-terminal test -race ./... 2>&1 | tee "$WORK/logs/terminal.log"
 python3 scripts/test-go-native-overlay.py 2>&1 | tee "$WORK/logs/wrapper.log"
