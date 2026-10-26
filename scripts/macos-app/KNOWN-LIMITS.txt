@@ -1,5 +1,11 @@
 KNOWN LIMITS / 已知限制 — experimental Finder app
 
+- This version includes the GOPI wordmark and pixel PI icon, bounded process
+  recovery without operation replay, independent commit model choice, and
+  editor identity/rename fixes. These are tested code changes, not full parity.
+- Launch-smoke PNGs are in-process content renders, not OS screen captures.
+  Dedicated cloud Mac composer proof remains NOT_RUN (no runner assigned).
+
 - Future macOS builds support Apple Silicon (arm64) only. Existing Intel
   releases and assets remain unchanged.
 - The reported workspace-selection unresponsiveness is NOT confirmed fixed.
