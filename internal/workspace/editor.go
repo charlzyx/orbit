@@ -14,7 +14,10 @@ const maxUndoStates = 512
 var ErrDocumentNotOpen = errors.New("document is not open")
 var ErrDocumentChanged = errors.New("document changed while saving; close again after saving")
 
+type DocumentID uint64
+
 type Document struct {
+	ID        DocumentID  `json:"id"`
 	Conflict  bool        `json:"conflict"`
 	Content   FileContent `json:"content"`
 	Text      string      `json:"text"`
@@ -30,6 +33,7 @@ type Document struct {
 // Editor owns open tabs independently of whether Files is currently visible.
 // Methods are safe from UI and autosave goroutines. Changes is coalesced.
 type Editor struct {
+	nextID    DocumentID
 	ioMu      sync.Mutex
 	writeFile func(string, string) error
 	mu        sync.Mutex
@@ -106,7 +110,8 @@ func (e *Editor) open(path string, activate bool) (Document, error) {
 		}
 		return documentCopy(d), nil
 	}
-	d := &Document{Content: content, Text: content.Text, saved: content.Text, Preview: content.Mode == FileMarkdown}
+	e.nextID++
+	d := &Document{ID: e.nextID, Content: content, Text: content.Text, saved: content.Text, Preview: content.Mode == FileMarkdown}
 	e.tabs = append(e.tabs, d)
 	if activate {
 		e.active = len(e.tabs) - 1
@@ -168,6 +173,21 @@ func (e *Editor) SetText(path, text string) error {
 	if d == nil {
 		return ErrDocumentNotOpen
 	}
+	return e.setText(d, text)
+}
+
+// SetTextID preserves native edit ownership across path-only rename changes.
+func (e *Editor) SetTextID(id DocumentID, text string) error {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	for _, d := range e.tabs {
+		if d.ID == id {
+			return e.setText(d, text)
+		}
+	}
+	return ErrDocumentNotOpen
+}
+func (e *Editor) setText(d *Document, text string) error {
 	if !d.Content.Editable() {
 		return ErrReadOnly
 	}

@@ -98,10 +98,32 @@ func TestTruncatedViewerBufferStaysBounded(t *testing.T) {
 	a := fixture(t)
 	a.initFiles()
 	p := filepath.Join(t.TempDir(), "many-lines.txt")
-	d := workspace.Document{Text: strings.Repeat("full\n", 1000), Content: workspace.FileContent{Path: p, Truncated: true, Lines: []string{"first", "second"}, Mode: workspace.FileText}}
+	// Use a real registered document: native synchronization rejects detached
+	// or closed IDs, and takes current metadata from the live Editor.
+	prefix := "first\nsecond\n" + strings.Repeat("x\n", workspace.MaxFileLines-2)
+	full := prefix + "tail-must-not-be-rendered\n"
+	if int64(len(full)) >= workspace.MaxFileBytes {
+		t.Fatal("fixture hit byte cap instead of line cap")
+	}
+	if err := os.WriteFile(p, []byte(full), 0600); err != nil {
+		t.Fatal(err)
+	}
+	d, err := a.files.editor.Open(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = a.files.editor.CloseAll() })
+	if d.ID == 0 || !d.Content.Truncated || d.Content.Editable() || len(d.Content.Lines) != workspace.MaxFileLines || d.Text != full {
+		t.Fatal("real loader did not produce a registered truncated source", d.ID, d.Content.Truncated, len(d.Content.Lines))
+	}
 	a.syncDocument(d)
-	if got := a.files.states[p].Buffer.String(); got != "first\nsecond" {
-		t.Fatalf("viewer loaded uncapped source: %d bytes", len(got))
+	st := a.files.states[p]
+	if st == nil {
+		t.Fatal("live truncated document has no native buffer")
+	}
+	want := strings.TrimSuffix(prefix, "\n")
+	if got := st.Buffer.String(); got != want || strings.Count(got, "\n")+1 != workspace.MaxFileLines || strings.Contains(got, "tail-must-not-be-rendered") {
+		t.Fatalf("viewer loaded uncapped or incorrect source: got %d bytes, want %d", len(got), len(want))
 	}
 }
 

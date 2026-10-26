@@ -15,6 +15,8 @@ import (
 )
 
 type filesState struct {
+	native                map[workspace.DocumentID]*fileNative
+	pathIDs               map[string]workspace.DocumentID
 	tree                  workspace.TreeSnapshot
 	expanded              map[string]bool
 	query, loaded, err    string
@@ -120,6 +122,7 @@ func (a *App) OpenFile(path string) {
 	for _, d := range s.editor.Documents() {
 		if d.Content.Path == path {
 			a.save(s.editor.Activate(path))
+			a.bindFileNative(d)
 			if s.states[path] == nil {
 				a.syncDocument(d)
 			}
@@ -128,13 +131,23 @@ func (a *App) OpenFile(path string) {
 		}
 	}
 	a.Async(func() func() {
-		_, e := s.editor.OpenInactive(path)
+		opened, e := s.editor.OpenInactive(path)
 		return func() {
-			if generation != s.openGeneration || root != a.Model.Workspace {
+			if a.files != s || generation != s.openGeneration || root != a.Model.Workspace {
 				return
 			}
 			if e != nil {
 				a.Notify(e.Error(), true)
+				return
+			}
+			live := false
+			for _, d := range s.editor.Documents() {
+				if d.ID == opened.ID && d.Content.Path == path {
+					live = true
+					break
+				}
+			}
+			if !live {
 				return
 			}
 			if e := s.editor.Activate(path); e != nil {
@@ -153,12 +166,28 @@ func (a *App) OpenFile(path string) {
 }
 func (a *App) syncDocument(d workspace.Document) {
 	s := a.files
+	// Same live identity/path may have newer metadata than a queued caller.
+	if s == nil {
+		return
+	}
+	for _, live := range s.editor.Documents() {
+		if live.ID == d.ID && live.Content.Path == d.Content.Path {
+			d = live
+			break
+		}
+	}
+	if !a.bindFileNative(d) {
+		return
+	}
 	p := d.Content.Path
 	viewText := d.Text
 	if d.Content.Truncated {
 		viewText = strings.Join(d.Content.Lines, "\n")
 	}
 	st := s.states[p]
+	if st != nil && st.Buffer.Version() != s.versions[p] {
+		return
+	}
 	if st == nil {
 		b := editor.NewBuffer(viewText)
 		b.SetLanguage(editor.LanguageFor(p))
@@ -182,6 +211,7 @@ func (a *App) syncDocument(d workspace.Document) {
 			a.Notify(e.Error(), true)
 		}
 	}
+	a.captureFileNative(d)
 }
 
 // Pinned explorer/panel.rs: width includes the left gutter, not only the card.
@@ -544,67 +574,27 @@ func (a *App) renameFilePrompt(path string) {
 			a.Notify(a.text("explorer.err_unsaved", "Save unsaved edits before renaming or deleting this path."), true)
 			return
 		}
-		a.files.mutating = true
+		s := a.files
+		receipt := a.captureFileRename(path)
+		s.mutating = true
 		a.Async(func() func() {
 			p, e := workspace.RenamePath(path, name)
 			if e == nil {
-				a.files.editor.RenameUnder(path, p)
+				s.editor.RenameUnder(path, p)
 			}
 			return func() {
-				a.files.mutating = false
+				s.mutating = false
+				if a.files != s {
+					return
+				}
 				a.save(e)
 				if e == nil {
-					a.reconcileFileRename(path, p)
+					a.applyFileRename(receipt, p)
 					a.RefreshFiles()
 				}
 			}
 		})
 	})
-}
-
-// Source FileViewer::reconcile_rename rewrites paths on existing editor
-// entities. Preserve native buffers, selections, undo/redo and scroll state,
-// including every unrelated tab; a successful rename is not a reload.
-func (a *App) reconcileFileRename(old, renamed string) {
-	if filepath.Clean(old) == filepath.Clean(renamed) {
-		return
-	}
-	s := a.files
-	remap := func(path string) (string, bool) {
-		rel, err := filepath.Rel(old, path)
-		if path == "" || err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
-			return path, false
-		}
-		return filepath.Join(renamed, rel), true
-	}
-	for path, state := range s.states {
-		if next, changed := remap(path); changed {
-			s.states[next] = state
-			delete(s.states, path)
-			if d, ok := s.editor.Active(); ok && d.Content.Path == next {
-				s.focusPending = next
-			}
-		}
-	}
-	for path, version := range s.versions {
-		if next, changed := remap(path); changed {
-			s.versions[next] = version
-			delete(s.versions, path)
-		}
-	}
-	for path, image := range s.images {
-		if next, changed := remap(path); changed {
-			s.images[next] = image
-			delete(s.images, path)
-		}
-	}
-	if next, changed := remap(s.desired); changed {
-		s.desired = next
-		s.openGeneration++ // Invalidate a queued open of the old path.
-	}
-	if next, changed := remap(s.focusPending); changed {
-		s.focusPending = next
-	}
 }
 
 func (a *App) deleteFile(path string) {
@@ -691,6 +681,7 @@ func (a *App) fileEditorContent(c *ui.Context) {
 		a.Empty(c, "Open a file", "Select a file in the explorer to view or edit it.")
 		return
 	}
+	a.bindFileNative(d)
 	ui.Row(c).Height(40).Gap(t.Space(6)).Padding(0, t.Space(16), 0, 0).Background(t.Surface).Children(func() {
 		ui.ScrollHorizontal(c.Key("file-tabs")).Label("File tabs").Grow(1).MinWidth(0).FillHeight().Children(func() {
 			ui.Row(c).FillHeight().Gap(t.Space(6)).AlignItems(ui.Center).Children(func() {
@@ -783,6 +774,7 @@ func (a *App) fileEditorContent(c *ui.Context) {
 		ui.Scroll(c).Grow(1).MinHeight(0).Children(func() { markdown.View(c, d.Text, &a.md).Padding(24).MaxWidth(960) })
 		return
 	}
+	a.bindFileNative(d)
 	st := s.states[d.Content.Path]
 	if st == nil {
 		a.syncDocument(d)
@@ -798,10 +790,11 @@ func (a *App) fileEditorContent(c *ui.Context) {
 		s.focusPending = ""
 	}
 	if st.Buffer.Version() != s.versions[d.Content.Path] {
-		if err := s.editor.SetText(d.Content.Path, st.Buffer.String()); err != nil {
+		if err := s.editor.SetTextID(d.ID, st.Buffer.String()); err != nil {
 			a.save(err)
 		} else {
 			s.versions[d.Content.Path] = st.Buffer.Version()
+			a.captureFileNative(d)
 		}
 	}
 	pos := st.CursorPos()
@@ -825,15 +818,17 @@ func (a *App) activateFile(path string) {
 func (a *App) syncFileBuffers() bool {
 	s := a.files
 	for _, d := range s.editor.Documents() {
+		a.bindFileNative(d)
 		st := s.states[d.Content.Path]
 		if st == nil || !d.Content.Editable() || st.Buffer.Version() == s.versions[d.Content.Path] {
 			continue
 		}
-		if err := s.editor.SetText(d.Content.Path, st.Buffer.String()); err != nil {
+		if err := s.editor.SetTextID(d.ID, st.Buffer.String()); err != nil {
 			a.save(err)
 			return false
 		}
 		s.versions[d.Content.Path] = st.Buffer.Version()
+		a.captureFileNative(d)
 	}
 	return true
 }
@@ -878,6 +873,8 @@ func (a *App) closeFile(path string) {
 				if !stillOpen {
 					delete(s.states, path)
 					delete(s.images, path)
+					delete(s.native, s.pathIDs[path])
+					delete(s.pathIDs, path)
 				}
 				if op.reopen && op.root == a.Model.Workspace && op.generation == s.openGeneration && s.desired == path {
 					a.OpenFile(path)

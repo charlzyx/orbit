@@ -75,6 +75,7 @@ func (a *App) commitExplorerEntry(e *explorerEntry) {
 		e.err = a.text("explorer.err_unsaved", "Save unsaved edits before renaming or deleting this path.")
 		return
 	}
+	receipt := a.captureFileRename(e.target)
 	e.pending, s.mutating = true, true
 	a.Async(func() func() {
 		var path string
@@ -94,7 +95,7 @@ func (a *App) commitExplorerEntry(e *explorerEntry) {
 			current := a.explorerEntryCurrent(e)
 			if err == nil && e.target != "" {
 				focus := s.focusPending
-				a.reconcileFileRename(e.target, path)
+				a.applyFileRename(receipt, path)
 				if !current {
 					s.focusPending = focus
 				}
