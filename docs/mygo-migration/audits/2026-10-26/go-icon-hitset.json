@@ -1,0 +1,24 @@
+{
+  "raw_sha256": "7bc0507f52d08f09397de74874d1a53380b700f2669460c728713f68ec6dee0a",
+  "package": "github.com/charlzyx/orbit/internal/ui",
+  "expected": [
+    "TestGoBrandDedicatedIconAndLightDarkScreens",
+    "TestGoBrandDedicatedIconAndLightDarkScreens/light",
+    "TestGoBrandDedicatedIconAndLightDarkScreens/dark",
+    "TestSourceProviderGridCapabilitiesFilteringAndAboutIdentity",
+    "TestSourceSidebarWordmarkAndNewTaskGeometry"
+  ],
+  "each_run": 1,
+  "each_pass": 1,
+  "skip": 0,
+  "fail": 0,
+  "elapsed_seconds": 7.05,
+  "captures": {
+    "sidebar-light.png": "f0d2447f7ed912ae0e3da37ec266c74a8280ce289060f56443f6afc70dc81d16",
+    "sidebar-dark.png": "69fe01d75d42f3abe7056a82d7c0f2728aef08376d9ddfe0426e94c3adb300d7",
+    "about-light.png": "0e80442b8d59db76cd729818cb9e0b1ac52d4abd1d43da87b3c10943d4783edd",
+    "go1024.png": "ce70a20b3716988c66ce2319ce245dfec3f103985b4cc4814ef566a300c75979",
+    "about-dark.png": "fc67a75314a10aef1320ab827f8cc8d20488c47f4fc4f13afe18d80dd8fd60f7",
+    "old-new-sizes.png": "3290207a9625f8595313885381a90d186897a677e66377eeeef71e1d3740a14a"
+  }
+}

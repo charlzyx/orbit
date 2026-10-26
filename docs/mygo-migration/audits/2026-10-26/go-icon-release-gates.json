@@ -1,0 +1,251 @@
+{
+  "status": "PASS",
+  "commit": "5633a4a8b4f3e5eb28c76a29dc46eef25dc69a66",
+  "verified_hashes": 1823,
+  "runtime_inputs": 1026,
+  "runtime_fingerprint": "e30dc361b78c9838d0fb68552088442de738eb6ff65bb020cae191ca4eae4b16",
+  "python_tests": "36 main +9 nested PASS",
+  "vet": "EXIT0",
+  "darwin_arm64": "BUILD_EXIT0",
+  "logs": {
+    "full": {
+      "sha256": "ef69b8774daf5e587c4c530420b17d3570da60cc586a3b46931e77af7ef76e51",
+      "pass_events": 3372,
+      "skips": [
+        {
+          "package": "github.com/charlzyx/orbit/internal/agent",
+          "test": "TestDeleteSessionCaseVariantProtectsLiveFileWhereSupported"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/mcpui",
+          "test": "TestNativeCaptureMCP"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/modelui",
+          "test": "TestNativeModelUICaptures"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/preferences",
+          "test": "TestWorkspaceRevisionCaseAliasWhenSupported"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/resourceui",
+          "test": "TestNativeCaptureResources"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/resourceui",
+          "test": "TestNativeCaptureFullResourceSlots"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/transcriptui",
+          "test": "TestNativeTranscriptCapture"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/transcriptui",
+          "test": "TestNativeRetainedSelectionCapture"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/ui",
+          "test": "TestNativeModelAndWorkspaceHostCaptures"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/ui",
+          "test": "TestNavigationRailCapture"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/ui",
+          "test": "TestOnboardingCapture"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/ui",
+          "test": "TestReviewToolbarCPUEvidence"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/ui",
+          "test": "TestSetupMigrationCapture"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/ui",
+          "test": "TestNativeCapture"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/ui",
+          "test": "TestNativeUsageShellCapture"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/ui",
+          "test": "TestNativeUsageCapture"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/ui",
+          "test": "TestNativeUsageComponentCaptures"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/ui",
+          "test": "TestNativeViewerCapture"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/workbench",
+          "test": "TestLivePiProviderMetadataWithoutInference"
+        }
+      ],
+      "packages": [
+        [
+          "github.com/charlzyx/orbit",
+          1.6440000000000001
+        ],
+        [
+          "github.com/charlzyx/orbit/cmd/orbit",
+          1.02
+        ],
+        [
+          "github.com/charlzyx/orbit/internal/agent",
+          149.58
+        ],
+        [
+          "github.com/charlzyx/orbit/internal/appbundle",
+          3.076
+        ],
+        [
+          "github.com/charlzyx/orbit/internal/attachments",
+          0
+        ],
+        [
+          "github.com/charlzyx/orbit/internal/background",
+          1.541
+        ],
+        [
+          "github.com/charlzyx/orbit/internal/bugreportui",
+          5.146
+        ],
+        [
+          "github.com/charlzyx/orbit/internal/composerui",
+          2.661
+        ],
+        [
+          "github.com/charlzyx/orbit/internal/diagnosticlog",
+          0
+        ],
+        [
+          "github.com/charlzyx/orbit/internal/gitworkbench",
+          14.961
+        ],
+        [
+          "github.com/charlzyx/orbit/internal/highlight",
+          1.2
+        ],
+        [
+          "github.com/charlzyx/orbit/internal/markdownimage",
+          1.956
+        ],
+        [
+          "github.com/charlzyx/orbit/internal/mcpui",
+          2.58
+        ],
+        [
+          "github.com/charlzyx/orbit/internal/modelui",
+          3.646
+        ],
+        [
+          "github.com/charlzyx/orbit/internal/native",
+          39.344
+        ],
+        [
+          "github.com/charlzyx/orbit/internal/pirpc",
+          0.001
+        ],
+        [
+          "github.com/charlzyx/orbit/internal/preferences",
+          1.29
+        ],
+        [
+          "github.com/charlzyx/orbit/internal/resourceui",
+          3.275
+        ],
+        [
+          "github.com/charlzyx/orbit/internal/runtimepath",
+          0
+        ],
+        [
+          "github.com/charlzyx/orbit/internal/terminal",
+          1.417
+        ],
+        [
+          "github.com/charlzyx/orbit/internal/transcriptui",
+          1.397
+        ],
+        [
+          "github.com/charlzyx/orbit/internal/ui",
+          375.328
+        ],
+        [
+          "github.com/charlzyx/orbit/internal/workbench",
+          13.992
+        ],
+        [
+          "github.com/charlzyx/orbit/internal/workspace",
+          0.001
+        ],
+        [
+          "github.com/charlzyx/orbit/internal/worktreeui",
+          2.01
+        ]
+      ]
+    },
+    "toolkit": {
+      "sha256": "361eb31f261ad698bd25682623786aa7139c14a58be56adaf96f235a0e2c7936",
+      "pass_events": 19,
+      "skips": [],
+      "packages": [
+        [
+          "github.com/egoist/mygo/ui",
+          1.279
+        ]
+      ]
+    },
+    "terminal": {
+      "sha256": "3e79853fff2c11d52e4cef06a1157a31ebbb8c369e1db33461174f12bd8d9b9e",
+      "pass_events": 115,
+      "skips": [
+        {
+          "package": "github.com/egoist/mygo/orbit-terminal/internal/libbuild",
+          "test": null
+        },
+        {
+          "package": "github.com/egoist/mygo/orbit-terminal/internal/library",
+          "test": null
+        },
+        {
+          "package": "github.com/egoist/mygo/orbit-terminal/internal/pty",
+          "test": "TestConPTY"
+        },
+        {
+          "package": "github.com/egoist/mygo/orbit-terminal",
+          "test": "TestWindowsShell"
+        }
+      ],
+      "packages": [
+        [
+          "github.com/egoist/mygo/orbit-terminal/internal/pty",
+          1.032
+        ],
+        [
+          "github.com/egoist/mygo/orbit-terminal/internal/vt",
+          1.08
+        ],
+        [
+          "github.com/egoist/mygo/orbit-terminal",
+          82.238
+        ]
+      ]
+    }
+  },
+  "icon_expected_actual": [
+    "TestGoBrandDedicatedIconAndLightDarkScreens",
+    "TestGoBrandDedicatedIconAndLightDarkScreens/light",
+    "TestGoBrandDedicatedIconAndLightDarkScreens/dark",
+    "TestSourceProviderGridCapabilitiesFilteringAndAboutIdentity",
+    "TestSourceSidebarWordmarkAndNewTaskGeometry"
+  ],
+  "critical_pairs": 100
+}

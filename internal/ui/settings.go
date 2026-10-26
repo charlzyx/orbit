@@ -95,7 +95,7 @@ func (a *App) settings(c *ui.Context) {
 			ui.Column(c).AlignSelf(ui.Stretch).Padding(t.Space(20), t.Space(24), t.Space(12)).Gap(t.Space(12)).Children(func() {
 				ui.Column(c.Key("settings-header")).AlignSelf(ui.Stretch).Gap(t.Space(4)).Children(func() {
 					if a.settingsPage == "about" {
-						ui.Image(c, logos["app-icon.png"]).Size(48, 48)
+						ui.Image(c, logos["go-app-icon.png"]).Size(48, 48).Label("Orbit Go app icon")
 					}
 					for _, cat := range settingsCategories {
 						if cat.ID == a.settingsPage {

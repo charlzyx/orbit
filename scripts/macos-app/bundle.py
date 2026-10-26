@@ -50,6 +50,34 @@ def verify_runtime(runtime,arch):
   if actual[path].get(key)!=row[key]:raise ValueError('Pi runtime inventory mismatch: '+path)
  return m
 
+def verify_go_icon(root):
+ manifest=json.loads((root/'assets/icons/go/manifest.json').read_text())
+ source='assets/icons/go/orbit-go.svg'
+ outputs=('assets/icons/go/orbit-go.icns','crates/orbit-pi/assets/go-app-icon.png')
+ if manifest.get('source')!=source or manifest.get('source_sha256')!=digest(root/source):raise ValueError('Go icon vector source mismatch')
+ if set(manifest.get('outputs',{}))!=set(outputs):raise ValueError('Unexpected Go icon output paths')
+ for rel in outputs:
+  p=root/rel;row=manifest['outputs'][rel]
+  if row.get('sha256')!=digest(p) or row.get('bytes')!=p.stat().st_size:raise ValueError('Go icon generated asset mismatch')
+ data=(root/outputs[0]).read_bytes()
+ if len(data)<8 or data[:4]!=b'icns' or struct.unpack('>I',data[4:8])[0]!=len(data):raise ValueError('Invalid Go ICNS container')
+ expected={'icp4':16,'icp5':32,'icp6':64,'ic07':128,'ic08':256,'ic09':512,'ic10':1024,'ic11':32,'ic12':64,'ic13':256,'ic14':512};seen=set();off=8
+ while off<len(data):
+  if off+8>len(data):raise ValueError('Truncated Go ICNS chunk')
+  kind=data[off:off+4].decode('ascii');size=struct.unpack('>I',data[off+4:off+8])[0]
+  if kind not in expected or kind in seen or size<32 or off+size>len(data):raise ValueError('Invalid Go ICNS slot')
+  png=data[off+8:off+size]
+  if png[:8]!=b'\x89PNG\r\n\x1a\n' or png[12:16]!=b'IHDR' or struct.unpack('>II',png[16:24])!=(expected[kind],expected[kind]):raise ValueError('Invalid Go ICNS PNG dimensions')
+  seen.add(kind);off+=size
+ if seen!=set(expected) or manifest.get('icns_slots')!=expected:raise ValueError('Missing Go ICNS size/retina slots')
+ return manifest
+
+def install_go_icon(root,res):
+ verify_go_icon(root)
+ copy(root/'assets/icons/go/orbit-go.icns',res/'OrbitTest.icns')
+ if digest(res/'OrbitTest.icns')!=digest(root/'assets/icons/go/orbit-go.icns'):raise ValueError('Packaged Go icon changed')
+ copy(root/'assets/icons/go/manifest.json',res/'Provenance/go-icon-manifest.json')
+
 def build(root,binaries,runtime,out,commit,arch,validation):
  if arch not in ARCHITECTURES:raise ValueError('Future macOS app builds support arm64 only')
  if platform.system()!='Darwin' or platform.machine()!='arm64':raise ValueError('Matching native macOS runner required')
@@ -69,7 +97,7 @@ def build(root,binaries,runtime,out,commit,arch,validation):
  for part in ('node','pi'):shutil.copytree(runtime/part,res/part,symlinks=True)
  nodeaudit=require_arch(res/'node/bin/node',arch)
  if not (res/'pi/node_modules/@earendil-works/pi-coding-agent/dist/bundle/cli.js').is_file():raise ValueError('Pinned Pi CLI missing')
- copy(root/'assets/icons/alpha-logo.icns',res/'OrbitTest.icns')
+ install_go_icon(root,res)
  info={'CFBundleDevelopmentRegion':'en','CFBundleName':'Orbit Go Test','CFBundleDisplayName':'Orbit Go Test','CFBundleIdentifier':'dev.orbit.go.experimental','CFBundleVersion':m['version'].split('go-test.')[1],'CFBundleShortVersionString':'0.2.12','CFBundleExecutable':'Orbit','CFBundlePackageType':'APPL','CFBundleIconFile':'OrbitTest','LSMinimumSystemVersion':'13.0','NSHighResolutionCapable':True,'NSPrincipalClass':'NSApplication','NSSupportsAutomaticGraphicsSwitching':True}
  (app/'Contents/Info.plist').write_bytes(plistlib.dumps(info));write(app/'Contents/PkgInfo','APPL????')
  write(res/'bin/pi','#!/bin/sh\nset -eu\nRES="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd -P)"\nexec "$RES/node/bin/node" "$RES/pi/node_modules/@earendil-works/pi-coding-agent/dist/bundle/cli.js" "$@"\n',0o755)

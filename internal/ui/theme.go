@@ -161,7 +161,7 @@ func LoadAssets() error {
 				if e = ui.RegisterFont(b, family); e != nil {
 					return fmt.Errorf("font %s: %w", p, e)
 				}
-			case p == "logo.png" || p == "logo-dark.png" || p == "app-icon.png":
+			case p == "logo.png" || p == "logo-dark.png" || p == "app-icon.png" || p == "go-app-icon.png":
 				b, e := orbitassets.Asset(p)
 				if e != nil {
 					return e

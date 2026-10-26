@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 64 64" role="img" aria-label="Orbit Go">
+  <!-- OP contours derived from marketing/src/app/icon.svg. Go-only artwork. -->
+  <defs><linearGradient id="tile" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#40E4EA"/><stop offset="1" stop-color="#00A9CB"/></linearGradient></defs>
+  <g transform="translate(6.25 6.25) scale(.8046875)">
+    <rect width="64" height="64" rx="14" fill="url(#tile)"/>
+    <g transform="translate(0 -5)" fill="#062A3A" fill-rule="evenodd">
+      <path d="M13 23h16v19H13V23Zm5 6h6v8h-6v-8Z"/>
+      <path d="M34 23h17v14H41v5h-7V23Zm5 5h6v4h-6v-4Z"/>
+    </g>
+    <rect x="28" y="42" width="31" height="17" rx="5" fill="#FFE45E"/>
+    <!-- GO badge is outlined geometry, never dependent on a system font. -->
+    <path d="M40 46H32V55H40V50H36V52H38V53H34V48H40Z" fill="#062A3A"/>
+    <path d="M43 46H54V55H43Z M46 48V53H51V48Z" fill="#062A3A" fill-rule="evenodd"/>
+  </g>
+</svg>
