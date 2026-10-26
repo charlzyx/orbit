@@ -317,19 +317,7 @@ func (x *Controller) syncAt(now time.Time) {
 				if x.UI.page == "git" {
 					x.Git.Refresh()
 				}
-				if x.UI.files != nil {
-					ed := x.UI.files.editor
-					x.UI.Async(func() func() {
-						for _, d := range ed.Documents() {
-							ed.Reload(d.Content.Path)
-						}
-						return func() {
-							for _, d := range ed.Documents() {
-								x.UI.syncDocument(d)
-							}
-						}
-					})
-				}
+				x.UI.reloadWatchedFiles()
 			}
 		default:
 		}

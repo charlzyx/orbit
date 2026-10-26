@@ -1,0 +1,7 @@
+# Editor safety follow-up after delivered test .20261026.2
+
+This source-only feature-branch batch is NOT in the delivered .20261026.2 DMG. Its release marker is unchanged. It contains three independently reviewed changes: synchronize existing native buffers before both rename admission paths; acknowledge native buffer versions only after successful SetText; and preserve later native edits when watched-reload callbacks apply. No forced save, new release, global filesystem lock, or complex document-ID rename architecture is added.
+
+The integrated final tree passed vet, the full race suite with canonical -p 1 / -timeout 20m, toolkit regressions, terminal tests and Darwin arm64 cross-compilation. All 1811 frozen non-document hashes matched after testing. 89 critical package/test identities actually passed; the focused 11 tests each ran/passed three times. Full UI took 360.684 seconds. Whole-suite 19 conditional skips and terminal 4 conditional skips remain explicitly recorded in the adjacent JSON; this is not zero-skip or native Mac acceptance.
+
+Remaining: asynchronous filesystem rename/editor remapping and old-path reopen need the separate stable-document-ID design; watcher Reload errors are still ignored; repeated readonly error notices and multi-document reload generation are not solved. The current native first-frame smoke captures Setup Checking, not completed setup UI. No full functionality or pixel-parity claim is made.

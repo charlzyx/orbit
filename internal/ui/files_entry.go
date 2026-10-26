@@ -63,6 +63,9 @@ func (a *App) commitExplorerEntry(e *explorerEntry) {
 	if !a.explorerEntryCurrent(e) || e.pending || s.mutating {
 		return
 	}
+	if e.target != "" && !a.syncFileBuffers() {
+		return
+	}
 	name, err := workspace.ValidateName(e.value)
 	if err != nil {
 		e.err = err.Error()

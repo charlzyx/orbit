@@ -537,6 +537,9 @@ func (a *App) renameFile(path string) {
 }
 func (a *App) renameFilePrompt(path string) {
 	a.Prompt("Rename", filepath.Base(path), func(name string) {
+		if !a.syncFileBuffers() {
+			return
+		}
 		if a.files.mutating || a.files.editor.HasDirtyUnder(path) {
 			a.Notify(a.text("explorer.err_unsaved", "Save unsaved edits before renaming or deleting this path."), true)
 			return
@@ -795,8 +798,11 @@ func (a *App) fileEditorContent(c *ui.Context) {
 		s.focusPending = ""
 	}
 	if st.Buffer.Version() != s.versions[d.Content.Path] {
-		a.save(s.editor.SetText(d.Content.Path, st.Buffer.String()))
-		s.versions[d.Content.Path] = st.Buffer.Version()
+		if err := s.editor.SetText(d.Content.Path, st.Buffer.String()); err != nil {
+			a.save(err)
+		} else {
+			s.versions[d.Content.Path] = st.Buffer.Version()
+		}
 	}
 	pos := st.CursorPos()
 	status := fmt.Sprintf("Ln %d, Col %d · %s", pos.Line+1, pos.Col+1, a.fileSaveStatus(d))
