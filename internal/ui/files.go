@@ -41,12 +41,15 @@ type filesState struct {
 	focusPending          string
 	handle                ui.Handle
 	closing               map[string]*fileClose
+	navigationGeneration  uint64
 }
 
 type fileClose struct {
-	reopen     bool
-	root       string
-	generation uint64
+	id, reopenID         workspace.DocumentID
+	navigationGeneration uint64
+	reopen               bool
+	root                 string
+	generation           uint64
 }
 
 func (a *App) initFiles() {
@@ -114,7 +117,15 @@ func (a *App) OpenFile(path string) {
 	a.Navigate("files")
 	if operation := s.closing[path]; operation != nil {
 		operation.reopen, operation.root = true, root
+		operation.reopenID = operation.id
+		for _, d := range s.editor.Documents() {
+			if d.Content.Path == path {
+				operation.reopenID = d.ID
+				break
+			}
+		}
 		operation.generation = generation
+		operation.navigationGeneration = s.navigationGeneration
 		return
 	}
 	// Source open(existing) activates the existing buffer synchronously. A
@@ -578,10 +589,8 @@ func (a *App) renameFilePrompt(path string) {
 		receipt := a.captureFileRename(path)
 		s.mutating = true
 		a.Async(func() func() {
-			p, e := workspace.RenamePath(path, name)
-			if e == nil {
-				s.editor.RenameUnder(path, p)
-			}
+			result, e := receipt.editor.RenameDocuments(receipt.request(name))
+			p := result.Path
 			return func() {
 				s.mutating = false
 				if a.files != s {
@@ -861,27 +870,47 @@ func (a *App) saveFiles() {
 }
 
 func (a *App) closeFile(path string) {
+	if job := a.admitFileClose(path); job != nil {
+		a.Async(job)
+	}
+}
+
+// Admission captures the original identity before dispatching the unchanged job.
+func (a *App) admitFileClose(path string) func() func() {
 	s := a.files
 	if !a.syncFileBuffers() {
-		return
+		return nil
 	}
 	if s.closing == nil {
 		s.closing = map[string]*fileClose{}
 	}
 	if s.closing[path] != nil {
-		return
+		return nil
 	}
-	op := &fileClose{}
+	ed := s.editor
+	var id workspace.DocumentID
+	for _, d := range ed.Documents() {
+		if d.Content.Path == path {
+			id = d.ID
+			break
+		}
+	}
+	if id == 0 {
+		return nil
+	}
+	op := &fileClose{id: id}
+	generation, page, navigation := s.openGeneration, a.page, s.navigationGeneration
 	s.closing[path] = op
-	a.Async(func() func() {
-		e := s.editor.Close(path)
+	return func() func() {
+		closed, e := ed.CloseIDReceipt(id)
 		return func() {
-			if s.closing[path] != op {
+			if a.files != s || s.editor != ed || s.closing[path] != op {
 				return
 			}
 			delete(s.closing, path)
 			a.save(e)
 			if e == nil {
+				a.pruneFileNative()
 				stillOpen := false
 				for _, d := range s.editor.Documents() {
 					if d.Content.Path == path {
@@ -895,8 +924,11 @@ func (a *App) closeFile(path string) {
 					delete(s.native, s.pathIDs[path])
 					delete(s.pathIDs, path)
 				}
-				if op.reopen && op.root == a.Model.Workspace && op.generation == s.openGeneration && s.desired == path {
-					a.OpenFile(path)
+				if op.reopen && op.root == a.Model.Workspace && op.generation == s.openGeneration && s.desired == path && a.page == "files" && op.navigationGeneration == s.navigationGeneration {
+					a.reopenClosedFile(s, ed, op, closed, path)
+					return
+				}
+				if page != "files" || op.reopen || generation != s.openGeneration || page != a.page || navigation != s.navigationGeneration {
 					return
 				}
 				if d, ok := s.editor.Active(); ok {
@@ -907,8 +939,48 @@ func (a *App) closeFile(path string) {
 				}
 			}
 		}
+	}
+}
+
+// Reopen intent belongs to the originally requested ID, never an arbitrary path occupant.
+func (a *App) reopenClosedFile(s *filesState, ed *workspace.Editor, op *fileClose, closed workspace.CloseReceipt, path string) {
+	activate := func(id workspace.DocumentID) {
+		d, err := ed.ActivateID(id)
+		if err != nil {
+			a.save(err)
+			return
+		}
+		if !a.bindFileNative(d) {
+			return
+		}
+		if s.states[d.Content.Path] == nil {
+			a.syncDocument(d)
+		}
+		s.desired, s.focusPending = d.Content.Path, d.Content.Path
+	}
+	if op.reopenID != op.id {
+		activate(op.reopenID)
+		return
+	}
+	if closed.ID != op.id || closed.Path != path {
+		return
+	}
+	generation, navigation, root := op.generation, op.navigationGeneration, op.root
+	a.Async(func() func() {
+		opened, err := ed.ReopenClosed(closed)
+		return func() {
+			if a.files != s || s.editor != ed || a.Model.Workspace != root || a.page != "files" || s.openGeneration != generation || s.navigationGeneration != navigation || s.desired != path {
+				return
+			}
+			if err != nil {
+				a.save(err)
+				return
+			}
+			activate(opened.ID)
+		}
 	})
 }
+
 func (a *App) featurePage(c *ui.Context) {
 	switch a.page {
 	case "files":

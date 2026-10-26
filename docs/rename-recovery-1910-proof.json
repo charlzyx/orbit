@@ -1,0 +1,1723 @@
+{
+  "base": "6a9c9937512387740f7a4e3cc4ca245e78d712df",
+  "recovery": "New behavioral reconstruction, not restoration of lost cb80/8d115 bytes or logs",
+  "old_full_gate": "UNKNOWN after executor reset; not claimed here",
+  "logs": {
+    "readfence-red.jsonl": {
+      "sha256": "a50f975e8ef4ea0140cab914c0902720d7ac79dce8fd5868c5658fe9cd9156c4",
+      "events": [
+        {
+          "Action": "run",
+          "Test": "TestRecoveryHeldReadCannotResurrectDeletedNamespace"
+        },
+        {
+          "Action": "fail",
+          "Test": "TestRecoveryHeldReadCannotResurrectDeletedNamespace",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryHeldReadCannotUndoNewerClose"
+        },
+        {
+          "Action": "fail",
+          "Test": "TestRecoveryHeldReadCannotUndoNewerClose",
+          "Elapsed": 0
+        },
+        {
+          "Action": "fail",
+          "Elapsed": 0.01
+        }
+      ]
+    },
+    "final-ui.jsonl": {
+      "sha256": "e6370a525bde8ca40d52192dc6b329293623ddf3a4975346927dff5dc083f23b",
+      "events": [
+        {
+          "Action": "run",
+          "Test": "TestMountedFileHeldSnapshotAfterRealCloseDoesNotReviveEditor"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestMountedFileHeldSnapshotAfterRealCloseDoesNotReviveEditor",
+          "Elapsed": 1.84
+        },
+        {
+          "Action": "run",
+          "Test": "TestMountedFileStaleSnapshotCannotRenderReopenedPath"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestMountedFileStaleSnapshotCannotRenderReopenedPath",
+          "Elapsed": 0.03
+        },
+        {
+          "Action": "run",
+          "Test": "TestFileEditorFailedSyncRetainsVersionAndRetries"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestFileEditorFailedSyncRetainsVersionAndRetries",
+          "Elapsed": 0.03
+        },
+        {
+          "Action": "run",
+          "Test": "TestNativeSyncRejectsClosedAndRenamedSnapshots"
+        },
+        {
+          "Action": "run",
+          "Test": "TestNativeSyncRejectsClosedAndRenamedSnapshots/closed"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestNativeSyncRejectsClosedAndRenamedSnapshots/closed",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestNativeSyncRejectsClosedAndRenamedSnapshots/renamed_again"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestNativeSyncRejectsClosedAndRenamedSnapshots/renamed_again",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "pass",
+          "Test": "TestNativeSyncRejectsClosedAndRenamedSnapshots",
+          "Elapsed": 0.04
+        },
+        {
+          "Action": "run",
+          "Test": "TestOpenCompletionPreservesAlreadyMountedPendingState"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestOpenCompletionPreservesAlreadyMountedPendingState",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRenameInvalidatesQueuedOldPathOpenIntent"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRenameInvalidatesQueuedOldPathOpenIntent",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestNativeReadonlyErrorPendingDoesNotAdvanceRecord"
+        },
+        {
+          "Action": "run",
+          "Test": "TestNativeReadonlyErrorPendingDoesNotAdvanceRecord/lossy"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestNativeReadonlyErrorPendingDoesNotAdvanceRecord/lossy",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestNativeReadonlyErrorPendingDoesNotAdvanceRecord/missing"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestNativeReadonlyErrorPendingDoesNotAdvanceRecord/missing",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "pass",
+          "Test": "TestNativeReadonlyErrorPendingDoesNotAdvanceRecord",
+          "Elapsed": 0.04
+        },
+        {
+          "Action": "run",
+          "Test": "TestRenameImageNativeCacheBelongsToDocumentID"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRenameImageNativeCacheBelongsToDocumentID",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestWatcherLateNativeEditPreserved"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestWatcherLateNativeEditPreserved",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestWatcherCleanReloadAndSelfEcho"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestWatcherCleanReloadAndSelfEcho",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestWatcherDispatchSyncsPendingEdit"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestWatcherDispatchSyncsPendingEdit",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestWatcherLatePendingAcrossReadonlyAndReadError"
+        },
+        {
+          "Action": "run",
+          "Test": "TestWatcherLatePendingAcrossReadonlyAndReadError/lossy"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestWatcherLatePendingAcrossReadonlyAndReadError/lossy",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestWatcherLatePendingAcrossReadonlyAndReadError/missing"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestWatcherLatePendingAcrossReadonlyAndReadError/missing",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "pass",
+          "Test": "TestWatcherLatePendingAcrossReadonlyAndReadError",
+          "Elapsed": 0.04
+        },
+        {
+          "Action": "run",
+          "Test": "TestWatcherCompletionExcludesNewTab"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestWatcherCompletionExcludesNewTab",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestWatcherCompletionRejectsReopenedTarget"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestWatcherCompletionRejectsReopenedTarget",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestWatcherDirtyDomainDoesNotReplaceLaterNativeEdit"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestWatcherDirtyDomainDoesNotReplaceLaterNativeEdit",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestWatcherReadonlyPendingCanRecoverWithoutReplacement"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestWatcherReadonlyPendingCanRecoverWithoutReplacement",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestWatcherCompletionRejectsReplacedFilesOwner"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestWatcherCompletionRejectsReplacedFilesOwner",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent"
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/settings"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/settings",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/chat"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/chat",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/new_file"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/new_file",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/reopen"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/reopen",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/reopen_settings"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/reopen_settings",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/history_aba"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/history_aba",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/reopen_history_aba"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/reopen_history_aba",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent",
+          "Elapsed": 0.13
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseBeforeRenameReceiptRejectsReplacement"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseBeforeRenameReceiptRejectsReplacement",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryAdmittedCloseJobTargetsOriginalID"
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryAdmittedCloseJobTargetsOriginalID/normal"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryAdmittedCloseJobTargetsOriginalID/normal",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryAdmittedCloseJobTargetsOriginalID/reopen_before_rename"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryAdmittedCloseJobTargetsOriginalID/reopen_before_rename",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryAdmittedCloseJobTargetsOriginalID/reopen_after_rename"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryAdmittedCloseJobTargetsOriginalID/reopen_after_rename",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryAdmittedCloseJobTargetsOriginalID/new_navigation"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryAdmittedCloseJobTargetsOriginalID/new_navigation",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryAdmittedCloseJobTargetsOriginalID",
+          "Elapsed": 0.08
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryNormalReopenAndNoopReceipt"
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryNormalReopenAndNoopReceipt/before_worker"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryNormalReopenAndNoopReceipt/before_worker",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryNormalReopenAndNoopReceipt/after_worker"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryNormalReopenAndNoopReceipt/after_worker",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryNormalReopenAndNoopReceipt/noop"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryNormalReopenAndNoopReceipt/noop",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryNormalReopenAndNoopReceipt",
+          "Elapsed": 0.05
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryExplicitReplacementNeverSelectsNextID"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryExplicitReplacementNeverSelectsNextID",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryReopenCompletionRespectsOwnerAndNavigation"
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryReopenCompletionRespectsOwnerAndNavigation/owner"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryReopenCompletionRespectsOwnerAndNavigation/owner",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryReopenCompletionRespectsOwnerAndNavigation/navigation"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryReopenCompletionRespectsOwnerAndNavigation/navigation",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryReopenCompletionRespectsOwnerAndNavigation",
+          "Elapsed": 0.04
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseCompletionPreservesReplacementOwner"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseCompletionPreservesReplacementOwner",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryWatcherBatchNamespaceErrors"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryWatcherBatchNamespaceErrors",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRenameOldPathReopenBeforeCompletionIdentityProbe"
+        },
+        {
+          "Action": "run",
+          "Test": "TestRenameOldPathReopenBeforeCompletionIdentityProbe/no_intermediate_render"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRenameOldPathReopenBeforeCompletionIdentityProbe/no_intermediate_render",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRenameOldPathReopenBeforeCompletionIdentityProbe/render_before_reopen"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRenameOldPathReopenBeforeCompletionIdentityProbe/render_before_reopen",
+          "Elapsed": 0.03
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRenameOldPathReopenBeforeCompletionIdentityProbe",
+          "Elapsed": 0.05
+        },
+        {
+          "Action": "run",
+          "Test": "TestRenameReceiptPreservesPendingUndoAndNewNavigation"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRenameReceiptPreservesPendingUndoAndNewNavigation",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRenameOpenExistingIDRetainsPendingBeforeCallback"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRenameOpenExistingIDRetainsPendingBeforeCallback",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRenamePreflightRecoveryPendingNativeBuffer"
+        },
+        {
+          "Action": "run",
+          "Test": "TestRenamePreflightRecoveryPendingNativeBuffer/inline"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRenamePreflightRecoveryPendingNativeBuffer/inline",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRenamePreflightRecoveryPendingNativeBuffer/prompt"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRenamePreflightRecoveryPendingNativeBuffer/prompt",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRenamePreflightRecoveryPendingNativeBuffer",
+          "Elapsed": 0.04
+        },
+        {
+          "Action": "run",
+          "Test": "TestMountedFileSelectionUndoRedoAndTabCaret"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestMountedFileSelectionUndoRedoAndTabCaret",
+          "Elapsed": 0.06
+        },
+        {
+          "Action": "run",
+          "Test": "TestMountedFileFailedCloseKeepsDraftAndCanRetry"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestMountedFileFailedCloseKeepsDraftAndCanRetry",
+          "Elapsed": 0.53
+        },
+        {
+          "Action": "run",
+          "Test": "TestMountedFileStaleCloseCompletionKeepsReopenedState"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestMountedFileStaleCloseCompletionKeepsReopenedState",
+          "Elapsed": 0.03
+        },
+        {
+          "Action": "run",
+          "Test": "TestMountedFilePrimaryWAndShiftWHaveDistinctScopes"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestMountedFilePrimaryWAndShiftWHaveDistinctScopes",
+          "Elapsed": 0.03
+        },
+        {
+          "Action": "run",
+          "Test": "TestMountedFileReopenQueuedBehindCloseCannotStealLaterSelection"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestMountedFileReopenQueuedBehindCloseCannotStealLaterSelection",
+          "Elapsed": 0.03
+        },
+        {
+          "Action": "run",
+          "Test": "TestMountedFileOpenCachedTabIsImmediateAndKeepsNativeBuffer"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestMountedFileOpenCachedTabIsImmediateAndKeepsNativeBuffer",
+          "Elapsed": 0.03
+        },
+        {
+          "Action": "run",
+          "Test": "TestMountedFileOpenCompletionUsesCurrentDocumentAfterReload"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestMountedFileOpenCompletionUsesCurrentDocumentAfterReload",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestMountedFileRenameSubtreeKeepsEveryBufferCaretAndUndo"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestMountedFileRenameSubtreeKeepsEveryBufferCaretAndUndo",
+          "Elapsed": 0.1
+        },
+        {
+          "Action": "run",
+          "Test": "TestMountedFileRenameCancelAndFailureKeepState"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestMountedFileRenameCancelAndFailureKeepState",
+          "Elapsed": 0.09
+        },
+        {
+          "Action": "run",
+          "Test": "TestTruncatedViewerBufferStaysBounded"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestTruncatedViewerBufferStaysBounded",
+          "Elapsed": 0.12
+        },
+        {
+          "Action": "pass",
+          "Elapsed": 4.849
+        }
+      ]
+    },
+    "navigation-red.jsonl": {
+      "sha256": "54335e466994704f89d903ac7638336e426826e57daf71b62fbf7f50312ad7f5",
+      "events": [
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent"
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/settings"
+        },
+        {
+          "Action": "fail",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/settings",
+          "Elapsed": 1.82
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/chat"
+        },
+        {
+          "Action": "fail",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/chat",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/new_file"
+        },
+        {
+          "Action": "fail",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/new_file",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/reopen"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/reopen",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/reopen_settings"
+        },
+        {
+          "Action": "fail",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/reopen_settings",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/history_aba"
+        },
+        {
+          "Action": "fail",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/history_aba",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/reopen_history_aba"
+        },
+        {
+          "Action": "fail",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/reopen_history_aba",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "fail",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent",
+          "Elapsed": 1.94
+        },
+        {
+          "Action": "fail",
+          "Elapsed": 1.968
+        }
+      ]
+    },
+    "reopen-order-red.jsonl": {
+      "sha256": "38582db5e104ef87eb5fd48fce499df282523ac852174b282a855b63f113d5c9",
+      "events": [
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseBeforeRenameReceiptRejectsReplacement"
+        },
+        {
+          "Action": "fail",
+          "Test": "TestRecoveryCloseBeforeRenameReceiptRejectsReplacement",
+          "Elapsed": 1.68
+        },
+        {
+          "Action": "fail",
+          "Elapsed": 1.7029999999999998
+        }
+      ]
+    },
+    "domain-first-green.jsonl": {
+      "sha256": "978d70f15476fe8e2538f4687692df871176a2ec234a97b7dad702f8a2f1bfac",
+      "events": [
+        {
+          "Action": "run",
+          "Test": "TestRecoveryHeldReadCannotResurrectDeletedNamespace"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryHeldReadCannotResurrectDeletedNamespace",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryHeldReadCannotUndoNewerClose"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryHeldReadCannotUndoNewerClose",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryRenameHeldIOKeepsLateEditAndSaveIdentity"
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryRenameHeldIOKeepsLateEditAndSaveIdentity/success"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryRenameHeldIOKeepsLateEditAndSaveIdentity/success",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryRenameHeldIOKeepsLateEditAndSaveIdentity/failure"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryRenameHeldIOKeepsLateEditAndSaveIdentity/failure",
+          "Elapsed": 0
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryRenameHeldIOKeepsLateEditAndSaveIdentity",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryAutosaveAfterFSRenameUsesNewPath"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryAutosaveAfterFSRenameUsesNewPath",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryAdmissionRejectsChangedDirtyClosedAndDestination"
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryAdmissionRejectsChangedDirtyClosedAndDestination/changed_id"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryAdmissionRejectsChangedDirtyClosedAndDestination/changed_id",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryAdmissionRejectsChangedDirtyClosedAndDestination/dirty"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryAdmissionRejectsChangedDirtyClosedAndDestination/dirty",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryAdmissionRejectsChangedDirtyClosedAndDestination/closed"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryAdmissionRejectsChangedDirtyClosedAndDestination/closed",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryAdmissionRejectsChangedDirtyClosedAndDestination/destination"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryAdmissionRejectsChangedDirtyClosedAndDestination/destination",
+          "Elapsed": 0
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryAdmissionRejectsChangedDirtyClosedAndDestination",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryReloadSequenceAndRenameEpoch"
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryReloadSequenceAndRenameEpoch/newer_read"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryReloadSequenceAndRenameEpoch/newer_read",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryReloadSequenceAndRenameEpoch/away_back"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryReloadSequenceAndRenameEpoch/away_back",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryReloadSequenceAndRenameEpoch/failed_rename"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryReloadSequenceAndRenameEpoch/failed_rename",
+          "Elapsed": 0
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryReloadSequenceAndRenameEpoch",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseEpochControls"
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseEpochControls/close"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseEpochControls/close",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseEpochControls/delete_empty"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseEpochControls/delete_empty",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseEpochControls/failed_close"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseEpochControls/failed_close",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseEpochControls/already_closed"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseEpochControls/already_closed",
+          "Elapsed": 0
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseEpochControls",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseReceiptAndIdentityActivation"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseReceiptAndIdentityActivation",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryReopenVacancyReadFences"
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryReopenVacancyReadFences/normal"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryReopenVacancyReadFences/normal",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryReopenVacancyReadFences/occupied_before"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryReopenVacancyReadFences/occupied_before",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryReopenVacancyReadFences/occupied_during"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryReopenVacancyReadFences/occupied_during",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryReopenVacancyReadFences/rename_during"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryReopenVacancyReadFences/rename_during",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryReopenVacancyReadFences/owner_closed"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryReopenVacancyReadFences/owner_closed",
+          "Elapsed": 0
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryReopenVacancyReadFences",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryRenameAdmissionRejectsNewMember"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryRenameAdmissionRejectsNewMember",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseAllFailureAndClosedIdentity"
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseAllFailureAndClosedIdentity/success"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseAllFailureAndClosedIdentity/success",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseAllFailureAndClosedIdentity/failure"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseAllFailureAndClosedIdentity/failure",
+          "Elapsed": 0
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseAllFailureAndClosedIdentity",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoverySaveIDNeverWritesReplacement"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoverySaveIDNeverWritesReplacement",
+          "Elapsed": 0
+        },
+        {
+          "Action": "pass",
+          "Elapsed": 1.04
+        }
+      ]
+    },
+    "final-domain.jsonl": {
+      "sha256": "54274a39fb9e8d8850a2568c794fbaea9c1068b23af52a11198b9712580c7766",
+      "events": [
+        {
+          "Action": "run",
+          "Test": "TestDocumentIdentityRenameReopenAndStaleEdit"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestDocumentIdentityRenameReopenAndStaleEdit",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestEditorDirtyReloadAndFailedSaveKeepBuffer"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestEditorDirtyReloadAndFailedSaveKeepBuffer",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestEditorDebounceAcrossTabsAndClosingLastEdited"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestEditorDebounceAcrossTabsAndClosingLastEdited",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestEditorAutosaveEpochRejectsOldAndSavesAllDirty"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestEditorAutosaveEpochRejectsOldAndSavesAllDirty",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestSlowSaveDoesNotBlockSnapshotsOrLoseConcurrentEdits"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestSlowSaveDoesNotBlockSnapshotsOrLoseConcurrentEdits",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestCloseKeepsTabIfUserEditsDuringSlowSave"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestCloseKeepsTabIfUserEditsDuringSlowSave",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestEditorSelfSaveReloadPreservesUndoHistory"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestEditorSelfSaveReloadPreservesUndoHistory",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryHeldReadCannotResurrectDeletedNamespace"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryHeldReadCannotResurrectDeletedNamespace",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryHeldReadCannotUndoNewerClose"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryHeldReadCannotUndoNewerClose",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryRenameHeldIOKeepsLateEditAndSaveIdentity"
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryRenameHeldIOKeepsLateEditAndSaveIdentity/success"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryRenameHeldIOKeepsLateEditAndSaveIdentity/success",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryRenameHeldIOKeepsLateEditAndSaveIdentity/failure"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryRenameHeldIOKeepsLateEditAndSaveIdentity/failure",
+          "Elapsed": 0
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryRenameHeldIOKeepsLateEditAndSaveIdentity",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryAutosaveAfterFSRenameUsesNewPath"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryAutosaveAfterFSRenameUsesNewPath",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryAdmissionRejectsChangedDirtyClosedAndDestination"
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryAdmissionRejectsChangedDirtyClosedAndDestination/changed_id"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryAdmissionRejectsChangedDirtyClosedAndDestination/changed_id",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryAdmissionRejectsChangedDirtyClosedAndDestination/dirty"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryAdmissionRejectsChangedDirtyClosedAndDestination/dirty",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryAdmissionRejectsChangedDirtyClosedAndDestination/closed"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryAdmissionRejectsChangedDirtyClosedAndDestination/closed",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryAdmissionRejectsChangedDirtyClosedAndDestination/destination"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryAdmissionRejectsChangedDirtyClosedAndDestination/destination",
+          "Elapsed": 0
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryAdmissionRejectsChangedDirtyClosedAndDestination",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryReloadSequenceAndRenameEpoch"
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryReloadSequenceAndRenameEpoch/newer_read"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryReloadSequenceAndRenameEpoch/newer_read",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryReloadSequenceAndRenameEpoch/away_back"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryReloadSequenceAndRenameEpoch/away_back",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryReloadSequenceAndRenameEpoch/failed_rename"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryReloadSequenceAndRenameEpoch/failed_rename",
+          "Elapsed": 0
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryReloadSequenceAndRenameEpoch",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseEpochControls"
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseEpochControls/close"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseEpochControls/close",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseEpochControls/delete_empty"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseEpochControls/delete_empty",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseEpochControls/failed_close"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseEpochControls/failed_close",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseEpochControls/already_closed"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseEpochControls/already_closed",
+          "Elapsed": 0
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseEpochControls",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseReceiptAndIdentityActivation"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseReceiptAndIdentityActivation",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryReopenVacancyReadFences"
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryReopenVacancyReadFences/normal"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryReopenVacancyReadFences/normal",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryReopenVacancyReadFences/occupied_before"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryReopenVacancyReadFences/occupied_before",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryReopenVacancyReadFences/occupied_during"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryReopenVacancyReadFences/occupied_during",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryReopenVacancyReadFences/rename_during"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryReopenVacancyReadFences/rename_during",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryReopenVacancyReadFences/owner_closed"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryReopenVacancyReadFences/owner_closed",
+          "Elapsed": 0
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryReopenVacancyReadFences",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryRenameAdmissionRejectsNewMember"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryRenameAdmissionRejectsNewMember",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseAllFailureAndClosedIdentity"
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseAllFailureAndClosedIdentity/success"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseAllFailureAndClosedIdentity/success",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseAllFailureAndClosedIdentity/failure"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseAllFailureAndClosedIdentity/failure",
+          "Elapsed": 0
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseAllFailureAndClosedIdentity",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoverySaveIDNeverWritesReplacement"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoverySaveIDNeverWritesReplacement",
+          "Elapsed": 0
+        },
+        {
+          "Action": "run",
+          "Test": "TestEditorFailedCloseKeepsDraftAndCanRetry"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestEditorFailedCloseKeepsDraftAndCanRetry",
+          "Elapsed": 0
+        },
+        {
+          "Action": "pass",
+          "Elapsed": 1.05
+        }
+      ]
+    },
+    "ui-first-green.jsonl": {
+      "sha256": "882a939f31eafbf30516d92231476519f79c3b91a5c4cf0b49df4950613a4913",
+      "events": [
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent"
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/settings"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/settings",
+          "Elapsed": 1.72
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/chat"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/chat",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/new_file"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/new_file",
+          "Elapsed": 0.03
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/reopen"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/reopen",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/reopen_settings"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/reopen_settings",
+          "Elapsed": 0.03
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/history_aba"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/history_aba",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/reopen_history_aba"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent/reopen_history_aba",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseCallbackPreservesNewIntent",
+          "Elapsed": 1.86
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseBeforeRenameReceiptRejectsReplacement"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseBeforeRenameReceiptRejectsReplacement",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryAdmittedCloseJobTargetsOriginalID"
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryAdmittedCloseJobTargetsOriginalID/normal"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryAdmittedCloseJobTargetsOriginalID/normal",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryAdmittedCloseJobTargetsOriginalID/reopen_before_rename"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryAdmittedCloseJobTargetsOriginalID/reopen_before_rename",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryAdmittedCloseJobTargetsOriginalID/reopen_after_rename"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryAdmittedCloseJobTargetsOriginalID/reopen_after_rename",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryAdmittedCloseJobTargetsOriginalID/new_navigation"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryAdmittedCloseJobTargetsOriginalID/new_navigation",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryAdmittedCloseJobTargetsOriginalID",
+          "Elapsed": 0.09
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryNormalReopenAndNoopReceipt"
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryNormalReopenAndNoopReceipt/before_worker"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryNormalReopenAndNoopReceipt/before_worker",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryNormalReopenAndNoopReceipt/after_worker"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryNormalReopenAndNoopReceipt/after_worker",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryNormalReopenAndNoopReceipt/noop"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryNormalReopenAndNoopReceipt/noop",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryNormalReopenAndNoopReceipt",
+          "Elapsed": 0.06
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryExplicitReplacementNeverSelectsNextID"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryExplicitReplacementNeverSelectsNextID",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryReopenCompletionRespectsOwnerAndNavigation"
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryReopenCompletionRespectsOwnerAndNavigation/owner"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryReopenCompletionRespectsOwnerAndNavigation/owner",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryReopenCompletionRespectsOwnerAndNavigation/navigation"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryReopenCompletionRespectsOwnerAndNavigation/navigation",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryReopenCompletionRespectsOwnerAndNavigation",
+          "Elapsed": 0.05
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryCloseCompletionPreservesReplacementOwner"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryCloseCompletionPreservesReplacementOwner",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "run",
+          "Test": "TestRecoveryWatcherBatchNamespaceErrors"
+        },
+        {
+          "Action": "pass",
+          "Test": "TestRecoveryWatcherBatchNamespaceErrors",
+          "Elapsed": 0.02
+        },
+        {
+          "Action": "pass",
+          "Elapsed": 3.171
+        }
+      ]
+    }
+  },
+  "domain": {
+    "top_level": 20,
+    "test_pass_events": 40,
+    "expected": [
+      "TestCloseKeepsTabIfUserEditsDuringSlowSave",
+      "TestDocumentIdentityRenameReopenAndStaleEdit",
+      "TestEditorAutosaveEpochRejectsOldAndSavesAllDirty",
+      "TestEditorDebounceAcrossTabsAndClosingLastEdited",
+      "TestEditorDirtyReloadAndFailedSaveKeepBuffer",
+      "TestEditorFailedCloseKeepsDraftAndCanRetry",
+      "TestEditorSelfSaveReloadPreservesUndoHistory",
+      "TestRecoveryAdmissionRejectsChangedDirtyClosedAndDestination",
+      "TestRecoveryAutosaveAfterFSRenameUsesNewPath",
+      "TestRecoveryCloseAllFailureAndClosedIdentity",
+      "TestRecoveryCloseEpochControls",
+      "TestRecoveryCloseReceiptAndIdentityActivation",
+      "TestRecoveryHeldReadCannotResurrectDeletedNamespace",
+      "TestRecoveryHeldReadCannotUndoNewerClose",
+      "TestRecoveryReloadSequenceAndRenameEpoch",
+      "TestRecoveryRenameAdmissionRejectsNewMember",
+      "TestRecoveryRenameHeldIOKeepsLateEditAndSaveIdentity",
+      "TestRecoveryReopenVacancyReadFences",
+      "TestRecoverySaveIDNeverWritesReplacement",
+      "TestSlowSaveDoesNotBlockSnapshotsOrLoseConcurrentEdits"
+    ]
+  },
+  "ui": {
+    "top_level": 39,
+    "test_pass_events": 65,
+    "expected": [
+      "TestFileEditorFailedSyncRetainsVersionAndRetries",
+      "TestMountedFileFailedCloseKeepsDraftAndCanRetry",
+      "TestMountedFileHeldSnapshotAfterRealCloseDoesNotReviveEditor",
+      "TestMountedFileOpenCachedTabIsImmediateAndKeepsNativeBuffer",
+      "TestMountedFileOpenCompletionUsesCurrentDocumentAfterReload",
+      "TestMountedFilePrimaryWAndShiftWHaveDistinctScopes",
+      "TestMountedFileRenameCancelAndFailureKeepState",
+      "TestMountedFileRenameSubtreeKeepsEveryBufferCaretAndUndo",
+      "TestMountedFileReopenQueuedBehindCloseCannotStealLaterSelection",
+      "TestMountedFileSelectionUndoRedoAndTabCaret",
+      "TestMountedFileStaleCloseCompletionKeepsReopenedState",
+      "TestMountedFileStaleSnapshotCannotRenderReopenedPath",
+      "TestNativeReadonlyErrorPendingDoesNotAdvanceRecord",
+      "TestNativeSyncRejectsClosedAndRenamedSnapshots",
+      "TestOpenCompletionPreservesAlreadyMountedPendingState",
+      "TestRecoveryAdmittedCloseJobTargetsOriginalID",
+      "TestRecoveryCloseBeforeRenameReceiptRejectsReplacement",
+      "TestRecoveryCloseCallbackPreservesNewIntent",
+      "TestRecoveryCloseCompletionPreservesReplacementOwner",
+      "TestRecoveryExplicitReplacementNeverSelectsNextID",
+      "TestRecoveryNormalReopenAndNoopReceipt",
+      "TestRecoveryReopenCompletionRespectsOwnerAndNavigation",
+      "TestRecoveryWatcherBatchNamespaceErrors",
+      "TestRenameImageNativeCacheBelongsToDocumentID",
+      "TestRenameInvalidatesQueuedOldPathOpenIntent",
+      "TestRenameOldPathReopenBeforeCompletionIdentityProbe",
+      "TestRenameOpenExistingIDRetainsPendingBeforeCallback",
+      "TestRenamePreflightRecoveryPendingNativeBuffer",
+      "TestRenameReceiptPreservesPendingUndoAndNewNavigation",
+      "TestTruncatedViewerBufferStaysBounded",
+      "TestWatcherCleanReloadAndSelfEcho",
+      "TestWatcherCompletionExcludesNewTab",
+      "TestWatcherCompletionRejectsReopenedTarget",
+      "TestWatcherCompletionRejectsReplacedFilesOwner",
+      "TestWatcherDirtyDomainDoesNotReplaceLaterNativeEdit",
+      "TestWatcherDispatchSyncsPendingEdit",
+      "TestWatcherLateNativeEditPreserved",
+      "TestWatcherLatePendingAcrossReadonlyAndReadError",
+      "TestWatcherReadonlyPendingCanRecoverWithoutReplacement"
+    ]
+  },
+  "base_tree": "5da4f267d2999f0e33598c1d89620dce39c6853c",
+  "scope": "New isolated candidate only; no full suite/native execution/integration/ref/release",
+  "validation_chain_exit": 0,
+  "published_render_section_sha256": "64410d843e51dcf9d5309dea2233dfd01a57150135f9c380786e85b8c8178c43",
+  "artifacts": {
+    "recovery_reopen_test.go.txt": "56248c21828356157d5d3f49fc52ce7a7bb658b7f97f416fcf75180dbf17175a",
+    "readfence-red.jsonl": "a50f975e8ef4ea0140cab914c0902720d7ac79dce8fd5868c5658fe9cd9156c4",
+    "recovery_read_fence_test.go": "92ad90310562f72261a386e555a74613983d5190b152a9863985ab416ef0c859",
+    "domain-expected.json": "259adb627e3d31a1d407877f141292c8d871cc6bfbdccbcdba9981fb6d6ce9ca",
+    "pre-reopen-files.go.txt": "ed879e43b192b0f5e5a00ae74a026e2bedee5fadf101306d663df864ebf41ab9",
+    "final-ui.jsonl": "e6370a525bde8ca40d52192dc6b329293623ddf3a4975346927dff5dc083f23b",
+    "recovery_watcher_error_test.go.txt": "999ffc312dc5e7abda7a34a9887d5d2df852078232e8233da299ab8a90b1c2eb",
+    "navigation-red.jsonl": "54335e466994704f89d903ac7638336e426826e57daf71b62fbf7f50312ad7f5",
+    "baseline-editor.go.txt": "3b91830b281de1fb5b2abf77c3b1ad8d5411d18edf8e0654505625fb59bc7dcf",
+    "rebuild-domain.py": "fcb1f88c325ab6a2c93056b705fa09624ab3ff5ef753133bd86143b89a8419d5",
+    "recovery_transaction_test.go.txt": "0f4d628163c0b239834c1e77b57841724033455f9c860f671407965407625183",
+    "reopen-order-red.jsonl": "38582db5e104ef87eb5fd48fce499df282523ac852174b282a855b63f113d5c9",
+    "ui-pattern.txt": "cd55128bd9952adc77f2985994ec91e50dc293b395fb363145f5a007c92af348",
+    "rebuild-ui-identity.py": "10c19fdd3e65b7dd7bc0014aec5b25bd282f9658b6c9b231354bcf74f828c2c4",
+    "final-arm-vet.log": "9da2d27b7ee72dd6c6d7e2ae1b7563cfb188c722afb006b10f70efacf395b90a",
+    "recovery_close_navigation_test.go": "a999b180841a310894e66fd74c60217214eb0c30ec8b8867afc4240b16afaff5",
+    "baseline-read-seam.diff": "e8a4b4386b42a08b025abed75d9c8429cf411e456bd1f48cdd157aef2831143f",
+    "rebuild-ui-stage1.py": "f5813206e47573162c3bfbc5f13944161f4c4e6d1ffd0b28e7dbf845c4f3c06c",
+    "rename_transaction.go.txt": "1c5c31c0db47e41a25c6345e4ba5e4a68d394591a98e2ff018d72af875525841",
+    "ui-expected.json": "db678aacbaceab9eb928e22aa93afd1b7780273e25252675e02ff90661c20866",
+    "read-seam.diff": "1798fde0edf0497e5f35158841c48eb3f13dad7c3e4d0cb88db236294482e934",
+    "domain-first-green.jsonl": "978d70f15476fe8e2538f4687692df871176a2ec234a97b7dad702f8a2f1bfac",
+    "final-domain.jsonl": "54274a39fb9e8d8850a2568c794fbaea9c1068b23af52a11198b9712580c7766",
+    "final-vet.log": "9da2d27b7ee72dd6c6d7e2ae1b7563cfb188c722afb006b10f70efacf395b90a",
+    "final-arm-compile.log": "9da2d27b7ee72dd6c6d7e2ae1b7563cfb188c722afb006b10f70efacf395b90a",
+    "domain-pattern.txt": "4eaabc39252a8d554f749ffd352c5a150bfb188c2896a105bb307663c99ce661",
+    "ui-first-green.jsonl": "882a939f31eafbf30516d92231476519f79c3b91a5c4cf0b49df4950613a4913",
+    "pre-reopen-identity.diff": "0c11cb605359bb1b2ad1374e523f7d3ac15255479c887f38f5f8591e502f26b3"
+  }
+}

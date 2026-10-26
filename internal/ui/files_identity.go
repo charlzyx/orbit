@@ -166,3 +166,11 @@ func (a *App) pruneFileNative() {
 		}
 	}
 }
+
+func (r fileRenameReceipt) request(name string) workspace.RenameRequest {
+	req := workspace.RenameRequest{Old: r.old, Name: name}
+	for _, target := range r.targets {
+		req.Targets = append(req.Targets, workspace.RenameTarget{ID: target.id, Path: target.old})
+	}
+	return req
+}

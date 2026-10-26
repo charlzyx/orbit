@@ -17,33 +17,38 @@ var ErrDocumentChanged = errors.New("document changed while saving; close again 
 type DocumentID uint64
 
 type Document struct {
-	ID        DocumentID  `json:"id"`
-	Conflict  bool        `json:"conflict"`
-	Content   FileContent `json:"content"`
-	Text      string      `json:"text"`
-	Dirty     bool        `json:"dirty"`
-	Saving    bool        `json:"saving"`
-	LastError string      `json:"lastError,omitempty"`
-	Preview   bool        `json:"preview"`
-	saved     string
-	undo      []string
-	redo      []string
+	ID           DocumentID  `json:"id"`
+	Conflict     bool        `json:"conflict"`
+	Content      FileContent `json:"content"`
+	Text         string      `json:"text"`
+	Dirty        bool        `json:"dirty"`
+	Saving       bool        `json:"saving"`
+	LastError    string      `json:"lastError,omitempty"`
+	Preview      bool        `json:"preview"`
+	loadSequence uint64
+	saved        string
+	undo         []string
+	redo         []string
 }
 
 // Editor owns open tabs independently of whether Files is currently visible.
 // Methods are safe from UI and autosave goroutines. Changes is coalesced.
 type Editor struct {
-	nextID    DocumentID
-	ioMu      sync.Mutex
-	writeFile func(string, string) error
-	mu        sync.Mutex
-	tabs      []*Document
-	active    int
-	Changes   chan struct{}
-	delay     time.Duration
-	closed    bool
-	autosave  *time.Timer
-	saveEpoch uint64
+	namespaceEpoch uint64
+	reservation    *renameReservation
+	renamePath     func(string, string) (string, error)
+	nextID         DocumentID
+	ioMu           sync.Mutex
+	writeFile      func(string, string) error
+	readFile       func(string) FileContent
+	mu             sync.Mutex
+	tabs           []*Document
+	active         int
+	Changes        chan struct{}
+	delay          time.Duration
+	closed         bool
+	autosave       *time.Timer
+	saveEpoch      uint64
 }
 
 func NewEditor() *Editor {
@@ -72,14 +77,21 @@ func (e *Editor) find(path string) (int, *Document) {
 	}
 	return -1, nil
 }
-func (e *Editor) Open(path string) (Document, error) { return e.open(path, true) }
+func (e *Editor) Open(path string) (Document, error) { return e.open(path, true, nil) }
 
 // OpenInactive performs the background load/register half of opening a file.
 // Only a UI result that still matches its workspace/navigation generation may
 // Activate it. A stale completion can retain a tab, but cannot steal selection.
-func (e *Editor) OpenInactive(path string) (Document, error) { return e.open(path, false) }
+func (e *Editor) OpenInactive(path string) (Document, error) { return e.open(path, false, nil) }
 
-func (e *Editor) open(path string, activate bool) (Document, error) {
+// ReopenClosed shares the normal reader but never adopts an existing occupant.
+func (e *Editor) ReopenClosed(receipt CloseReceipt) (Document, error) {
+	if receipt.ID == 0 || receipt.Path == "" || !filepath.IsAbs(receipt.Path) {
+		return Document{}, ErrDocumentNotOpen
+	}
+	return e.open(receipt.Path, false, &receipt)
+}
+func (e *Editor) open(path string, activate bool, vacant *CloseReceipt) (Document, error) {
 	abs, err := filepath.Abs(path)
 	if err != nil {
 		return Document{}, err
@@ -87,9 +99,24 @@ func (e *Editor) open(path string, activate bool) (Document, error) {
 	e.mu.Lock()
 	if e.closed {
 		e.mu.Unlock()
-		return Document{}, errors.New("editor closed")
+		return Document{}, ErrEditorClosed
 	}
+	if e.namespaceBusy(abs) {
+		e.mu.Unlock()
+		return Document{}, ErrNamespaceBusy
+	}
+	if vacant != nil {
+		if _, original := e.findID(vacant.ID); original != nil || vacant.ID > e.nextID || vacant.Path != abs {
+			e.mu.Unlock()
+			return Document{}, ErrReopenOccupied
+		}
+	}
+	epoch := e.namespaceEpoch
 	if i, d := e.find(abs); d != nil {
+		if vacant != nil {
+			e.mu.Unlock()
+			return Document{}, ErrReopenOccupied
+		}
 		if activate {
 			e.active = i
 		}
@@ -98,13 +125,19 @@ func (e *Editor) open(path string, activate bool) (Document, error) {
 		return copy, nil
 	}
 	e.mu.Unlock()
-	content := LoadFile(abs)
+	content := e.loadFile(abs)
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	if e.closed {
-		return Document{}, errors.New("editor closed")
+		return Document{}, ErrEditorClosed
+	}
+	if epoch != e.namespaceEpoch || e.namespaceBusy(abs) {
+		return Document{}, ErrNamespaceChanged
 	}
 	if i, d := e.find(abs); d != nil {
+		if vacant != nil {
+			return Document{}, ErrReopenOccupied
+		}
 		if activate {
 			e.active = i
 		}
@@ -146,6 +179,19 @@ func (e *Editor) Activate(path string) error {
 	e.active = i
 	e.notify()
 	return nil
+}
+
+// ActivateID cannot select a new document that reused a closed path.
+func (e *Editor) ActivateID(id DocumentID) (Document, error) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	i, d := e.findID(id)
+	if d == nil {
+		return Document{}, ErrDocumentNotOpen
+	}
+	e.active = i
+	e.notify()
+	return documentCopy(d), nil
 }
 func (e *Editor) SetPreview(path string, preview bool) error {
 	e.mu.Lock()
@@ -283,10 +329,24 @@ func (e *Editor) saveDocument(d *Document) error {
 	return nil
 }
 func (e *Editor) Save(path string) error {
+	e.mu.Lock()
+	_, d := e.find(path)
+	var id DocumentID
+	if d != nil {
+		id = d.ID
+	}
+	e.mu.Unlock()
+	return e.SaveID(id)
+}
+func (e *Editor) SaveID(id DocumentID) error {
 	e.ioMu.Lock()
 	defer e.ioMu.Unlock()
 	e.mu.Lock()
-	_, d := e.find(path)
+	if e.closed {
+		e.mu.Unlock()
+		return ErrEditorClosed
+	}
+	_, d := e.findID(id)
 	e.mu.Unlock()
 	if d == nil {
 		return ErrDocumentNotOpen
@@ -312,28 +372,51 @@ func (e *Editor) flushAll(epoch uint64, autosave bool) error {
 	return errors.Join(errs...)
 }
 func (e *Editor) SaveAll() error { return e.flushAll(0, false) }
+
+// A nonzero receipt is produced only by an actual successful ID removal.
+type CloseReceipt struct {
+	ID   DocumentID
+	Path string
+}
+
 func (e *Editor) Close(path string) error {
+	e.mu.Lock()
+	_, d := e.find(path)
+	var id DocumentID
+	if d != nil {
+		id = d.ID
+	}
+	e.mu.Unlock()
+	if id == 0 {
+		return nil
+	}
+	return e.CloseID(id)
+}
+func (e *Editor) CloseID(id DocumentID) error { _, err := e.CloseIDReceipt(id); return err }
+func (e *Editor) CloseIDReceipt(id DocumentID) (CloseReceipt, error) {
 	e.ioMu.Lock()
 	defer e.ioMu.Unlock()
 	e.mu.Lock()
-	_, d := e.find(path)
+	_, d := e.findID(id)
 	e.mu.Unlock()
 	if d == nil {
-		return nil
+		return CloseReceipt{}, nil
 	}
 	if err := e.saveDocument(d); err != nil {
-		return err
+		return CloseReceipt{}, err
 	}
 	e.mu.Lock()
 	defer e.mu.Unlock()
-	i, live := e.find(path)
+	i, live := e.findID(id)
 	if live != d {
-		return nil
+		return CloseReceipt{}, nil
 	}
 	if d.Dirty {
-		return ErrDocumentChanged
+		return CloseReceipt{}, ErrDocumentChanged
 	}
+	receipt := CloseReceipt{d.ID, d.Content.Path}
 	e.tabs = append(e.tabs[:i], e.tabs[i+1:]...)
+	e.namespaceEpoch++
 	if i < e.active {
 		e.active--
 	}
@@ -341,7 +424,7 @@ func (e *Editor) Close(path string) error {
 		e.active = len(e.tabs) - 1
 	}
 	e.notify()
-	return nil
+	return receipt, nil
 }
 func (e *Editor) CloseAll() error {
 	e.ioMu.Lock()
@@ -378,18 +461,48 @@ func (e *Editor) CloseAll() error {
 func (e *Editor) Reload(path string) error {
 	e.mu.Lock()
 	_, d := e.find(path)
+	var id DocumentID
+	if d != nil {
+		id = d.ID
+	}
+	e.mu.Unlock()
+	return e.ReloadID(id)
+}
+func (e *Editor) ReloadID(id DocumentID) error {
+	e.mu.Lock()
+	if e.closed {
+		e.mu.Unlock()
+		return ErrEditorClosed
+	}
+	_, d := e.findID(id)
 	if d == nil {
 		e.mu.Unlock()
 		return ErrDocumentNotOpen
 	}
 	currentPath := d.Content.Path
+	if e.namespaceBusy(currentPath) {
+		e.mu.Unlock()
+		return ErrNamespaceBusy
+	}
+	epoch := e.namespaceEpoch
+	d.loadSequence++
+	sequence := d.loadSequence
 	e.mu.Unlock()
-	content := LoadFile(currentPath)
+	content := e.loadFile(currentPath)
 	e.mu.Lock()
 	defer e.mu.Unlock()
-	_, live := e.find(currentPath)
+	if e.closed {
+		return ErrEditorClosed
+	}
+	_, live := e.findID(id)
 	if live != d {
-		return nil
+		return ErrDocumentNotOpen
+	}
+	if epoch != e.namespaceEpoch || d.Content.Path != currentPath || e.namespaceBusy(currentPath) {
+		return ErrNamespaceChanged
+	}
+	if d.loadSequence != sequence {
+		return ErrReadSuperseded
 	}
 	if content.Error == "" && content.Text == d.Text && content.Mode != FileImage && content.Mode != FileBinary && content.Mode != FileTooLarge {
 		// A self-save echo (or matching external save) must not reset undo,
@@ -434,6 +547,7 @@ func (e *Editor) RenameUnder(old, new string) {
 	defer e.ioMu.Unlock()
 	e.mu.Lock()
 	defer e.mu.Unlock()
+	e.namespaceEpoch++
 	for _, d := range e.tabs {
 		if pathUnder(d.Content.Path, old) {
 			rel, _ := filepath.Rel(old, d.Content.Path)
@@ -451,6 +565,7 @@ func (e *Editor) CloseUnder(prefix string) {
 	defer e.ioMu.Unlock()
 	e.mu.Lock()
 	defer e.mu.Unlock()
+	e.namespaceEpoch++ // Fence held reads even when deletion had zero registered tabs.
 	out := e.tabs[:0]
 	for _, d := range e.tabs {
 		if !pathUnder(d.Content.Path, prefix) {
@@ -462,4 +577,11 @@ func (e *Editor) CloseUnder(prefix string) {
 		e.active = len(out) - 1
 	}
 	e.notify()
+}
+
+func (e *Editor) loadFile(path string) FileContent {
+	if e.readFile != nil {
+		return e.readFile(path)
+	}
+	return LoadFile(path)
 }

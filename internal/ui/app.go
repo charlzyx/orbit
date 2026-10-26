@@ -457,6 +457,9 @@ func (a *App) goHistory(delta int) {
 	}
 }
 func (a *App) flushFilesOnLeave(next string) {
+	if a.files != nil && a.page != next {
+		a.files.navigationGeneration++
+	}
 	if a.page == "files" && next != "files" && a.files != nil {
 		a.saveFiles()
 	}

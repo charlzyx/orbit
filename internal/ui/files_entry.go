@@ -81,14 +81,12 @@ func (a *App) commitExplorerEntry(e *explorerEntry) {
 		var path string
 		var err error
 		if e.target != "" {
-			path, err = workspace.RenamePath(e.target, name)
+			result, failure := receipt.editor.RenameDocuments(receipt.request(name))
+			path, err = result.Path, failure
 		} else if e.directory {
 			path, err = workspace.CreateDirectory(e.parent, name)
 		} else {
 			path, err = workspace.CreateFile(e.parent, name)
-		}
-		if err == nil && e.target != "" {
-			s.editor.RenameUnder(e.target, path)
 		}
 		return func() {
 			e.pending, s.mutating = false, false
