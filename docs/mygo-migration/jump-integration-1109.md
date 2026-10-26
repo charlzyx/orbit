@@ -1,0 +1,11 @@
+# Floating transcript jump integration — 2026-10-26 11:09 UTC
+
+Public source base `4fe0529592f1f00804d42d287e75e44c7ed4da50`; isolated implementation `13eea694145d80d861a0276c8845bab0cdd7744f`. One serialized full chain finished EXIT 0 with all 1,840 frozen non-document hashes unchanged. No new package/release is implied.
+
+The source-scoped change moves only the existing final jump layer out of flex layout: the transcript no longer loses 30px of viewport when the control appears. It keeps List/selection ancestry and keys, uses a pass-through layer with an interactive child, source 32px round idle button / unread pill and fixed bottom8 positioning. Actual mounted tests preserve selection and exact message context menus across the overlay strip, blank-layer wheel, button activation and viewport height across appearance, label growth and disappearance. Four light/dark CPU images were inspected; these are not hosted-native Rust/Go pixel-equivalence pairs.
+
+Root race `-p 1 -timeout 20m` completed with 3,418 passing test events, 19 conditional test skips, UI 384.168s. The exact critical union is 171 package/test identities, including prior 165 identities and all 17 geometry top-level / 25 total named cases. Unread 11/17, focus 21/38 and the 22 required toolkit menu names remain verified. Original toolkit, terminal, wrapper, vet, Darwin ARM64 build and publisher40/icon5/legacy21 packaging tests passed. Adjacent evidence contains precise names, log hashes and conditional/package skips; these counts are not features or screenshot pairs.
+
+The earlier 80-Tab test failed on both baseline and candidate. A subsequent exact pinned Rust/GPUI audit proves this Jump div is not a registered Tab stop, so that diagnostic is source-consistent rather than an unresolved migration defect. Original assertions/logs remain, and no global keyboard routing is changed. See jump-tab-source-audit-1057.json for crate checksum and source anchors.
+
+Fade rendering, nested Thought scroll chaining, snapshot limitations and native/pixel acceptance remain separate. No fade candidate or domain rename transaction is included. Existing release marker bytes are unchanged; delivered .4 Actions artifact remains source7bd, formally published Release remains .2. No external permission, token, draft or release mutation occurred in this validation.

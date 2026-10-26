@@ -1,0 +1,17 @@
+func TestJumpGeometryKeyboardActivation(t *testing.T) {
+	a, tt, _, _ := jumpGeometryFixture(t, "dark")
+	// Public native traversal in the actual App. Focus remains on a real control;
+	// no test-only Handle or injected activation is used.
+	for i := 0; i < 80 && !tt.Focused("Jump to latest"); i++ {
+		tt.Key(0, ui.KeyTab)
+		tt.Frame()
+	}
+	if !tt.Focused("Jump to latest") {
+		t.Fatal("jump not reachable by keyboard Tab")
+	}
+	tt.Key(0, ui.KeySpace)
+	tt.Frame()
+	if !a.transcript.AtEnd() {
+		t.Fatal("keyboard activation did not jump")
+	}
+}

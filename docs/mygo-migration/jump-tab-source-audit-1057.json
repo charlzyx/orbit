@@ -1,0 +1,17 @@
+{
+  "rust": "299a32bc87fe3d4851bdb902d9c03dcf9bf99cac",
+  "crate_url": "https://static.crates.io/crates/gpui/gpui-0.2.2.crate",
+  "verified_crate_sha256": "979b45cfa6ec723b6f42330915a1b3769b930d02b2d505f9697f8ca602bee707",
+  "expected_from": "pinned Rust Cargo.lock gpui0.2.2",
+  "files": {
+    "window.rs": "40d58470971ccd658ead4d4f788219658fb68b9486aff73e143835c09237ab18",
+    "div.rs": "5c227b7b562aa7471d2f3e78b599ac668c6915b54ec994ce981ce6e29a55e9a6"
+  },
+  "conclusion": "Rust Jump div has neither focusable nor track_focus nor tab_index; focus() sets styles only and on_click appends listener only. Global Tab focus_next traverses registered tab stops. Go composer-to-Jump Tab absence is not demonstrated migration gap.",
+  "anchors": [
+    "Orbit message_scroller.rs330-383",
+    "Orbit app/helpers.rs339-356,407-421,16-25",
+    "GPUI div.rs484-491,616-640,1018-1025,1584-1594,1818",
+    "GPUI window.rs1413-1421"
+  ]
+}

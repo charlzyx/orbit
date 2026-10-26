@@ -1,0 +1,166 @@
+{
+  "base": "69c66c8bd01402f832d983ba04c76e4576a09290",
+  "package": "github.com/charlzyx/orbit/internal/ui",
+  "expected_top_level_names": [
+    "TestAuditJumpAffordanceDoesNotResizeTranscriptViewport",
+    "TestAuditScrolledTranscriptNewActivity",
+    "TestComposerNativeTurnNavigation",
+    "TestHostRetainedTranscriptSelectionUnmountAndSessionReset",
+    "TestJumpGeometryEmptyLayerPassesWheelSelectionAndMenu",
+    "TestJumpGeometryFocusedButtonKeyboardActivation",
+    "TestJumpGeometryLightDarkAndUnread",
+    "TestMessageMenuBlankPreservesActualSelection",
+    "TestMessageMenuCancelBlankAndOtherTextSelection",
+    "TestMessageMenuMeasuredBlankDoesNotReusePreviousHover",
+    "TestMessageMenuSameOwnerStreamUsesOpeningSnapshot",
+    "TestTranscriptActivityExplicitSubmitClears",
+    "TestTranscriptActivityIgnoresClockUsageAndDetectsImage",
+    "TestTranscriptActivityOpaqueOwnerAndHiddenRoundtrip",
+    "TestTranscriptActivityRawToolPartialAndCompletion",
+    "TestTranscriptActivityTailInitializationResetAndReorder",
+    "TestTranscriptVariableHeightFollowAndReaderPosition"
+  ],
+  "actual_counts": {
+    "TestAuditJumpAffordanceDoesNotResizeTranscriptViewport": {
+      "run": 3,
+      "output": 9,
+      "pass": 3
+    },
+    "TestAuditScrolledTranscriptNewActivity": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestAuditScrolledTranscriptNewActivity/append": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestAuditScrolledTranscriptNewActivity/stream_text": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestAuditScrolledTranscriptNewActivity/thinking": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestAuditScrolledTranscriptNewActivity/tool_output": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestComposerNativeTurnNavigation": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestHostRetainedTranscriptSelectionUnmountAndSessionReset": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestJumpGeometryEmptyLayerPassesWheelSelectionAndMenu": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestJumpGeometryFocusedButtonKeyboardActivation": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestJumpGeometryLightDarkAndUnread": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestJumpGeometryLightDarkAndUnread/dark": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestJumpGeometryLightDarkAndUnread/light": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestMessageMenuBlankPreservesActualSelection": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestMessageMenuCancelBlankAndOtherTextSelection": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestMessageMenuMeasuredBlankDoesNotReusePreviousHover": {
+      "run": 3,
+      "output": 9,
+      "pass": 3
+    },
+    "TestMessageMenuSameOwnerStreamUsesOpeningSnapshot": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestTranscriptActivityExplicitSubmitClears": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestTranscriptActivityIgnoresClockUsageAndDetectsImage": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestTranscriptActivityOpaqueOwnerAndHiddenRoundtrip": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestTranscriptActivityRawToolPartialAndCompletion": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestTranscriptActivityRawToolPartialAndCompletion/false": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestTranscriptActivityRawToolPartialAndCompletion/true": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestTranscriptActivityTailInitializationResetAndReorder": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestTranscriptVariableHeightFollowAndReaderPosition": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    }
+  },
+  "elapsed": 33.364,
+  "scope": "Focused CPU mounted verification, not hosted native or full suite",
+  "known_residual": "80-Tab diagnostic fails on baseline and candidate, but exact pinned Rust/GPUI source confirms this Jump is not a registered Tab stop: source-consistent, not migration gap. Pointer-focused Space activation passes. Fade/nestedThought/native pixels remain separate.",
+  "sha256": {
+    "/tmp/orbit-jump-final-1050.jsonl": "ed31fd391a41ef6383ab65577a66a339f8da7babff6680541b231aba60baa4a1",
+    "/tmp/orbit-jump-final-1050.status": "d68d6bd807836ddd527201d1a819c2c4f07c15c1d15f06264392d4dd75969f3c",
+    "/tmp/orbit-jump-vet-1050.log": "9da2d27b7ee72dd6c6d7e2ae1b7563cfb188c722afb006b10f70efacf395b90a",
+    "/tmp/orbit-jump-arm64-1050.log": "9da2d27b7ee72dd6c6d7e2ae1b7563cfb188c722afb006b10f70efacf395b90a",
+    "/tmp/orbit-jump-geometry-red-v2-1042.jsonl": "4cf517f1fe8f2c1530c4b56aae2db8ffdc1edaefdec971ad9db454147b7fef0b",
+    "/tmp/orbit-jump-keyboard-baseline-1047.jsonl": "7902ce30d37a45305cf6fc3c1ffa71dacf09d86ade9920e04bc049bd245bda47",
+    "/tmp/orbit-jump-captures-final-1050/dark-idle.png": "8e70847506f4a51da0cc8e16d957669d54b7fdd95d4ad85dc4aeff45bca96ae3",
+    "/tmp/orbit-jump-captures-final-1050/dark-unread.png": "8dc7e184a2c6690d965aa2e6dc08ec793301441a2acbd565eb2cc4c4d546ac5c",
+    "/tmp/orbit-jump-captures-final-1050/light-idle.png": "c2e4d3573ed810e76ee9541312f6fa8feb484032ae6ab48d6da9ce55fcba55a4",
+    "/tmp/orbit-jump-captures-final-1050/light-unread.png": "b9b91278d5d069c9c29c5ccda46c2a0ea9c4b1e75dd8f59fa32101f6b700dac0"
+  },
+  "tab_source_audit": "jump-tab-source-audit-1057.json"
+}
