@@ -1,0 +1,7 @@
+# Single-image mixed clipboard integration
+
+Exact base public ddf9b4ca24bc6ac1f811afefa0c1185b46f2480b. Only composer metadata probing and captured-owner rejection are added; canonical PNG advertised alongside text uses the original PasteImage/ReadImage/FIFO path. No native batch API or data-read expansion. Text-only/unavailable metadata preserve native text fallback; empty text preserves legacy image error behavior.
+
+Final serial full chain EXIT 0, all1853 non-document hashes unchanged. 220 exact package/test identities run/pass once, preserving previous201 plus actual paste names. Root3469 passing events/19 enumerated conditional skips, not feature counts. Composer/selection19 and required menu22top/32events zero skip; terminal115events/4conditional skips. Wrapper, vet, Darwin ARM64, publisher40/icon5/legacy21 passed.
+
+Original actual mixed-image/text CmdV RED and controls remain recorded. Lazy provider proves metadata-only probe performs zero image reads; physical OS clipboard/IME acceptance remains unverified. Multiple clipboard images remain a known source gap: current old ReadImage obtains one. Metadata/data are not an atomic snapshot and native/provider allocation is not bounded by downstream FIFO. Proposed native batch design is separate and not implemented. Artificial direct Draft assignment was not shown to correspond to a reachable user entry; no speculative sync repair is included. No new marker/package/release/user data changes.

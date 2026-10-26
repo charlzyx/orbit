@@ -1,0 +1,209 @@
+package orbitui
+
+import (
+	"bytes"
+	"fmt"
+	"github.com/charlzyx/orbit/internal/agent"
+	"github.com/egoist/mygo/transfer"
+	"github.com/egoist/mygo/ui"
+	"image"
+	"image/png"
+	"testing"
+	"time"
+)
+
+func clipboardAuditPNG(t *testing.T) []byte {
+	t.Helper()
+	var b bytes.Buffer
+	if e := png.Encode(&b, image.NewRGBA(image.Rect(0, 0, 2, 2))); e != nil {
+		t.Fatal(e)
+	}
+	return b.Bytes()
+}
+func TestAuditComposerMixedClipboardImagePrecedence(t *testing.T) {
+	for _, kind := range []string{"same-item", "separate-items", "image-only"} {
+		t.Run(kind, func(t *testing.T) {
+			a := fixture(t)
+			var tt *ui.Tester
+			requests := 0
+			// Explicit synthetic backend: only replaces global native ReadImage, while
+			// keeping real CmdV/OnPaste/Dispatch and the production AddImage pipeline.
+			a.Options.OnAction = func(act Action) {
+				if act.Kind == "PasteImage" {
+					requests++
+					raw, e := tt.ClipboardData().Read(transfer.PNG)
+					if e != nil {
+						t.Error(e)
+						return
+					}
+					a.AddImage(raw, "image/png", "Fixture pasted image")
+				}
+			}
+			tt = ui.NewTester(a.View, 1200, 800)
+			if e := tt.Click("Message"); e != nil {
+				t.Fatal(e)
+			}
+			tt.Type("甲😀乙尾")
+			tt.Key(0, ui.KeyLeft)
+			tt.Key(ui.Shift, ui.KeyLeft)
+			pngRep := transfer.Bytes(transfer.PNG, clipboardAuditPNG(t))
+			textRep := transfer.Bytes(transfer.Text, []byte("CLIP"))
+			data := transfer.New(transfer.NewItem(pngRep))
+			if kind == "same-item" {
+				data = transfer.New(transfer.NewItem(pngRep, textRep))
+			}
+			if kind == "separate-items" {
+				data = transfer.New(transfer.NewItem(textRep), transfer.NewItem(pngRep))
+			}
+			wantImages := 1
+			tt.SetClipboardData(data)
+			tt.Key(ui.Cmd, ui.KeyV)
+			if requests > 0 {
+				deadline := time.Now().Add(2 * time.Second)
+				for len(a.attachments) == 0 && time.Now().Before(deadline) {
+					tt.Frame()
+					time.Sleep(time.Millisecond)
+				}
+			}
+			if a.Draft != "甲😀乙尾" {
+				t.Errorf("Rust image precedence changed selected draft: %q", a.Draft)
+			}
+			if requests != 1 || len(a.attachments) != wantImages {
+				t.Errorf("real paste must attach source image count %d; requests=%d attachments=%d", wantImages, requests, len(a.attachments))
+			}
+			tt.Key(ui.Cmd, ui.KeyC)
+			if tt.Clipboard() != "乙" {
+				t.Errorf("image paste changed actual native selection/caret: copied%q", tt.Clipboard())
+			}
+			tt.Key(ui.Cmd, ui.KeyZ)
+			if a.Draft != "" {
+				t.Errorf("image paste added text undo entry: %q", a.Draft)
+			}
+		})
+	}
+}
+func TestAuditComposerTextClipboardKeepsSelectionUndo(t *testing.T) {
+	a := fixture(t)
+	requests := 0
+	a.Options.OnAction = func(act Action) {
+		if act.Kind == "PasteImage" {
+			requests++
+		}
+	}
+	tt := ui.NewTester(a.View, 1200, 800)
+	if e := tt.Click("Message"); e != nil {
+		t.Fatal(e)
+	}
+	tt.Type("甲😀乙尾")
+	tt.Key(0, ui.KeyLeft)
+	tt.Key(ui.Shift, ui.KeyLeft)
+	tt.SetClipboardData(transfer.New(transfer.NewItem(transfer.Bytes(transfer.Text, []byte("CLIP")))))
+	tt.Key(ui.Cmd, ui.KeyV)
+	if a.Draft != "甲😀CLIP尾" || requests != 0 {
+		t.Fatalf("text paste contract %q requests%d", a.Draft, requests)
+	}
+	tt.Key(ui.Cmd, ui.KeyZ)
+	if a.Draft != "甲😀乙尾" {
+		t.Fatal("text undo lost original", a.Draft)
+	}
+}
+
+func TestComposerPasteOnlyProbesImageMetadata(t *testing.T) {
+	a := fixture(t)
+	requests, reads := 0, 0
+	a.Options.OnAction = func(act Action) {
+		if act.Kind == "PasteImage" {
+			requests++
+		}
+	}
+	tt := ui.NewTester(a.View, 1200, 800)
+	if e := tt.Click("Message"); e != nil {
+		t.Fatal(e)
+	}
+	tt.Type("preserved")
+	tt.SetClipboardData(transfer.New(transfer.NewItem(transfer.Bytes(transfer.Text, []byte("ignored")), transfer.Lazy(transfer.PNG, func() ([]byte, error) { reads++; return nil, fmt.Errorf("controlled read failure") }))))
+	tt.Key(ui.Cmd, ui.KeyV)
+	if reads != 0 || requests != 1 || a.Draft != "preserved" {
+		t.Fatalf("probe materialized data or inserted mixed text: reads%d requests%d draft%q", reads, requests, a.Draft)
+	}
+}
+func TestComposerPasteWithoutCanonicalImageRetainsLegacyFallback(t *testing.T) {
+	for _, kind := range []string{"text-only", "unsupported-image-format", "empty"} {
+		t.Run(kind, func(t *testing.T) {
+			a := fixture(t)
+			requests := 0
+			a.Options.OnAction = func(act Action) {
+				if act.Kind == "PasteImage" {
+					requests++
+				}
+			}
+			tt := ui.NewTester(a.View, 1200, 800)
+			if e := tt.Click("Message"); e != nil {
+				t.Fatal(e)
+			}
+			tt.Type("draft")
+			data := transfer.New(transfer.NewItem(transfer.Bytes(transfer.Text, []byte("text"))))
+			if kind == "unsupported-image-format" {
+				data = transfer.New(transfer.NewItem(transfer.Bytes(transfer.Text, []byte("text")), transfer.Bytes(transfer.Format("image/x-fixture-unsupported"), []byte("not read"))))
+			}
+			if kind == "empty" {
+				data = transfer.Data{}
+			}
+			tt.SetClipboardData(data)
+			tt.Key(ui.Cmd, ui.KeyV)
+			want, req := "drafttext", 0
+			if kind == "empty" {
+				want, req = "draft", 1
+			} // Preserve existing empty-text PasteImage error route.
+			if a.Draft != want || requests != req {
+				t.Fatalf("legacy fallback changed: %q req%d", a.Draft, requests)
+			}
+		})
+	}
+}
+func TestComposerOldRenderedPasteRejectsNewOwner(t *testing.T) {
+	for _, change := range []string{"runtime", "session", "generation", "closed"} {
+		t.Run(change, func(t *testing.T) {
+			a := fixture(t)
+			s := Snapshot{RuntimeID: "old-runtime", SessionID: "old-session"}
+			a.SetSnapshot(s)
+			gen := uint64(1)
+			live := true
+			if change == "generation" || change == "closed" {
+				a.Options.AttachmentContext = func() (agent.WorkflowTarget, uint64, bool) { return agent.WorkflowTarget{}, gen, live }
+			}
+			requests := 0
+			a.Options.OnAction = func(act Action) {
+				if act.Kind == "PasteImage" {
+					requests++
+				}
+			}
+			tt := ui.NewTester(a.View, 1200, 800)
+			if e := tt.Click("Message"); e != nil {
+				t.Fatal(e)
+			}
+			tt.Type("old draft")
+			tt.SetClipboardData(transfer.New(transfer.NewItem(transfer.Bytes(transfer.Text, []byte("must not insert")), transfer.Bytes(transfer.PNG, clipboardAuditPNG(t)))))
+			wantDraft := "old draft"
+			switch change {
+			case "runtime":
+				s.RuntimeID = "new-runtime"
+				a.SetSnapshot(s)
+			case "session":
+				wantDraft = "新草稿"
+				a.drafts["new-session"] = draftState{Text: wantDraft}
+				s.SessionID = "new-session"
+				a.SetSnapshot(s)
+			case "generation":
+				gen++
+			case "closed":
+				live = false
+			}
+			// Actual SetSnapshot owner/draft semantics; old native input still owns the committed event target.
+			tt.Key(ui.Cmd, ui.KeyV)
+			if requests != 0 || len(a.attachments) != 0 || a.Draft != wantDraft {
+				t.Fatalf("old rendered paste retargeted: req%d images%d draft%q", requests, len(a.attachments), a.Draft)
+			}
+		})
+	}
+}

@@ -1,0 +1,34 @@
+package orbitui
+
+import (
+	"github.com/egoist/mygo/ui"
+	"testing"
+)
+
+func TestAuditProgrammaticDraftBeforeOldInputEvent(t *testing.T) {
+	for _, event := range []string{"frame-only", "left-key", "paste"} {
+		t.Run(event, func(t *testing.T) {
+			a := fixture(t)
+			s := Snapshot{RuntimeID: "r1", SessionID: "same"}
+			a.SetSnapshot(s)
+			tt := ui.NewTester(a.View, 1200, 800)
+			tt.Click("Message")
+			tt.Type("old draft")
+			tt.SetClipboard("clipboard")
+			s.RuntimeID = "r2"
+			a.SetSnapshot(s)
+			a.Draft = "新草稿"
+			switch event {
+			case "frame-only":
+				tt.Frame()
+			case "left-key":
+				tt.Key(0, ui.KeyLeft)
+			case "paste":
+				tt.Key(ui.Cmd, ui.KeyV)
+			}
+			if a.Draft != "新草稿" {
+				t.Errorf("event=%s draft=%q", event, a.Draft)
+			}
+		})
+	}
+}

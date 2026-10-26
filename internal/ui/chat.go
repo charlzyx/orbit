@@ -3,11 +3,13 @@ package orbitui
 import (
 	"fmt"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/charlzyx/orbit/internal/composerui"
 	"github.com/charlzyx/orbit/internal/modelui"
 	"github.com/charlzyx/orbit/internal/transcriptui"
+	"github.com/egoist/mygo/transfer"
 	"github.com/egoist/mygo/ui"
 )
 
@@ -227,6 +229,7 @@ func (a *App) composerView(c *ui.Context) {
 			var input ui.Element
 			anchor.Children(func() {
 				a.attachmentRow(c)
+				pasteOwner := a.attachmentOwner()
 				input = ui.TextAreaBase(c.Key(struct {
 					Field, Session, Workspace string
 					ComposerEpoch             uint64
@@ -268,7 +271,10 @@ func (a *App) composerView(c *ui.Context) {
 					}
 					return false
 				}).OnPaste(func(text string) bool {
-					if text == "" {
+					if !a.ownsAttachment(pasteOwner) {
+						return true
+					} // Do not retarget an old rendered input or fall through to its text edit.
+					if text == "" || slices.Contains(c.Services().ClipboardFormats(), transfer.PNG) {
 						a.Dispatch(Action{Kind: "PasteImage"})
 						return true
 					}

@@ -1,0 +1,111 @@
+package orbitui
+
+import (
+	"bytes"
+	"github.com/egoist/mygo/transfer"
+	"github.com/egoist/mygo/ui"
+	"image"
+	"image/png"
+	"testing"
+	"time"
+)
+
+func clipboardAuditPNG(t *testing.T) []byte {
+	t.Helper()
+	var b bytes.Buffer
+	if e := png.Encode(&b, image.NewRGBA(image.Rect(0, 0, 2, 2))); e != nil {
+		t.Fatal(e)
+	}
+	return b.Bytes()
+}
+func TestAuditComposerMixedClipboardImagePrecedence(t *testing.T) {
+	for _, kind := range []string{"same-item", "separate-items", "image-only", "two-images"} {
+		t.Run(kind, func(t *testing.T) {
+			a := fixture(t)
+			var tt *ui.Tester
+			requests := 0
+			// Explicit synthetic backend: only replaces global native ReadImage, while
+			// keeping real CmdV/OnPaste/Dispatch and the production AddImage pipeline.
+			a.Options.OnAction = func(act Action) {
+				if act.Kind == "PasteImage" {
+					requests++
+					raw, e := tt.ClipboardData().Read(transfer.PNG)
+					if e != nil {
+						t.Error(e)
+						return
+					}
+					a.AddImage(raw, "image/png", "Fixture pasted image")
+				}
+			}
+			tt = ui.NewTester(a.View, 1200, 800)
+			if e := tt.Click("Message"); e != nil {
+				t.Fatal(e)
+			}
+			tt.Type("甲😀乙尾")
+			tt.Key(0, ui.KeyLeft)
+			tt.Key(ui.Shift, ui.KeyLeft)
+			pngRep := transfer.Bytes(transfer.PNG, clipboardAuditPNG(t))
+			textRep := transfer.Bytes(transfer.Text, []byte("CLIP"))
+			data := transfer.New(transfer.NewItem(pngRep))
+			if kind == "same-item" {
+				data = transfer.New(transfer.NewItem(pngRep, textRep))
+			}
+			if kind == "separate-items" {
+				data = transfer.New(transfer.NewItem(textRep), transfer.NewItem(pngRep))
+			}
+			wantImages := 1
+			if kind == "two-images" {
+				data = transfer.New(transfer.NewItem(pngRep), transfer.NewItem(transfer.Bytes(transfer.PNG, clipboardAuditPNG(t))))
+				wantImages = 2
+			}
+			tt.SetClipboardData(data)
+			tt.Key(ui.Cmd, ui.KeyV)
+			if requests > 0 {
+				deadline := time.Now().Add(2 * time.Second)
+				for len(a.attachments) == 0 && time.Now().Before(deadline) {
+					tt.Frame()
+					time.Sleep(time.Millisecond)
+				}
+			}
+			if a.Draft != "甲😀乙尾" {
+				t.Errorf("Rust image precedence changed selected draft: %q", a.Draft)
+			}
+			if requests != 1 || len(a.attachments) != wantImages {
+				t.Errorf("real paste must attach source image count %d; requests=%d attachments=%d", wantImages, requests, len(a.attachments))
+			}
+			tt.Key(ui.Cmd, ui.KeyC)
+			if tt.Clipboard() != "乙" {
+				t.Errorf("image paste changed actual native selection/caret: copied%q", tt.Clipboard())
+			}
+			tt.Key(ui.Cmd, ui.KeyZ)
+			if a.Draft != "" {
+				t.Errorf("image paste added text undo entry: %q", a.Draft)
+			}
+		})
+	}
+}
+func TestAuditComposerTextClipboardKeepsSelectionUndo(t *testing.T) {
+	a := fixture(t)
+	requests := 0
+	a.Options.OnAction = func(act Action) {
+		if act.Kind == "PasteImage" {
+			requests++
+		}
+	}
+	tt := ui.NewTester(a.View, 1200, 800)
+	if e := tt.Click("Message"); e != nil {
+		t.Fatal(e)
+	}
+	tt.Type("甲😀乙尾")
+	tt.Key(0, ui.KeyLeft)
+	tt.Key(ui.Shift, ui.KeyLeft)
+	tt.SetClipboardData(transfer.New(transfer.NewItem(transfer.Bytes(transfer.Text, []byte("CLIP")))))
+	tt.Key(ui.Cmd, ui.KeyV)
+	if a.Draft != "甲😀CLIP尾" || requests != 0 {
+		t.Fatalf("text paste contract %q requests%d", a.Draft, requests)
+	}
+	tt.Key(ui.Cmd, ui.KeyZ)
+	if a.Draft != "甲😀乙尾" {
+		t.Fatal("text undo lost original", a.Draft)
+	}
+}

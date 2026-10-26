@@ -1,0 +1,106 @@
+{
+  "base": "fe034cd0cbfcd86a6d9f28b6d389d12cdb341237",
+  "base_tree": "506739e213841837c07987fbc002a71ba0f44d0a",
+  "expected_top": [
+    "TestAuditComposerMixedClipboardImagePrecedence",
+    "TestAuditComposerTextClipboardKeepsSelectionUndo",
+    "TestComposerPasteOnlyProbesImageMetadata",
+    "TestComposerPasteWithoutCanonicalImageRetainsLegacyFallback",
+    "TestComposerOldRenderedPasteRejectsNewOwner",
+    "TestAttachmentIngressExactSafetyLimits",
+    "TestAttachmentIngressFIFOIncludesClipboardAndFilePicker",
+    "TestAttachmentPendingBlockedEnterPreservesSelectionAndExistingImage",
+    "TestAttachmentPathsQueuedEnterAndIME"
+  ],
+  "all_names": [
+    "TestAttachmentIngressExactSafetyLimits",
+    "TestAttachmentIngressFIFOIncludesClipboardAndFilePicker",
+    "TestAttachmentPathsQueuedEnterAndIME",
+    "TestAttachmentPendingBlockedEnterPreservesSelectionAndExistingImage",
+    "TestAuditComposerMixedClipboardImagePrecedence",
+    "TestAuditComposerMixedClipboardImagePrecedence/image-only",
+    "TestAuditComposerMixedClipboardImagePrecedence/same-item",
+    "TestAuditComposerMixedClipboardImagePrecedence/separate-items",
+    "TestAuditComposerTextClipboardKeepsSelectionUndo",
+    "TestComposerOldRenderedPasteRejectsNewOwner",
+    "TestComposerOldRenderedPasteRejectsNewOwner/closed",
+    "TestComposerOldRenderedPasteRejectsNewOwner/generation",
+    "TestComposerOldRenderedPasteRejectsNewOwner/runtime",
+    "TestComposerOldRenderedPasteRejectsNewOwner/session",
+    "TestComposerPasteOnlyProbesImageMetadata",
+    "TestComposerPasteWithoutCanonicalImageRetainsLegacyFallback",
+    "TestComposerPasteWithoutCanonicalImageRetainsLegacyFallback/empty",
+    "TestComposerPasteWithoutCanonicalImageRetainsLegacyFallback/text-only",
+    "TestComposerPasteWithoutCanonicalImageRetainsLegacyFallback/unsupported-image-format"
+  ],
+  "counts": {
+    "TestAuditComposerMixedClipboardImagePrecedence": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestAuditComposerTextClipboardKeepsSelectionUndo": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestComposerPasteOnlyProbesImageMetadata": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestComposerPasteWithoutCanonicalImageRetainsLegacyFallback": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestComposerOldRenderedPasteRejectsNewOwner": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestAttachmentIngressExactSafetyLimits": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestAttachmentIngressFIFOIncludesClipboardAndFilePicker": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestAttachmentPendingBlockedEnterPreservesSelectionAndExistingImage": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestAttachmentPathsQueuedEnterAndIME": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    }
+  },
+  "count": 3,
+  "skip": 0,
+  "fail": 0,
+  "elapsed": 23.204,
+  "log": "/tmp/orbit-composer-clipboard-final-1226.jsonl",
+  "sha256": "e914d5a91c5b9a97f9f9c5ffb4035fa11ac8a54fe6b28951ce6ab0125f80eb5b",
+  "status": "FOCUSED_EXIT:0\nVET_EXIT:0\nARM64_EXIT:0\n",
+  "production_file_sha256": "7a886080ff52f3a2ca8fe59ba7d9ecd6ce0a8552ab2d66635c0f1d9f9f6a1d53",
+  "original_red_log": {
+    "path": "/tmp/orbit-composer-clipboard-final-red-v2-1216.jsonl",
+    "sha256": "26b23d8cea720f6716d5c7fd6c87b5d12e84d1b44b236f13c53444aae2c5492c"
+  },
+  "baseline_buffer_residual": {
+    "path": "/tmp/orbit-composer-draft-baseline-probe-1224.jsonl",
+    "sha256": "edda53156f039f5ba265b8483017e10d052e674f1f9fa4195aeeab4aac4c653f"
+  },
+  "limits": [
+    "single-image only",
+    "metadata/read not same snapshot",
+    "native Formats errors cannot be distinguished from unavailable metadata",
+    "no OS clipboard exercised",
+    "full suite lead-owned NOT_RUN"
+  ]
+}
