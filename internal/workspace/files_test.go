@@ -8,6 +8,7 @@ import (
 	"runtime"
 	"strings"
 	"testing"
+	"testing/synctest"
 	"time"
 )
 
@@ -201,32 +202,142 @@ func TestEditorReadonly(t *testing.T) {
 }
 
 func TestEditorDebounceAcrossTabsAndClosingLastEdited(t *testing.T) {
-	root := t.TempDir()
-	a := filepath.Join(root, "a")
-	b := filepath.Join(root, "b")
-	os.WriteFile(a, []byte("a"), 0600)
-	os.WriteFile(b, []byte("b"), 0600)
-	e := NewEditor()
-	e.delay = 100 * time.Millisecond
-	defer e.CloseAll()
-	e.Open(a)
-	e.Open(b)
-	e.SetText(a, "changed a")
-	time.Sleep(60 * time.Millisecond)
-	e.SetText(b, "changed b")
-	time.Sleep(60 * time.Millisecond)
-	raw, _ := os.ReadFile(a)
-	if string(raw) != "a" {
-		t.Fatal("autosave fired before global idle window")
-	}
-	if err := e.Close(b); err != nil {
-		t.Fatal(err)
-	}
-	time.Sleep(70 * time.Millisecond)
-	raw, _ = os.ReadFile(a)
-	if string(raw) != "changed a" {
-		t.Fatal("closing last-edited tab abandoned dirty neighbor", string(raw))
-	}
+	synctest.Test(t, func(t *testing.T) {
+		root := t.TempDir()
+		a, b := filepath.Join(root, "a"), filepath.Join(root, "b")
+		if err := os.WriteFile(a, []byte("a"), 0600); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(b, []byte("b"), 0600); err != nil {
+			t.Fatal(err)
+		}
+		e := NewEditor()
+		e.delay = 100 * time.Millisecond
+		defer e.CloseAll()
+		entered, release, completed := make(chan struct{}), make(chan struct{}), make(chan error, 1)
+		released := false
+		defer func() {
+			if !released {
+				close(release)
+			}
+		}()
+		e.writeFile = func(path, text string) error {
+			if path == a {
+				close(entered)
+				<-release
+			}
+			err := SaveExisting(path, text)
+			if path == a {
+				completed <- err
+			}
+			return err
+		}
+		if _, err := e.Open(a); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := e.Open(b); err != nil {
+			t.Fatal(err)
+		}
+		if err := e.SetText(a, "changed a"); err != nil {
+			t.Fatal(err)
+		}
+		time.Sleep(60 * time.Millisecond)
+		if err := e.SetText(b, "changed b"); err != nil {
+			t.Fatal(err)
+		}
+		time.Sleep(60 * time.Millisecond)
+		synctest.Wait()
+		// The second edit reset the global deadline: no timer write may start yet.
+		select {
+		case <-entered:
+			t.Fatal("autosave fired before global idle window")
+		default:
+		}
+		raw, err := os.ReadFile(a)
+		if err != nil || string(raw) != "a" {
+			t.Fatal("autosave fired before global idle window", string(raw), err)
+		}
+		if err := e.Close(b); err != nil {
+			t.Fatal(err)
+		}
+		time.Sleep(70 * time.Millisecond)
+		synctest.Wait()
+		select {
+		case <-entered:
+		default:
+			t.Fatal("timer did not save dirty neighbor after closing last-edited tab")
+		}
+		// Timer expiry is not I/O completion: prove the old observation can still
+		// see original bytes, then release and wait for the actual disk write.
+		raw, err = os.ReadFile(a)
+		if err != nil || string(raw) != "a" {
+			t.Fatal("held write changed disk", string(raw), err)
+		}
+		close(release)
+		released = true
+		if err := <-completed; err != nil {
+			t.Fatal(err)
+		}
+		synctest.Wait() // Settle saveDocument bookkeeping after the write seam.
+		raw, err = os.ReadFile(a)
+		if err != nil || string(raw) != "changed a" {
+			t.Fatal("closing last-edited tab abandoned dirty neighbor", string(raw), err)
+		}
+		raw, err = os.ReadFile(b)
+		if err != nil || string(raw) != "changed b" {
+			t.Fatal("Close did not save its own target", string(raw), err)
+		}
+		d, ok := e.Active()
+		if !ok || d.Content.Path != a || d.Dirty || d.Saving {
+			t.Fatal("neighbor save did not settle", d)
+		}
+	})
+}
+
+func TestEditorAutosaveEpochRejectsOldAndSavesAllDirty(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		root := t.TempDir()
+		e := NewEditor()
+		defer e.CloseAll()
+		paths := []string{filepath.Join(root, "a"), filepath.Join(root, "b")}
+		for _, p := range paths {
+			if err := os.WriteFile(p, []byte("original"), 0600); err != nil {
+				t.Fatal(err)
+			}
+			if _, err := e.Open(p); err != nil {
+				t.Fatal(err)
+			}
+		}
+		if err := e.SetText(paths[0], "first"); err != nil {
+			t.Fatal(err)
+		}
+		old := e.saveEpoch
+		if err := e.SetText(paths[1], "second"); err != nil {
+			t.Fatal(err)
+		}
+		current := e.saveEpoch
+		if old == current {
+			t.Fatal("edit did not advance autosave epoch")
+		}
+		if err := e.flushAll(old, true); err != nil {
+			t.Fatal(err)
+		}
+		for _, p := range paths {
+			raw, err := os.ReadFile(p)
+			if err != nil || string(raw) != "original" {
+				t.Fatal("stale epoch wrote disk", string(raw), err)
+			}
+		}
+		if err := e.flushAll(current, true); err != nil {
+			t.Fatal(err)
+		}
+		for i, p := range paths {
+			raw, err := os.ReadFile(p)
+			if err != nil || string(raw) != []string{"first", "second"}[i] {
+				t.Fatal("current epoch missed dirty tab", string(raw), err)
+			}
+		}
+	})
 }
 
 func TestSaveExistingAtomicPreservesModeAndConflict(t *testing.T) {
