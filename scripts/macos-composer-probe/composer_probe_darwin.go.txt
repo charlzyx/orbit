@@ -1,0 +1,601 @@
+//go:build darwin && arm64
+
+// Instrumentation overlay only. No business state is written by this probe.
+package orbitui
+
+import (
+	"bytes"
+	"crypto/sha256"
+	"encoding/base64"
+	"encoding/hex"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"golang.org/x/sys/unix"
+	"image"
+	_ "image/png"
+	"io"
+	"os"
+	"path/filepath"
+	"sync"
+	"sync/atomic"
+	"time"
+
+	proof "github.com/charlzyx/orbit/scripts/macos-composer-probe/menuproof"
+	"github.com/egoist/mygo"
+	"github.com/egoist/mygo/ui"
+)
+
+var composerProofConfigPath = os.Getenv("ORBIT_COMPOSER_PROOF_CONFIG")
+var composerProofDisposable = os.Getenv("ORBIT_COMPOSER_DISPOSABLE_RUNNER") == "1"
+var composerProofOnce sync.Once
+var composerProofActive *composerNativeProof // main-thread only
+
+type composerProofConfig struct {
+	Mode      string `json:"mode"`
+	Out       string `json:"out_dir"`
+	Nonce     string `json:"nonce"`
+	Clipboard int64  `json:"clipboard_generation"`
+}
+type composerProofImage struct {
+	MIME   string `json:"mime"`
+	Width  int    `json:"width"`
+	Height int    `json:"height"`
+	Pixels string `json:"pixel_sha256"`
+}
+type composerProofState struct {
+	Phase    string               `json:"phase"`
+	Draft    string               `json:"draft"`
+	Images   []composerProofImage `json:"attachments"`
+	Pending  bool                 `json:"pending"`
+	Focused  bool                 `json:"focused"`
+	Ready    bool                 `json:"ready"`
+	Owner    string               `json:"owner"`
+	Messages int                  `json:"messages"`
+	At       int64                `json:"at_unix_ns"`
+	Problem  string               `json:"problem,omitempty"`
+}
+type composerProofInput struct {
+	Action       string        `json:"action"`
+	At           int64         `json:"at_unix_ns"`
+	PID          int           `json:"pid"`
+	Start        uint64        `json:"start_us"`
+	Window       uintptr       `json:"window"`
+	TargetSource string        `json:"target_source"`
+	Target       *proof.Target `json:"target,omitempty"`
+}
+type composerNativeProof struct {
+	x               *Controller
+	w               *mygo.Window
+	cfg             composerProofConfig
+	id              proof.Identity
+	mu              sync.Mutex
+	latest          composerProofState
+	inputs          []composerProofInput
+	states          []composerProofState
+	captures        []map[string]any
+	osCapturePhases []string
+	owner           attachmentOwner
+	ownerSet        bool
+	observer        *proof.NativeObserver
+	stopped         atomic.Bool
+}
+
+func composerProofObserve(x *Controller, c *ui.Context) {
+	p := composerProofActive
+	if p == nil || p.x != x {
+		return
+	}
+	a := x.UI
+	s := composerProofState{Images: []composerProofImage{}, Draft: a.Draft, Focused: a.composer.Focused(c), Ready: a.composerVisibleForFocus() && !a.modalOpen() && a.Model.Connected, Messages: len(a.Model.Messages), At: time.Now().UnixNano()}
+	owner := a.attachmentOwner()
+	if !p.ownerSet && s.Ready {
+		p.owner = owner
+		p.ownerSet = true
+	}
+	if p.ownerSet && owner == p.owner {
+		s.Owner = p.cfg.Nonce + ":1"
+	} else {
+		s.Problem = "owner changed or not ready"
+	}
+	s.Pending = a.pendingAttachmentImages != nil || a.attachmentIngress.requests > 0
+	if len(s.Draft) > 64 || len(a.attachments) > 1 {
+		s.Problem = "unexpected fixture size"
+		s.Draft = ""
+	} else {
+		for _, v := range a.attachments {
+			r := composerProofImage{MIME: v.Image.MIMEType}
+			if len(v.Image.Data) > 4096 {
+				s.Problem = "unexpected attachment size"
+				break
+			}
+			raw, e := base64.StdEncoding.DecodeString(v.Image.Data)
+			if e != nil {
+				s.Problem = "attachment encoding"
+				break
+			}
+			cfg, _, e := image.DecodeConfig(bytes.NewReader(raw))
+			if e != nil || cfg.Width != 2 || cfg.Height != 2 {
+				s.Problem = "unexpected raster dimensions"
+				break
+			}
+			im, _, e := image.Decode(bytes.NewReader(raw))
+			if e != nil {
+				s.Problem = "raster decode"
+				break
+			}
+			pix := make([]byte, 0, 16)
+			for y := 0; y < 2; y++ {
+				for xx := 0; xx < 2; xx++ {
+					red, g, b, alpha := im.At(xx, y).RGBA()
+					pix = append(pix, byte(red>>8), byte(g>>8), byte(b>>8), byte(alpha>>8))
+				}
+			}
+			sum := sha256.Sum256(pix)
+			r.Width = 2
+			r.Height = 2
+			r.Pixels = hex.EncodeToString(sum[:])
+			s.Images = append(s.Images, r)
+		}
+	}
+	p.mu.Lock()
+	p.latest = s
+	p.mu.Unlock()
+}
+func composerProofStart(x *Controller, w *mygo.Window) {
+	if composerProofConfigPath == "" || !composerProofDisposable {
+		return
+	}
+	composerProofOnce.Do(func() {
+		p := &composerNativeProof{x: x, w: w}
+		raw, e := os.ReadFile(composerProofConfigPath)
+		if e != nil || len(raw) > 4096 {
+			return
+		}
+		if json.Unmarshal(raw, &p.cfg) != nil {
+			return
+		}
+		if p.cfg.Mode != "png-text" && p.cfg.Mode != "tiff-text" && p.cfg.Mode != "text-only" && p.cfg.Mode != "menu-cancel" {
+			return
+		}
+		nonce, e := hex.DecodeString(p.cfg.Nonce)
+		if e != nil || len(nonce) != 32 || !filepath.IsAbs(p.cfg.Out) || filepath.Base(p.cfg.Out) != "orbit-composer-"+p.cfg.Nonce || filepath.Dir(composerProofConfigPath) != p.cfg.Out {
+			return
+		}
+		st, e := os.Lstat(p.cfg.Out)
+		if e != nil || !st.IsDir() || st.Mode()&os.ModeSymlink != 0 || st.Mode().Perm() != 0700 {
+			return
+		}
+		p.id, e = proof.CurrentIdentity(w.NativeHandle())
+		if e != nil {
+			return
+		}
+		composerProofActive = p
+		go p.run()
+	})
+}
+func (p *composerNativeProof) main(f func() error) error {
+	ch := make(chan error, 1)
+	mygo.RunOnMain(func() {
+		if p.stopped.Load() {
+			ch <- errors.New("BLOCKED: proof already stopped")
+			return
+		}
+		ch <- f()
+	})
+	select {
+	case e := <-ch:
+		return e
+	case <-time.After(5 * time.Second):
+		p.stopped.Store(true)
+		return errors.New("BLOCKED: main-thread observation/input deadline")
+	}
+}
+func (p *composerNativeProof) snapshot() composerProofState {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	return p.latest
+}
+func (p *composerNativeProof) wait(f func(composerProofState) bool) error {
+	deadline := time.Now().Add(20 * time.Second)
+	for time.Now().Before(deadline) {
+		s := p.snapshot()
+		if s.Ready && s.Problem == "" && time.Now().UnixNano()-s.At >= 0 && time.Now().UnixNano()-s.At < 250_000_000 && f(s) {
+			return nil
+		}
+		time.Sleep(25 * time.Millisecond)
+	}
+	return errors.New("BLOCKED: expected real composer state not observed")
+}
+func (p *composerNativeProof) fresh(label string) (proof.Target, error) {
+	// Window.Update callbacks and manager generations may change between a
+	// committed frame observation and this owner-thread native input admission.
+	a := p.x.UI
+	currentOwner := a.attachmentOwner()
+	if p.x.hostStopped() || !p.ownerSet || !currentOwner.live || currentOwner != p.owner || a.Window != p.w || !a.composerVisibleForFocus() || a.modalOpen() || !a.Model.Connected {
+		return proof.Target{}, errors.New("BLOCKED: current owner/readiness changed after frame")
+	}
+
+	id, e := proof.CurrentIdentity(p.w.NativeHandle())
+	if e != nil || id != p.id || p.w.IsDestroyed() {
+		return proof.Target{}, errors.New("BLOCKED: app identity changed")
+	}
+	s := p.snapshot()
+	if !s.Ready || s.Problem != "" || s.Owner != p.cfg.Nonce+":1" || (time.Now().UnixNano()-s.At < 0 || time.Now().UnixNano()-s.At > 250_000_000) {
+		return proof.Target{}, errors.New("BLOCKED: stale owner/readiness")
+	}
+	return proof.FreshTarget(id, label)
+}
+func (p *composerNativeProof) log(action string, target *proof.Target) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	source := "fresh-unique-AX"
+	if target == nil {
+		source = "matching-native-menu-begin"
+	}
+	p.inputs = append(p.inputs, composerProofInput{action, time.Now().UnixNano(), p.id.PID, p.id.Start, p.id.Window, source, target})
+}
+func (p *composerNativeProof) click(label string) error {
+	return p.main(func() error {
+		t, e := p.fresh(label)
+		if e != nil {
+			return e
+		}
+		if label == "Add attachment" {
+			p.observer, e = proof.NewNativeObserver(func() proof.Identity {
+				if p.stopped.Load() {
+					return proof.Identity{}
+				}
+				id, _ := proof.CurrentIdentity(p.w.NativeHandle())
+				return id
+			})
+			if e != nil {
+				return e
+			}
+			a := proof.Arm{Owner: p.id, At: time.Now(), Deadline: time.Now().Add(5 * time.Second), Content: t.Content, Target: t.Rect, Matches: t.Matches, Labels: []string{p.x.UI.text("composer.attach_image", "Attach image…"), "Attach files…", p.x.UI.text("composer.mention_file", "Mention file"), "Paste image"}}
+			if e = p.observer.State.Arm(a); e != nil {
+				return e
+			}
+			if e = p.observer.State.RecordClick(p.id, t.Rect, time.Now(), 1); e != nil {
+				return e
+			}
+			p.observer.OnEscapePosted = func() { p.log("key:Escape", nil) }
+		}
+		if e = proof.PostClick(t); e != nil {
+			return e
+		}
+		p.log("click:"+label, &t)
+		return nil
+	})
+}
+func (p *composerNativeProof) key(key string) error {
+	return p.main(func() error {
+		t, e := p.fresh("Message")
+		if e != nil {
+			return e
+		}
+		if !p.snapshot().Focused {
+			return errors.New("BLOCKED: composer is not focused")
+		}
+		if key == "CmdV" && proof.ClipboardGeneration() != p.cfg.Clipboard {
+			return errors.New("BLOCKED: fixture clipboard generation changed")
+		}
+		if e = proof.PostKey(t, key); e != nil {
+			return e
+		}
+		p.log("key:"+key, &t)
+		return nil
+	})
+}
+func (p *composerNativeProof) capture(phase string) error {
+	data, e := p.w.CapturePage()
+	if e != nil {
+		return e
+	}
+	if len(data) == 0 || len(data) > 16<<20 {
+		return errors.New("BLOCKED: native capture bound")
+	}
+	if e = os.WriteFile(filepath.Join(p.cfg.Out, phase+".png"), data, 0600); e != nil {
+		return e
+	}
+	sum := sha256.Sum256(data)
+	p.captures = append(p.captures, map[string]any{"phase": phase, "sha256": hex.EncodeToString(sum[:]), "bytes": len(data), "at_unix_ns": time.Now().UnixNano()})
+	s := p.snapshot()
+	s.Phase = phase
+	p.states = append(p.states, s)
+	return p.captureOSPhase(phase)
+}
+func (p *composerNativeProof) run() {
+	err := p.perform()
+	p.stopped.Store(true)
+	type finalResult struct {
+		inputs []composerProofInput
+		menu   map[string]int
+	}
+	settled := make(chan finalResult, 1)
+	// Finalize on the real owner thread even after an input deadline. This only
+	// observes/removes this test observer; it never posts another input.
+	mygo.RunOnMain(func() {
+		var result finalResult
+		if p.observer != nil {
+			s := p.observer.State
+			result.menu = map[string]int{"begins": s.Begins, "ends": s.Ends, "actions": s.Actions, "escape_requests": s.EscapeRequests}
+			p.observer.Close()
+		}
+		composerProofActive = nil
+		p.mu.Lock()
+		result.inputs = append([]composerProofInput(nil), p.inputs...)
+		p.mu.Unlock()
+		settled <- result
+	})
+	complete := false
+	var result finalResult
+	select {
+	case result = <-settled:
+		complete = true
+	case <-time.After(5 * time.Second):
+		err = errors.New("BLOCKED: native observer finalization deadline")
+	}
+	// No unsynchronized reads of the pending finalizer's fields on timeout.
+	if !complete {
+		result = finalResult{}
+	}
+	report := map[string]any{"schema": 1, "mode": p.cfg.Mode, "nonce": p.cfg.Nonce, "pid": p.id.PID, "start_us": p.id.Start, "window": p.id.Window, "status": "PASS", "inputlog": result.inputs, "inputlog_complete": complete, "states": p.states, "captures": p.captures, "capture_kind": "content-rerender", "os_capture_phases": p.osCapturePhases}
+	exe, _ := os.Executable()
+	report["executable"] = exe
+	if err != nil {
+		report["status"] = "BLOCKED"
+		report["error"] = err.Error()
+	}
+	if result.menu != nil {
+		report["menu"] = result.menu
+	}
+	data, _ := json.MarshalIndent(report, "", "  ")
+	_ = composerProofAtomic(filepath.Join(p.cfg.Out, "report.json"), append(data, '\n'))
+	mygo.App.Quit()
+}
+func (p *composerNativeProof) perform() error {
+	proc, e := proof.InspectProcess(p.id.PID)
+	if e != nil || proc.Start != p.id.Start {
+		return errors.New("BLOCKED: independent process identity unavailable")
+	}
+	identity := map[string]any{"pid": proc.PID, "start_us": proc.Start, "executable": proc.Executable, "nonce": p.cfg.Nonce, "mode": p.cfg.Mode, "window": p.id.Window}
+	raw, _ := json.Marshal(identity)
+	if e = composerProofAtomic(filepath.Join(p.cfg.Out, "identity.json"), raw); e != nil {
+		return e
+	}
+	approved := false
+	deadline := time.Now().Add(20 * time.Second)
+	for time.Now().Before(deadline) {
+		raw, e = os.ReadFile(filepath.Join(p.cfg.Out, "runner-approved.json"))
+		if e == nil && len(raw) < 4096 {
+			var got map[string]any
+			if json.Unmarshal(raw, &got) == nil {
+				want, _ := json.Marshal(identity)
+				actual, _ := json.Marshal(got)
+				approved = bytes.Equal(want, actual)
+				break
+			}
+		}
+		time.Sleep(25 * time.Millisecond)
+	}
+	if !approved {
+		return errors.New("BLOCKED: no independent runner identity approval")
+	}
+
+	if e := p.wait(func(s composerProofState) bool {
+		return s.Draft == "" && len(s.Images) == 0 && !s.Pending && s.Messages == 0
+	}); e != nil {
+		return e
+	}
+	if e := p.capture("before"); e != nil {
+		return e
+	}
+	if e := p.click("Message"); e != nil {
+		return e
+	}
+	if e := p.wait(func(s composerProofState) bool { return s.Focused }); e != nil {
+		return e
+	}
+	seed := ""
+	for _, key := range []string{"s", "e", "e", "d"} {
+		if e := p.key(key); e != nil {
+			return e
+		}
+		seed += key
+		want := seed
+		if e := p.wait(func(s composerProofState) bool { return s.Draft == want }); e != nil {
+			return e
+		}
+	}
+	if e := p.capture("seed"); e != nil {
+		return e
+	}
+	if p.cfg.Mode == "menu-cancel" {
+		if e := p.click("Add attachment"); e != nil {
+			return e
+		}
+		deadline := time.Now().Add(6 * time.Second)
+		closed := false
+		for time.Now().Before(deadline) {
+			e := p.main(func() error {
+				if p.observer == nil {
+					return proof.ErrBlocked
+				}
+				closed = p.observer.State.Result() == nil
+				return nil
+			})
+			if e != nil {
+				return e
+			}
+			if closed {
+				break
+			}
+			time.Sleep(25 * time.Millisecond)
+		}
+		if !closed {
+			return errors.New("BLOCKED: real native menu cancellation not proved")
+		}
+		if e := p.wait(func(s composerProofState) bool { return s.Focused }); e != nil {
+			return e
+		}
+		if e := p.key("x"); e != nil {
+			return e
+		}
+		if e := p.wait(func(s composerProofState) bool { return s.Draft == "seedx" && len(s.Images) == 0 && !s.Pending }); e != nil {
+			return e
+		}
+		return p.capture("final")
+	}
+	if e := p.key("CmdV"); e != nil {
+		return e
+	}
+	if p.cfg.Mode == "text-only" {
+		if e := p.wait(func(s composerProofState) bool {
+			return s.Draft == "seedclipboard-text" && len(s.Images) == 0 && !s.Pending
+		}); e != nil {
+			return e
+		}
+		if e := p.capture("final"); e != nil {
+			return e
+		}
+		if e := p.key("CmdZ"); e != nil {
+			return e
+		}
+		if e := p.wait(func(s composerProofState) bool { return s.Draft == "seed" && len(s.Images) == 0 }); e != nil {
+			return e
+		}
+		return p.capture("undo")
+	}
+	if e := p.wait(func(s composerProofState) bool {
+		return s.Draft == "seed" && len(s.Images) == 1 && !s.Pending && s.Images[0].MIME == "image/png" && s.Images[0].Pixels == "c21b35e3f28e676cedf24c13575a7346682e101a2d26aad9598d0cdbcee9ee3b"
+	}); e != nil {
+		return e
+	}
+	if e := p.main(func() error {
+		if proof.ClipboardGeneration() != p.cfg.Clipboard {
+			return fmt.Errorf("BLOCKED: clipboard changed during paste")
+		}
+		return nil
+	}); e != nil {
+		return e
+	}
+	return p.capture("final")
+}
+
+func composerProofAtomic(path string, data []byte) error {
+	tmp := path + ".tmp"
+	f, e := os.OpenFile(tmp, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0600)
+	if e != nil {
+		return e
+	}
+	_, e = f.Write(data)
+	ce := f.Close()
+	if e != nil {
+		return e
+	}
+	if ce != nil {
+		return ce
+	}
+	return os.Rename(tmp, path)
+}
+
+// The phase handshake waits only on this proof goroutine, never the UI thread.
+func (p *composerNativeProof) captureOSPhase(phase string) error {
+	if phase != "before" && phase != "seed" && phase != "final" && phase != "undo" {
+		return errors.New("BLOCKED: capture phase")
+	}
+	deadline := time.Now().Add(10 * time.Second)
+	var number uint32
+	var bounds proof.Rect
+	observe := func() error {
+		return p.main(func() error {
+			if _, e := p.fresh("Message"); e != nil {
+				return e
+			}
+			n, r, e := proof.OwnWindowReceipt(p.id)
+			if e != nil {
+				return e
+			}
+			if number != 0 && n != number {
+				return errors.New("BLOCKED: window changed")
+			}
+			number, bounds = n, r
+			return nil
+		})
+	}
+	if e := observe(); e != nil {
+		return e
+	}
+	token := map[string]any{"nonce": p.cfg.Nonce, "pid": p.id.PID, "start_us": p.id.Start, "window_number": number, "phase": phase}
+	publish := func(suffix string, value any) error {
+		raw, e := json.Marshal(value)
+		if e != nil {
+			return e
+		}
+		path := filepath.Join(p.cfg.Out, phase+suffix)
+		temp := path + ".tmp"
+		f, e := os.OpenFile(temp, os.O_WRONLY|os.O_CREATE|os.O_EXCL|unix.O_NOFOLLOW, 0600)
+		if e != nil {
+			return e
+		}
+		defer os.Remove(temp)
+		_, e = f.Write(raw)
+		ce := f.Close()
+		if e != nil {
+			return e
+		}
+		if ce != nil {
+			return ce
+		}
+		return os.Link(temp, path)
+	}
+	waitToken := func(suffix string, ack bool) error {
+		path := filepath.Join(p.cfg.Out, phase+suffix)
+		for time.Now().Before(deadline) {
+			f, e := os.OpenFile(path, os.O_RDONLY|unix.O_NOFOLLOW|unix.O_NONBLOCK, 0)
+			if os.IsNotExist(e) {
+				time.Sleep(10 * time.Millisecond)
+				continue
+			}
+			if e != nil {
+				return e
+			}
+			st, e := f.Stat()
+			if e != nil || !st.Mode().IsRegular() || st.Size() > 4096 {
+				f.Close()
+				return errors.New("BLOCKED: phase artifact")
+			}
+			raw, e := io.ReadAll(io.LimitReader(f, 4097))
+			f.Close()
+			if e != nil {
+				return e
+			}
+			if e := proof.ValidatePhaseToken(raw, proof.PhaseToken{Nonce: p.cfg.Nonce, PID: p.id.PID, Start: p.id.Start, Window: number, Phase: phase}, ack); e != nil {
+				return e
+			}
+			return nil
+		}
+		return errors.New("BLOCKED: phase handshake deadline")
+	}
+	if e := publish(".os-ready.json", token); e != nil {
+		return e
+	}
+	for _, stage := range []string{"before", "after"} {
+		if e := waitToken(".os-"+stage+"-request.json", false); e != nil {
+			return e
+		}
+		if e := observe(); e != nil {
+			return e
+		}
+		receipt := map[string]any{"nonce": p.cfg.Nonce, "pid": p.id.PID, "start_us": p.id.Start, "window_number": number, "phase": phase, "visible": true, "bounds": bounds, "at_unix_ns": time.Now().UnixNano()}
+		if e := publish(".os-"+stage+".json", receipt); e != nil {
+			return e
+		}
+	}
+	if e := waitToken(".os-ack.json", true); e != nil {
+		return e
+	}
+	p.osCapturePhases = append(p.osCapturePhases, phase)
+	return nil
+}

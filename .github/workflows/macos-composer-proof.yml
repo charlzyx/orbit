@@ -1,0 +1,132 @@
+name: One-shot isolated macOS composer proof
+on:
+  push:
+    branches: [redesign/mygo-rpc]
+    paths: [.github/workflows/macos-composer-proof.yml, scripts/macos-composer-probe/**]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: orbit-composer-proof-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  composer-proof:
+    if: github.repository == 'charlzyx/orbit' && github.event_name == 'push' && github.ref == 'refs/heads/redesign/mygo-rpc' && github.event.before == 'ee25813f9a2065ae8632d4c15b24e3c99e7bf469' && github.event.head_commit.message == 'Run isolated macOS composer proof once (2026-10-26)'
+    runs-on: macos-15
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
+      HARNESS_MANIFEST_SHA256: 9d454384302768c796d7bee6a0d5dbe05c7f3dc129d79a3131d4d79e740668e2
+      ORBIT_COMPOSER_WORKFLOW_SOURCE: ${{ github.workspace }}/harness/.github/workflows/macos-composer-proof.yml
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ee25813f9a2065ae8632d4c15b24e3c99e7bf469
+          path: baseline
+          persist-credentials: false
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          path: harness
+          persist-credentials: false
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16
+        with:
+          go-version: '1.27.3'
+          cache: false
+      - name: Fixed installed Xcode and Python; exact harness allowlist
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(uname -s)" = Darwin; test "$(uname -m)" = arm64
+          test "$(xcodebuild -version)" = $'Xcode 16.4\nBuild version 16F6'
+          test "$(xcrun --find swiftc)" = "$DEVELOPER_DIR/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+          xcrun swiftc --version | grep -E '^Apple Swift version 6\.1([. ]|$)'
+          PY="$RUNNER_TOOL_CACHE/Python/3.12.10/arm64/bin/python3"
+          test "$($PY -c 'import platform; print(platform.python_version())')" = 3.12.10
+          mkdir -p "$RUNNER_TEMP/composer-proof/logs" "$RUNNER_TEMP/composer-proof/evidence"
+          printf '%s\n' "$GITHUB_SHA" > "$RUNNER_TEMP/composer-proof/harness-commit.txt"
+          git -C baseline rev-parse HEAD HEAD^{tree} > "$RUNNER_TEMP/composer-proof/baseline-source.txt"
+          git -C harness rev-parse HEAD HEAD^{tree} > "$RUNNER_TEMP/composer-proof/harness-source.txt"
+          xcodebuild -version > "$RUNNER_TEMP/composer-proof/logs/xcode-version.txt"
+          xcrun swiftc --version > "$RUNNER_TEMP/composer-proof/logs/swift-version.txt"
+          shasum -a 256 "$(xcrun --find swiftc)" > "$RUNNER_TEMP/composer-proof/swiftc.sha256"
+          "$PY" harness/scripts/macos-composer-probe/ci_support.py copy-harness "$GITHUB_WORKSPACE/harness/scripts/macos-composer-probe" "$GITHUB_WORKSPACE/baseline/scripts/macos-composer-probe" "$GITHUB_WORKSPACE/harness/scripts/macos-composer-probe/harness-manifest.json" "$HARNESS_MANIFEST_SHA256"
+          "$PY" -m venv "$RUNNER_TEMP/composer-proof/venv"
+          echo "$RUNNER_TEMP/composer-proof/venv/bin" >> "$GITHUB_PATH"
+      - name: Install only hash-pinned official Pillow test dependency
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '%s\n' 'Pillow==12.3.0 --hash=sha256:ffd0c5368496f41b0944be820fcb7a838aa6e623d250b01acf2643939c3f99d7' > "$RUNNER_TEMP/composer-proof/requirements.txt"
+          python -m pip install --disable-pip-version-check --no-deps --only-binary=:all: --require-hashes --index-url https://pypi.org/simple -r "$RUNNER_TEMP/composer-proof/requirements.txt"
+          python -c 'import PIL; assert PIL.__version__ == "12.3.0"; print(PIL.__version__)' > "$RUNNER_TEMP/composer-proof/pillow-version.txt"
+      - name: Offline policy gates, Swift compile and both source builds before input
+        working-directory: baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$RUNNER_TEMP/composer-proof"
+          (cd scripts/macos-composer-probe && python -m unittest discover -v) > "$OUT/logs/python-tests.log" 2>&1
+          go test -race -count=3 -json ./scripts/macos-composer-probe/menuproof > "$OUT/logs/go-policy.jsonl"
+          python scripts/macos-composer-probe/ci_check_gates.py "$OUT/logs/python-tests.log" "$OUT/logs/go-policy.jsonl"
+          xcrun swiftc -swift-version 5 scripts/macos-composer-probe/clipboard_writer.swift -o "$OUT/clipboard-writer" > "$OUT/logs/swift-build.log" 2>&1
+          CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 scripts/go-native.sh build -o "$OUT/baseline-Orbit" ./cmd/orbit > "$OUT/logs/baseline-build.log" 2>&1
+          python scripts/macos-composer-probe/prepare.py --output "$OUT/overlay"
+          GOFLAGS="-overlay=$OUT/overlay/overlay.json" CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 scripts/go-native.sh build -o "$OUT/instrumented-Orbit" ./cmd/orbit > "$OUT/logs/instrumented-build.log" 2>&1
+          CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -o "$OUT/process-proof" ./scripts/macos-composer-probe/process-proof > "$OUT/logs/process-build.log" 2>&1
+          shasum -a 256 "$OUT/baseline-Orbit" "$OUT/instrumented-Orbit" "$OUT/clipboard-writer" "$OUT/process-proof" > "$OUT/binaries.sha256"
+      - name: Fetch exactly two immutable resource artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api repos/charlzyx/orbit/actions/artifacts/12639059961/zip > "$RUNNER_TEMP/composer-proof/resources.zip"
+          gh api repos/charlzyx/orbit/actions/artifacts/12638984059/zip > "$RUNNER_TEMP/composer-proof/smoke.zip"
+      - name: Verify resources; read-only mount and derive clearly instrumented test app
+        working-directory: baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$RUNNER_TEMP/composer-proof"
+          python scripts/macos-composer-probe/ci_support.py extract "$OUT/resources.zip" 25b0b43b2e1c3e6b029e8a730781c9b81007078b1442893d7d6d9c4005212801 "$OUT/resources"
+          python scripts/macos-composer-probe/ci_support.py extract "$OUT/smoke.zip" 449a8ae4359ad4ca3bcece9a22143ce61242079fee9156652a256eae5e7636d7 "$OUT/smoke"
+          python scripts/macos-composer-probe/ci_resource_paths.py "$OUT"
+          mkdir "$OUT/mounted"
+          hdiutil attach -readonly -nobrowse -mountpoint "$OUT/mounted" "$OUT/baseline.dmg"
+          trap 'hdiutil detach "$OUT/mounted" || true' EXIT
+          ditto "$OUT/mounted/Orbit Go Test.app" "$OUT/baseline.app"
+          hdiutil detach "$OUT/mounted"; trap - EXIT
+          python scripts/macos-composer-probe/test_bundle.py --baseline "$OUT/baseline.app" --expected "$OUT/expected-app-arm64.json" --expected-sha256 2d1cf296a34fff329f6ec7e0a9459b620ad038c259aa2c48fbfd40c6834aad77 --binary "$OUT/instrumented-Orbit" --binary-sha256 "$(shasum -a 256 "$OUT/instrumented-Orbit" | awk '{print $1}')" --overlay-manifest "$OUT/overlay/manifest.json" --output "$OUT/derived"
+          codesign -dv --verbose=2 "$OUT/derived/Orbit Composer Proof.app" > "$OUT/logs/signature.txt" 2>&1 || true
+      - name: Exactly four owned-window composer cases, no retry
+        working-directory: baseline
+        env:
+          ORBIT_COMPOSER_DISPOSABLE_RUNNER: '1'
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$RUNNER_TEMP/composer-proof"
+          python scripts/macos-composer-probe/runner.py --execute-native --app "$OUT/derived/Orbit Composer Proof.app" --writer "$OUT/clipboard-writer" --process-proof "$OUT/process-proof" > "$OUT/runner-summary.json"
+      - name: Collect only declared owned evidence, never HOME or stores
+        if: always()
+        working-directory: baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$RUNNER_TEMP/composer-proof"
+          if test -s "$OUT/runner-summary.json"; then python scripts/macos-composer-probe/ci_support.py collect "$OUT/runner-summary.json" "$OUT/evidence"; fi
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: isolated-composer-proof-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/composer-proof/evidence/
+            ${{ runner.temp }}/composer-proof/logs/
+            ${{ runner.temp }}/composer-proof/*.json
+            ${{ runner.temp }}/composer-proof/*.txt
+            ${{ runner.temp }}/composer-proof/*.sha256
+            ${{ runner.temp }}/composer-proof/overlay/
+            ${{ runner.temp }}/composer-proof/derived/test-bundle-manifest.json
+          if-no-files-found: warn
+          retention-days: 14

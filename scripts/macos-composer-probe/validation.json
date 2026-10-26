@@ -1,0 +1,399 @@
+{
+  "compiled_sha256": {
+    "/tmp/orbit-native-composer-final-1512.arm64": "4b747718e1996312aa884b775915c52fdfa5d5f6be75568273c664c83e650397",
+    "/tmp/orbit-native-process-proof-final-1512.arm64": "81b2fb00a845a3d870303fdce17fc7df6d004abf48f09556534280934decb6ec"
+  },
+  "darwin_overlay_compile_exit": 0,
+  "darwin_process_proof_compile_exit": 0,
+  "darwin_vet_exit": 0,
+  "delta_logs": {
+    "darwin_compile": "/tmp/orbit-native-composer-delta-compile-1449.log",
+    "darwin_vet": "/tmp/orbit-native-composer-delta-vet-1449.log",
+    "policy": "/tmp/orbit-native-composer-delta-policy-1443.jsonl",
+    "python": "/tmp/orbit-native-composer-delta-python-1449.log"
+  },
+  "files": {
+    "scripts/macos-composer-probe/MYGO-MIT-LICENSE": "f0b56f4ab53beb6e18c5e155219c2e2b6000b5475c0ae3ddb3af3894fd9349b4",
+    "scripts/macos-composer-probe/README.clipboard-writer.md": "7fa1f6ed937873e762af02eb8a840fbfa60289b53011306eca2c44969cbf4824",
+    "scripts/macos-composer-probe/README.md": "021dedf01a25b1a034916596544671ecebb18529ed3c0cd4d1c4d569476440ca",
+    "scripts/macos-composer-probe/README.window-capture.md": "495c0e3c160914f0aaaa93550352c61b988d401a708fe2394eeb243bf5db10e8",
+    "scripts/macos-composer-probe/ci_check_gates.py": "099f81a89ceefadbfc9571d62fccb0ba83767480c329ce5853dc188623346c31",
+    "scripts/macos-composer-probe/ci_resource_paths.py": "f3d2bdc1282477851d6571c01430781987a5c2c07888333e879d222dce096300",
+    "scripts/macos-composer-probe/ci_support.py": "98cdf0f2870969c6dd64f7db6d5850116a524f4c3e56f00273c0388b98adf21e",
+    "scripts/macos-composer-probe/clipboard_writer.swift": "6d69752a458af2df941a0f253df4a02b561071274116091998c29fe6654996bd",
+    "scripts/macos-composer-probe/composer_probe_darwin.go.txt": "3c15a9aeb4ced4bb576c779c5edcf45a742324e53357df5e390e606aaa704446",
+    "scripts/macos-composer-probe/menuproof/README.md": "7f961a723acc5d6cf27c44786a1d22f532b2c81c116862978a83671e9fcd3f99",
+    "scripts/macos-composer-probe/menuproof/input_darwin.go": "2b2dafa7a4fd2546ac786265623baec7b075ed83f26bd9c3e8492fcedf97e66a",
+    "scripts/macos-composer-probe/menuproof/observer_darwin.go": "156ba49eca75b309e0332f13d475a589f29a95d46b9968972e62721434b33797",
+    "scripts/macos-composer-probe/menuproof/pair.go": "e03d68da84671c16c5a2e31f52cc8a4007e228789f107bf67b0f670d627e0fce",
+    "scripts/macos-composer-probe/menuproof/pair_test.go": "9b3d1717df4a7912c3ccea4d6521da3402b82df4363bcbff2c2618b49a3045f8",
+    "scripts/macos-composer-probe/menuproof/phase.go": "4f5468a40190f8b1ab0d98892574b3c549a2306fe694e380b99ec8cbef97af10",
+    "scripts/macos-composer-probe/menuproof/phase_test.go": "ae944878c22649127c955c7bccf83c314c6985f30ad6151130f6d14f4cf1b424",
+    "scripts/macos-composer-probe/menuproof/policy.go": "53e5b1962252d9c2f78fe452c8575bc8fa7d2705d5591695b9ecf5f5a8a752bc",
+    "scripts/macos-composer-probe/menuproof/policy_test.go": "a3124105a9cb46fc926411b5480f95b0633baac0189b1c3d6f4d7e3b14d34b61",
+    "scripts/macos-composer-probe/menuproof/process_darwin.go": "475a56125678b0d9f93961b13b2ddf4dabd3ae71908cb7edd95fef9fa74616ee",
+    "scripts/macos-composer-probe/menuproof/window_darwin.go": "3c6aeeab72ca1e24ee7836e78e2be8c327b0d99e27867fbcdcedd33b757f2764",
+    "scripts/macos-composer-probe/prepare.py": "51f5bba38ce7ecb9f45a920dcb93d87e5e02109a0437727bdabcf711bf97cf42",
+    "scripts/macos-composer-probe/process-proof/main_darwin.go": "734114e8be96eebcd606cf08dac95f1eaf8b7b87dcb9417a4284182dd69f3cfe",
+    "scripts/macos-composer-probe/runner.py": "d2591862905bb5fbd39eea78f827cfd25769dc6ebf802625928f125301b1adbc",
+    "scripts/macos-composer-probe/test_bundle.py": "2adb7f15c6d935727c348a83bd0c5b85e511faa74241db8e0c6f162dcfb5fecb",
+    "scripts/macos-composer-probe/test_bundle_contract.py": "80991dc471010d8ed49a01264dc0e8ab0d6faa8b542ae4b4c05e8c110ffe57a8",
+    "scripts/macos-composer-probe/test_ci_policy.py": "6f81ba47b9ad4618c39dba8f3a232f4b97411a2901d356eca7a8889b4757dbe2",
+    "scripts/macos-composer-probe/test_ci_support.py": "c3b5ce453104ff6b7ccd17e1f15f7ffe54d85981f1b69ac68814947d455a0496",
+    "scripts/macos-composer-probe/test_phase_handshake.py": "894f4e9d41ec9504edc1a4feb50e11c708d46c61b708af469f9883058f463df8",
+    "scripts/macos-composer-probe/test_prepare.py": "31064a3b866ecb466ca14bc15ca01e64b144b51dcb740bd1da6bbd6b768b3d80",
+    "scripts/macos-composer-probe/test_runner.py": "076e65ef3de9573f54288a4f9d96c3686284674f62f2a98ef86a69ddc65e6f82",
+    "scripts/macos-composer-probe/test_window_capture.py": "17ee645ba8738b5e1f71ccc22a579064025c119c171fc91333726c40721856c4",
+    "scripts/macos-composer-probe/test_writer_contract.py": "e5400657d6ef832e7565a73119fde7794d4d1218c9de64269edda4a47b6a9fd7",
+    "scripts/macos-composer-probe/window_capture.py": "e398eab0b481a215c6fa17323c33631be8fda3d76d030e2634499ec32ceddb5f",
+    "scripts/macos-composer-probe/writer_contract.py": "37ec42b21e301b7b66df22b32308772fce6049536911bfa109761d3a47b10ce7"
+  },
+  "final_logs": {
+    "darwin_overlay": "/tmp/orbit-native-composer-final-1512-build.log",
+    "darwin_process_window": "/tmp/orbit-native-composer-final-1512-process.log",
+    "darwin_vet": "/tmp/orbit-native-composer-final-1512-vet.log",
+    "go_policy": "/tmp/orbit-native-composer-final-1512-policy.jsonl",
+    "python": "/tmp/orbit-composer-ci-final-1529.log"
+  },
+  "go_policy_counts": {
+    "TestClosedBeforeBeginCannotRearmOrAuthorizeEscape": {
+      "output": 6,
+      "pass": 3,
+      "run": 3
+    },
+    "TestMenuActionDuplicateWrongEndAndCloseFailClosed": {
+      "output": 6,
+      "pass": 3,
+      "run": 3
+    },
+    "TestMenuActionDuplicateWrongEndAndCloseFailClosed/action": {
+      "output": 6,
+      "pass": 3,
+      "run": 3
+    },
+    "TestMenuActionDuplicateWrongEndAndCloseFailClosed/close": {
+      "output": 6,
+      "pass": 3,
+      "run": 3
+    },
+    "TestMenuActionDuplicateWrongEndAndCloseFailClosed/duplicate": {
+      "output": 6,
+      "pass": 3,
+      "run": 3
+    },
+    "TestMenuActionDuplicateWrongEndAndCloseFailClosed/wrong-end": {
+      "output": 6,
+      "pass": 3,
+      "run": 3
+    },
+    "TestMenuExactSingleEscapeAndEnd": {
+      "output": 6,
+      "pass": 3,
+      "run": 3
+    },
+    "TestMenuRejectsAmbiguousInvalidStaleOwnership": {
+      "output": 6,
+      "pass": 3,
+      "run": 3
+    },
+    "TestMenuRejectsAmbiguousInvalidStaleOwnership/duplicate-target": {
+      "output": 6,
+      "pass": 3,
+      "run": 3
+    },
+    "TestMenuRejectsAmbiguousInvalidStaleOwnership/early": {
+      "output": 6,
+      "pass": 3,
+      "run": 3
+    },
+    "TestMenuRejectsAmbiguousInvalidStaleOwnership/expired-arm": {
+      "output": 6,
+      "pass": 3,
+      "run": 3
+    },
+    "TestMenuRejectsAmbiguousInvalidStaleOwnership/hidden": {
+      "output": 6,
+      "pass": 3,
+      "run": 3
+    },
+    "TestMenuRejectsAmbiguousInvalidStaleOwnership/inf": {
+      "output": 6,
+      "pass": 3,
+      "run": 3
+    },
+    "TestMenuRejectsAmbiguousInvalidStaleOwnership/labels": {
+      "output": 6,
+      "pass": 3,
+      "run": 3
+    },
+    "TestMenuRejectsAmbiguousInvalidStaleOwnership/late": {
+      "output": 6,
+      "pass": 3,
+      "run": 3
+    },
+    "TestMenuRejectsAmbiguousInvalidStaleOwnership/long-deadline": {
+      "output": 6,
+      "pass": 3,
+      "run": 3
+    },
+    "TestMenuRejectsAmbiguousInvalidStaleOwnership/nan": {
+      "output": 6,
+      "pass": 3,
+      "run": 3
+    },
+    "TestMenuRejectsAmbiguousInvalidStaleOwnership/not-key": {
+      "output": 6,
+      "pass": 3,
+      "run": 3
+    },
+    "TestMenuRejectsAmbiguousInvalidStaleOwnership/outside": {
+      "output": 6,
+      "pass": 3,
+      "run": 3
+    },
+    "TestMenuRejectsAmbiguousInvalidStaleOwnership/pid": {
+      "output": 6,
+      "pass": 3,
+      "run": 3
+    },
+    "TestMenuRejectsAmbiguousInvalidStaleOwnership/start": {
+      "output": 6,
+      "pass": 3,
+      "run": 3
+    },
+    "TestMenuRejectsAmbiguousInvalidStaleOwnership/window": {
+      "output": 6,
+      "pass": 3,
+      "run": 3
+    },
+    "TestMenuRejectsAmbiguousInvalidStaleOwnership/zero-menu": {
+      "output": 6,
+      "pass": 3,
+      "run": 3
+    },
+    "TestMenuRejectsAmbiguousInvalidStaleOwnership/zero-pid": {
+      "output": 6,
+      "pass": 3,
+      "run": 3
+    },
+    "TestMenuRejectsAmbiguousInvalidStaleOwnership/zero-start": {
+      "output": 6,
+      "pass": 3,
+      "run": 3
+    },
+    "TestMenuRejectsAmbiguousInvalidStaleOwnership/zero-window": {
+      "output": 6,
+      "pass": 3,
+      "run": 3
+    },
+    "TestMenuRequiresClickReceiptAndRejectsOtherPopupFirst": {
+      "output": 6,
+      "pass": 3,
+      "run": 3
+    },
+    "TestNativePairConstructionFailurePostsNothing": {
+      "output": 6,
+      "pass": 3,
+      "run": 3
+    },
+    "TestNativePairSuccessPostsTwoInOrderThenReceipt": {
+      "output": 6,
+      "pass": 3,
+      "run": 3
+    },
+    "TestPhaseTokenExactRequestsAndAcknowledgment": {
+      "output": 6,
+      "pass": 3,
+      "run": 3
+    },
+    "TestPhaseTokenForeignMalformedDuplicateAndFailureRejected": {
+      "output": 6,
+      "pass": 3,
+      "run": 3
+    }
+  },
+  "historical_failed_logs": [
+    "/tmp/orbit-window-capture-pillow-diagnostic/tests.log",
+    "/tmp/orbit-native-composer-final-1512-python.log",
+    "/tmp/orbit-composer-ci-offline-1527.log",
+    "/tmp/orbit-composer-ci-offline-final2-1528.log"
+  ],
+  "hosted_workflow": "NOT_WIRED / NOT_RUN",
+  "logs": {
+    "darwin_vet": "/tmp/orbit-native-composer-darwin-vet-final-1434.log",
+    "overlay_compile": "/tmp/orbit-native-composer-compile-final-1434.log",
+    "policy": "/tmp/orbit-native-composer-policy-final-1434.jsonl",
+    "process_compile": "/tmp/orbit-native-process-proof-final-1434.log",
+    "python": "/tmp/orbit-native-composer-python-final-1435.log"
+  },
+  "native_execution": "NOT_RUN",
+  "normal_base_CI": "attempt1 reference OCR timeout retained; lead reports attempt2 single retry pending",
+  "pillow_version": "12.3.0",
+  "previous_frozen_patch_sha256": "b33bc1f9ef7ef4142d03e6ecde818fcca7658af369a7890f04be8d62400411fb",
+  "python_count": 102,
+  "python_exact_names": [
+    "test_bundle_contract.TestBundleDerivation.test_baseline_tamper_refused",
+    "test_bundle_contract.TestBundleDerivation.test_existing_output_refused",
+    "test_bundle_contract.TestBundleDerivation.test_independent_manifest_mismatch_refused",
+    "test_bundle_contract.TestBundleDerivation.test_only_binary_changed_original_retained",
+    "test_bundle_contract.TestBundleDerivation.test_wrong_base_refused",
+    "test_bundle_contract.TestBundleDerivation.test_wrong_instrumented_hash_refused",
+    "test_prepare.PrepareTests.test_dirty_production_no_output",
+    "test_prepare.PrepareTests.test_exact_overlay_preserves_original_and_only_two_anchors",
+    "test_prepare.PrepareTests.test_existing_or_relative_output_refused",
+    "test_prepare.PrepareTests.test_missing_or_duplicate_anchor_no_output",
+    "test_prepare.PrepareTests.test_real_helper_shadow_refused",
+    "test_prepare.PrepareTests.test_untracked_production_refused",
+    "test_prepare.PrepareTests.test_wrong_base_no_output",
+    "test_runner.RunnerContractTests.test_AX_freshness_clip_unique_owner_negative",
+    "test_runner.RunnerContractTests.test_capture_exact_phases_and_fixed_paths",
+    "test_runner.RunnerContractTests.test_capture_local_file_rejects_symlink_fifo_and_oversize",
+    "test_runner.RunnerContractTests.test_capture_refuses_phases_paths_hash_bytes_and_times",
+    "test_runner.RunnerContractTests.test_capture_refuses_png_header_or_dimensions",
+    "test_runner.RunnerContractTests.test_event_and_state_timing_identity_negative",
+    "test_runner.RunnerContractTests.test_exact_four_cases_and_no_native_claim",
+    "test_runner.RunnerContractTests.test_four_behavior_oracles_still_not_native_evidence",
+    "test_runner.RunnerContractTests.test_identity_timeout_never_signals_unverified_process",
+    "test_runner.RunnerContractTests.test_incomplete_native_finalization_refused",
+    "test_runner.RunnerContractTests.test_invalid_admission",
+    "test_runner.RunnerContractTests.test_json_reject_duplicate_and_nonfinite",
+    "test_runner.RunnerContractTests.test_menu_must_open_close_no_action_one_escape",
+    "test_runner.RunnerContractTests.test_missing_independent_observation",
+    "test_runner.RunnerContractTests.test_missing_repeated_and_forbidden_actions",
+    "test_runner.RunnerContractTests.test_mocked_native_handshake_launch_and_cleanup",
+    "test_runner.RunnerContractTests.test_native_admission_never_spawns_on_wrong_platform_or_gate",
+    "test_runner.RunnerContractTests.test_native_matrix_stops_on_first_failure_no_retry",
+    "test_runner.RunnerContractTests.test_native_unimplemented_not_fallback",
+    "test_runner.RunnerContractTests.test_optional_before_state_strict_and_only_first",
+    "test_runner.RunnerContractTests.test_pid_reuse_refused",
+    "test_runner.RunnerContractTests.test_private_artifact_rejects_symlink_fifo_oversized",
+    "test_runner.RunnerContractTests.test_process_preexisting_wrong_path_noncanonical",
+    "test_runner.RunnerContractTests.test_report_cannot_claim_other_process",
+    "test_runner.RunnerContractTests.test_report_stale_future_or_oversized",
+    "test_runner.RunnerContractTests.test_state_semantic_negative_cases",
+    "test_runner.RunnerContractTests.test_terminate_requires_fresh_same_process_inspection",
+    "test_runner.RunnerContractTests.test_valid_envelope_never_native_pass",
+    "test_runner.RunnerContractTests.test_writer_reject_partial_multiple_oversized_or_menu",
+    "test_runner.RunnerContractTests.test_writer_valid_lines",
+    "test_writer_contract.WriterContractTests.test_all_modes",
+    "test_writer_contract.WriterContractTests.test_cleanup_owned_generation_only",
+    "test_writer_contract.WriterContractTests.test_mock_process_cleanup",
+    "test_writer_contract.WriterContractTests.test_negative_has_no_image",
+    "test_writer_contract.WriterContractTests.test_no_cleanup_with_forged_generation_path_or_token",
+    "test_writer_contract.WriterContractTests.test_reject_metadata_tampering",
+    "test_writer_contract.WriterContractTests.test_reject_unknown_modes",
+    "test_writer_contract.WriterContractTests.test_swift_bounded_surface",
+    "test_writer_contract.WriterContractTests.test_swift_embedded_encoded_hashes_and_pixels",
+    "test_writer_contract.WriterContractTests.test_tiff_never_png",
+    "test_writer_contract.WriterContractTests.test_wrong_raster_rejected"
+  ],
+  "python_tests": [
+    "test_bundle_contract.TestBundleDerivation.test_baseline_tamper_refused",
+    "test_bundle_contract.TestBundleDerivation.test_existing_output_refused",
+    "test_bundle_contract.TestBundleDerivation.test_independent_manifest_mismatch_refused",
+    "test_bundle_contract.TestBundleDerivation.test_only_binary_changed_original_retained",
+    "test_bundle_contract.TestBundleDerivation.test_wrong_base_refused",
+    "test_bundle_contract.TestBundleDerivation.test_wrong_instrumented_hash_refused",
+    "test_ci_policy.CIPolicyTests.test_actual_workflow_predicate_event_matrix",
+    "test_ci_policy.CIPolicyTests.test_complete_exact_gate_and_missing_skip_refused",
+    "test_ci_policy.CIPolicyTests.test_resource_missing_duplicate_wrong_hash_refused",
+    "test_ci_policy.CIPolicyTests.test_workflow_scope_and_failclosed_chain",
+    "test_ci_support.CISupportTests.test_archive_hash_traversal_symlink_duplicate_refused",
+    "test_ci_support.CISupportTests.test_collect_refuses_arbitrary_or_excess_cases",
+    "test_ci_support.CISupportTests.test_exact_archive_extract",
+    "test_ci_support.CISupportTests.test_exact_harness_copy_and_extra_hash_rejection",
+    "test_phase_handshake.PhaseHandshakeTests.test_capture_failure_no_ack_no_retry_or_later_phase",
+    "test_phase_handshake.PhaseHandshakeTests.test_exact_phases_requests_proofs_ack",
+    "test_phase_handshake.PhaseHandshakeTests.test_foreign_or_wrong_phase_no_capture_or_ack",
+    "test_phase_handshake.PhaseHandshakeTests.test_missing_ready_stops_without_input_or_ack",
+    "test_phase_handshake.PhaseHandshakeTests.test_unknown_mode_refused",
+    "test_phase_handshake.PhaseHandshakeTests.test_window_number_changed_between_phases_no_later_capture",
+    "test_prepare.PrepareTests.test_dirty_production_no_output",
+    "test_prepare.PrepareTests.test_exact_overlay_preserves_original_and_only_two_anchors",
+    "test_prepare.PrepareTests.test_existing_or_relative_output_refused",
+    "test_prepare.PrepareTests.test_missing_or_duplicate_anchor_no_output",
+    "test_prepare.PrepareTests.test_real_helper_shadow_refused",
+    "test_prepare.PrepareTests.test_untracked_production_refused",
+    "test_prepare.PrepareTests.test_wrong_base_no_output",
+    "test_runner.RunnerContractTests.test_AX_freshness_clip_unique_owner_negative",
+    "test_runner.RunnerContractTests.test_capture_exact_phases_and_fixed_paths",
+    "test_runner.RunnerContractTests.test_capture_local_file_rejects_symlink_fifo_and_oversize",
+    "test_runner.RunnerContractTests.test_capture_refuses_phases_paths_hash_bytes_and_times",
+    "test_runner.RunnerContractTests.test_capture_refuses_png_header_or_dimensions",
+    "test_runner.RunnerContractTests.test_event_and_state_timing_identity_negative",
+    "test_runner.RunnerContractTests.test_exact_four_cases_and_no_native_claim",
+    "test_runner.RunnerContractTests.test_four_behavior_oracles_still_not_native_evidence",
+    "test_runner.RunnerContractTests.test_identity_timeout_never_signals_unverified_process",
+    "test_runner.RunnerContractTests.test_incomplete_native_finalization_refused",
+    "test_runner.RunnerContractTests.test_invalid_admission",
+    "test_runner.RunnerContractTests.test_json_reject_duplicate_and_nonfinite",
+    "test_runner.RunnerContractTests.test_menu_must_open_close_no_action_one_escape",
+    "test_runner.RunnerContractTests.test_missing_independent_observation",
+    "test_runner.RunnerContractTests.test_missing_repeated_and_forbidden_actions",
+    "test_runner.RunnerContractTests.test_mocked_native_handshake_launch_and_cleanup",
+    "test_runner.RunnerContractTests.test_native_admission_never_spawns_on_wrong_platform_or_gate",
+    "test_runner.RunnerContractTests.test_native_matrix_stops_on_first_failure_no_retry",
+    "test_runner.RunnerContractTests.test_native_unimplemented_not_fallback",
+    "test_runner.RunnerContractTests.test_optional_before_state_strict_and_only_first",
+    "test_runner.RunnerContractTests.test_pid_reuse_refused",
+    "test_runner.RunnerContractTests.test_private_artifact_rejects_symlink_fifo_oversized",
+    "test_runner.RunnerContractTests.test_process_preexisting_wrong_path_noncanonical",
+    "test_runner.RunnerContractTests.test_report_cannot_claim_other_process",
+    "test_runner.RunnerContractTests.test_report_stale_future_or_oversized",
+    "test_runner.RunnerContractTests.test_state_semantic_negative_cases",
+    "test_runner.RunnerContractTests.test_terminate_requires_fresh_same_process_inspection",
+    "test_runner.RunnerContractTests.test_valid_envelope_never_native_pass",
+    "test_runner.RunnerContractTests.test_writer_reject_partial_multiple_oversized_or_menu",
+    "test_runner.RunnerContractTests.test_writer_valid_lines",
+    "test_window_capture.WindowCaptureTests.test_adam7_explicitly_unsupported_real_file",
+    "test_window_capture.WindowCaptureTests.test_bounded_inflate_loop_across_output_and_idat_boundaries",
+    "test_window_capture.WindowCaptureTests.test_changed_each_source_or_size_refused",
+    "test_window_capture.WindowCaptureTests.test_command_failure_no_retry_no_fallback",
+    "test_window_capture.WindowCaptureTests.test_coordinate_boundary_no_cross_source_y_comparison",
+    "test_window_capture.WindowCaptureTests.test_decoder_pixel_budget_checked_before_import",
+    "test_window_capture.WindowCaptureTests.test_direct_child_terminated_and_reaped_after_failure",
+    "test_window_capture.WindowCaptureTests.test_direct_child_unreaped_is_blocked_with_owned_pid_no_sigkill",
+    "test_window_capture.WindowCaptureTests.test_empty_symlink_and_non_png_artifacts_refused",
+    "test_window_capture.WindowCaptureTests.test_expired_deadline_never_capture",
+    "test_window_capture.WindowCaptureTests.test_external_verifier_exact_command_bounded_output",
+    "test_window_capture.WindowCaptureTests.test_illegal_depth_color_real_file_refused",
+    "test_window_capture.WindowCaptureTests.test_independent_proof_wrong_process_window_permission_refused",
+    "test_window_capture.WindowCaptureTests.test_inflated_output_budget_before_decompression",
+    "test_window_capture.WindowCaptureTests.test_json_empty_duplicate_malformed_nonfinite_refused",
+    "test_window_capture.WindowCaptureTests.test_mocked_exact_single_window_command_before_after_proof",
+    "test_window_capture.WindowCaptureTests.test_no_native_calls_without_admission",
+    "test_window_capture.WindowCaptureTests.test_nonfinite_zero_negative_or_excessive_bounds",
+    "test_window_capture.WindowCaptureTests.test_output_fixed_private_path_and_existing_refusal",
+    "test_window_capture.WindowCaptureTests.test_owner_nonce_phase_and_stale_receipts_refused",
+    "test_window_capture.WindowCaptureTests.test_permission_or_proof_failure_never_capture",
+    "test_window_capture.WindowCaptureTests.test_png_bad_crc_real_file_refused",
+    "test_window_capture.WindowCaptureTests.test_png_chunk_limit_real_file_refused",
+    "test_window_capture.WindowCaptureTests.test_png_complete_real_file_accepted",
+    "test_window_capture.WindowCaptureTests.test_png_decoder_unavailable_or_truncated_mode_blocked",
+    "test_window_capture.WindowCaptureTests.test_png_good_crc_invalid_compression_real_file_refused",
+    "test_window_capture.WindowCaptureTests.test_png_good_crc_invalid_filter_real_file_refused",
+    "test_window_capture.WindowCaptureTests.test_png_good_crc_truncated_pixel_stream_real_file_refused",
+    "test_window_capture.WindowCaptureTests.test_png_header_only_real_file_refused",
+    "test_window_capture.WindowCaptureTests.test_png_missing_nonterminal_or_nonempty_iend_real_file_refused",
+    "test_window_capture.WindowCaptureTests.test_png_missing_or_empty_idat_real_file_refused",
+    "test_window_capture.WindowCaptureTests.test_png_truncated_real_file_refused",
+    "test_window_capture.WindowCaptureTests.test_valid_palette_lowbit_and_16bit_real_files",
+    "test_window_capture.WindowCaptureTests.test_zlib_excess_extra_stream_and_truncated_real_files",
+    "test_writer_contract.WriterContractTests.test_all_modes",
+    "test_writer_contract.WriterContractTests.test_cleanup_owned_generation_only",
+    "test_writer_contract.WriterContractTests.test_mock_process_cleanup",
+    "test_writer_contract.WriterContractTests.test_negative_has_no_image",
+    "test_writer_contract.WriterContractTests.test_no_cleanup_with_forged_generation_path_or_token",
+    "test_writer_contract.WriterContractTests.test_reject_metadata_tampering",
+    "test_writer_contract.WriterContractTests.test_reject_unknown_modes",
+    "test_writer_contract.WriterContractTests.test_swift_bounded_surface",
+    "test_writer_contract.WriterContractTests.test_swift_embedded_encoded_hashes_and_pixels",
+    "test_writer_contract.WriterContractTests.test_tiff_never_png",
+    "test_writer_contract.WriterContractTests.test_wrong_raster_rejected"
+  ],
+  "revision": "one-shot workflow candidate; NEVER_EXECUTED",
+  "source_commit": "ee25813f9a2065ae8632d4c15b24e3c99e7bf469",
+  "source_tree": "0476116687acf0838d52a0246210270000530530",
+  "swift_compile": "NOT_COMPILED (Linux, Swift unavailable)",
+  "workflow": "CANDIDATE_ONLY_NOT_PUBLISHED_NOT_EXECUTED"
+}
