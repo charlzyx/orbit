@@ -1,0 +1,108 @@
+{
+  "base": "cee007d9309815489bfaa11529fa3047a2b612f8",
+  "recovered_attachments_tree": "5f4b4838a41e52c7346ee0980f156ef9c7099f04",
+  "status": "new reconstructed source, scoped final race and vet PASS; no full/native gate",
+  "expected_top_level": [
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAttachmentPreviewRejectsUnsafeConfigBeforeDecode"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAttachmentPreviewExactThresholdUsesDecoderWithoutAllocatingPixels"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAttachmentPreviewOversizedHeaderPreservesPayloadWithoutPixelDecode"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAttachmentPreviewSmallFormatsPreserveWirePayload"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAttachmentPreviewUnsupportedAndInvalidKeepRaw"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerNativeTurnNavigation"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerTurnNavigationPreservesDraftSelectionUndo"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerTurnNavigationIMEAndPlainArrowNegativeControls"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestTurnNavigationOutsideComposerUsesGlobalShortcut"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerTurnNavigationAutocompletePrecedence"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/attachments",
+      "TestAuditOversizedPNGPreparePreservesRawHeader"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/attachments",
+      "TestDecodeDimensionsAllowedBoundaryAndOverflow"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestIMECompositionDoesNotSubmit"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestNativeComposerCompletionPrecedesSendAndAbort"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAttachmentPathsNativeCaretSelectionUndo"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAttachmentClipboardSVGAndTIFFRemainPassThrough"
+    ]
+  ],
+  "each_run_pass": 3,
+  "actual_run_events": 99,
+  "actual_pass_events": 99,
+  "skip": 0,
+  "fail": 0,
+  "packages": [
+    {
+      "Time": "2026-10-26T12:46:19.08484744+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/attachments",
+      "Elapsed": 1.013
+    },
+    {
+      "Time": "2026-10-26T12:46:37.859724842+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Elapsed": 19.788
+    }
+  ],
+  "source_hashes": {
+    "internal/ui/attachment_ingress.go": "94e28dae383c3e126fab0b34655ac5b9d9a5f562c6983ac02720b9126374c099",
+    "internal/ui/attachment_preview.go": "6ec07daba8eb3d531dba036ce7c87c8f78c20be3c429f3f89886aea1edb3d40b",
+    "internal/ui/attachment_preview_test.go": "2638b6de8d527fe5f400372156a5fe4cfc8f77c01a92f1bb4930bed76c55f760",
+    "internal/ui/attachment_preview_payload_test.go": "72f27e90ff6afa1743116a47926f9509f0f2e53946d0ef4bf2579d831160393c",
+    "internal/ui/chat.go": "35c5daea4aa42858c510730b99b82623b7c2e9b24b924da761e4fa4ceb44681b",
+    "internal/ui/composer_navigation_test.go": "29d34fadf7172db4d51f014169cd0322e13328fb03fe286e1b30b563449177e9",
+    "internal/attachments/image.go": "59c2a27c07a0d9bf0c54324c34375058d6e5b834c6ab3ec0f010e2a3224103fc",
+    "internal/attachments/decode_limits_test.go": "ac39944079d708c7cfe9b6e884749a1307851bd79fbb12803e9b06c011528454",
+    "internal/attachments/decode_boundary_audit_test.go": "98bd89e38b727bd66f6db07969bb2613708eb4ab446b5da9c4cf030f56163d89"
+  },
+  "log_hashes": {
+    "/tmp/orbit-recovery-nav-red-0343.jsonl": "feda37d39d79d3292448ddf1a2913dd8b28ff7e0273831c872b426950093b314",
+    "/tmp/orbit-recovery-preview-seam-red-0345.jsonl": "9028a3b094641c2e8f2a9ff9077ad2dc028bc377530cf1d07cd8b7c03cb40f20",
+    "/tmp/orbit-recovery-nav-preview-final-0346.jsonl": "6b267dd5f62315bec8fe9c79e737020b099fce7c47b5d472c1620f15efde9de9",
+    "/tmp/orbit-recovery-nav-preview-vet-0346.log": "9da2d27b7ee72dd6c6d7e2ae1b7563cfb188c722afb006b10f70efacf395b90a"
+  },
+  "negative_controls": "native key baseline row21!=20; guard-disabled fake decoder five invalid configs fail; production restored, no giant decode"
+}

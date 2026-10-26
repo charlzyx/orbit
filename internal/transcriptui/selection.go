@@ -29,27 +29,50 @@ func SelectionData(parts []ui.SelectedText) transfer.Data {
 	return transfer.TextData(SelectionText(parts))
 }
 
+type selectionMenuIntent struct {
+	host               uint64
+	message, selection string
+}
+type selectionMenuIntentKey struct{}
+
 // SelectionMenu supplies the pinned source's Copy Selection / Copy Message
 // menu. Pass the shared Selectable ancestor and the currently hit message's
 // answer text, not a different nested selection container. The host identifies
 // the hovered logical row; the selected range may span several rows.
 func SelectionMenu(c *ui.Context, scope ui.Element, messageText string, o Options) {
+	// Local lifetime is the actual owner-keyed selectable/menu host. Retiring
+	// that host retires its sole intent; each new open replaces these strings.
+	intent := ui.Local(scope, selectionMenuIntentKey{}, func() selectionMenuIntent { return selectionMenuIntent{} })
+	copyText := func(text string) {
+		if o.Copy != nil {
+			o.Copy(text)
+		} else {
+			c.WriteClipboard(text)
+		}
+	}
 	scope.CopyData(SelectionData).ContextMenu(func(m *ui.Menu) {
-		selected := SelectionText(scope.SelectedTexts())
-		if m.Item(o.tr("transcript.copy_selection", "Copy Selection")).Disabled(selected == "").Chosen() {
-			if o.Copy != nil {
-				o.Copy(selected)
-			} else {
-				c.WriteClipboard(selected)
+		// Keep indices and labels fixed across the public collect/Chosen phases.
+		selected := m.Item(o.tr("transcript.copy_selection", "Copy Selection"))
+		message := m.Item(o.tr("transcript.copy_message", "Copy Message"))
+		if selected.Chosen() {
+			if intent.host == scope.ID() && intent.selection != "" {
+				copyText(intent.selection)
 			}
+			*intent = selectionMenuIntent{}
+			return
 		}
-		if m.Item(o.tr("transcript.copy_message", "Copy Message")).Disabled(messageText == "").Chosen() {
-			if o.Copy != nil {
-				o.Copy(messageText)
-			} else {
-				c.WriteClipboard(messageText)
+		if message.Chosen() {
+			if intent.host == scope.ID() && intent.message != "" {
+				copyText(intent.message)
 			}
+			*intent = selectionMenuIntent{}
+			return
 		}
+		// ContextMenu calls the builder only to collect a newly opened menu or
+		// replay a chosen item. No chosen item means this is the opening payload.
+		*intent = selectionMenuIntent{host: scope.ID(), message: messageText, selection: SelectionText(scope.SelectedTexts())}
+		selected.Disabled(intent.selection == "")
+		message.Disabled(intent.message == "")
 	})
 }
 

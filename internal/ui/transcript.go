@@ -50,6 +50,7 @@ func messageSearchText(m Message) string {
 	return m.Text + "\n" + m.Thinking + "\n" + m.ToolOutput
 }
 func (a *App) transcriptOptions(c *ui.Context) transcriptui.Options {
+	owner := a.inlineImageToken()
 	t := a.Theme
 	latest := a.Model.LatestTurn
 	colors := transcriptui.Colors{Text: t.Text, Muted: t.TextMuted, Accent: t.AccentText, Border: t.Border, Surface: t.Surface, Code: t.CodeBg, Error: t.Error, Warning: t.Warning, Success: t.Success, Selection: t.Selection, Syntax: map[highlight.Class]ui.Color{}}
@@ -61,7 +62,11 @@ func (a *App) transcriptOptions(c *ui.Context) transcriptui.Options {
 		Markdown: func(c *ui.Context, text string, streaming bool) {
 			a.chatMarkdown(c, text, streaming)
 		},
-		Copy: func(text string) { c.Services().WriteClipboard(text) }, Review: func() { a.OpenTurnReview(latest) },
+		Copy: func(text string) {
+			if a.ownsInlineImage(owner) {
+				c.Services().WriteClipboard(text)
+			}
+		}, Review: func() { a.OpenTurnReview(latest) },
 	}
 }
 func (a *App) logicalMessage(c *ui.Context, m Message) {

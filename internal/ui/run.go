@@ -178,6 +178,9 @@ func NewController(o RunOptions) (*Controller, error) {
 			return nil
 		}))
 	}, OnChange: invalidate, OpenWorkspace: x.SetWorkspace, OpenTerminal: func(path string) { x.Terminal.SetWorkspace(path); x.UI.save(x.Terminal.NewTab()) }, RevealPath: native.RevealPath, ConfigPath: filepath.Join(s.RootDir, "worktrees.json")})
+	x.UI.Options.CaptureWorkflowTarget = func(runtimeID, sessionID, path, workspace string) (agent.WorkflowTarget, error) {
+		return x.Agent.CaptureWorkflowTargetFor(runtimeID, sessionID, path, workspace)
+	}
 	x.UI.Options.SessionPinned = func(path string) bool { return x.pinned[path] }
 	x.UI.Options.CaptureSessionRenameTarget = func(runtimeID, sessionID, path string) (agent.SessionRenameTarget, error) {
 		return x.Agent.CaptureSessionRenameTarget(runtimeID, sessionID, path)
@@ -398,6 +401,7 @@ func (x *Controller) changeWorkspaceServices(path string) {
 		x.UI.resetMarkdownImageOwner()
 		x.UI.cancelPaletteDelete()
 		x.UI.cancelPaletteRename()
+		x.UI.closeComposerModeMenu(false)
 	}
 	x.workspace = path
 	x.UI.invalidateWorkspaceMenu(path)
@@ -571,6 +575,9 @@ func (x *Controller) Action(a Action) {
 		e = m.SetAccessMode(a.Value)
 	case "SetWorkflow":
 		target, mode, supported := m.CaptureWorkflowTarget(), a.Value, u.Model.Extensions.Workflow
+		if a.workflowTarget != nil {
+			target = *a.workflowTarget
+		}
 		u.Async(func() func() {
 			var err error
 			if !x.sessionGate.TryRLock() {

@@ -1,0 +1,54 @@
+{
+  "scope": "one matched raw Go-to-Go WB05 view; manually viewed both original PNGs; no resize/input or inferred live policy value",
+  "old_source": "99866d8611aac61fcef9267e6d7cfc534c050944",
+  "new_source": "cee007d9309815489bfaa11529fa3047a2b612f8",
+  "old_png_sha256": "085e9909de26e378835f1ecc3a7d98351b50976ccd198c805610ab6642f5ef99",
+  "new_png_sha256": "1bb1a538712e16967248cd72f51b02417555ee9c7af750ed77e9f027940c07bb",
+  "zip_sha256": "a4c5af5a5cd352577bed20b8732264f281e5104640178492369a81ac8682d3b6",
+  "artifact": 12616334782,
+  "matched": {
+    "recipeSha256": "db30754e9ffd4038cf77b8a3c2d15c210a23abb5d89c2351105178d4c725420d",
+    "fixtureSha256": "d7f41d2b5fd3dadfcea2fc8112c5f7876a5ff6d37473ee4d3579a6ba331ebbca",
+    "requestedViewport": [
+      1470,
+      922
+    ],
+    "fontSize": 14,
+    "density": 100,
+    "dpi": 96,
+    "uiScale": 1,
+    "palette": "orbit-azure",
+    "language": "en",
+    "requestedFontPreferences": {
+      "ui": ".ZedSans",
+      "code": ".ZedMono",
+      "uiSize": 14,
+      "editorSize": 13,
+      "terminalSize": 13
+    }
+  },
+  "observed_visual_lines": {
+    "alpha return staged": {
+      "old": 2,
+      "new": 1
+    },
+    "notes Untracked fixture note.": {
+      "old": 2,
+      "new": 1
+    },
+    "alpha/bravo function signature": {
+      "old": 2,
+      "new": 2
+    },
+    "bravo return unstaged": {
+      "old": 2,
+      "new": 2
+    }
+  },
+  "limits": [
+    "not full pixel equality or Rust parity",
+    "resolvedFontFaces remain unverified",
+    "no runtime owned-layout Pango diagnostic used",
+    "other states not reviewed by this observation"
+  ]
+}

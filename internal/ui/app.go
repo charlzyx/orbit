@@ -99,12 +99,14 @@ type Snapshot struct {
 	QuotaSupport                                                                                            string
 }
 type Action struct {
+	workflowTarget         *agent.WorkflowTarget
 	sessionRenameTarget    *agent.SessionRenameTarget
 	newTaskAdmission       *newTaskAdmission
 	Kind, Value, SessionID string
 	Data                   map[string]any
 }
 type Options struct {
+	CaptureWorkflowTarget func(runtimeID, sessionID, path, workspace string) (agent.WorkflowTarget, error)
 	// Owner-thread cache lookup; never performs filesystem work during palette paint.
 	SessionPinned              func(string) bool
 	CaptureSessionRenameTarget func(runtimeID, sessionID, sessionPath string) (agent.SessionRenameTarget, error)
@@ -220,6 +222,8 @@ type App struct {
 	md                                                              markdown.Options
 	markdownImages                                                  *markdownimage.Cache
 	access, workflow                                                string
+	composerMode                                                    *composerModeMenu
+	composerModeEpoch                                               uint64
 	dialogValue                                                     string
 	dialogID                                                        string
 	promptOpen                                                      bool
@@ -364,6 +368,7 @@ func (a *App) SetSnapshot(s Snapshot) {
 		s.Error = orbitassets.Translate(a.catalog, a.english, "events.auto_retry_failed", map[string]string{"error": message})
 	}
 	a.Model = s
+	a.pruneComposerModeMenu()
 	a.syncInlineImageOwner()
 	a.syncInlineImageContents(s.Messages)
 	a.pruneAttachmentPaths()
@@ -454,6 +459,7 @@ func (a *App) flushFilesOnLeave(next string) {
 	}
 }
 func (a *App) View(c *ui.Context) {
+	a.pruneComposerModeMenu()
 	a.workspaceActions.rendered = false
 	a.drainUpdates()
 	a.pruneAttachmentPaths()

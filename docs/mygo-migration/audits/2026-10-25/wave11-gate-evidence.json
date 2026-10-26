@@ -1,0 +1,408 @@
+{
+  "source_commit": "ec9fec9f229e328c3bba93fa299cf0722ac58465",
+  "source_hashes": 1608,
+  "source_recheck": "PASS",
+  "vet": "PASS",
+  "race": "PASS",
+  "packages": 25,
+  "ui_seconds": 540.015,
+  "agent_seconds": 157.051,
+  "arm64": "PASS",
+  "expected_pairs": [
+    [
+      "github.com/charlzyx/orbit/internal/agent",
+      "TestWorkflowDisplayCaptureAllowsUnhydratedPendingTask"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/agent",
+      "TestWorkflowDisplayCaptureGenerationAndReplacement"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/agent",
+      "TestWorkflowDisplayCaptureRejectsUnprovableIdentity"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/transcriptui",
+      "TestSelectionMenuDisabledAndImmutableSelection"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/transcriptui",
+      "TestSelectionMenuEmptyMessageRemainsDisabledWithSelection"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/transcriptui",
+      "TestSelectionMenuOpeningSnapshotAndReopen"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAttachmentIngressCancelReleasesQueuedButNotRunningRaw"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAttachmentIngressExactSafetyLimits"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAttachmentIngressFIFOIncludesClipboardAndFilePicker"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAttachmentIngressRejectedPathsDoNotBlockTextSubmit"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAttachmentIngressRequestLimitRejectsWholeRequest"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAttachmentIngressRetiredOwnersKeepActualResources"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAttachmentPendingBlockedEnterPreservesSelectionAndExistingImage"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAttachmentPendingCancellationAndCloseDiscardLateCompletion"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAttachmentPendingDecodeOwnerCallbackPreventsEarlyActualSubmit"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAttachmentPendingFailureAllowsRetryWithoutChangingExistingError"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAttachmentPendingOldOwnerCannotBlockOrUnlockNewDraft"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAttachmentPendingReadDecodeHandoffAndDuplicateCallback"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAttachmentPendingReadMountedSubmitKeepsDraft"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAttachmentPreviewExactThresholdUsesDecoderWithoutAllocatingPixels"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAttachmentPreviewOversizedHeaderPreservesPayloadWithoutPixelDecode"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAttachmentPreviewRejectsUnsafeConfigBeforeDecode"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAttachmentPreviewSmallFormatsPreserveWirePayload"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAttachmentPreviewUnsupportedAndInvalidKeepRaw"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestCodeFoldActualTranscriptSelectionAndSettledOpen"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestCodeFoldExpandedStatePersistsRevisionButResetsOwner"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestCodeFoldKeyboardActivation"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestCodeFoldMultipleBlocksMessagesAndOrdinal"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestCodeFoldNestedAlertAndIndentedRemainUnfolded"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestCodeFoldOwnerContentAndReset"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestCodeFoldPreviewLiteralLanguageAndCache"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestCodeFoldRealListLiveTailFollowsAppendAndSettle"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestCodeFoldRealListRemeasuresAndPreservesScrolledAnchor"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerAddMenuCancelRestoresDraftFocus"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerAddMenuPickerChoiceRestoresDraftFocus"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerAddMenuStaleChoiceCannotFocusUnrelatedPage"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerModeAcceptedChoiceProjectsConfirmedSnapshot"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerModeAccessGlobalSuccessAndInvalidBackend"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerModeAccessMaintenanceRejectLeavesExactFile"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerModeAccessWriteFailureKeepsVisibleMode"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerModeAsyncWorkflowRejectionKeepsVisibleMode"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerModeCompactRetentionAndOwnerCancellation"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerModeCompetitionAndUnknownValue"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerModeFullReviewRetainsButDoesNotMount"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerModeHeldChoiceAndWorkspaceABA"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerModeHiddenCommandDoesNotCreateGlobalPrompt"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerModeManagerReplacementDuringHeldChoice"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerModePaletteFiniteChoicesKeyboardAndFocus"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerModePendingIdentitySuccessProjectsSnapshot"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerModeRejectedChoiceKeepsVisibleMode"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerModeWorkflowActualControllerPersistsExactTask"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerModeWorkflowControllerUsesOriginalTargetAfterDispatchDelay"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerNativeTurnNavigation"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerTurnNavigationAutocompletePrecedence"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerTurnNavigationIMEAndPlainArrowNegativeControls"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerTurnNavigationPreservesDraftSelectionUndo"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestMessageMenuAuditActualServiceTaskAndClose"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestMessageMenuAuditCurrentHit"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestMessageMenuAuditOldOwner"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestMessageMenuAuditPointerMovesIntoNativeMenu"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestMessageMenuSameOwnerStreamUsesOpeningSnapshot"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestMountedCodeFoldCaptionsStayCorrect"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestMountedCodeFoldRustThreshold"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestMountedMarkdownImageServiceRoundtripInvalidatesHeldOwner"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestP20ChatChineseMenusPreservePublicIdentity"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestPalettePinTargetsActiveAndTogglesOnlyItsStoredPath"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestPalettePinWithoutSavedPathDoesNotDispatch"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestReviewRefreshFeedbackDeadlineBoundaries"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestReviewRefreshKeepsSource650msFeedback"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestReviewRefreshNativeClickCompletesRealReload"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestSameWorkspaceIntentRejectsOldSheetAndAttachmentOwner"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestTurnNavigationOutsideComposerUsesGlobalShortcut"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestWorkspaceServiceRefreshPreservesOwnerButMismatchAdvances"
+    ]
+  ],
+  "expected_pairs_result": "all73 actuallyrun/pass; no skips in this set",
+  "conditional_skips": [
+    {
+      "package": "github.com/charlzyx/orbit/internal/agent",
+      "test": "TestDeleteSessionCaseVariantProtectsLiveFileWhereSupported",
+      "output": "=== RUN   TestDeleteSessionCaseVariantProtectsLiveFileWhereSupported\n    session_delete_guard_test.go:403: filesystem is case-sensitive; Darwin case-insensitive CI must run this case\n--- SKIP: TestDeleteSessionCaseVariantProtectsLiveFileWhereSupported (0.00s)\n"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/mcpui",
+      "test": "TestNativeCaptureMCP",
+      "output": "=== RUN   TestNativeCaptureMCP\n    state_test.go:220: set ORBIT_MCP_CAPTURE_DIR for explicit native CPU fixture screenshots\n--- SKIP: TestNativeCaptureMCP (0.00s)\n"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/modelui",
+      "test": "TestNativeModelUICaptures",
+      "output": "=== RUN   TestNativeModelUICaptures\n    view_test.go:266: set ORBIT_MODELUI_CAPTURE_DIR for explicit native CPU fixture captures\n--- SKIP: TestNativeModelUICaptures (0.00s)\n"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/preferences",
+      "test": "TestWorkspaceRevisionCaseAliasWhenSupported",
+      "output": "=== RUN   TestWorkspaceRevisionCaseAliasWhenSupported\n    workspace_marks_test.go:124: case-sensitive filesystem; native Mac coverage pending\n--- SKIP: TestWorkspaceRevisionCaseAliasWhenSupported (0.00s)\n"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/resourceui",
+      "test": "TestNativeCaptureResources",
+      "output": "=== RUN   TestNativeCaptureResources\n    state_test.go:494: set ORBIT_RESOURCE_CAPTURE_DIR for explicit native CPU fixture captures\n--- SKIP: TestNativeCaptureResources (0.00s)\n"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/resourceui",
+      "test": "TestNativeCaptureFullResourceSlots",
+      "output": "=== RUN   TestNativeCaptureFullResourceSlots\n    view_test.go:221: explicit screenshot fixture opt-in\n--- SKIP: TestNativeCaptureFullResourceSlots (0.00s)\n"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/transcriptui",
+      "test": "TestNativeTranscriptCapture",
+      "output": "=== RUN   TestNativeTranscriptCapture\n    view_test.go:205: set ORBIT_TRANSCRIPT_CAPTURE_DIR for explicit fixture native CPU review images\n--- SKIP: TestNativeTranscriptCapture (0.00s)\n"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/transcriptui",
+      "test": "TestNativeRetainedSelectionCapture",
+      "output": "=== RUN   TestNativeRetainedSelectionCapture\n    view_test.go:455: set ORBIT_TRANSCRIPT_CAPTURE_DIR for explicit retained-selection native CPU review image\n--- SKIP: TestNativeRetainedSelectionCapture (0.00s)\n"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestNativeModelAndWorkspaceHostCaptures",
+      "output": "=== RUN   TestNativeModelAndWorkspaceHostCaptures\n    models_integration_test.go:258: explicit native CPU fixtures only\n--- SKIP: TestNativeModelAndWorkspaceHostCaptures (0.00s)\n"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestNavigationRailCapture",
+      "output": "=== RUN   TestNavigationRailCapture\n    navigation_rail_test.go:321: capture path not requested\n--- SKIP: TestNavigationRailCapture (0.00s)\n"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestOnboardingCapture",
+      "output": "=== RUN   TestOnboardingCapture\n    onboarding_test.go:90: optional native CPU setup capture\n--- SKIP: TestOnboardingCapture (0.00s)\n"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestReviewToolbarCPUEvidence",
+      "output": "=== RUN   TestReviewToolbarCPUEvidence\n    review_toolbar_test.go:326: set ORBIT_REVIEW_CPU_CAPTURE_DIR for CPU-only review fixtures\n--- SKIP: TestReviewToolbarCPUEvidence (0.00s)\n"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestSetupMigrationCapture",
+      "output": "=== RUN   TestSetupMigrationCapture\n    setup_migration_test.go:312: optional CPU-only npm setup capture\n--- SKIP: TestSetupMigrationCapture (0.00s)\n"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestNativeCapture",
+      "output": "=== RUN   TestNativeCapture\n    snapshot_test.go:49: set ORBIT_CAPTURE_DIR to write reproducible native CPU screenshots\n--- SKIP: TestNativeCapture (0.00s)\n"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestNativeUsageShellCapture",
+      "output": "=== RUN   TestNativeUsageShellCapture\n    usage_shell_test.go:110: set ORBIT_CAPTURE_DIR for explicit CPU fixture\n--- SKIP: TestNativeUsageShellCapture (0.00s)\n"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestNativeUsageCapture",
+      "output": "=== RUN   TestNativeUsageCapture\n    usage_test.go:154: set ORBIT_CAPTURE_DIR for explicitly labelled fixture screenshots\n--- SKIP: TestNativeUsageCapture (0.00s)\n"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestNativeUsageComponentCaptures",
+      "output": "=== RUN   TestNativeUsageComponentCaptures\n    usage_visual_test.go:186: set ORBIT_CAPTURE_DIR for labelled CPU fixtures\n--- SKIP: TestNativeUsageComponentCaptures (0.00s)\n"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestNativeViewerCapture",
+      "output": "=== RUN   TestNativeViewerCapture\n    viewer_native_test.go:452: set ORBIT_VIEWER_CAPTURE_DIR to capture native viewer fixtures\n--- SKIP: TestNativeViewerCapture (0.00s)\n"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/workbench",
+      "test": "TestLivePiProviderMetadataWithoutInference",
+      "output": "=== RUN   TestLivePiProviderMetadataWithoutInference\n    providers_parity_test.go:141: set ORBIT_PI_METADATA_TEST_BIN for credential-free installed Pi metadata probe\n--- SKIP: TestLivePiProviderMetadataWithoutInference (0.00s)\n"
+    }
+  ],
+  "logs": {
+    "/workspace/shared/orbit-toolchains-continued/wave11-race-2235.jsonl": "b3d129bdd31bad7a1753a18b687c16bce625e86053e4863b790303d037774f41",
+    "/workspace/shared/orbit-toolchains-continued/wave11-vet-2235.log": "9da2d27b7ee72dd6c6d7e2ae1b7563cfb188c722afb006b10f70efacf395b90a",
+    "/workspace/shared/orbit-toolchains-continued/wave11-arm64-2235.log": "9da2d27b7ee72dd6c6d7e2ae1b7563cfb188c722afb006b10f70efacf395b90a"
+  }
+}

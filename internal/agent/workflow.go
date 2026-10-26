@@ -16,10 +16,26 @@ type WorkflowTarget struct {
 func (m *Manager) CaptureWorkflowTarget() WorkflowTarget {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	if e := m.sessions[m.active]; e != nil {
-		return WorkflowTarget{m.active, e.workflowGeneration}
+	return m.workflowTargetLocked(m.active)
+}
+func (m *Manager) workflowTargetLocked(key string) WorkflowTarget {
+	if e := m.sessions[key]; e != nil {
+		return WorkflowTarget{key, e.workflowGeneration}
 	}
 	return WorkflowTarget{}
+}
+
+// CaptureWorkflowTargetFor binds a displayed composer to its current task;
+// matching unhydrated tasks remain valid (the existing setter holds pending mode).
+// This is identity capture only, with no filesystem work or Pi readiness RPC.
+func (m *Manager) CaptureWorkflowTargetFor(runtimeID, sessionID, path, workspace string) (WorkflowTarget, error) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	e := m.sessions[m.active]
+	if m.closed || e == nil || e.stopped || e.stopping || e.restartClosing || runtimeID == "" || m.active != runtimeID || e.state.snapshot.ActiveSession.ID != sessionID || e.state.snapshot.ActiveSession.Path != path || e.state.snapshot.ActiveSession.Workspace != workspace {
+		return WorkflowTarget{}, errors.New("The displayed task changed; reopen the mode picker after it refreshes")
+	}
+	return m.workflowTargetLocked(m.active), nil
 }
 
 // setWorkflowMode follows composer_ops.rs::choose_workflow_mode: a choice

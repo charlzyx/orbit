@@ -1,0 +1,15 @@
+# Reconstructed Wave11 candidate after executor reset
+
+The old executor reset after only two Git tree batches had been created. The public branch remained cee007; no Wave11 commit/ref existed. Exactly19 files were recovered by their Git blob hashes and reproduced remote tree5f4b4838a41e52c7346ee0980f156ef9c7099f04. Remaining UI behavior/tests were reconstructed from the fixed Rust source, surviving audits and new regressions. These are new bytes, not a claim that the lost a738 tree was recovered.
+
+Historical `2026-10-25/wave11-gate-evidence.json` describes the lost ec9fec9 source only. It is not a pass for this reconstruction. New focused manifests cover the rebuilt exact-key navigation/IME preservation, raw-preserving preview admission, owner-scoped message menus, literal code folding, and finite Access/Workflow composer menus. Independent review corrected recovery-time hover/geometry/locale and fold selection/threshold/live-state regressions before this candidate freeze; rejected drafts and failure logs are retained.
+
+Reviewed source objects were saved without moving the branch: nav/preview tree0ccd053254e5da9191a7e5879bd0f5cb2116f6c0, then transcript tree97fcea775b64941dcc52e12bb644f2941132b058. The final reviewed source tree is `07d6e1ea0bff9a3bd9b915496c1aa3a1b585af16`. These object saves did not create a branch commit or acceptance claim.
+
+The new final combined gate completed on 2026-10-26 at 04:22 UTC: canonical vet, all-package race (`-p 1 -timeout 20m`), terminal module race, all nine exact composer/selection toolkit regressions, and Darwin arm64 cross-build passed. All 1,746 frozen non-document tracked file hashes stayed unchanged. The 78 explicitly expected package/test pairs ran and passed; 19 unrelated conditional skips are listed in the new evidence. Some packages already passed in the first run were legitimately reused from Go test cache; this does not reuse the lost Wave11 build.
+
+The first new full run failed nine font/terminal cases because the reset environment left the default generated cache under read-only `/home/agent/.cache`. No source assertions changed: a writable `XDG_CACHE_HOME` was configured for later processes, all nine exact failing cases passed, and the complete chain was rerun. The original failure and environment correction remain recorded. Local full gates are not hosted native acceptance or a complete parity claim.
+
+Go1.27.3, Node22.23.4 and Pi1.4.0 were restored with official checksums. A real credential-free Pi RPC test passed. Local strict receipt/ancestry tests failed because this cloud kernel lacks `/proc` task-child discovery; that failure is retained, not downgraded to a local success. The required hosted Ubuntu receipt regression must execute without skipping after publication.
+
+The .4 release is unchanged. No user Mac, real installer, credential migration, model inference or new native keyboard capture was performed during this reconstruction. Fresh native navigation acceptance still requires a separately reviewed exact-parent one-shot after the new normal CI passes.

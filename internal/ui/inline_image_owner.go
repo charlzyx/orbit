@@ -26,6 +26,7 @@ func (a *App) currentInlineImageOwner() inlineImageOwner {
 	return inlineImageOwner{a.Model.RuntimeID, a.Model.SessionID, a.Model.SessionPath, a.Model.Workspace, a.attachmentOwner()}
 }
 func (a *App) resetInlineImages() {
+	a.transcriptHover = ""
 	a.inlineImages.generation++
 	a.inlineImages.contents = nil
 	a.inlineImages.preview = inlineImageContentToken{}

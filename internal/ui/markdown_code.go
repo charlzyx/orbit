@@ -7,12 +7,14 @@ import (
 
 	"github.com/egoist/mygo/ui"
 	"github.com/egoist/mygo/ui/markdown"
+	"github.com/egoist/mygo/ui/markdown/parser"
 )
 
 type chatMarkdownState struct {
 	options  markdown.Options // owned in place; never copy its internal sync.Map
 	source   string
 	revision uint64
+	fold     codeFoldState
 }
 type chatMarkdownStateKey struct{}
 type codeCopyFeedback struct{ at time.Time }
@@ -23,10 +25,14 @@ type codeCopyFeedbackKey struct{}
 // incremental highlighting and horizontal scroll state unchanged.
 func (a *App) chatMarkdown(c *ui.Context, source string, streaming bool) {
 	// Preserve the caller's slot key before adding an owner-specific subtree.
-	ui.Column(c).Children(func() { a.chatMarkdownOwned(c, source, streaming) })
+	a.chatMarkdownWithFolding(c, source, streaming, true)
 }
 
-func (a *App) chatMarkdownOwned(c *ui.Context, source string, streaming bool) {
+func (a *App) chatMarkdownWithFolding(c *ui.Context, source string, streaming, allowFold bool) {
+	ui.Column(c).Children(func() { a.chatMarkdownOwned(c, source, streaming, allowFold) })
+}
+
+func (a *App) chatMarkdownOwned(c *ui.Context, source string, streaming, allowFold bool) {
 	owner := a.inlineImageToken()
 	root := ui.Column(c).Key("chat-markdown-owner-" + strconv.FormatUint(owner.generation, 10))
 	state := ui.Local(root, chatMarkdownStateKey{}, func() *chatMarkdownState { return &chatMarkdownState{} })
@@ -45,7 +51,13 @@ func (a *App) chatMarkdownOwned(c *ui.Context, source string, streaming bool) {
 	o.ShareSelection = a.md.ShareSelection
 	o.LoadImage = a.md.LoadImage
 	o.OnLink = a.md.OnLink
-	o.Block = a.md.Block
+	o.Block = func(c *ui.Context, d *parser.Document, index int) bool {
+		s.fold.prepareEligible(d, revision, streaming, allowFold)
+		if a.md.Block != nil {
+			return a.md.Block(c, d, index)
+		}
+		return false
+	}
 	o.WrapCode = a.md.WrapCode
 	o.Reveal = a.md.Reveal
 	o.CodeBlock = func(c *ui.Context, b *markdown.CodeBlockView) {
@@ -58,7 +70,7 @@ func (a *App) chatMarkdownOwned(c *ui.Context, source string, streaming bool) {
 		box.Label(label)
 		box.Children(func() {
 			a.codeCopyHeader(c, b.Language, owner, revision, func() bool { return s.revision == revision }, b.Code)
-			b.Body(c)
+			a.codeFoldBody(c, b, s, owner, revision, streaming, allowFold)
 		})
 	}
 	root.Children(func() {

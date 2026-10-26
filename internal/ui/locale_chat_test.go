@@ -23,7 +23,7 @@ func TestP20ChatChineseMenusPreservePublicIdentity(t *testing.T) {
 	if err := tt.Click("Supervised"); err != nil {
 		t.Fatal("public label changed", err)
 	}
-	if err := tt.ChooseMenuItem("自动接受编辑"); err != nil {
+	if err := tt.Click("自动接受编辑"); err != nil {
 		t.Fatal(err)
 	}
 	tt.Frame()
@@ -33,13 +33,20 @@ func TestP20ChatChineseMenusPreservePublicIdentity(t *testing.T) {
 	if err := tt.Click("Plan"); err != nil {
 		t.Fatal(err)
 	}
-	if err := tt.ChooseMenuItem("提问"); err != nil {
+	if err := tt.Click("提问"); err != nil {
 		t.Fatal(err)
 	}
 	tt.Frame()
 	if len(actions) != 2 || actions[1].Kind != "SetWorkflow" || actions[1].Value != "ask" {
 		t.Fatal(actions)
 	}
+	// A recording Action is not backend confirmation: keep the original labels.
+	if !tt.HasText("受监督") || !tt.HasText("计划") {
+		t.Fatal("unconfirmed choice changed visible mode")
+	}
+	confirmed := a.Model
+	confirmed.AccessMode, confirmed.WorkflowMode = "auto-accept-edits", "ask"
+	a.SetSnapshot(confirmed)
 	a.Prefs.Language = "en"
 	a.reloadLocale()
 	tt.Frame()

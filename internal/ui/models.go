@@ -121,6 +121,7 @@ func (x *Controller) refreshModelCatalog() error {
 }
 
 func (a *App) openModelPicker(kind modelui.PickerKind, now time.Time) {
+	a.closeComposerModeMenu(false)
 	if a.Models == nil || a.Model.Running {
 		return
 	}

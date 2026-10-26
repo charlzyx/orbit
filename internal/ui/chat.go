@@ -32,7 +32,8 @@ func (a *App) messageTranscript(c *ui.Context) ui.Element {
 	if a.searchOpen && len(hits) > 0 {
 		active = hits[min(a.searchCursor, len(hits)-1)]
 	}
-	scope := ui.Column(c.Key("transcript-wrap")).Selectable().Grow(1).MinHeight(0)
+	owner := a.inlineImageToken()
+	scope := ui.Column(c.Key(fmt.Sprintf("transcript-wrap-%d", owner.generation))).Selectable().Grow(1).MinHeight(0)
 	transcriptui.RetainSelection(scope, a.Model.SessionID)
 	scope.Children(func() {
 		a.transcript.Key = func(i int) any {
@@ -185,6 +186,17 @@ func (a *App) composerView(c *ui.Context) {
 					if a.autocomplete.HandleKey(k) {
 						return true
 					}
+					if k.Mods == ui.Cmd && (k.Key == ui.KeyUp || k.Key == ui.KeyDown) {
+						if editor, ok := any(k).(interface{ Composing() bool }); !ok || editor.Composing() {
+							return false
+						}
+						command := "PrevTurn"
+						if k.Key == ui.KeyDown {
+							command = "NextTurn"
+						}
+						a.shortcutCommand(command, "")
+						return true
+					}
 					if k.Key == ui.KeyEnter && k.Mods == 0 {
 						if a.submit(k.Text(), "") {
 							k.SetText("")
@@ -237,23 +249,10 @@ func (a *App) composerView(c *ui.Context) {
 						if terse {
 							display = ""
 						}
-						a.composerChip(c, label, display, "icons/lock.svg", !terse, 0).Tooltip(translated).Menu(func(m *ui.Menu) {
-							for _, v := range []struct{ id, title string }{{"supervised", "Supervised"}, {"auto-accept-edits", "Auto-accept edits"}, {"full-access", "Full access"}} {
-								if m.Item(a.accessDisplay(v.id, v.title)).Checked(a.access == v.id).Chosen() {
-									a.access = v.id
-									a.save(a.Options.Store.SaveAccess(v.id))
-									a.Dispatch(Action{Kind: "SetAccess", Value: v.id})
-								}
-							}
-						})
-						a.composerChip(c, titleCase(a.workflow), a.workflowDisplay(a.workflow), "icons/start-up.svg", true, 0).Tooltip(a.workflowDisplay(a.workflow)).Menu(func(m *ui.Menu) {
-							for _, v := range []string{"plan", "build", "ask"} {
-								if m.Item(a.workflowDisplay(v)).Checked(a.workflow == v).Chosen() {
-									a.workflow = v
-									a.Dispatch(Action{Kind: "SetWorkflow", Value: v})
-								}
-							}
-						})
+						accessChip := a.composerChip(c, label, display, "icons/lock.svg", !terse, 0).Tooltip(translated)
+						a.composerModeTrigger(c, accessChip, "access")
+						workflowChip := a.composerChip(c, titleCase(a.workflow), a.workflowDisplay(a.workflow), "icons/start-up.svg", true, 0).Tooltip(a.workflowDisplay(a.workflow))
+						a.composerModeTrigger(c, workflowChip, "workflow")
 					}
 					ui.Spacer(c)
 					model := a.Model.ModelID

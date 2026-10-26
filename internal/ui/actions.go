@@ -48,6 +48,10 @@ func shortcutLabel(chord string) string {
 	return r.Replace(chord)
 }
 func (a *App) shortcuts(c *ui.Context) {
+	if a.composerMode != nil && c.Shortcut(0, ui.KeyEscape) {
+		a.closeComposerModeMenu(true)
+		return
+	}
 	if a.files != nil && a.files.entry != nil && a.files.entry.input.FocusWithin(c) {
 		if c.Shortcut(0, ui.KeyEscape) {
 			a.cancelExplorerEntry()
@@ -120,7 +124,7 @@ func (a *App) shortcuts(c *ui.Context) {
 	}
 }
 func (a *App) modalOpen() bool {
-	return a.workspaceActions.open || a.nativeSettings.selectMenu.id != "" || a.providerState.usageProvider != "" || (a.Models != nil && a.Models.HasModal()) || a.workspaceOpen || a.usageState.filterMenu != "" || a.providerState.editor != nil || (a.Options.HasModal != nil && a.Options.HasModal()) || a.promptOpen || a.confirmOpen || a.Model.Dialog != nil || a.paletteOpen || a.modelOpen || a.jsonOpen || a.secretOpen || a.imageOpen || a.usageState.detailError != nil || a.usageState.customOpen || a.usageState.detailRecord != nil || a.usageState.detailSession != nil
+	return a.composerMode != nil || a.workspaceActions.open || a.nativeSettings.selectMenu.id != "" || a.providerState.usageProvider != "" || (a.Models != nil && a.Models.HasModal()) || a.workspaceOpen || a.usageState.filterMenu != "" || a.providerState.editor != nil || (a.Options.HasModal != nil && a.Options.HasModal()) || a.promptOpen || a.confirmOpen || a.Model.Dialog != nil || a.paletteOpen || a.modelOpen || a.jsonOpen || a.secretOpen || a.imageOpen || a.usageState.detailError != nil || a.usageState.customOpen || a.usageState.detailRecord != nil || a.usageState.detailSession != nil
 }
 
 // Native menu accelerators arrive outside MyGo's modal shortcut scope. Apply
@@ -258,23 +262,15 @@ func (a *App) command(id, value string) {
 			a.Options.Terminal.Cycle(-1)
 		}
 	case "ChooseModel":
+		a.closeComposerModeMenu(false)
 		a.modelOpen = true
 	case "ChooseThinking":
+		a.closeComposerModeMenu(false)
 		a.thinkingOpen = true
 	case "ChooseAccess":
-		a.Prompt("Access mode (supervised, auto-accept-edits, full-access)", a.access, func(v string) {
-			if e := a.Options.Store.SaveAccess(v); e != nil {
-				a.Notify(e.Error(), true)
-				return
-			}
-			a.access = v
-			a.Dispatch(Action{Kind: "SetAccess", Value: v})
-		})
+		a.toggleComposerModeMenu("access")
 	case "ChooseWorkflowMode":
-		a.Prompt("Workflow mode (plan, build, ask)", a.workflow, func(v string) {
-			a.workflow = v
-			a.Dispatch(Action{Kind: "SetWorkflow", Value: v})
-		})
+		a.toggleComposerModeMenu("workflow")
 	case "PinSession":
 		// Palette commands have no row payload. Pin the active saved path,
 		// never the empty value used by the command registry result.

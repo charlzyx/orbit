@@ -17,6 +17,14 @@ import (
 	_ "golang.org/x/image/webp"
 )
 
+// MaxDecodedPixels preserves the existing preparation threshold. It is not a
+// resident-memory budget: this many RGBA pixels alone can approach 1 GiB.
+const MaxDecodedPixels = 268435456
+
+func DecodeDimensionsAllowed(width, height int) bool {
+	return width > 0 && height > 0 && width <= MaxDecodedPixels && height <= MaxDecodedPixels && width <= MaxDecodedPixels/height
+}
+
 const MaxEdge = 1400
 const MaxBase64Bytes = 512 * 1024
 
@@ -42,7 +50,7 @@ func Prepare(input []byte, mime string) Image {
 		return result
 	}
 	result.Width, result.Height = cfg.Width, cfg.Height
-	if cfg.Width <= 0 || cfg.Height <= 0 || int64(cfg.Width)*int64(cfg.Height) > 268435456 {
+	if !DecodeDimensionsAllowed(cfg.Width, cfg.Height) {
 		return result
 	}
 	if cfg.Width <= MaxEdge && cfg.Height <= MaxEdge && base64.StdEncoding.EncodedLen(len(input)) <= MaxBase64Bytes {

@@ -1,0 +1,216 @@
+{
+  "raw_sha256": "1bf478dab73fa803e7ba438c4e62b56389c6febe3f136e825d2ec0e5f00a6009",
+  "expected_count": 32,
+  "repeat": 3,
+  "expected": [
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestMountedCodeFoldRustThreshold",
+      "run": 3,
+      "pass": 3
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestCodeFoldPreviewLiteralLanguageAndCache",
+      "run": 3,
+      "pass": 3
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestCodeFoldActualTranscriptSelectionAndSettledOpen",
+      "run": 3,
+      "pass": 3
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestCodeFoldExpandedStatePersistsRevisionButResetsOwner",
+      "run": 3,
+      "pass": 3
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestCodeFoldOwnerContentAndReset",
+      "run": 3,
+      "pass": 3
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestCodeFoldNestedAlertAndIndentedRemainUnfolded",
+      "run": 3,
+      "pass": 3
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestCodeFoldKeyboardActivation",
+      "run": 3,
+      "pass": 3
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestMountedCodeFoldCaptionsStayCorrect",
+      "run": 3,
+      "pass": 3
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestCodeFoldMultipleBlocksMessagesAndOrdinal",
+      "run": 3,
+      "pass": 3
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestCodeFoldRealListRemeasuresAndPreservesScrolledAnchor",
+      "run": 3,
+      "pass": 3
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestCodeFoldRealListLiveTailFollowsAppendAndSettle",
+      "run": 3,
+      "pass": 3
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestCodeFoldToggleClearsOldSelection",
+      "run": 3,
+      "pass": 3
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestMessageMenuAuditCurrentHit",
+      "run": 3,
+      "pass": 3
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestMessageMenuAuditOldOwner",
+      "run": 3,
+      "pass": 3
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestMessageMenuAuditPointerMovesIntoNativeMenu",
+      "run": 3,
+      "pass": 3
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestMessageMenuAuditActualServiceTaskAndClose",
+      "run": 3,
+      "pass": 3
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestMessageMenuSameOwnerStreamUsesOpeningSnapshot",
+      "run": 3,
+      "pass": 3
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestMountedCodeCopyMatchesRustPayload",
+      "run": 3,
+      "pass": 3
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestMountedCodeCopyOwnerAndChangedSource",
+      "run": 3,
+      "pass": 3
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestMountedCodeCopyStreamAppendSettleAndAlert",
+      "run": 3,
+      "pass": 3
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestCodeCopyIdleDoesNotReadPayloadAndKeyboardWorks",
+      "run": 3,
+      "pass": 3
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestMountedCodeCopyPreservesCrossMessageSelection",
+      "run": 3,
+      "pass": 3
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestCodeCopyTwoBlocksKeyboardAndHorizontalScroll",
+      "run": 3,
+      "pass": 3
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestMountedCodeCopyLogicalRPCProjection",
+      "run": 3,
+      "pass": 3
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestSourceCodeCaptionsPreserveUnknownAndTokenizerTag",
+      "run": 3,
+      "pass": 3
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestMountedCodeSourceCaptionsAndLocale",
+      "run": 3,
+      "pass": 3
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/transcriptui",
+      "test": "TestSelectionMenuOpeningSnapshotAndReopen",
+      "run": 3,
+      "pass": 3
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/transcriptui",
+      "test": "TestSelectionMenuDisabledAndImmutableSelection",
+      "run": 3,
+      "pass": 3
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/transcriptui",
+      "test": "TestSelectionMenuEmptyMessageRemainsDisabledWithSelection",
+      "run": 3,
+      "pass": 3
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestCodeFoldMetadataDisabledAndStreaming",
+      "run": 3,
+      "pass": 3
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestCodeFoldExpansionSurvivesThresholdRoundtrip",
+      "run": 3,
+      "pass": 3
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestCodeFoldReplacementRevokesPreviewSelection",
+      "run": 3,
+      "pass": 3
+    }
+  ],
+  "unique_tests_and_subtests": 68,
+  "packages": [
+    {
+      "Time": "2026-10-26T12:55:02.602486292+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/transcriptui",
+      "Elapsed": 1.055
+    },
+    {
+      "Time": "2026-10-26T12:55:11.046749278+09:00",
+      "Action": "pass",
+      "Package": "github.com/charlzyx/orbit/internal/ui",
+      "Elapsed": 9.5
+    }
+  ],
+  "skip": 0,
+  "fail": 0
+}

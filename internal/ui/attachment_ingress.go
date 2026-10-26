@@ -250,7 +250,7 @@ func (a *App) decodeAttachmentIngress(q *attachmentIngressQueue, r *attachmentIn
 		if im.MIME == "image/svg+xml" {
 			preview, _ = ui.ParseSVG(im.Bytes)
 		} else {
-			preview, _ = ui.DecodeBitmap(im.Bytes)
+			preview = attachmentBitmapPreview(im.Bytes)
 		}
 		result := attachment{Name: name, Image: agent.Image{Type: "image", Data: im.Base64(), MIMEType: im.MIME}, Preview: preview}
 		return func() {
