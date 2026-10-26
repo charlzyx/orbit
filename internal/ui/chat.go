@@ -113,6 +113,11 @@ func (a *App) messageTranscript(c *ui.Context) ui.Element {
 		}).Grow(1).MinHeight(0).Justify(ui.End).TrackScroll(&a.transcriptScroll)
 		unread := a.presentTranscriptActivity()
 		if !a.transcript.AtEnd() {
+			// Clip only this decoration, not the transcript/selection ancestry.
+			// Pinned GPUI defaults to 16 DIP per rem: source rems(3) is 48.
+			ui.Box(c.Key("transcript-fade-clip")).Label("Transcript fade viewport").Absolute().Left(0).Right(0).Top(0).Bottom(0).Clip().PassThrough().Children(func() {
+				ui.Box(c.Key("transcript-fade")).Label("Transcript bottom fade").Absolute().Left(0).Right(0).Bottom(0).Height(48).Gradient(t.Background.Alpha(0), t.Background, 180).PassThrough()
+			})
 			// Source message_scroller: a floating affordance must not shrink the
 			// transcript viewport. Only the child button receives pointer input.
 			ui.Row(c.Key("transcript-jump-layer")).Absolute().Left(0).Right(0).Bottom(8).Justify(ui.Center).PassThrough().Children(func() {

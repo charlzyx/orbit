@@ -1,0 +1,1042 @@
+{
+  "status": "PASS",
+  "local_commit": "d4b33caf0cdc5af2b6db8cf684e061ccea89da4a",
+  "public_base": "6f21e73093151689bdf86885669b486cf481a6df",
+  "verified_non_doc_files": 1842,
+  "logs": {
+    "full": {
+      "sha256": "b80aed64868010bb5a6b078f94b64643297a52614e4336f81208d9c1f7d31b18",
+      "pass_events": 3425,
+      "skips": [
+        {
+          "package": "github.com/charlzyx/orbit/internal/agent",
+          "test": "TestDeleteSessionCaseVariantProtectsLiveFileWhereSupported"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/mcpui",
+          "test": "TestNativeCaptureMCP"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/modelui",
+          "test": "TestNativeModelUICaptures"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/preferences",
+          "test": "TestWorkspaceRevisionCaseAliasWhenSupported"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/resourceui",
+          "test": "TestNativeCaptureResources"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/resourceui",
+          "test": "TestNativeCaptureFullResourceSlots"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/transcriptui",
+          "test": "TestNativeTranscriptCapture"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/transcriptui",
+          "test": "TestNativeRetainedSelectionCapture"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/ui",
+          "test": "TestNativeModelAndWorkspaceHostCaptures"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/ui",
+          "test": "TestNavigationRailCapture"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/ui",
+          "test": "TestOnboardingCapture"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/ui",
+          "test": "TestReviewToolbarCPUEvidence"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/ui",
+          "test": "TestSetupMigrationCapture"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/ui",
+          "test": "TestNativeCapture"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/ui",
+          "test": "TestNativeUsageShellCapture"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/ui",
+          "test": "TestNativeUsageCapture"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/ui",
+          "test": "TestNativeUsageComponentCaptures"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/ui",
+          "test": "TestNativeViewerCapture"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/workbench",
+          "test": "TestLivePiProviderMetadataWithoutInference"
+        }
+      ],
+      "package_results": [
+        {
+          "package": "github.com/charlzyx/orbit",
+          "elapsed": 1.667
+        },
+        {
+          "package": "github.com/charlzyx/orbit/cmd/orbit",
+          "elapsed": 1.018
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/agent",
+          "elapsed": 151.311
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/appbundle",
+          "elapsed": 3.209
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/attachments",
+          "elapsed": 0
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/background",
+          "elapsed": 1.5590000000000002
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/bugreportui",
+          "elapsed": 5.511
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/composerui",
+          "elapsed": 2.586
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/diagnosticlog",
+          "elapsed": 0
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/gitworkbench",
+          "elapsed": 16.086
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/highlight",
+          "elapsed": 1.256
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/markdownimage",
+          "elapsed": 2.058
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/mcpui",
+          "elapsed": 2.651
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/modelui",
+          "elapsed": 3.209
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/native",
+          "elapsed": 38.84
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/pirpc",
+          "elapsed": 0
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/preferences",
+          "elapsed": 1.285
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/resourceui",
+          "elapsed": 3.12
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/runtimepath",
+          "elapsed": 0
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/terminal",
+          "elapsed": 1.407
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/transcriptui",
+          "elapsed": 1.3940000000000001
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/ui",
+          "elapsed": 408.27
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/workbench",
+          "elapsed": 11.456
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/workspace",
+          "elapsed": 0.001
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/worktreeui",
+          "elapsed": 2.096
+        }
+      ]
+    },
+    "toolkit": {
+      "sha256": "791f7c1baa5cbe9d65d01ad9a462c8b646239d9e3f3eef9357b1f2b513a36197",
+      "pass_events": 19,
+      "skips": [],
+      "package_results": [
+        {
+          "package": "github.com/egoist/mygo/ui",
+          "elapsed": 1.229
+        }
+      ]
+    },
+    "menu": {
+      "sha256": "3ace68e1a48f29c940c4d076743f1d2786f8eeda029941943c8dbc067920f79b",
+      "pass_events": 32,
+      "skips": [],
+      "package_results": [
+        {
+          "package": "github.com/egoist/mygo/ui",
+          "elapsed": 1.585
+        }
+      ]
+    },
+    "terminal": {
+      "sha256": "dd1b4362904118ec31829fad008be83372619b4ea94ace9422376dd2b599301b",
+      "pass_events": 115,
+      "skips": [
+        {
+          "package": "github.com/egoist/mygo/orbit-terminal/internal/libbuild",
+          "test": null
+        },
+        {
+          "package": "github.com/egoist/mygo/orbit-terminal/internal/library",
+          "test": null
+        },
+        {
+          "package": "github.com/egoist/mygo/orbit-terminal/internal/pty",
+          "test": "TestConPTY"
+        },
+        {
+          "package": "github.com/egoist/mygo/orbit-terminal",
+          "test": "TestWindowsShell"
+        }
+      ],
+      "package_results": [
+        {
+          "package": "github.com/egoist/mygo/orbit-terminal/internal/pty",
+          "elapsed": 1.021
+        },
+        {
+          "package": "github.com/egoist/mygo/orbit-terminal/internal/vt",
+          "elapsed": 1.063
+        },
+        {
+          "package": "github.com/egoist/mygo/orbit-terminal",
+          "elapsed": 86.222
+        }
+      ]
+    },
+    "packaging.log": {
+      "sha256": "62b774c5b8b900c378a44c19335a3df7716f9e3044571a03a49eee97e5e4e336"
+    },
+    "icon.log": {
+      "sha256": "828a38cdf5ee7e733b7dd8d4c9cb7b7c9727eb10d76fee7437c522923c32c584"
+    },
+    "legacy.log": {
+      "sha256": "11cc470d6e91f7018b399ad8a8deccafbfb86f9f7244950219e46771cc901497"
+    },
+    "wrapper.log": {
+      "sha256": "148fe067f8ea98cbf239631f65e1a27dc3b4dc34c5ba778ff6cb66e3ede94e9a"
+    },
+    "vet.log": {
+      "sha256": "9da2d27b7ee72dd6c6d7e2ae1b7563cfb188c722afb006b10f70efacf395b90a"
+    },
+    "arm64.log": {
+      "sha256": "9da2d27b7ee72dd6c6d7e2ae1b7563cfb188c722afb006b10f70efacf395b90a"
+    }
+  },
+  "critical_exact_package_test_pairs": [
+    [
+      "github.com/charlzyx/orbit/internal/agent",
+      "TestWorkflowDisplayCaptureAllowsUnhydratedPendingTask"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/agent",
+      "TestWorkflowDisplayCaptureGenerationAndReplacement"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/agent",
+      "TestWorkflowDisplayCaptureRejectsUnprovableIdentity"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/attachments",
+      "TestAuditOversizedPNGPreparePreservesRawHeader"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/attachments",
+      "TestDecodeDimensionsAllowedBoundaryAndOverflow"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/transcriptui",
+      "TestSelectionMenuDisabledAndImmutableSelection"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/transcriptui",
+      "TestSelectionMenuEmptyMessageRemainsDisabledWithSelection"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/transcriptui",
+      "TestSelectionMenuOpeningSnapshotAndReopen"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAttachmentClipboardSVGAndTIFFRemainPassThrough"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAttachmentPathsNativeCaretSelectionUndo"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAttachmentPreviewExactThresholdUsesDecoderWithoutAllocatingPixels"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAttachmentPreviewOversizedHeaderPreservesPayloadWithoutPixelDecode"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAttachmentPreviewRejectsUnsafeConfigBeforeDecode"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAttachmentPreviewSmallFormatsPreserveWirePayload"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAttachmentPreviewUnsupportedAndInvalidKeepRaw"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAuditJumpAffordanceDoesNotResizeTranscriptViewport"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAuditPaletteEscapeFromSidebarHandsFocusToComposer"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAuditScrolledTranscriptNewActivity"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAuditScrolledTranscriptNewActivity/append"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAuditScrolledTranscriptNewActivity/stream_text"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAuditScrolledTranscriptNewActivity/thinking"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAuditScrolledTranscriptNewActivity/tool_output"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestAuditSidebarHideHandsFocusToComposer"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestCodeCopyIdleDoesNotReadPayloadAndKeyboardWorks"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestCodeCopyTwoBlocksKeyboardAndHorizontalScroll"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestCodeFoldActualTranscriptSelectionAndSettledOpen"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestCodeFoldExpandedStatePersistsRevisionButResetsOwner"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestCodeFoldExpansionSurvivesThresholdRoundtrip"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestCodeFoldKeyboardActivation"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestCodeFoldMetadataDisabledAndStreaming"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestCodeFoldMultipleBlocksMessagesAndOrdinal"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestCodeFoldNestedAlertAndIndentedRemainUnfolded"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestCodeFoldOwnerContentAndReset"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestCodeFoldPreviewLiteralLanguageAndCache"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestCodeFoldRealListLiveTailFollowsAppendAndSettle"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestCodeFoldRealListRemeasuresAndPreservesScrolledAnchor"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestCodeFoldReplacementRevokesPreviewSelection"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestCodeFoldToggleClearsOldSelection"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerModeAcceptedChoiceProjectsConfirmedSnapshot"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerModeAccessGlobalSuccessAndInvalidBackend"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerModeAccessMaintenanceRejectLeavesExactFile"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerModeAccessWriteFailureKeepsVisibleMode"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerModeCompactRetentionAndOwnerCancellation"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerModeCompetitionAndUnknownValue"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerModeFullReviewRetainsButDoesNotMount"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerModeHeldChoiceAndWorkspaceABA"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerModeHiddenCommandDoesNotCreateGlobalPrompt"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerModeImmediateCloseAndReopenWithoutTimeGate"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerModeManagerReplacementDuringHeldChoice"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerModePaletteFiniteChoicesKeyboardAndFocus"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerModePendingIdentitySuccessProjectsSnapshot"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerModeRejectedChoiceKeepsVisibleMode"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerModeSameTriggerTogglesWithoutReopen"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerModeSourceWidthAndLocalizedPopupLabel"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerModeStationaryPointerDoesNotOverrideKeyboard"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerModeWorkflowActualControllerPersistsExactTask"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerModeWorkflowControllerUsesOriginalTargetAfterDispatchDelay"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerModeWorkflowWriteFailurePreservesExistingSnapshotContract"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerNativeTurnNavigation"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerTurnNavigationAutocompletePrecedence"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerTurnNavigationIMEAndPlainArrowNegativeControls"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestComposerTurnNavigationPreservesDraftSelectionUndo"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestFadeOwnWrapperClipsFixed48WithoutRescaling"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestFadeOwnWrapperClipsFixed48WithoutRescaling/24"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestFadeOwnWrapperClipsFixed48WithoutRescaling/80"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestFileEditorFailedSyncRetainsVersionAndRetries"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestFocusHandoffHiddenComposerSidebarLeavesNoDeferredRequest"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestFocusHandoffHiddenComposerSidebarLeavesNoDeferredRequest/full_Review"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestFocusHandoffHiddenComposerSidebarLeavesNoDeferredRequest/setup"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestFocusHandoffOffChatPaletteLeavesNoDeferredRequest"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestFocusHandoffPaletteCommandKeepsDestination"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestFocusHandoffPaletteDispatchExactlyOnce"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestFocusHandoffPaletteDispatchExactlyOnce/Enter"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestFocusHandoffPaletteDispatchExactlyOnce/pointer"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestFocusHandoffPaletteOffChatDoesNotNavigate"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestFocusHandoffQueuedOwnerDoesNotApplyOldHideIntent"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestFocusHandoffQueuedPageLeavesNoPendingHandleRequest"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestFocusHandoffQueuedPageLeavesNoPendingHandleRequest/CancelFocus_negative"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestFocusHandoffQueuedPageLeavesNoPendingHandleRequest/candidate"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestFocusHandoffQueuedPageLeavesNoPendingHandleRequest/explicit_Focus_positive"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestFocusHandoffQueuedPagePreservesCurrentInput"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestFocusHandoffSidebarDoesNotStealOtherInput"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestFocusHandoffSidebarPointerAndEmpty"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestFocusHandoffSidebarPointerAndEmpty/empty"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestFocusHandoffSidebarPointerAndEmpty/list"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestFocusHandoffSidebarPreservesNativeComposition"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestFocusHandoffSidebarPreservesRealTerminal"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestGoBrandDedicatedIconAndLightDarkScreens"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestHostRetainedTranscriptSelectionUnmountAndSessionReset"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestIMECompositionDoesNotSubmit"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestInlineImageContentAuditUnchangedStreamingSnapshotKeepsCache"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestJumpGeometryEmptyLayerPassesWheelSelectionAndMenu"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestJumpGeometryFocusedButtonKeyboardActivation"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestJumpGeometryLightDarkAndUnread"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestJumpGeometryLightDarkAndUnread/dark"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestJumpGeometryLightDarkAndUnread/light"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestMessageMenuAuditActualServiceTaskAndClose"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestMessageMenuAuditCurrentHit"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestMessageMenuAuditOldOwner"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestMessageMenuAuditPointerMovesIntoNativeMenu"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestMessageMenuBlankPreservesActualSelection"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestMessageMenuCancelBlankAndOtherTextSelection"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestMessageMenuMeasuredBlankDoesNotReusePreviousHover"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestMessageMenuSameOwnerStreamUsesOpeningSnapshot"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestModalTransitionRestoresComposerFocus"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestMountedCodeCopyLogicalRPCProjection"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestMountedCodeCopyMatchesRustPayload"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestMountedCodeCopyOwnerAndChangedSource"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestMountedCodeCopyPreservesCrossMessageSelection"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestMountedCodeCopyStreamAppendSettleAndAlert"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestMountedCodeFoldCaptionsStayCorrect"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestMountedCodeFoldRustThreshold"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestMountedCodeSourceCaptionsAndLocale"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestMountedFileHeldSnapshotAfterRealCloseDoesNotReviveEditor"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestMountedFilePrimaryWAndShiftWHaveDistinctScopes"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestMountedFileRenameSubtreeKeepsEveryBufferCaretAndUndo"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestMountedFileReopenQueuedBehindCloseCannotStealLaterSelection"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestMountedFileStaleSnapshotCannotRenderReopenedPath"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestMountedMarkdownImageServiceRoundtripInvalidatesHeldOwner"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestNativeComposerCompletionPrecedesSendAndAbort"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestNativeMenuCannotMutateBehindModal"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestNativeMenuCannotMutateBehindModal/confirm"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestNativeMenuCannotMutateBehindModal/custom"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestNativeMenuCannotMutateBehindModal/image"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestNativeMenuCannotMutateBehindModal/json"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestNativeMenuCannotMutateBehindModal/model"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestNativeMenuCannotMutateBehindModal/palette"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestNativeMenuCannotMutateBehindModal/prompt"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestNativeMenuCannotMutateBehindModal/secret"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestNativeReadonlyErrorPendingDoesNotAdvanceRecord"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestNativeSyncRejectsClosedAndRenamedSnapshots"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestNativeSyncRejectsClosedAndRenamedSnapshots/closed"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestNativeSyncRejectsClosedAndRenamedSnapshots/renamed_again"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestNavigationRailMountedClickAndHover"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestOpenCompletionPreservesAlreadyMountedPendingState"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestP20ChatChineseMenusPreservePublicIdentity"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestRenameImageNativeCacheBelongsToDocumentID"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestRenameInvalidatesQueuedOldPathOpenIntent"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestRenameOldPathReopenBeforeCompletionIdentityProbe"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestRenameOpenExistingIDRetainsPendingBeforeCallback"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestRenamePreflightRecoveryPendingNativeBuffer"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestRenameReceiptPreservesPendingUndoAndNewNavigation"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestReviewRefreshFeedbackDeadlineBoundaries"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestReviewRefreshKeepsSource650msFeedback"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestReviewRefreshNativeClickCompletesRealReload"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestSameWorkspaceIntentRejectsOldSheetAndAttachmentOwner"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestSourceCodeCaptionsPreserveUnknownAndTokenizerTag"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestSourceSidebarMountedShortcutsUseDisplayedFilteredOrder"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestTranscriptActivityExplicitSubmitClears"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestTranscriptActivityIgnoresClockUsageAndDetectsImage"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestTranscriptActivityOpaqueOwnerAndHiddenRoundtrip"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestTranscriptActivityRawToolPartialAndCompletion"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestTranscriptActivityRawToolPartialAndCompletion/false"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestTranscriptActivityRawToolPartialAndCompletion/true"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestTranscriptActivityTailInitializationResetAndReorder"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestTranscriptFadeProductionOrderBoundsAndCapture"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestTranscriptFadeProductionOrderBoundsAndCapture/dark"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestTranscriptFadeProductionOrderBoundsAndCapture/light"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestTranscriptFadeProductionTinyViewportClip"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestTranscriptVariableHeightFollowAndReaderPosition"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestTruncatedViewerBufferStaysBounded"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestTurnNavigationOutsideComposerUsesGlobalShortcut"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestWatcherCleanReloadAndSelfEcho"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestWatcherCompletionExcludesNewTab"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestWatcherCompletionRejectsReopenedTarget"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestWatcherCompletionRejectsReplacedFilesOwner"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestWatcherDirtyDomainDoesNotReplaceLaterNativeEdit"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestWatcherDispatchSyncsPendingEdit"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestWatcherLateNativeEditPreserved"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestWatcherLatePendingAcrossReadonlyAndReadError"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestWatcherReadonlyPendingCanRecoverWithoutReplacement"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestWorkbenchEmptySidebarRemainsReachable"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestWorkbenchModalAndAutocompleteOwnTab"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestWorkbenchSurfaceReturnPreservesComposerSelection"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestWorkbenchTerminalOwnsTabAndBacktabInRealPTY"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/ui",
+      "TestWorkspaceServiceRefreshPreservesOwnerButMismatchAdvances"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/workspace",
+      "TestDocumentIdentityRenameReopenAndStaleEdit"
+    ],
+    [
+      "github.com/charlzyx/orbit/internal/workspace",
+      "TestRenameGapSnapshotLateEditAndRecoveryProbe"
+    ]
+  ],
+  "focus_top_names": [
+    "TestAuditPaletteEscapeFromSidebarHandsFocusToComposer",
+    "TestAuditSidebarHideHandsFocusToComposer",
+    "TestFocusHandoffHiddenComposerSidebarLeavesNoDeferredRequest",
+    "TestFocusHandoffOffChatPaletteLeavesNoDeferredRequest",
+    "TestFocusHandoffPaletteCommandKeepsDestination",
+    "TestFocusHandoffPaletteDispatchExactlyOnce",
+    "TestFocusHandoffPaletteOffChatDoesNotNavigate",
+    "TestFocusHandoffQueuedOwnerDoesNotApplyOldHideIntent",
+    "TestFocusHandoffQueuedPageLeavesNoPendingHandleRequest",
+    "TestFocusHandoffQueuedPagePreservesCurrentInput",
+    "TestFocusHandoffSidebarDoesNotStealOtherInput",
+    "TestFocusHandoffSidebarPointerAndEmpty",
+    "TestFocusHandoffSidebarPreservesNativeComposition",
+    "TestFocusHandoffSidebarPreservesRealTerminal",
+    "TestModalTransitionRestoresComposerFocus",
+    "TestNativeMenuCannotMutateBehindModal",
+    "TestSourceSidebarMountedShortcutsUseDisplayedFilteredOrder",
+    "TestWorkbenchEmptySidebarRemainsReachable",
+    "TestWorkbenchModalAndAutocompleteOwnTab",
+    "TestWorkbenchSurfaceReturnPreservesComposerSelection",
+    "TestWorkbenchTerminalOwnsTabAndBacktabInRealPTY"
+  ],
+  "focus_names_with_subtests": 38,
+  "menu_required_names": 22,
+  "unread_top_names": [
+    "TestAuditScrolledTranscriptNewActivity",
+    "TestComposerNativeTurnNavigation",
+    "TestHostRetainedTranscriptSelectionUnmountAndSessionReset",
+    "TestInlineImageContentAuditUnchangedStreamingSnapshotKeepsCache",
+    "TestNavigationRailMountedClickAndHover",
+    "TestTranscriptActivityExplicitSubmitClears",
+    "TestTranscriptActivityIgnoresClockUsageAndDetectsImage",
+    "TestTranscriptActivityOpaqueOwnerAndHiddenRoundtrip",
+    "TestTranscriptActivityRawToolPartialAndCompletion",
+    "TestTranscriptActivityTailInitializationResetAndReorder",
+    "TestTranscriptVariableHeightFollowAndReaderPosition"
+  ],
+  "unread_all_names": 17,
+  "geometry_top_names": [
+    "TestAuditJumpAffordanceDoesNotResizeTranscriptViewport",
+    "TestAuditScrolledTranscriptNewActivity",
+    "TestComposerNativeTurnNavigation",
+    "TestHostRetainedTranscriptSelectionUnmountAndSessionReset",
+    "TestJumpGeometryEmptyLayerPassesWheelSelectionAndMenu",
+    "TestJumpGeometryFocusedButtonKeyboardActivation",
+    "TestJumpGeometryLightDarkAndUnread",
+    "TestMessageMenuBlankPreservesActualSelection",
+    "TestMessageMenuCancelBlankAndOtherTextSelection",
+    "TestMessageMenuMeasuredBlankDoesNotReusePreviousHover",
+    "TestMessageMenuSameOwnerStreamUsesOpeningSnapshot",
+    "TestTranscriptActivityExplicitSubmitClears",
+    "TestTranscriptActivityIgnoresClockUsageAndDetectsImage",
+    "TestTranscriptActivityOpaqueOwnerAndHiddenRoundtrip",
+    "TestTranscriptActivityRawToolPartialAndCompletion",
+    "TestTranscriptActivityTailInitializationResetAndReorder",
+    "TestTranscriptVariableHeightFollowAndReaderPosition"
+  ],
+  "geometry_all_names": 25,
+  "scope": "Isolated source aggregate only; marker unchanged, no external publication or native OS acceptance; root conditional skips retained."
+}

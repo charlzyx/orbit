@@ -1,0 +1,100 @@
+// The overlay is a test-only input/paint probe on the actual App. It is built
+// after App.View, so these captures are not final jump-over-fade paint ordering.
+func TestFadeWrapperActualAppInputAndPaintProbe(t *testing.T) {
+	for _, mode := range []string{"light", "dark"} {
+		t.Run(mode, func(t *testing.T) {
+			a := fixture(t)
+			a.Appearance.Mode = mode
+			a.Prefs.ReduceMotion = true
+			s := Snapshot{RuntimeID: "fade", SessionID: "fade"}
+			for i := 0; i < 120; i++ {
+				s.Messages = append(s.Messages, Message{ID: fmt.Sprint(i), Role: "user", Text: fmt.Sprintf("Fade message %03d", i)})
+			}
+			a.SetSnapshot(s)
+			probe := false
+			var bounds ui.Rect
+			tt := ui.NewTester(func(c *ui.Context) {
+				a.View(c)
+				bounds = a.transcript.Handle.Bounds(c)
+				if probe && !a.transcript.AtEnd() {
+					ui.Box(c.Key("test-fade-viewport")).Absolute().Left(bounds.X).Top(bounds.Y).Width(bounds.W).Height(bounds.H).PassThrough().Children(func() { testSourceFade(c, a.Theme.Background) })
+				}
+			}, 1200, 800)
+			for i := 0; i < 6; i++ {
+				tt.Scroll(700, 400, 0, -30)
+			}
+			tt.Frame()
+			tt.Frame()
+			original := tt.Image()
+			probe = true
+			tt.Frame()
+			tt.Frame()
+			faded := tt.Image()
+			changed := 0
+			for y := int(bounds.Y+bounds.H) - 48; y < int(bounds.Y+bounds.H); y++ {
+				for x := int(bounds.X); x < int(bounds.X+bounds.W); x++ {
+					if original.RGBAAt(x, y) != faded.RGBAAt(x, y) {
+						changed++
+					}
+				}
+			}
+			if changed == 0 {
+				t.Fatal("actual App missing-fade paint probe made no difference")
+			}
+			t.Logf("test-only source fade changes %d pixels within actual bottom48 strip; production contains no fade", changed)
+			before := a.transcriptScroll.Y
+			tt.Scroll(bounds.X+10, bounds.Y+bounds.H-20, 0, -30)
+			tt.Frame()
+			if a.transcriptScroll.Y >= before {
+				t.Fatal("fade wrapper intercepted wheel")
+			}
+			// A real message under the fade remains an exact menu target.
+			target := ""
+			var r ui.Rect
+			for tries := 0; tries < 20 && target == ""; tries++ {
+				for _, m := range s.Messages {
+					q, ok := tt.Find(m.Text)
+					if ok && q.Y+q.H/2 > bounds.Y+bounds.H-48 && q.Y+q.H/2 < bounds.Y+bounds.H-4 {
+						target, r = m.Text, q
+						break
+					}
+				}
+				if target == "" {
+					tt.Scroll(bounds.X+10, bounds.Y+bounds.H-20, 0, -5)
+					tt.Frame()
+				}
+			}
+			if target == "" {
+				t.Fatal("no measured message under fade")
+			}
+			if e := tt.RightClick(target); e != nil {
+				t.Fatal(e)
+			}
+			if e := tt.ChooseMenuItem("Copy Message"); e != nil {
+				t.Fatal(e)
+			}
+			if tt.Clipboard() != target {
+				t.Fatal("fade retargeted menu")
+			}
+			tt.Press(r.X+17, r.Y+r.H/2)
+			tt.Move(r.X+r.W-17, r.Y+r.H/2)
+			tt.Release(r.X+r.W-17, r.Y+r.H/2)
+			tt.Key(ui.Cmd, ui.KeyC)
+			if !strings.Contains(tt.Clipboard(), target) {
+				t.Fatalf("fade hid text from selection: %q", tt.Clipboard())
+			}
+			if dir := os.Getenv("ORBIT_FADE_CAPTURE_DIR"); dir != "" {
+				for name, im := range map[string]*image.RGBA{"production-" + mode: original, "test-probe-after-App-" + mode: faded} {
+					f, e := os.Create(filepath.Join(dir, name+".png"))
+					if e != nil {
+						t.Fatal(e)
+					}
+					if e = png.Encode(f, im); e != nil {
+						t.Fatal(e)
+					}
+					f.Close()
+				}
+			}
+		})
+	}
+}

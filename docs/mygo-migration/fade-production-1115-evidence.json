@@ -1,0 +1,199 @@
+{
+  "base": "13eea694145d80d861a0276c8845bab0cdd7744f",
+  "package": "github.com/charlzyx/orbit/internal/ui",
+  "expected_top_level_names": [
+    "TestAuditJumpAffordanceDoesNotResizeTranscriptViewport",
+    "TestAuditScrolledTranscriptNewActivity",
+    "TestComposerNativeTurnNavigation",
+    "TestFadeOwnWrapperClipsFixed48WithoutRescaling",
+    "TestHostRetainedTranscriptSelectionUnmountAndSessionReset",
+    "TestJumpGeometryEmptyLayerPassesWheelSelectionAndMenu",
+    "TestJumpGeometryFocusedButtonKeyboardActivation",
+    "TestJumpGeometryLightDarkAndUnread",
+    "TestMessageMenuBlankPreservesActualSelection",
+    "TestMessageMenuCancelBlankAndOtherTextSelection",
+    "TestMessageMenuMeasuredBlankDoesNotReusePreviousHover",
+    "TestMessageMenuSameOwnerStreamUsesOpeningSnapshot",
+    "TestTranscriptActivityExplicitSubmitClears",
+    "TestTranscriptActivityIgnoresClockUsageAndDetectsImage",
+    "TestTranscriptActivityOpaqueOwnerAndHiddenRoundtrip",
+    "TestTranscriptActivityRawToolPartialAndCompletion",
+    "TestTranscriptActivityTailInitializationResetAndReorder",
+    "TestTranscriptFadeProductionOrderBoundsAndCapture",
+    "TestTranscriptFadeProductionTinyViewportClip",
+    "TestTranscriptVariableHeightFollowAndReaderPosition"
+  ],
+  "counts": {
+    "TestAuditJumpAffordanceDoesNotResizeTranscriptViewport": {
+      "run": 3,
+      "output": 9,
+      "pass": 3
+    },
+    "TestAuditScrolledTranscriptNewActivity": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestAuditScrolledTranscriptNewActivity/append": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestAuditScrolledTranscriptNewActivity/stream_text": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestAuditScrolledTranscriptNewActivity/thinking": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestAuditScrolledTranscriptNewActivity/tool_output": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestComposerNativeTurnNavigation": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestFadeOwnWrapperClipsFixed48WithoutRescaling": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestFadeOwnWrapperClipsFixed48WithoutRescaling/24": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestFadeOwnWrapperClipsFixed48WithoutRescaling/80": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestHostRetainedTranscriptSelectionUnmountAndSessionReset": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestJumpGeometryEmptyLayerPassesWheelSelectionAndMenu": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestJumpGeometryFocusedButtonKeyboardActivation": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestJumpGeometryLightDarkAndUnread": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestJumpGeometryLightDarkAndUnread/dark": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestJumpGeometryLightDarkAndUnread/light": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestMessageMenuBlankPreservesActualSelection": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestMessageMenuCancelBlankAndOtherTextSelection": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestMessageMenuMeasuredBlankDoesNotReusePreviousHover": {
+      "run": 3,
+      "output": 9,
+      "pass": 3
+    },
+    "TestMessageMenuSameOwnerStreamUsesOpeningSnapshot": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestTranscriptActivityExplicitSubmitClears": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestTranscriptActivityIgnoresClockUsageAndDetectsImage": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestTranscriptActivityOpaqueOwnerAndHiddenRoundtrip": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestTranscriptActivityRawToolPartialAndCompletion": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestTranscriptActivityRawToolPartialAndCompletion/false": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestTranscriptActivityRawToolPartialAndCompletion/true": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestTranscriptActivityTailInitializationResetAndReorder": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestTranscriptFadeProductionOrderBoundsAndCapture": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestTranscriptFadeProductionOrderBoundsAndCapture/dark": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestTranscriptFadeProductionOrderBoundsAndCapture/light": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestTranscriptFadeProductionTinyViewportClip": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestTranscriptVariableHeightFollowAndReaderPosition": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    }
+  },
+  "elapsed": 36.309,
+  "scope": "Focused local CPU tests only, no full suite or hosted-native",
+  "logs_and_images_sha256": {
+    "/tmp/orbit-fade-final-1113.jsonl": "1c42a67521b1beb7b97116805e621052e5d1fa7e6c0880e315f1f83eb2c96610",
+    "/tmp/orbit-fade-final-1113.status": "d68d6bd807836ddd527201d1a819c2c4f07c15c1d15f06264392d4dd75969f3c",
+    "/tmp/orbit-fade-vet-1113.log": "9da2d27b7ee72dd6c6d7e2ae1b7563cfb188c722afb006b10f70efacf395b90a",
+    "/tmp/orbit-fade-arm64-1113.log": "9da2d27b7ee72dd6c6d7e2ae1b7563cfb188c722afb006b10f70efacf395b90a",
+    "/tmp/orbit-fade-production-final-1113/production-fade-dark.png": "2d3ae6a606fc609ad7e17e05b746a714ed725b7b95ec63dcbd1b6b7584bda96a",
+    "/tmp/orbit-fade-production-final-1113/production-fade-light.png": "d3596b0056f6cc4effb66881e93966be196d201aa4bac7a122a78912009f0313",
+    "/tmp/orbit-fade-production-final-1113/production-fade-tiny.png": "a0a9ca0f3d10bdb4a546d7d2b843b83df8a72e6661291fbf087dde7e99798a4f"
+  }
+}

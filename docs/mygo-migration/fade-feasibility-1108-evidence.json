@@ -1,0 +1,49 @@
+{
+  "base": "13eea694145d80d861a0276c8845bab0cdd7744f",
+  "scope": "Test-only feasibility, production untouched",
+  "expected_top_level_names": [
+    "TestFadeOwnWrapperClipsFixed48WithoutRescaling",
+    "TestFadeWrapperActualAppInputAndPaintProbe"
+  ],
+  "actual_counts": {
+    "TestFadeOwnWrapperClipsFixed48WithoutRescaling": {
+      "run": 1,
+      "output": 2,
+      "pass": 1
+    },
+    "TestFadeOwnWrapperClipsFixed48WithoutRescaling/24": {
+      "run": 1,
+      "output": 2,
+      "pass": 1
+    },
+    "TestFadeOwnWrapperClipsFixed48WithoutRescaling/80": {
+      "run": 1,
+      "output": 2,
+      "pass": 1
+    },
+    "TestFadeWrapperActualAppInputAndPaintProbe": {
+      "run": 1,
+      "output": 2,
+      "pass": 1
+    },
+    "TestFadeWrapperActualAppInputAndPaintProbe/dark": {
+      "run": 1,
+      "output": 3,
+      "pass": 1
+    },
+    "TestFadeWrapperActualAppInputAndPaintProbe/light": {
+      "run": 1,
+      "output": 3,
+      "pass": 1
+    }
+  },
+  "sha256": {
+    "/tmp/orbit-fade-input-paint-1107.jsonl": "d1f054d6275abc31d97ad918ac2de370d6e96f45f645e045409f6c4f00b8a4c8",
+    "/tmp/orbit-fade-captures-1107/clip-24.png": "4fb41bd5474ec64ca352c7c68dc73a617ad67568895f68d19de5c8685b8cc819",
+    "/tmp/orbit-fade-captures-1107/clip-80.png": "ea2e0d702a024e4ac5c258ed79631d4b51dd4840b804d7595f6b7e7914af55b5",
+    "/tmp/orbit-fade-captures-1107/production-dark.png": "7c763535118e90a4d5ce6c57017d46dff4eba70d0878ae0d8effc044685c41dc",
+    "/tmp/orbit-fade-captures-1107/production-light.png": "17f28fce382ac8c56e2ad62a1081f30abefb8ad5d06f9b7510fcba933a67815c",
+    "/tmp/orbit-fade-captures-1107/test-probe-after-App-dark.png": "f95db5f72722a0a16605b2cc8290af7196294c82ccf563f57f2a24e082195353",
+    "/tmp/orbit-fade-captures-1107/test-probe-after-App-light.png": "6474f29a184a957413699a2538f1ed18e941f65546c56522a180cc11da4e7e09"
+  }
+}
