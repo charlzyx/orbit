@@ -483,7 +483,7 @@ func (m *Manager) NewSession(workspace string) error {
 				entry.creatingSession = false
 				entry.loading = false
 				entry.state.snapshot.Status = "Disconnected"
-				entry.state.snapshot.setConnectionError(err.Error())
+				entry.state.snapshot.setCommandError(pirpc.NewSession, err.Error())
 				entry.state.snapshot.Connected = false
 			}
 			m.mu.Unlock()
@@ -623,6 +623,9 @@ func (m *Manager) Send(kind string, params map[string]any) error {
 	}
 	var before func()
 	commandContext := m.ctx
+	if kind == pirpc.Abort {
+		entry.state.requestAbort()
+	}
 	if kind == pirpc.Abort && entry.promptCancel != nil {
 		entry.promptCancel()
 		entry.state.awaiting = false
@@ -644,6 +647,9 @@ func (m *Manager) Send(kind string, params map[string]any) error {
 			entry.turnOpen = true
 			before = m.checkpointLocked(entry, true)
 		}
+		m.sequence++
+		command.ID = fmt.Sprintf("orbit-composer-%d", m.sequence)
+		entry.state.promptInFlight = command.ID
 		entry.state.awaiting = true
 		entry.state.snapshot.Status = "Waiting for Pi"
 	}
@@ -686,9 +692,11 @@ func (m *Manager) Send(kind string, params map[string]any) error {
 			}
 			if (kind == pirpc.Prompt || kind == pirpc.Steer || kind == pirpc.FollowUp) && errors.Is(err, context.Canceled) {
 				m.mu.Lock()
-				entry.state.awaiting = false
-				if !entry.state.snapshot.Running {
-					entry.state.snapshot.Status = "Ready"
+				if kind != pirpc.Prompt || entry.state.ownsPrompt(command.ID) {
+					entry.state.awaiting = false
+					if !entry.state.snapshot.Running {
+						entry.state.snapshot.Status = "Ready"
+					}
 				}
 				m.mu.Unlock()
 				m.changed()
@@ -697,9 +705,11 @@ func (m *Manager) Send(kind string, params map[string]any) error {
 			var rejected *pirpc.CommandError
 			if !errors.As(err, &rejected) {
 				m.mu.Lock()
-				if current := m.sessions[key]; current == entry && !m.closed && !entry.stopped {
-					current.state.snapshot.setConnectionError(err.Error())
-					current.state.awaiting = false
+				if current := m.sessions[key]; current == entry && !m.closed && !entry.stopped && (kind != pirpc.Prompt || current.state.ownsPrompt(command.ID)) {
+					current.state.snapshot.setCommandError(kind, err.Error())
+					if kind != pirpc.Prompt || current.state.ownsPrompt(command.ID) {
+						current.state.awaiting = false
+					}
 				}
 				m.mu.Unlock()
 			}
@@ -888,6 +898,7 @@ func (m *Manager) Tick() bool {
 			if (entry.creatingSession || entry.stopped) && event.Type == "response" && event.String("command") == pirpc.GetState {
 				continue
 			}
+			composerReply := event.Type == "response" && event.String("command") == pirpc.Prompt && entry.state.ownsPrompt(event.ID)
 			wasRunning := entry.state.snapshot.Running
 			parkedRequest := key != m.active && event.Type == "extension_ui_request"
 			if parkedRequest {
@@ -951,7 +962,15 @@ func (m *Manager) Tick() bool {
 					notifications = append(notifications, Notification{SessionID: row.ID, SessionPath: row.Path, Title: row.Name, Message: event.String("title"), Kind: "input-needed", Active: true})
 				}
 			}
-			if event.Type == "response" && event.String("command") == pirpc.Prompt && event.Bool("success") {
+			if composerReply && !event.Bool("success") {
+				// Rejected before a run: retire only this optimistic turn, never
+				// manufacture a completed checkpoint for a failed prompt.
+				entry.turnOpen = false
+				if !entry.state.snapshot.Running && !entry.state.snapshot.Retrying && !entry.state.snapshot.Compacting {
+					entry.state.snapshot.Status = "Ready"
+				}
+			}
+			if composerReply && event.Bool("success") {
 				var reply struct{ Disposition string }
 				_ = event.DecodeField("data", &reply)
 				if reply.Disposition == "handled" && entry.turnOpen {
@@ -1510,6 +1529,7 @@ func (m *Manager) Abort() error {
 		m.mu.Unlock()
 		return errors.New("Pi session is not ready")
 	}
+	entry.state.requestAbort()
 	if entry.promptCancel != nil {
 		entry.promptCancel()
 	}
@@ -1560,7 +1580,7 @@ func (m *Manager) Abort() error {
 			} else if err != nil {
 				m.mu.Lock()
 				if !m.closed && m.sessions[key] == entry && entry.client == client && origin.matches(entry) {
-					entry.state.snapshot.setConnectionError(err.Error())
+					entry.state.snapshot.setCommandError(pirpc.Abort, err.Error())
 				}
 				m.mu.Unlock()
 			}

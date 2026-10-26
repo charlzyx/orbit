@@ -442,7 +442,7 @@ func (a *App) trackExtensionComposer(c *ui.Context, input ui.Element) {
 
 func (a *App) extensionStatus(c *ui.Context) {
 	if extensionStatusVisible(a.Model.ExtensionStatusAt, time.Now()) && a.Model.ExtensionStatusText != "" {
-		ui.Text(c, a.Model.ExtensionStatusText).MaxWidth(a.Theme.Px(320)).MaxLines(1).TextColor(a.Theme.TextMuted).FontSize(a.Theme.Px(12))
+		ui.Text(c, statusPlainText(a.Model.ExtensionStatusText)).MaxWidth(a.Theme.Px(320)).MaxLines(1).TextColor(a.Theme.TextMuted).FontSize(a.Theme.Px(12))
 	}
 }
 func extensionStatusVisible(at, now time.Time) bool {

@@ -11,6 +11,8 @@ import (
 )
 
 type sessionState struct {
+	abortRequested       bool
+	promptInFlight       string
 	retrySequence        uint64
 	compactionNonce      uint64
 	manualCompactPending bool
@@ -52,6 +54,8 @@ func (s *sessionState) applyRecord(event pirpc.Event) {
 		s.awaiting = false
 		s.snapshot.Status = "Running"
 	case "agent_settled":
+		s.abortRequested = false
+		s.promptInFlight = ""
 		s.snapshot.Running = false
 		s.awaiting = false
 		s.snapshot.Retrying = false
@@ -68,6 +72,7 @@ func (s *sessionState) applyRecord(event pirpc.Event) {
 	case "message_start":
 		s.startMessage(event.Fields["message"])
 	case "message_end":
+		s.applyMessageError(event.Raw)
 		s.endMessage(event.Fields["message"])
 	case "message_update":
 		s.updateMessage(event)
@@ -97,11 +102,13 @@ func (s *sessionState) applyRecord(event pirpc.Event) {
 		s.snapshot.RetryDetail = retryDetail(event)
 		s.snapshot.RetryDetail.Revision = s.retrySequence
 	case "auto_retry_end":
+		cancelled := s.abortRequested
+		s.abortRequested = false
 		s.snapshot.Retrying = false
 		s.snapshot.RetryDetail = RetryDetail{}
-		// Only an explicit false is exhaustion; cancellation/omitted success
-		// must not invent a terminal failure (pinned events.rs).
-		if string(event.Fields["success"]) == "false" {
+		// Upstream #87: explicit user cancellation is not retry exhaustion.
+		// AgentStart deliberately does not clear the admitted abort intent.
+		if string(event.Fields["success"]) == "false" && !cancelled {
 			var reported string
 			provided := json.Unmarshal(event.Fields["finalError"], &reported) == nil && string(event.Fields["finalError"]) != "null"
 			s.snapshot.setRetryFailure(reported, provided)
@@ -116,6 +123,8 @@ func (s *sessionState) applyRecord(event pirpc.Event) {
 			s.snapshot.setConnectionError(event.String("message"))
 		}
 	case "process_exited", "transport_error":
+		s.abortRequested = false
+		s.promptInFlight = ""
 		s.clearExtensionUI()
 		s.snapshot.Connected = false
 		s.manualCompactPending = false
@@ -164,11 +173,15 @@ func (s *sessionState) applyResponse(event pirpc.Event) {
 			s.snapshot.QuotaSupport = "unsupported"
 			return
 		}
-		s.snapshot.setConnectionError(response.Error)
-		if response.Command == pirpc.Prompt {
+		s.snapshot.setCommandError(response.Command, response.Error)
+		if response.Command == pirpc.Prompt && s.ownsPrompt(response.ID) {
+			s.promptInFlight = ""
 			s.awaiting = false
 		}
 		return
+	}
+	if !dedicatedErrorCommand(response.Command) {
+		s.snapshot.clearErrorFrom(errorSource{Command: response.Command})
 	}
 	data := response.Data
 	switch response.Command {
@@ -188,6 +201,8 @@ func (s *sessionState) applyResponse(event pirpc.Event) {
 			return
 		}
 		if s.snapshot.ActiveSession.ID != "" && state.SessionID != s.snapshot.ActiveSession.ID {
+			s.abortRequested = false
+			s.promptInFlight = ""
 			s.snapshot.Turn = 0
 			s.snapshot.LatestTurn = 0
 			s.snapshot.CheckpointRecovering = false
@@ -294,6 +309,10 @@ func (s *sessionState) applyResponse(event pirpc.Event) {
 	case pirpc.GetEntries:
 		s.applyEntries(data)
 	case pirpc.Prompt:
+		if !s.ownsPrompt(response.ID) {
+			return
+		}
+		s.promptInFlight = ""
 		var value struct{ Disposition string }
 		_ = json.Unmarshal(data, &value)
 		if value.Disposition == "handled" {

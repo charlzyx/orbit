@@ -160,13 +160,14 @@ type ExtensionStatus struct {
 	Patches                       PatchStatus
 }
 type Snapshot struct {
-	RetryFailure        RetryFailure
-	RuntimeID           string
-	ComposerRevision    uint64
-	ExtensionStatusText string
-	ExtensionStatusAt   time.Time
-	Awaiting            bool
-	Turn                int
+	ConnectionErrorSource errorSource `json:"-"`
+	RetryFailure          RetryFailure
+	RuntimeID             string
+	ComposerRevision      uint64
+	ExtensionStatusText   string
+	ExtensionStatusAt     time.Time
+	Awaiting              bool
+	Turn                  int
 	// LatestTurn is the newest successfully captured completed turn. Turn may
 	// already identify a running prompt; Review must never substitute it here.
 	LatestTurn                               int

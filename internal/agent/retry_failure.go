@@ -4,6 +4,7 @@ package agent
 // their existing error text, priority, timing and lifecycle decisions.
 func (s *Snapshot) setConnectionError(message string) {
 	s.ConnectionError = message
+	s.ConnectionErrorSource = errorSource{}
 	s.RetryFailure = RetryFailure{}
 }
 func (s *Snapshot) setRetryFailure(message string, provided bool) {

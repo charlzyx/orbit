@@ -140,6 +140,8 @@ func (m *Manager) Stop() error {
 	if entry.promptCancel != nil {
 		entry.promptCancel()
 	}
+	entry.state.abortRequested = false
+	entry.state.promptInFlight = ""
 	entry.state.awaiting = false
 	entry.state.snapshot.Connected = false
 	entry.state.snapshot.Running = false
