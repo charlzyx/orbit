@@ -674,14 +674,24 @@ func (a *App) fileEditor(c *ui.Context) {
 
 func (a *App) fileEditorContent(c *ui.Context) {
 	s := a.files
-	t := a.Theme
 	docs := s.editor.Documents()
 	d, ok := s.editor.Active()
 	if !ok {
 		a.Empty(c, "Open a file", "Select a file in the explorer to view or edit it.")
 		return
 	}
-	a.bindFileNative(d)
+	a.fileEditorDocument(c, docs, d)
+}
+
+// fileEditorDocument renders an Active snapshot; background close may finish
+// after that snapshot was taken.
+func (a *App) fileEditorDocument(c *ui.Context, docs []workspace.Document, d workspace.Document) {
+	s := a.files
+	t := a.Theme
+	if !a.bindFileNative(d) {
+		c.AnimationFrame()
+		return
+	}
 	ui.Row(c).Height(40).Gap(t.Space(6)).Padding(0, t.Space(16), 0, 0).Background(t.Surface).Children(func() {
 		ui.ScrollHorizontal(c.Key("file-tabs")).Label("File tabs").Grow(1).MinWidth(0).FillHeight().Children(func() {
 			ui.Row(c).FillHeight().Gap(t.Space(6)).AlignItems(ui.Center).Children(func() {
@@ -774,11 +784,20 @@ func (a *App) fileEditorContent(c *ui.Context) {
 		ui.Scroll(c).Grow(1).MinHeight(0).Children(func() { markdown.View(c, d.Text, &a.md).Padding(24).MaxWidth(960) })
 		return
 	}
-	a.bindFileNative(d)
+	if !a.bindFileNative(d) {
+		c.AnimationFrame()
+		return
+	}
 	st := s.states[d.Content.Path]
 	if st == nil {
 		a.syncDocument(d)
 		st = s.states[d.Content.Path]
+	}
+	// A close may complete after bind's live check but before syncDocument;
+	// rejected snapshots intentionally do not create a replacement editor.
+	if st == nil {
+		c.AnimationFrame()
+		return
 	}
 	st.Font = ui.Font{Family: a.Fonts.CodeFamily, Size: float32(a.Prefs.EditorFontSize)}
 	st.Theme = t.Code()

@@ -30,6 +30,8 @@ Download the arm64 DMG for Apple Silicon. Future builds are arm64 only; existing
 
 This exact arm64 DMG passed matching-architecture hosted macOS launch smoke: read-only mount, copy outside build directory, detach, native visible first frame with captured PNG, Ghostty load, Pi RPC get_state, second launch and unchanged app bytes. These are bounded smoke checks, not full feature or pixel parity, not downloaded-app Gatekeeper acceptance, and not successful model inference.
 
+This revision also prevents an editor render crash when a file closes between its active snapshot and native editor binding. The failed .3 validation created no release assets; the original failure is retained in migration evidence.
+
 This is not Developer ID signed or notarized. macOS may block opening a downloaded build. If blocked, stop and report the message; no OS security changes or bypass commands are provided. The first experimental release/tag/assets remain unchanged.
 
 '''+(HERE/'KNOWN-LIMITS.txt').read_text())

@@ -1,0 +1,340 @@
+{
+  "status": "PASS",
+  "commit": "29bc26e9fdf48d700e2cc29469afbcd978f3a28c",
+  "verified_hashes": 1824,
+  "logs": {
+    "full": {
+      "sha256": "1048c8ae5d473e14fce6823da32a4e3da3ce102ebc5766de7406c2a70fa9a659",
+      "pass_events": 3374,
+      "skips": [
+        {
+          "package": "github.com/charlzyx/orbit/internal/agent",
+          "test": "TestDeleteSessionCaseVariantProtectsLiveFileWhereSupported"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/mcpui",
+          "test": "TestNativeCaptureMCP"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/modelui",
+          "test": "TestNativeModelUICaptures"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/preferences",
+          "test": "TestWorkspaceRevisionCaseAliasWhenSupported"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/resourceui",
+          "test": "TestNativeCaptureResources"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/resourceui",
+          "test": "TestNativeCaptureFullResourceSlots"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/transcriptui",
+          "test": "TestNativeTranscriptCapture"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/transcriptui",
+          "test": "TestNativeRetainedSelectionCapture"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/ui",
+          "test": "TestNativeModelAndWorkspaceHostCaptures"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/ui",
+          "test": "TestNavigationRailCapture"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/ui",
+          "test": "TestOnboardingCapture"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/ui",
+          "test": "TestReviewToolbarCPUEvidence"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/ui",
+          "test": "TestSetupMigrationCapture"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/ui",
+          "test": "TestNativeCapture"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/ui",
+          "test": "TestNativeUsageShellCapture"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/ui",
+          "test": "TestNativeUsageCapture"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/ui",
+          "test": "TestNativeUsageComponentCaptures"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/ui",
+          "test": "TestNativeViewerCapture"
+        },
+        {
+          "package": "github.com/charlzyx/orbit/internal/workbench",
+          "test": "TestLivePiProviderMetadataWithoutInference"
+        }
+      ],
+      "packages": [
+        {
+          "Time": "2026-10-26T17:48:35.029989958+09:00",
+          "Action": "pass",
+          "Package": "github.com/charlzyx/orbit",
+          "Elapsed": 1.635
+        },
+        {
+          "Time": "2026-10-26T17:48:41.955358148+09:00",
+          "Action": "pass",
+          "Package": "github.com/charlzyx/orbit/cmd/orbit",
+          "Elapsed": 1.019
+        },
+        {
+          "Time": "2026-10-26T17:51:10.901989185+09:00",
+          "Action": "pass",
+          "Package": "github.com/charlzyx/orbit/internal/agent",
+          "Elapsed": 148.532
+        },
+        {
+          "Time": "2026-10-26T17:51:14.587305737+09:00",
+          "Action": "pass",
+          "Package": "github.com/charlzyx/orbit/internal/appbundle",
+          "Elapsed": 3.176
+        },
+        {
+          "Time": "2026-10-26T17:51:14.59046376+09:00",
+          "Action": "pass",
+          "Package": "github.com/charlzyx/orbit/internal/attachments",
+          "Elapsed": 0
+        },
+        {
+          "Time": "2026-10-26T17:51:16.622930741+09:00",
+          "Action": "pass",
+          "Package": "github.com/charlzyx/orbit/internal/background",
+          "Elapsed": 1.564
+        },
+        {
+          "Time": "2026-10-26T17:51:27.554042489+09:00",
+          "Action": "pass",
+          "Package": "github.com/charlzyx/orbit/internal/bugreportui",
+          "Elapsed": 5.319
+        },
+        {
+          "Time": "2026-10-26T17:51:30.608221393+09:00",
+          "Action": "pass",
+          "Package": "github.com/charlzyx/orbit/internal/composerui",
+          "Elapsed": 2.498
+        },
+        {
+          "Time": "2026-10-26T17:51:30.621730418+09:00",
+          "Action": "pass",
+          "Package": "github.com/charlzyx/orbit/internal/diagnosticlog",
+          "Elapsed": 0
+        },
+        {
+          "Time": "2026-10-26T17:51:46.449780294+09:00",
+          "Action": "pass",
+          "Package": "github.com/charlzyx/orbit/internal/gitworkbench",
+          "Elapsed": 15.149
+        },
+        {
+          "Time": "2026-10-26T17:51:47.938627975+09:00",
+          "Action": "pass",
+          "Package": "github.com/charlzyx/orbit/internal/highlight",
+          "Elapsed": 1.279
+        },
+        {
+          "Time": "2026-10-26T17:51:50.739422416+09:00",
+          "Action": "pass",
+          "Package": "github.com/charlzyx/orbit/internal/markdownimage",
+          "Elapsed": 2.23
+        },
+        {
+          "Time": "2026-10-26T17:51:53.750238266+09:00",
+          "Action": "pass",
+          "Package": "github.com/charlzyx/orbit/internal/mcpui",
+          "Elapsed": 2.475
+        },
+        {
+          "Time": "2026-10-26T17:51:57.614096374+09:00",
+          "Action": "pass",
+          "Package": "github.com/charlzyx/orbit/internal/modelui",
+          "Elapsed": 3.349
+        },
+        {
+          "Time": "2026-10-26T17:52:39.243906517+09:00",
+          "Action": "pass",
+          "Package": "github.com/charlzyx/orbit/internal/native",
+          "Elapsed": 40.92
+        },
+        {
+          "Time": "2026-10-26T17:52:39.24663343+09:00",
+          "Action": "pass",
+          "Package": "github.com/charlzyx/orbit/internal/pirpc",
+          "Elapsed": 0
+        },
+        {
+          "Time": "2026-10-26T17:52:40.733068572+09:00",
+          "Action": "pass",
+          "Package": "github.com/charlzyx/orbit/internal/preferences",
+          "Elapsed": 1.267
+        },
+        {
+          "Time": "2026-10-26T17:52:44.076342076+09:00",
+          "Action": "pass",
+          "Package": "github.com/charlzyx/orbit/internal/resourceui",
+          "Elapsed": 2.846
+        },
+        {
+          "Time": "2026-10-26T17:52:44.079719401+09:00",
+          "Action": "pass",
+          "Package": "github.com/charlzyx/orbit/internal/runtimepath",
+          "Elapsed": 0
+        },
+        {
+          "Time": "2026-10-26T17:52:46.08457914+09:00",
+          "Action": "pass",
+          "Package": "github.com/charlzyx/orbit/internal/terminal",
+          "Elapsed": 1.401
+        },
+        {
+          "Time": "2026-10-26T17:52:48.113352303+09:00",
+          "Action": "pass",
+          "Package": "github.com/charlzyx/orbit/internal/transcriptui",
+          "Elapsed": 1.444
+        },
+        {
+          "Time": "2026-10-26T17:58:57.363039301+09:00",
+          "Action": "pass",
+          "Package": "github.com/charlzyx/orbit/internal/ui",
+          "Elapsed": 368.423
+        },
+        {
+          "Time": "2026-10-26T17:59:10.709491788+09:00",
+          "Action": "pass",
+          "Package": "github.com/charlzyx/orbit/internal/workbench",
+          "Elapsed": 13.051
+        },
+        {
+          "Time": "2026-10-26T17:59:10.8491613+09:00",
+          "Action": "pass",
+          "Package": "github.com/charlzyx/orbit/internal/workspace",
+          "Elapsed": 0.001
+        },
+        {
+          "Time": "2026-10-26T17:59:13.33343024+09:00",
+          "Action": "pass",
+          "Package": "github.com/charlzyx/orbit/internal/worktreeui",
+          "Elapsed": 1.9889999999999999
+        }
+      ]
+    },
+    "toolkit": {
+      "sha256": "30f3333333d554f1f32b567e383e1a5e37ba7caac9c97f304ba56dc651c64985",
+      "pass_events": 19,
+      "skips": [],
+      "packages": [
+        {
+          "Time": "2026-10-26T17:59:15.784302287+09:00",
+          "Action": "pass",
+          "Package": "github.com/egoist/mygo/ui",
+          "Elapsed": 1.2349999999999999
+        }
+      ]
+    },
+    "terminal": {
+      "sha256": "83bcb47a0ec22db11cfef64a84dd016db98b3e6209aa6e170cc5c7b956b6d882",
+      "pass_events": 115,
+      "skips": [
+        {
+          "package": "github.com/egoist/mygo/orbit-terminal/internal/pty",
+          "test": "TestConPTY"
+        },
+        {
+          "package": "github.com/egoist/mygo/orbit-terminal",
+          "test": "TestWindowsShell"
+        }
+      ],
+      "packages": [
+        {
+          "Time": "2026-10-26T17:59:18.266684878+09:00",
+          "Action": "pass",
+          "Package": "github.com/egoist/mygo/orbit-terminal/internal/pty",
+          "Elapsed": 1.02
+        },
+        {
+          "Time": "2026-10-26T17:59:18.306674008+09:00",
+          "Action": "pass",
+          "Package": "github.com/egoist/mygo/orbit-terminal/internal/vt",
+          "Elapsed": 1.06
+        },
+        {
+          "Time": "2026-10-26T18:00:33.451827563+09:00",
+          "Action": "pass",
+          "Package": "github.com/egoist/mygo/orbit-terminal",
+          "Elapsed": 76.206
+        }
+      ]
+    }
+  },
+  "critical_exact_pairs": [
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestFileEditorFailedSyncRetainsVersionAndRetries"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestGoBrandDedicatedIconAndLightDarkScreens"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestMountedFileHeldSnapshotAfterRealCloseDoesNotReviveEditor"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestMountedFilePrimaryWAndShiftWHaveDistinctScopes"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestMountedFileRenameSubtreeKeepsEveryBufferCaretAndUndo"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestMountedFileReopenQueuedBehindCloseCannotStealLaterSelection"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestMountedFileStaleSnapshotCannotRenderReopenedPath"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestNativeSyncRejectsClosedAndRenamedSnapshots"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestNativeSyncRejectsClosedAndRenamedSnapshots/closed"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestNativeSyncRejectsClosedAndRenamedSnapshots/renamed_again"
+    },
+    {
+      "package": "github.com/charlzyx/orbit/internal/ui",
+      "test": "TestTruncatedViewerBufferStaysBounded"
+    }
+  ],
+  "runtime_inputs": 1027,
+  "runtime_fingerprint": "3e88b194d68ec9281e7d65abb46430fb41788aa87d34aab5f0fd5b07ec07708a",
+  "version": "0.2.12-go-test.20261026.4",
+  "vet": "EXIT0",
+  "darwin_arm64": "BUILD_EXIT0",
+  "python_tests": "36 main plus nested tests; separate legacy21 PASS"
+}

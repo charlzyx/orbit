@@ -1,0 +1,7 @@
+# Distinct Go icon release 4 candidate
+
+Based on exact c2122d227147dc2efb588f588ccd57d90637ed61. The .3 release validation failed with a nil pointer in fileEditorContent after a file close; native and publication jobs were skipped, and release/tag APIs were 404. Ordinary c212 CI passed independently and does not erase this failure.
+
+This candidate includes only the reviewed stale-render rejection/regressions plus explicit execution of all five Go icon packaging tests in release validation. It retains the dedicated cyan/GO assets, BundleID and private Home. No filesystem transaction or context-menu candidate is included. The original keyboard test passed ten local repeats; a controlled real close after Active snapshot reproduced the same dereference. This establishes the boundary, not the exact hosted interleaving.
+
+Version 0.2.12-go-test.20261026.4. Final local aggregate PASS on frozen 29bc26e9fdf48d700e2cc29469afbcd978f3a28c: all 1824 file hashes match, 3374 root PASS events/19 conditional skips, toolkit19/zero skips, terminal115/2 conditional skips, vet and Darwin arm64 build passed. All 11 listed critical package/test identities including the original failure and controlled close/reopen regressions passed. Packaging36 plus nested tests and legacy21 passed. Exact-source hosted release gates remain pending. Public four-asset downloads, hashes and hosted Mac installed resources must be verified before delivery. Existing .2 remains unchanged; full parity and the earlier picker hang remain unconfirmed.
