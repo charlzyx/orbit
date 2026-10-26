@@ -8,7 +8,7 @@ import unittest
 HERE=Path(__file__).resolve().parent
 ROOT=HERE.parent.parent
 MANUAL_EXPRESSION="github.event_name == 'workflow_dispatch' && inputs.capture_chat_stage1 && '1' || '0'"
-ONE_SHOT_EXPRESSION="((github.event_name == 'workflow_dispatch' && inputs.capture_chat_stage1) || (github.event_name == 'push' && github.event.before == 'a5c40cc2f85b57b94c1e2027d5cfc690b8692a49' && github.event.head_commit.message == 'Capture static Chat stage 1 after verified threaded ownership')) && '1' || '0'"
+ONE_SHOT_EXPRESSION="((github.event_name == 'workflow_dispatch' && inputs.capture_chat_stage1) || (github.event_name == 'push' && github.event.before == 'a8f42531e3f4bb0c7450dc427a669a971c4545c5' && github.event.head_commit.message == 'Verify reconstructed composer navigation with static Chat stage 1')) && '1' || '0'"
 class Wiring(unittest.TestCase):
     def test_workflow_is_opt_in_and_same_two_renderers(self):
         s=(ROOT/'.github/workflows/go-native.yml').read_text()
@@ -59,8 +59,8 @@ class OneShotEventMatrix(unittest.TestCase):
         self.assertEqual(len(expressions),2)
         self.assertEqual(expressions[0],expressions[1])
         self.assertIn(expressions[0],(MANUAL_EXPRESSION,ONE_SHOT_EXPRESSION))
-        parent='a5c40cc2f85b57b94c1e2027d5cfc690b8692a49'
-        title='Capture static Chat stage 1 after verified threaded ownership'
+        parent='a8f42531e3f4bb0c7450dc427a669a971c4545c5'
+        title='Verify reconstructed composer navigation with static Chat stage 1'
         cases=[
             ('planned push','push',False,parent,title,'1' if expressions[0]==ONE_SHOT_EXPRESSION else '0'),
             ('normal push','push',False,'another-parent','Ordinary change','0'),
@@ -68,6 +68,8 @@ class OneShotEventMatrix(unittest.TestCase):
             ('wrong parent','push',False,'another-parent',title,'0'),
             ('wrong title','push',False,parent,'Ordinary change','0'),
             ('title suffix','push',False,parent,title+' extra','0'),
+            ('title newline','push',False,parent,title+'\n','0'),
+            ('expired threaded marker','push',False,'a5c40cc2f85b57b94c1e2027d5cfc690b8692a49','Capture static Chat stage 1 after verified threaded ownership','0'),
             ('manual false','workflow_dispatch',False,parent,title,'0'),
             ('manual true','workflow_dispatch',True,'','', '1'),
             ('pull request','pull_request',True,parent,title,'0'),

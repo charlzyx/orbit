@@ -4,6 +4,7 @@ import re
 import unittest
 from contextlib import redirect_stderr,redirect_stdout
 import run_receipt_regression as runner
+from test_wiring import MANUAL_EXPRESSION, ONE_SHOT_EXPRESSION
 
 ROOT=Path(__file__).resolve().parent.parent.parent
 
@@ -22,7 +23,7 @@ class RequiredReceiptWiring(unittest.TestCase):
         for name in ('native-desktop','reference-desktop'):
             self.assertIn('needs: [proc-guard-regression, receipt-guard-regression]',job(source,name))
         expressions=[line.split('${{',1)[1].rsplit('}}',1)[0].strip() for line in source.splitlines()if 'ORBIT_CAPTURE_CHAT_STAGE1:' in line]
-        self.assertEqual(expressions,["github.event_name == 'workflow_dispatch' && inputs.capture_chat_stage1 && '1' || '0'"]*2)
+        self.assertIn(expressions, [ [MANUAL_EXPRESSION]*2, [ONE_SHOT_EXPRESSION]*2 ])
         self.assertIn('default: false',source)
     def test_strict_runner_rejects_skips_and_missing_test_count(self):
         class Skipped(unittest.TestCase):
