@@ -286,7 +286,11 @@ func activity(c *ui.Context, s *State, rowKey string, all []Step, part Part, o O
 							if step.Streaming && scroll.Y >= scroll.MaxY {
 								scroll.Y = math.MaxFloat32
 							}
-							ui.Scroll(sc).TrackScroll(scroll).AlignSelf(ui.Stretch).MaxHeight(260).Children(func() {
+							body := ui.Scroll(sc).TrackScroll(scroll).AlignSelf(ui.Stretch).MaxHeight(260)
+							if o.ThoughtScroll != nil {
+								body.HandleInput(thoughtScrollInput(scroll, o.ThoughtScroll))
+							}
+							body.Children(func() {
 								ui.Text(sc, capChars(step.Thinking, 40000)).Selectable().Font(o.CodeFont).FontSize(o.CodeSize).TextColor(o.Colors.Muted)
 							})
 						}

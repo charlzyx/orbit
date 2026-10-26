@@ -1,0 +1,181 @@
+{
+  "base": "a1fb7be9fe9b86bac7ae7c1409f797842780fa6a",
+  "expected_top": [
+    "TestAuditThoughtSingleWheelResidual",
+    "TestAuditThoughtResidualTailClearsUnread",
+    "TestThoughtScrollInputKindsAndOwnerAdmission",
+    "TestThoughtOptInStreamFollowDetach",
+    "TestThoughtScrollActualAppOwnerChangesRejectCapturedCallback",
+    "TestThoughtStaleMountedInputMustNotFallThrough",
+    "TestThoughtStaleAppHitTreeDoesNotScrollNewRuntime",
+    "TestNativeThinkingTimingAndStreamFollowDetach",
+    "TestJumpGeometryEmptyLayerPassesWheelSelectionAndMenu",
+    "TestNativeVirtualizedCrossRowSelectionAndEndpointLimit",
+    "TestNativeToolKeyboardToggleAndCopy"
+  ],
+  "all_names": [
+    "TestAuditThoughtResidualTailClearsUnread",
+    "TestAuditThoughtResidualTailClearsUnread/false",
+    "TestAuditThoughtResidualTailClearsUnread/true",
+    "TestAuditThoughtSingleWheelResidual",
+    "TestJumpGeometryEmptyLayerPassesWheelSelectionAndMenu",
+    "TestNativeThinkingTimingAndStreamFollowDetach",
+    "TestNativeToolKeyboardToggleAndCopy",
+    "TestNativeVirtualizedCrossRowSelectionAndEndpointLimit",
+    "TestThoughtOptInStreamFollowDetach",
+    "TestThoughtScrollActualAppOwnerChangesRejectCapturedCallback",
+    "TestThoughtScrollActualAppOwnerChangesRejectCapturedCallback/closed",
+    "TestThoughtScrollActualAppOwnerChangesRejectCapturedCallback/roundtrip",
+    "TestThoughtScrollActualAppOwnerChangesRejectCapturedCallback/runtime",
+    "TestThoughtScrollActualAppOwnerChangesRejectCapturedCallback/session",
+    "TestThoughtScrollInputKindsAndOwnerAdmission",
+    "TestThoughtStaleAppHitTreeDoesNotScrollNewRuntime",
+    "TestThoughtStaleMountedInputMustNotFallThrough"
+  ],
+  "count": 3,
+  "counts": {
+    "TestAuditThoughtSingleWheelResidual": {
+      "run": 3,
+      "output": 12,
+      "pass": 3
+    },
+    "TestAuditThoughtResidualTailClearsUnread": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestThoughtScrollInputKindsAndOwnerAdmission": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestThoughtOptInStreamFollowDetach": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestThoughtScrollActualAppOwnerChangesRejectCapturedCallback": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestThoughtStaleMountedInputMustNotFallThrough": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestThoughtStaleAppHitTreeDoesNotScrollNewRuntime": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestNativeThinkingTimingAndStreamFollowDetach": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestJumpGeometryEmptyLayerPassesWheelSelectionAndMenu": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestNativeVirtualizedCrossRowSelectionAndEndpointLimit": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestNativeToolKeyboardToggleAndCopy": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    }
+  },
+  "skip": 0,
+  "fail": 0,
+  "log": "/tmp/orbit-thought-final-v2-1159.jsonl",
+  "log_sha256": "f09e62f48465ddd3871db99798a7abf847285ce6e14fd83897a156c7e4f2e50d",
+  "status": "FOCUSED_EXIT:0\nVET_EXIT:0\nARM64_EXIT:0\n",
+  "red_logs": {
+    "/tmp/orbit-thought-routing-red-1140.jsonl": "640c8b88d1527acf4cf290ee60e18f9019a9d6704e3647eac8fae5ded66458f8",
+    "/tmp/orbit-thought-corrected-baseline-red-v3-1152.jsonl": "a8a527c69e0a0cde2ee5019a9aa27106fd86e726d49207bef8527e5cdbcd5357"
+  },
+  "withdrawn": "1141 App header+offset did not prove Thought hit; replaced with exact public body bounds. 1151 overlay command/build attempts NOT_RUN tests.",
+  "full_suite": "NOT_RUN; lead aggregate only",
+  "superseded_v1_evidence": {
+    "expected_top": [
+      "TestAuditThoughtSingleWheelResidual",
+      "TestAuditThoughtResidualTailClearsUnread",
+      "TestThoughtScrollInputKindsAndOwnerAdmission",
+      "TestThoughtOptInStreamFollowDetach",
+      "TestThoughtScrollActualAppOwnerChangesRejectCapturedCallback",
+      "TestNativeThinkingTimingAndStreamFollowDetach",
+      "TestJumpGeometryEmptyLayerPassesWheelSelectionAndMenu",
+      "TestNativeVirtualizedCrossRowSelectionAndEndpointLimit",
+      "TestNativeToolKeyboardToggleAndCopy"
+    ],
+    "count": 3,
+    "counts": {
+      "TestAuditThoughtSingleWheelResidual": {
+        "run": 3,
+        "output": 12,
+        "pass": 3
+      },
+      "TestAuditThoughtResidualTailClearsUnread": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "TestThoughtScrollInputKindsAndOwnerAdmission": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "TestThoughtOptInStreamFollowDetach": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "TestThoughtScrollActualAppOwnerChangesRejectCapturedCallback": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "TestNativeThinkingTimingAndStreamFollowDetach": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "TestJumpGeometryEmptyLayerPassesWheelSelectionAndMenu": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "TestNativeVirtualizedCrossRowSelectionAndEndpointLimit": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      },
+      "TestNativeToolKeyboardToggleAndCopy": {
+        "run": 3,
+        "output": 6,
+        "pass": 3
+      }
+    },
+    "log": "/tmp/orbit-thought-final-1153.jsonl",
+    "log_sha256": "d70641dd621026491d49641cd39887301590840907b92438a4cd4a9d22ea181c",
+    "status": "FOCUSED_EXIT:0\nVET_EXIT:0\nARM64_EXIT:0\n"
+  },
+  "final_revision": "consume-stale v2 1159",
+  "stale_hit_tree_red": {
+    "log": "/tmp/orbit-thought-stale-red-1158.jsonl",
+    "sha256": "94b4867390c87292fdbcb6f04ded7f4e5a2f8b6be1b914789e2865fb61f96c4c",
+    "actual_old_inner": [
+      655,
+      645
+    ],
+    "actual_new_runtime_outer": [
+      1638.171,
+      1688.171
+    ]
+  }
+}

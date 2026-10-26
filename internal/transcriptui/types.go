@@ -76,11 +76,16 @@ type Options struct {
 	Markdown           func(c *ui.Context, text string, streaming bool)
 	Copy               func(string)
 	Image              func(c *ui.Context, image agent.Image)
-	Review             func()
-	Workspace          string
-	SuppressFooter     bool
-	TimestampLabel     string
-	Now                func() time.Time
+	// ThoughtScroll validates the host owner and accepts the unconsumed DIP delta.
+	// Called with zero too; nil leaves native scrolling unchanged.
+	// Rejection forbids custom state changes but consumes this opted-in event,
+	// preventing stale committed hit trees from falling through to native scroll.
+	ThoughtScroll  func(float32) bool
+	Review         func()
+	Workspace      string
+	SuppressFooter bool
+	TimestampLabel string
+	Now            func() time.Time
 }
 
 // State is per-session view state. Reset it when switching transcript identity,

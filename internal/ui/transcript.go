@@ -71,6 +71,7 @@ func (a *App) transcriptOptions(c *ui.Context) transcriptui.Options {
 		Markdown: func(c *ui.Context, text string, streaming bool) {
 			a.chatMarkdown(c, text, streaming)
 		},
+		ThoughtScroll: a.thoughtScrollChain(owner),
 		Copy: func(text string) {
 			if a.ownsInlineImage(owner) {
 				c.Services().WriteClipboard(text)

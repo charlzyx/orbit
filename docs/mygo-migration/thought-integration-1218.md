@@ -1,0 +1,7 @@
+# Owned Thought wheel routing aggregate
+
+Integrated against exact public e5341834555fb425442f6b4b8d6b768d6f3c3298. Optional local public HandleInput routes unconsumed Thought delta to the owned transcript; only Thought chaining to tail clears unread. Ordinary outer scroll behavior and native default when not opted in remain unchanged. Rejected old-owner events are consumed without modifying state, preventing native fallback through the stale hit tree. No global toolkit/input-hook change.
+
+Final serial full chain EXIT 0. All 1852 non-document hashes unchanged; 201 exact package/test identities each run/pass once, retaining prior184 and new Thought tests including actual stale mounted hit-tree regressions and separate public routing proof. Root race3454 passing events/19 enumerated conditional skips, not feature counts. Toolkit composer/selection19 and menu22top/32events zero skip; terminal115events/4conditional skips. Wrapper, vet, Darwin ARM64, publisher40/icon5/legacy21 all passed.
+
+Original residual-loss/tail-unread RED, corrected actual-body-bound fixture proof and stale-fallback RED remain recorded. Earlier header-coordinate assumption and pre-consume-stale candidate are explicitly superseded, not counted as final evidence. Shift modifier behavior is callback/synthetic evidence, not physical native Shift-wheel acceptance. Virtual List estimated extent refines after scrolling; saturation asserts final AtEnd rather than a stale estimated coordinate. No new marker, package, release, external model or credential calls.
