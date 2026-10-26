@@ -150,6 +150,7 @@ type App struct {
 	pendingAttachmentPaths []attachmentPathInsertion
 	navigation             navigationState
 	transcriptScroll       ui.ScrollState
+	transcriptActivity     transcriptActivity
 	railHintDismissed      bool
 	railHintSaving         bool
 	railHintAt             time.Time
@@ -367,9 +368,11 @@ func (a *App) SetSnapshot(s Snapshot) {
 		}
 		s.Error = orbitassets.Translate(a.catalog, a.english, "events.auto_retry_failed", map[string]string{"error": message})
 	}
+	previousMessages := a.Model.Messages
 	a.Model = s
 	a.pruneComposerModeMenu()
 	a.syncInlineImageOwner()
+	a.observeTranscriptActivity(previousMessages)
 	a.syncInlineImageContents(s.Messages)
 	a.pruneAttachmentPaths()
 	a.pruneAttachmentImages()

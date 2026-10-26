@@ -111,9 +111,15 @@ func (a *App) messageTranscript(c *ui.Context) ui.Element {
 				})
 			})
 		}).Grow(1).MinHeight(0).Justify(ui.End).TrackScroll(&a.transcriptScroll)
+		unread := a.presentTranscriptActivity()
 		if !a.transcript.AtEnd() {
 			ui.Row(c).AlignSelf(ui.Stretch).Justify(ui.Center).Children(func() {
-				if a.button(c, a.Tr("message_scroller.jump_to_latest"), "icons/arrow-down.svg", false).Label("Jump to latest").Clicked() {
+				label := a.Tr("message_scroller.jump_to_latest")
+				if unread {
+					label = a.Tr("message_scroller.new_activity")
+				}
+				if a.button(c, label, "icons/arrow-down.svg", false).Label("Jump to latest").Clicked() {
+					a.transcriptActivity.unread = false
 					a.transcript.ScrollToEnd()
 				}
 			})
@@ -418,6 +424,7 @@ func (a *App) submit(text, mode string) bool {
 	}
 	a.submitAccepted = true
 	a.Dispatch(Action{Kind: "Submit", Value: text, Data: map[string]any{"mode": mode}})
+	a.transcriptActivity.unread = false
 	a.transcript.ScrollToEnd()
 	return a.submitAccepted
 }

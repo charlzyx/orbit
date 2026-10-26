@@ -1,0 +1,114 @@
+{
+  "base": "565b3592fc7c092573374f8f8ba78402cac7f678",
+  "package": "github.com/charlzyx/orbit/internal/ui",
+  "expected_top_level_names": [
+    "TestAuditScrolledTranscriptNewActivity",
+    "TestComposerNativeTurnNavigation",
+    "TestHostRetainedTranscriptSelectionUnmountAndSessionReset",
+    "TestInlineImageContentAuditUnchangedStreamingSnapshotKeepsCache",
+    "TestNavigationRailMountedClickAndHover",
+    "TestTranscriptActivityExplicitSubmitClears",
+    "TestTranscriptActivityIgnoresClockUsageAndDetectsImage",
+    "TestTranscriptActivityOpaqueOwnerAndHiddenRoundtrip",
+    "TestTranscriptActivityRawToolPartialAndCompletion",
+    "TestTranscriptActivityTailInitializationResetAndReorder",
+    "TestTranscriptVariableHeightFollowAndReaderPosition"
+  ],
+  "actual_counts": {
+    "TestAuditScrolledTranscriptNewActivity": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestAuditScrolledTranscriptNewActivity/append": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestAuditScrolledTranscriptNewActivity/stream_text": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestAuditScrolledTranscriptNewActivity/thinking": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestAuditScrolledTranscriptNewActivity/tool_output": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestComposerNativeTurnNavigation": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestHostRetainedTranscriptSelectionUnmountAndSessionReset": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestInlineImageContentAuditUnchangedStreamingSnapshotKeepsCache": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestNavigationRailMountedClickAndHover": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestTranscriptActivityExplicitSubmitClears": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestTranscriptActivityIgnoresClockUsageAndDetectsImage": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestTranscriptActivityOpaqueOwnerAndHiddenRoundtrip": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestTranscriptActivityRawToolPartialAndCompletion": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestTranscriptActivityRawToolPartialAndCompletion/false": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestTranscriptActivityRawToolPartialAndCompletion/true": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestTranscriptActivityTailInitializationResetAndReorder": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    },
+    "TestTranscriptVariableHeightFollowAndReaderPosition": {
+      "run": 3,
+      "output": 6,
+      "pass": 3
+    }
+  },
+  "elapsed": 19.82,
+  "scope": "Focused only; no full suite, hosted native or publication",
+  "status_file": "/tmp/orbit-unread-final-v2-1032.status",
+  "logs_sha256": {
+    "/tmp/orbit-unread-final-v2-1032.jsonl": "2086ede34d1b2e48058622dcb8b3ba6e60b0466472431b81110710c2db216db1",
+    "/tmp/orbit-unread-final-v2-1032.status": "d68d6bd807836ddd527201d1a819c2c4f07c15c1d15f06264392d4dd75969f3c",
+    "/tmp/orbit-unread-vet-v2-1032.log": "9da2d27b7ee72dd6c6d7e2ae1b7563cfb188c722afb006b10f70efacf395b90a",
+    "/tmp/orbit-unread-arm64-v2-1032.log": "9da2d27b7ee72dd6c6d7e2ae1b7563cfb188c722afb006b10f70efacf395b90a",
+    "/tmp/orbit-unread-audit-red-v2-1022.jsonl": "9a58a351876c46021368d7209ae3873bcc1cc7cb914a83b0da4f9763e43b132a"
+  }
+}
