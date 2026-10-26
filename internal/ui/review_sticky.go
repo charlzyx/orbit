@@ -28,17 +28,19 @@ func (a *App) reviewFileHeader(c *ui.Context, l workspace.ReviewLine, sticky boo
 		}
 		row.Label(fmt.Sprintf("Review file header %d", l.File)).Bind(s.headerHandles[l.File])
 	}
-	row.Height(34).Background(t.Surface).PaddingX(t.Space(12)).Gap(t.Space(8)).AlignItems(ui.Center).Children(func() {
+	// The source header toggles as one row; child controls keep their own hits.
+	toggle := row.Clicked()
+	background := t.Surface
+	if row.Hovered() {
+		background = t.Hover
+	}
+	row.Cursor(ui.CursorPointer).Height(34).Background(background).PaddingX(t.Space(12)).Gap(t.Space(8)).AlignItems(ui.Center).Children(func() {
 		icon := "icons/chevron-down.svg"
 		if s.collapsed[l.File] {
 			icon = "icons/chevron-right.svg"
 		}
 		if a.iconButton(c, "Toggle file diff", icon).Clicked() {
-			if s.collapsed == nil {
-				s.collapsed = map[int]bool{}
-			}
-			s.collapsed[l.File] = !s.collapsed[l.File]
-			s.selected = l.File
+			toggle = true
 		}
 		// Rust diff_view::render_file_header uses a file glyph (plain file SVG
 		// when no Nerd Font is installed), never an extension badge.
@@ -59,6 +61,13 @@ func (a *App) reviewFileHeader(c *ui.Context, l workspace.ReviewLine, sticky boo
 			a.OpenFile(filepath.Join(a.Model.Workspace, path))
 		}
 	})
+	if toggle {
+		if s.collapsed == nil {
+			s.collapsed = map[int]bool{}
+		}
+		s.collapsed[l.File] = !s.collapsed[l.File]
+		c.AnimationFrame()
+	}
 }
 
 // Match Rust sidepane.rs:1485–1550 with a native absolute child, rather than

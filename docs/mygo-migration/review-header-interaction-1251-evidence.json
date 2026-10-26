@@ -1,0 +1,228 @@
+{
+  "base": "fe034cd0cbfcd86a6d9f28b6d389d12cdb341237",
+  "base_tree": "506739e213841837c07987fbc002a71ba0f44d0a",
+  "expected_top": [
+    "TestAuditReviewWholeHeaderToggle",
+    "TestAuditReviewChevronPreservesNavigationOrigin",
+    "TestAuditReviewOpenChildDoesNotToggleHeader",
+    "TestReviewHeaderArrowKeyboardKeepsFocusAndSelection",
+    "TestReviewHeaderBodyHoverAndCollapseRoundTripAnchor",
+    "TestMountedReviewStickyFileHeaderAfterVerticalAndHorizontalWheel",
+    "TestMountedReviewStickyPressCannotActivateDifferentFileAfterScroll",
+    "TestMountedReviewWheelOverStickyHeaderStillScrollsDiff",
+    "TestMountedReviewHeaderSourceMetadata",
+    "TestMountedReviewHeaderMetadataFollowsStickySnapshotAndOpen"
+  ],
+  "counts": {
+    "TestAuditReviewWholeHeaderToggle": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestAuditReviewWholeHeaderToggle/sticky=false/path": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestAuditReviewWholeHeaderToggle/sticky=false/counts": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestAuditReviewWholeHeaderToggle/sticky=true/path": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestAuditReviewWholeHeaderToggle/sticky=true/counts": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestAuditReviewChevronPreservesNavigationOrigin": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestAuditReviewChevronPreservesNavigationOrigin/sticky=false": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestAuditReviewChevronPreservesNavigationOrigin/sticky=true": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestAuditReviewOpenChildDoesNotToggleHeader": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestAuditReviewOpenChildDoesNotToggleHeader/sticky=false": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestAuditReviewOpenChildDoesNotToggleHeader/sticky=true": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestReviewHeaderArrowKeyboardKeepsFocusAndSelection": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestReviewHeaderArrowKeyboardKeepsFocusAndSelection/sticky=false": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestReviewHeaderArrowKeyboardKeepsFocusAndSelection/sticky=true": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestReviewHeaderBodyHoverAndCollapseRoundTripAnchor": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestMountedReviewHeaderSourceMetadata": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestMountedReviewHeaderSourceMetadata/modified/sticky=false": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestMountedReviewHeaderSourceMetadata/modified/sticky=true": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestMountedReviewHeaderSourceMetadata/added/sticky=false": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestMountedReviewHeaderSourceMetadata/added/sticky=true": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestMountedReviewHeaderSourceMetadata/binary/sticky=false": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestMountedReviewHeaderSourceMetadata/binary/sticky=true": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestMountedReviewHeaderSourceMetadata/modified/sticky=false#01": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestMountedReviewHeaderSourceMetadata/modified/sticky=true#01": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestMountedReviewHeaderSourceMetadata/deleted/sticky=false": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestMountedReviewHeaderSourceMetadata/deleted/sticky=true": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestMountedReviewHeaderMetadataFollowsStickySnapshotAndOpen": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestMountedReviewStickyFileHeaderAfterVerticalAndHorizontalWheel": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestMountedReviewStickyFileHeaderAfterVerticalAndHorizontalWheel/unified": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestMountedReviewStickyFileHeaderAfterVerticalAndHorizontalWheel/split": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestMountedReviewStickyPressCannotActivateDifferentFileAfterScroll": {
+      "run": 3,
+      "pass": 3
+    },
+    "TestMountedReviewWheelOverStickyHeaderStillScrollsDiff": {
+      "run": 3,
+      "pass": 3
+    }
+  },
+  "top_count": 10,
+  "including_subtests": 32,
+  "elapsed_seconds": 174.074,
+  "status": "FOCUSED_EXIT:0\nVET_EXIT:0\nARM64_EXIT:0\n",
+  "logs": {
+    "/tmp/orbit-review-header-final-1251.jsonl": "7e597e07818246e5ef17c86de9e4c9d97be17732c66e1add6ec6505d4ba85df3",
+    "/tmp/orbit-review-header-final-1251.status": "9f8bbfba07a4c5037fb8eb1599392e5c8d97bb96014ab564f6acdef93d03c5f4",
+    "/tmp/orbit-review-header-vet-1251.log": "9da2d27b7ee72dd6c6d7e2ae1b7563cfb188c722afb006b10f70efacf395b90a",
+    "/tmp/orbit-review-header-arm64-1251.log": "9da2d27b7ee72dd6c6d7e2ae1b7563cfb188c722afb006b10f70efacf395b90a",
+    "/tmp/orbit-review-header-red-v3-1246.jsonl": "eaeeffd9aaef10dc725b6493b1110ff88177fd0e7b3d7864bf88e32eb81ca8d1"
+  },
+  "scope": "Focused race3x, UI vet and Darwin ARM64 crossbuild only; no aggregate/native acceptance",
+  "red_evidence": {
+    "base": "fe034cd0cbfcd86a6d9f28b6d389d12cdb341237",
+    "status": "EXPECTED_RED not passing candidate",
+    "log": "/tmp/orbit-review-header-red-v3-1246.jsonl",
+    "sha256": "eaeeffd9aaef10dc725b6493b1110ff88177fd0e7b3d7864bf88e32eb81ca8d1",
+    "expected": {
+      "TestAuditReviewWholeHeaderToggle": "fail",
+      "TestAuditReviewChevronPreservesNavigationOrigin": "fail",
+      "TestAuditReviewOpenChildDoesNotToggleHeader": "pass",
+      "TestAuditReviewWholeHeaderToggle/sticky=false/path": "fail",
+      "TestAuditReviewWholeHeaderToggle/sticky=false/counts": "fail",
+      "TestAuditReviewChevronPreservesNavigationOrigin/sticky=false": "fail",
+      "TestAuditReviewOpenChildDoesNotToggleHeader/sticky=false": "pass",
+      "TestAuditReviewWholeHeaderToggle/sticky=true/path": "fail",
+      "TestAuditReviewWholeHeaderToggle/sticky=true/counts": "fail",
+      "TestAuditReviewChevronPreservesNavigationOrigin/sticky=true": "fail",
+      "TestAuditReviewOpenChildDoesNotToggleHeader/sticky=true": "pass"
+    },
+    "actual": {
+      "TestAuditReviewWholeHeaderToggle": {
+        "run": 1,
+        "fail": 1
+      },
+      "TestAuditReviewWholeHeaderToggle/sticky=false/path": {
+        "run": 1,
+        "fail": 1
+      },
+      "TestAuditReviewWholeHeaderToggle/sticky=false/counts": {
+        "run": 1,
+        "fail": 1
+      },
+      "TestAuditReviewWholeHeaderToggle/sticky=true/path": {
+        "run": 1,
+        "fail": 1
+      },
+      "TestAuditReviewWholeHeaderToggle/sticky=true/counts": {
+        "run": 1,
+        "fail": 1
+      },
+      "TestAuditReviewChevronPreservesNavigationOrigin": {
+        "run": 1,
+        "fail": 1
+      },
+      "TestAuditReviewChevronPreservesNavigationOrigin/sticky=false": {
+        "run": 1,
+        "fail": 1
+      },
+      "TestAuditReviewChevronPreservesNavigationOrigin/sticky=true": {
+        "run": 1,
+        "fail": 1
+      },
+      "TestAuditReviewOpenChildDoesNotToggleHeader": {
+        "run": 1,
+        "pass": 1
+      },
+      "TestAuditReviewOpenChildDoesNotToggleHeader/sticky=false": {
+        "run": 1,
+        "pass": 1
+      },
+      "TestAuditReviewOpenChildDoesNotToggleHeader/sticky=true": {
+        "run": 1,
+        "pass": 1
+      }
+    },
+    "prior_fixture_failures": [
+      "/tmp/orbit-review-header-red-1244.jsonl: wrong KeyRightBracket compile name",
+      "/tmp/orbit-review-header-red-1245.jsonl: Open child expected relative path vs real absolute path; corrected real temp Workspace",
+      "/tmp/orbit-review-header-red-v2-1246.jsonl: own earlier test fixture bravo.go mistakenly in package cwd; removed exact known 12-byte generated file"
+    ]
+  }
+}
