@@ -150,7 +150,7 @@ func (s *State) View(c *ui.Context) ui.Element {
 					s.notice(c, fmt.Sprintf("probe-error-%d", i), s.label("mcp.probe_error", "Connection error"), err, a.native.Danger, nil)
 				}
 				if s.Error != "" {
-					s.notice(c, "action-error", s.label("mcp.action_failed", "MCP action failed"), s.Error, a.native.Danger, nil)
+					s.notice(c, "action-error", s.label("mcp.action_failed", "MCP action failed"), s.displayActionError(), a.native.Danger, nil)
 				}
 				if s.probeNote != "" {
 					s.notice(c, "project-note", s.label("mcp.project_untrusted", "Project configuration"), s.probeNote, a.native.Warning, nil)

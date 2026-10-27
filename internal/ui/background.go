@@ -153,7 +153,7 @@ func (a *App) sourceBackgroundRow(c *ui.Context) {
 	if s.loading {
 		ui.Row(c).Padding(8, 16).Gap(8).Children(func() {
 			ui.Spinner(c).Size(12, 12)
-			ui.Text(c, "Processing background…").TextColor(a.Theme.TextMuted)
+			ui.Text(c, a.Tr("go.background.processing")).TextColor(a.Theme.TextMuted)
 		})
 	}
 	if s.err != "" {

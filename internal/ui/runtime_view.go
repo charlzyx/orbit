@@ -27,7 +27,7 @@ func (a *App) runtimeSettings(c *ui.Context) {
 	pid := "—"
 	executable := snap.ConfiguredExecutable
 	if executable == "" {
-		executable = "pi (resolved on start)"
+		executable = a.Tr("go.runtime.binary_default")
 	}
 	if p != nil {
 		state = p.State
@@ -48,7 +48,7 @@ func (a *App) runtimeSettings(c *ui.Context) {
 		description = a.Tr("settings.spawned_child_process")
 	}
 	if description == "settings.runtime_"+state {
-		description = "pi --mode rpc · direct child process"
+		description = a.Tr("go.runtime.direct_child")
 	}
 	runtimeValue := func(value string, path bool) {
 		e := ui.Text(c, value).FontSize(t.Px(12)).TextColor(t.Text).MaxLines(1).MaxWidth(650).Selectable()
@@ -65,21 +65,18 @@ func (a *App) runtimeSettings(c *ui.Context) {
 			if state == "failed" || state == "exited" {
 				color = t.Error
 			}
-			label := a.Tr("runtime.state_" + state)
-			if strings.HasPrefix(label, "runtime.state_") {
-				label = state
-			}
+			label := a.runtimeStateLabel(state)
 			ui.Row(c).Gap(t.Space(8)).AlignItems(ui.Center).Children(func() {
 				ui.Row(c).Gap(t.Space(6)).AlignItems(ui.Center).Children(func() { ui.Box(c).Size(7, 7).Radius(3.5).Background(color); ui.Text(c, label).FontSize(t.Px(12)) })
 				if p != nil && (p.Alive || p.Loading) {
-					if a.sourceSettingsButton(c, "Restart").Disabled(state == "stopping").Clicked() {
+					if a.sourceSettingsButton(c, a.Tr("go.runtime.restart")).Label("Restart").Disabled(state == "stopping").Clicked() {
 						a.Dispatch(Action{Kind: "RestartRuntime"})
 					}
-					if a.sourceSettingsButton(c, "Stop").Disabled(state == "stopping").Clicked() {
+					if a.sourceSettingsButton(c, a.Tr("go.runtime.stop")).Label("Stop").Disabled(state == "stopping").Clicked() {
 						a.Dispatch(Action{Kind: "StopRuntime"})
 					}
 				} else {
-					if a.sourceSettingsButton(c, "Start").Disabled(snap.Closed).Clicked() {
+					if a.sourceSettingsButton(c, a.Tr("go.runtime.start")).Label("Start").Disabled(snap.Closed).Clicked() {
 						a.Dispatch(Action{Kind: "StartRuntime"})
 					}
 				}
@@ -99,14 +96,14 @@ func (a *App) runtimeSettings(c *ui.Context) {
 		a.sourceSettingsRow(c, a.Tr("settings.transport"), "", "", func() { runtimeValue(transport, false) })
 		a.sourceSettingsDivider(c)
 		patches := a.Model.Extensions.Patches
-		summary := "Disabled — pi keeps the current patches until it updates"
+		summary := a.Tr("go.runtime.patches_disabled")
 		if patches.Enabled {
-			summary = "Enabled — patches apply before the next agent launch"
+			summary = a.Tr("go.runtime.patches_enabled")
 			if len(patches.Applied) > 0 {
-				summary = "Applied on this launch: " + strings.NewReplacer("custom-ui-rpc", "custom UI", "quota-rpc", "quota", "auth-rpc", "auth").Replace(strings.Join(patches.Applied, ", "))
+				summary = strings.ReplaceAll(a.Tr("go.runtime.patches_applied"), "%{patches}", strings.NewReplacer("custom-ui-rpc", "custom UI", "quota-rpc", "quota", "auth-rpc", "auth").Replace(strings.Join(patches.Applied, ", ")))
 			}
 		}
-		a.sourceSettingsRow(c, "RPC patches", summary, "", func() {
+		a.sourceSettingsRow(c, a.Tr("go.runtime.patches"), summary, "", func() {
 			enabled := patches.Enabled
 			if a.sourceSettingsToggle(c, &enabled, "RPC patches").Disabled(a.rpcPatchSaving).Changed() {
 				a.Dispatch(Action{Kind: "SetRPCPatches", Data: map[string]any{"enabled": enabled}})
@@ -114,11 +111,11 @@ func (a *App) runtimeSettings(c *ui.Context) {
 		})
 		if patches.PackageRoot != "" {
 			a.sourceSettingsDivider(c)
-			a.sourceSettingsRow(c, "Package root", "", "", func() { runtimeValue(patches.PackageRoot, true) })
+			a.sourceSettingsRow(c, a.Tr("go.runtime.package_root"), "", "", func() { runtimeValue(patches.PackageRoot, true) })
 		}
 		if patches.Error != "" {
 			a.sourceSettingsDivider(c)
-			a.sourceSettingsRow(c, "RPC patches error", patches.Error, "", nil)
+			a.sourceSettingsRow(c, a.Tr("go.runtime.patches_error"), patches.Error, "", nil)
 		}
 		if p != nil && p.Error != "" {
 			a.sourceSettingsDivider(c)
@@ -126,7 +123,7 @@ func (a *App) runtimeSettings(c *ui.Context) {
 		}
 		if p != nil && p.ExitCode != nil {
 			a.sourceSettingsDivider(c)
-			a.sourceSettingsRow(c, "Exit code", "", "", func() { runtimeValue(fmt.Sprint(*p.ExitCode), false) })
+			a.sourceSettingsRow(c, a.Tr("go.runtime.exit_code"), "", "", func() { runtimeValue(fmt.Sprint(*p.ExitCode), false) })
 		}
 	})
 	if len(snap.Parked) > 0 {
@@ -138,9 +135,9 @@ func (a *App) runtimeSettings(c *ui.Context) {
 				if name == "" {
 					name = filepath.Base(other.SessionPath)
 				}
-				value := other.State
+				value := a.runtimeStateLabel(other.State)
 				if other.PID > 0 {
-					value = fmt.Sprintf("PID %d · %s", other.PID, other.State)
+					value = fmt.Sprintf("PID %d · %s", other.PID, a.runtimeStateLabel(other.State))
 				}
 				a.sourceSettingsDivider(c)
 				a.sourceSettingsRow(c, name, "", "", func() { runtimeValue(value, false) })
@@ -163,4 +160,25 @@ func (a *App) runtimeSettings(c *ui.Context) {
 			}
 		})
 	})
+}
+
+func (a *App) runtimeStateLabel(state string) string {
+	switch state {
+	case "idle":
+		return a.Tr("go.runtime.state_idle")
+	case "busy":
+		return a.Tr("go.runtime.state_busy")
+	case "loading":
+		return a.Tr("go.runtime.state_loading")
+	case "starting":
+		return a.Tr("go.runtime.state_starting")
+	case "stopping":
+		return a.Tr("go.runtime.state_stopping")
+	case "disconnected":
+		return a.Tr("go.runtime.state_disconnected")
+	case "recovering":
+		return a.Tr("go.runtime.state_recovering")
+	default:
+		return a.text("runtime.state_"+state, state)
+	}
 }

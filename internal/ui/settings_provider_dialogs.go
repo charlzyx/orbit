@@ -133,7 +133,11 @@ func (a *App) providerDialog(c *ui.Context) {
 				ui.Text(c, hint).FontSize(t.Px(12)).TextColor(t.TextMuted)
 			})
 		})
-		a.sourceProviderModalError(c, d.error)
+		message := d.error
+		if d.validationError {
+			message = a.providerValidationMessage(message)
+		}
+		a.sourceProviderModalError(c, message)
 		label := a.Tr("settings.add_provider")
 		if d.originalID != "" {
 			label = a.Tr("settings.save_changes")
@@ -210,5 +214,25 @@ func (a *App) secretDialog(c *ui.Context) {
 	})
 	if !a.secretOpen {
 		a.secretValue = ""
+	}
+}
+
+// Translate only exact, locally-owned validation messages; backend details stay verbatim.
+func (a *App) providerValidationMessage(message string) string {
+	switch message {
+	case "provider id is required":
+		return a.Tr("go.providers.validation_0")
+	case "provider id must start with a letter or digit and contain only letters, digits, dots, underscores, or hyphens":
+		return a.Tr("go.providers.validation_1")
+	case "provider base URL must use http or https":
+		return a.Tr("go.providers.validation_2")
+	case "custom provider base URL is required":
+		return a.Tr("go.providers.validation_3")
+	case "add at least one custom model id":
+		return a.Tr("go.providers.validation_4")
+	case "paste the Ollama Cookie header containing a name=value pair":
+		return a.Tr("go.providers.validation_5")
+	default:
+		return message
 	}
 }

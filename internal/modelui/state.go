@@ -97,6 +97,7 @@ type selectState struct {
 	dismissedAt time.Time
 }
 type State struct {
+	localError            bool
 	Options               Options
 	Snapshot              Snapshot
 	Query, ProviderFilter string
@@ -168,7 +169,7 @@ func (s *State) Refresh() bool {
 		return false
 	}
 	if s.Options.OnRefresh == nil {
-		s.fail(errors.New("Model catalog update is not connected."))
+		s.failLocal("Model catalog update is not connected.")
 		return false
 	}
 	s.Refreshing = true
@@ -185,6 +186,7 @@ func (s *State) fail(err error) {
 	if err == nil {
 		return
 	}
+	s.localError = false
 	s.Error = err.Error()
 	if s.Options.Notify != nil {
 		s.Options.Notify(s.Error, true)
@@ -228,11 +230,11 @@ func (s *State) SelectModel(index int, fromPicker bool) bool {
 	}
 	m := s.Snapshot.Models[index]
 	if m.ID == "" || m.Provider == "" {
-		s.fail(errors.New("Pi reported an incomplete model identity."))
+		s.failLocal("Pi reported an incomplete model identity.")
 		return false
 	}
 	if s.Options.OnSelectModel == nil {
-		s.fail(errors.New("Model selection is not connected."))
+		s.failLocal("Model selection is not connected.")
 		return false
 	}
 	s.Error = ""
@@ -253,7 +255,7 @@ func (s *State) SelectThinking(level string) bool {
 		return false
 	}
 	if s.Options.OnSelectThinking == nil {
-		s.fail(errors.New("Thinking selection is not connected."))
+		s.failLocal("Thinking selection is not connected.")
 		return false
 	}
 	if err := s.Options.OnSelectThinking(level); err != nil {
@@ -747,4 +749,12 @@ func (s *State) thinkingHint(level string) string {
 		key, fallback = "reasoning_auto", "Model chooses depth"
 	}
 	return s.label("model_selector."+key, fallback)
+}
+
+func (s *State) failLocal(message string) {
+	s.Error = message
+	s.localError = true
+	if s.Options.Notify != nil {
+		s.Options.Notify(s.displayValidation(message), true)
+	}
 }

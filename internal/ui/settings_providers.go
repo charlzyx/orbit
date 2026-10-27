@@ -187,7 +187,7 @@ func (a *App) providerRows(c *ui.Context) {
 					a.runtimeQuotaCard(c, r, time.Now())
 				}
 			}
-			if a.sourceSettingsButton(c, "Refresh usage").Clicked() {
+			if a.sourceSettingsButton(c, a.Tr("go.providers.refresh_usage")).Label("Refresh usage").Clicked() {
 				a.Dispatch(Action{Kind: "RefreshQuota"})
 			}
 		})
@@ -337,7 +337,7 @@ func (a *App) sourceProviderActions(c *ui.Context, v sourceProviderView) {
 					a.Dispatch(Action{Kind: "LoginTerminal", Value: id})
 				}
 			} else {
-				ui.Text(c, "Connect pi to discover available sign-in methods.").FontSize(a.Theme.Px(12)).TextColor(a.Theme.TextMuted)
+				ui.Text(c, a.Tr("go.providers.connect_methods")).FontSize(a.Theme.Px(12)).TextColor(a.Theme.TextMuted)
 			}
 		}
 		if id == "ollama" || id == "ollama-cloud" {
@@ -381,10 +381,10 @@ func (a *App) providerHasUsage(id string) bool {
 }
 func (a *App) confirmProviderDisconnect(v sourceProviderView) {
 	if v.auth.Authenticated {
-		a.Confirm("Sign out?", v.name, func() { a.Dispatch(Action{Kind: "Logout", Value: v.meta.ID}) })
+		a.Confirm(a.Tr("go.providers.sign_out"), v.name, func() { a.Dispatch(Action{Kind: "Logout", Value: v.meta.ID}) })
 		return
 	}
-	a.Confirm("Remove saved credential?", v.name+" will no longer use this locally saved credential. Environment credentials are not changed.", func() {
+	a.Confirm(a.Tr("go.providers.remove_credential"), strings.ReplaceAll(a.Tr("go.providers.remove_credential_detail"), "%{name}", v.name), func() {
 		svc := a.Service()
 		a.Async(func() func() {
 			var err error
@@ -404,7 +404,7 @@ func (a *App) confirmProviderDisconnect(v sourceProviderView) {
 	})
 }
 func (a *App) confirmProviderRemove(v sourceProviderView) {
-	a.Confirm("Remove provider configuration?", v.meta.ID+" overrides and custom models will be removed. Saved authentication is kept.", func() {
+	a.Confirm(a.Tr("go.providers.remove_config"), strings.ReplaceAll(a.Tr("go.providers.remove_config_detail"), "%{id}", v.meta.ID), func() {
 		svc := a.Service()
 		a.Async(func() func() {
 			err := svc.RemoveProvider(v.meta.ID)

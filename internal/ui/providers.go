@@ -21,6 +21,7 @@ type providerDraft struct {
 	edit                           workbench.ProviderEdit
 	originalID, models, key, error string
 	busy, inCatalog, hadAPIKey     bool
+	validationError                bool
 }
 
 func (a *App) refreshProviders() {
@@ -69,12 +70,14 @@ func (a *App) saveProviderDraft(d *providerDraft) {
 	d.inCatalog = a.isCatalogProvider(edit.ID)
 	if e := workbench.ValidateProviderEdit(edit, d.inCatalog); e != nil {
 		d.error = e.Error()
+		d.validationError = true
 		return
 	}
 	if strings.TrimSpace(d.key) != "" {
 		key := d.key
 		edit.APIKey = &key
 	}
+	d.validationError = false
 	d.busy = true
 	d.error = ""
 	root := a.Model.Workspace

@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### In progress
 
+- Complete Chinese Settings display text and local validation across the native settings routes and their dialogs; preserve English, configuration/protocol identities and raw external error details.
+
 - Add a commit-only native model picker and private preference, preserving follow-session/default behavior and explicit unknown-model identity. Apply a selected-window shared byte budget to commit context only; preserve isolated tool-free Pi generation, honest fallback/cancellation, and unchanged chat/Issue/PR models. Scoped source evidence remains separate from native/full-parity acceptance.
 
 - Integrate source-derived session metadata/delete ownership fences and target-bound async HTML export, workspace path/icon/color/sidebar-removal actions, embedded Git diff navigation and owner-bound menus, retry failure/cancellation feedback, hidden-provider grouping and MCP probe lifecycle. Preserve destructive confirmations, actual completion/timeout uncertainty, and unresolved native acceptance; see the third-wave migration audit.

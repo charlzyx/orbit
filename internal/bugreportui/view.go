@@ -163,10 +163,10 @@ func View(c *ui.Context, s *State) ui.Element {
 			ui.Column(c).WidthPercent(100).MaxWidth(contentMaxWidth).AlignSelf(ui.Center).Padding(a.Space(20), a.Space(24), a.Space(24)).Gap(a.Space(20)).Children(func() {
 				s.form(c)
 				if s.Error != nil {
-					ui.Text(c, s.Error.Error()).Label("Report error").AlignSelf(ui.Stretch).Padding(a.Space(8), a.Space(12)).Radius(a.Px(8)).Background(a.native.Danger.Alpha(.10)).TextColor(a.native.Danger).FontSize(a.Px(12)).Selectable()
+					ui.Text(c, s.errorMessage(s.Error)).Label("Report error").AlignSelf(ui.Stretch).Padding(a.Space(8), a.Space(12)).Radius(a.Px(8)).Background(a.native.Danger.Alpha(.10)).TextColor(a.native.Danger).FontSize(a.Px(12)).Selectable()
 				}
 				if s.Status != "" {
-					ui.Text(c, s.Status).FontSize(a.Px(12)).TextColor(a.native.TextMuted).Selectable()
+					ui.Text(c, s.displayMessage(s.Status)).FontSize(a.Px(12)).TextColor(a.native.TextMuted).Selectable()
 				}
 				s.footer(c)
 			})
@@ -318,7 +318,7 @@ func (s *State) screenshots(c *ui.Context) {
 			ui.Row(c).AlignSelf(ui.Stretch).Wrap().Gap(a.Space(6)).Children(func() {
 				for index, shot := range s.shots {
 					ui.Row(c.Key(fmt.Sprintf("shot-%d", index))).Height(a.Px(28)).Gap(a.Space(4)).PaddingX(a.Space(6)).Background(a.Elevated).Border(1, a.native.Border).Radius(a.Px(8)).AlignItems(ui.Center).Children(func() {
-						preview := ui.ButtonBase(c.Key("preview")).Disabled(s.Busy).Label("Preview / redact " + shot.Image.Name).Tooltip("Preview / redact " + shot.Image.Name).Height(a.Px(26)).Gap(a.Space(4)).Children(func() {
+						preview := ui.ButtonBase(c.Key("preview")).Disabled(s.Busy).Label("Preview / redact " + shot.Image.Name).Tooltip(strings.ReplaceAll(s.label("go.bug.preview", "Preview / redact %{name}"), "%{name}", shot.Image.Name)).Height(a.Px(26)).Gap(a.Space(4)).Children(func() {
 							if shot.Bitmap != nil {
 								ui.Image(c, shot.Bitmap).Size(a.Px(16), a.Px(16)).Radius(a.Px(4))
 							}
@@ -327,7 +327,7 @@ func (s *State) screenshots(c *ui.Context) {
 						if preview.Clicked() {
 							s.preview = index
 						}
-						remove := ui.ButtonBase(c.Key("remove")).Disabled(s.Busy).Label("Remove "+shot.Image.Name).Tooltip("Remove "+shot.Image.Name).Size(a.Px(18), a.Px(24)).Center().Children(func() { icon(c, "x", a.Px(14), a.native.TextMuted) })
+						remove := ui.ButtonBase(c.Key("remove")).Disabled(s.Busy).Label("Remove "+shot.Image.Name).Tooltip(strings.ReplaceAll(s.label("go.bug.remove", "Remove %{name}"), "%{name}", shot.Image.Name)).Size(a.Px(18), a.Px(24)).Center().Children(func() { icon(c, "x", a.Px(14), a.native.TextMuted) })
 						if remove.Clicked() {
 							s.RemoveScreenshot(index)
 						}
@@ -344,20 +344,22 @@ func (s *State) footer(c *ui.Context) {
 	ui.Row(c.Key("footer")).AlignSelf(ui.Stretch).AlignItems(ui.Center).Justify(ui.SpaceBetween).Gap(a.Space(12)).Children(func() {
 		ui.Row(c).Grow(1).MinWidth(0).AlignItems(ui.Center).Gap(a.Space(6)).Children(func() {
 			icon(c, "github", a.Px(14), a.native.TextMuted)
-			note := "Diagnostics are off. Review before sharing."
+			note := s.label("go.bug.copy_0", "Diagnostics are off. Review before sharing.")
 			if s.IncludeDiagnostics {
-				note = "Selected diagnostics will be included in your review."
+				note = s.label("go.bug.copy_1", "Selected diagnostics will be included in your review.")
 			}
 			if s.Busy {
-				note = s.Activity + "…"
+				note = s.displayMessage(s.Activity) + "…"
 			}
 			ui.Text(c, note).FontSize(a.Px(12)).TextColor(a.native.TextMuted)
 			if s.Busy {
-				if s.button(c, "cancel", "Cancel", "", false, s.cancelling).Clicked() {
+				if s.button(c, "cancel", s.label("common.cancel", "Cancel"), "", false, s.cancelling).Clicked() {
 					s.Cancel()
 				}
 			} else {
-				if ui.ButtonBase(c.Key("privacy-options")).Label("Report privacy options").Tooltip("Choose diagnostics, redaction, and window capture").Height(a.Px(28)).PaddingX(a.Space(6)).Children(func() { ui.Text(c, "Privacy…").FontSize(a.Px(12)).TextColor(a.TextSecondary) }).Clicked() {
+				if ui.ButtonBase(c.Key("privacy-options")).Label("Report privacy options").Tooltip(s.label("go.bug.copy_2", "Choose diagnostics, redaction, and window capture")).Height(a.Px(28)).PaddingX(a.Space(6)).Children(func() {
+					ui.Text(c, s.label("go.bug.copy_3", "Privacy…")).FontSize(a.Px(12)).TextColor(a.TextSecondary)
+				}).Clicked() {
 					s.optionsOpen = true
 				}
 			}
@@ -370,7 +372,7 @@ func (s *State) footer(c *ui.Context) {
 			if s.Busy && s.operation == "Submitting reviewed report" {
 				label = s.label("bug_report.creating", "Creating…")
 			}
-			if s.button(c, "prepare", label, "github", true, s.Busy).Tooltip("Review the report before confirming public submission").Clicked() {
+			if s.button(c, "prepare", label, "github", true, s.Busy).Tooltip(s.label("go.bug.copy_4", "Review the report before confirming public submission")).Clicked() {
 				s.Prepare()
 			}
 		})
@@ -385,21 +387,21 @@ func dialog(c *ui.Context, open *bool, fn func()) {
 }
 func (s *State) review(c *ui.Context) {
 	dialog(c.Key("review"), &s.reviewOpen, func() {
-		ui.Text(c, "Review public GitHub report").Font(c.Theme().Font).FontSize(18).LineHeight(1.3).Height(24).Shrink(0).FontWeight(500).TextColor(c.Theme().Text)
-		ui.Text(c, "Destination: https://github.com/"+s.prepared.Repository+"/issues").Selectable()
+		ui.Text(c, s.label("go.bug.copy_5", "Review public GitHub report")).Font(c.Theme().Font).FontSize(18).LineHeight(1.3).Height(24).Shrink(0).FontWeight(500).TextColor(c.Theme().Text)
+		ui.Text(c, strings.ReplaceAll(s.label("go.bug.destination", "Destination: %{url}"), "%{url}", "https://github.com/"+s.prepared.Repository+"/issues")).Selectable()
 		ui.Text(c, s.prepared.Title).FontWeight(500).TextColor(c.Theme().Text)
 		ui.Scroll(c).Height(300).AlignSelf(ui.Stretch).Children(func() { ui.Text(c, s.prepared.BrowserBody).Selectable() })
-		ui.Text(c, fmt.Sprintf("%d explicitly selected screenshots will be shared. Nothing is sent until you confirm.", len(s.prepared.Screenshots)))
-		ui.Checkbox(c, &s.reviewed, "I reviewed the report and screenshots and want to submit them publicly")
+		ui.Text(c, strings.ReplaceAll(s.label("go.bug.shared_count", "%{count} explicitly selected screenshots will be shared. Nothing is sent until you confirm."), "%{count}", fmt.Sprint(len(s.prepared.Screenshots))))
+		ui.Checkbox(c, &s.reviewed, s.label("go.bug.copy_6", "I reviewed the report and screenshots and want to submit them publicly"))
 		ui.Row(c).Gap(8).Justify(ui.End).Children(func() {
-			if s.button(c, "edit", "Back to editing", "", false, false).Clicked() {
+			if s.button(c, "edit", s.label("go.bug.copy_7", "Back to editing"), "", false, false).Clicked() {
 				s.reviewOpen = false
 				s.reviewed = false
 			}
-			if s.button(c, "copy", "Copy reviewed report", "", false, false).Clicked() {
+			if s.button(c, "copy", s.label("go.bug.copy_8", "Copy reviewed report"), "", false, false).Clicked() {
 				c.Services().WriteClipboard(s.prepared.Title + "\n\n" + s.prepared.BrowserBody)
 			}
-			if s.button(c, "submit", "Submit reviewed report", "", true, !s.reviewed || s.Busy).Clicked() {
+			if s.button(c, "submit", s.label("go.bug.copy_9", "Submit reviewed report"), "", true, !s.reviewed || s.Busy).Clicked() {
 				s.Submit()
 			}
 		})
@@ -408,43 +410,43 @@ func (s *State) review(c *ui.Context) {
 
 func (s *State) privacy(c *ui.Context) {
 	dialog(c.Key("privacy"), &s.optionsOpen, func() {
-		ui.Text(c, "Report privacy options").Font(c.Theme().Font).FontSize(18).LineHeight(1.3).Height(24).Shrink(0).FontWeight(500).TextColor(c.Theme().Text)
-		ui.Text(c, "These choices affect only this report. No logs, credentials or session files are collected.").TextColor(c.Theme().TextMuted)
-		ui.Checkbox(c, &s.RedactSensitive, "Redact recognizable secrets and my home path in report text").Disabled(s.Busy)
-		ui.Text(c, "Redaction cannot detect every secret. Review text and screenshots yourself. Only Context is sent to the selected model when you choose Generate draft.").FontSize(12).TextColor(c.Theme().TextMuted)
+		ui.Text(c, s.label("go.bug.copy_10", "Report privacy options")).Font(c.Theme().Font).FontSize(18).LineHeight(1.3).Height(24).Shrink(0).FontWeight(500).TextColor(c.Theme().Text)
+		ui.Text(c, s.label("go.bug.copy_11", "These choices affect only this report. No logs, credentials or session files are collected.")).TextColor(c.Theme().TextMuted)
+		ui.Checkbox(c, &s.RedactSensitive, s.label("go.bug.copy_12", "Redact recognizable secrets and my home path in report text")).Disabled(s.Busy)
+		ui.Text(c, s.label("go.bug.copy_13", "Redaction cannot detect every secret. Review text and screenshots yourself. Only Context is sent to the selected model when you choose Generate draft.")).FontSize(12).TextColor(c.Theme().TextMuted)
 		ui.Row(c).Gap(8).Children(func() {
-			if ui.Checkbox(c, &s.IncludeDiagnostics, "Include build and runtime diagnostics").Disabled(s.Busy).Changed() && s.IncludeDiagnostics {
+			if ui.Checkbox(c, &s.IncludeDiagnostics, s.label("go.bug.copy_14", "Include build and runtime diagnostics")).Disabled(s.Busy).Changed() && s.IncludeDiagnostics {
 				s.RefreshDiagnostics()
 			}
-			if s.button(c, "refresh", "Refresh diagnostics", "", false, s.Busy || !s.IncludeDiagnostics).Clicked() {
+			if s.button(c, "refresh", s.label("go.bug.copy_15", "Refresh diagnostics"), "", false, s.Busy || !s.IncludeDiagnostics).Clicked() {
 				s.RefreshDiagnostics()
 			}
 		})
 		if s.IncludeDiagnostics {
-			if ui.Checkbox(c, &s.IncludeIdentity, "Include my GitHub username (contacts GitHub)").Disabled(s.Busy).Changed() {
+			if ui.Checkbox(c, &s.IncludeIdentity, s.label("go.bug.copy_16", "Include my GitHub username (contacts GitHub)")).Disabled(s.Busy).Changed() {
 				s.RefreshDiagnostics()
 			}
 			ui.Scroll(c).Height(160).AlignSelf(ui.Stretch).Children(func() { ui.Text(c, s.Diagnostics.Markdown()).Selectable().FontSize(12) })
 		}
-		ui.Text(c, "Only images you select or explicitly capture are included. Image metadata is removed; use Preview to redact pixels.").FontSize(12).TextColor(c.Theme().TextMuted)
+		ui.Text(c, s.label("go.bug.copy_17", "Only images you select or explicitly capture are included. Image metadata is removed; use Preview to redact pixels.")).FontSize(12).TextColor(c.Theme().TextMuted)
 		if s.Options.Capture != nil {
-			ui.Checkbox(c, &s.CaptureConsent, "I want to capture the current Orbit window, including any visible private content").Disabled(s.Busy)
-			if s.button(c, "capture", "Capture this window", "image", false, s.Busy || !s.CaptureConsent || len(s.shots) >= native.MaxReportScreenshots).Clicked() {
+			ui.Checkbox(c, &s.CaptureConsent, s.label("go.bug.copy_18", "I want to capture the current Orbit window, including any visible private content")).Disabled(s.Busy)
+			if s.button(c, "capture", s.label("go.bug.copy_19", "Capture this window"), "image", false, s.Busy || !s.CaptureConsent || len(s.shots) >= native.MaxReportScreenshots).Clicked() {
 				s.optionsOpen = false
 				s.Capture()
 			}
 		}
 		if s.Error != nil {
-			ui.Text(c, s.Error.Error()).TextColor(c.Theme().Danger).Selectable()
+			ui.Text(c, s.errorMessage(s.Error)).TextColor(c.Theme().Danger).Selectable()
 		}
 		ui.Row(c).AlignSelf(ui.Stretch).Justify(ui.End).Gap(8).Children(func() {
 			if s.Busy {
-				ui.Text(c, s.Activity+"…").TextColor(c.Theme().TextMuted)
-				if s.button(c, "cancel", "Cancel", "", false, s.cancelling).Clicked() {
+				ui.Text(c, s.displayMessage(s.Activity)+"…").TextColor(c.Theme().TextMuted)
+				if s.button(c, "cancel", s.label("common.cancel", "Cancel"), "", false, s.cancelling).Clicked() {
 					s.Cancel()
 				}
 			}
-			if s.button(c, "done", "Done", "", false, false).Clicked() {
+			if s.button(c, "done", s.label("common.done", "Done"), "", false, false).Clicked() {
 				s.optionsOpen = false
 				s.CaptureConsent = false
 			}
@@ -459,17 +461,17 @@ func (s *State) previewView(c *ui.Context) {
 	dialog(c.Key("screenshot-preview"), &open, func() {
 		ui.Text(c, shot.Image.Name).FontWeight(500).TextColor(c.Theme().Text)
 		ui.Image(c, shot.Bitmap).Height(320).MaxWidth(680)
-		ui.Text(c, fmt.Sprintf("Original pixels: %d × %d. Opaque black boxes remove selected pixels from the attachment only.", shot.Image.Width, shot.Image.Height)).FontSize(12)
-		ui.Text(c, "Redaction boxes: x,y,width,height; separate boxes with semicolons").FontSize(12)
+		ui.Text(c, strings.NewReplacer("%{width}", fmt.Sprint(shot.Image.Width), "%{height}", fmt.Sprint(shot.Image.Height)).Replace(s.label("go.bug.pixels", "Original pixels: %{width} × %{height}. Opaque black boxes remove selected pixels from the attachment only."))).FontSize(12)
+		ui.Text(c, s.label("go.bug.copy_20", "Redaction boxes: x,y,width,height; separate boxes with semicolons")).FontSize(12)
 		ui.TextInput(c, &shot.Redactions).Label("Redaction boxes: x,y,width,height; x,y,width,height").Placeholder("20,40,200,50").AlignSelf(ui.Stretch).Disabled(s.Busy)
 		if s.Error != nil {
-			ui.Text(c, s.Error.Error()).TextColor(c.Theme().Danger).Selectable()
+			ui.Text(c, s.errorMessage(s.Error)).TextColor(c.Theme().Danger).Selectable()
 		}
 		ui.Row(c).Gap(8).Children(func() {
-			if s.button(c, "redact", "Apply redaction", "", false, s.Busy || strings.TrimSpace(shot.Redactions) == "").Clicked() {
+			if s.button(c, "redact", s.label("go.bug.copy_21", "Apply redaction"), "", false, s.Busy || strings.TrimSpace(shot.Redactions) == "").Clicked() {
 				s.redact(index)
 			}
-			if s.button(c, "done", "Done", "", false, false).Clicked() {
+			if s.button(c, "done", s.label("common.done", "Done"), "", false, false).Clicked() {
 				s.preview = -1
 			}
 		})

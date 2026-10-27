@@ -16,6 +16,8 @@ Latest source-only continuation: session ownership/export ordering, workspace ac
 
 Commit generation can use an independent model preference without changing chat or Issue/PR models; selected-window byte budgets and limitations are documented in the [bounded P2 candidate](docs/mygo-migration/audits/2026-10-26/commit-model-p2.md). This is not a complete upstream #88 or native-parity claim.
 
+Chinese Settings coverage now includes Runtime, Privacy, Providers, Models, Skills, Plugins, MCP and report dialogs, with live English/Chinese switching regressions. This is display localization, not a protocol or configuration migration.
+
 ## Original Orbit reference
 
 [![CI](https://github.com/imrj05/orbit/actions/workflows/ci.yml/badge.svg)](https://github.com/imrj05/orbit/actions/workflows/ci.yml)

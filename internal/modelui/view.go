@@ -205,6 +205,9 @@ func (s *State) View(c *ui.Context) ui.Element {
 	return ui.Column(c).AlignSelf(ui.Stretch).Gap(a.Space(16)).Children(func() {
 
 		detail := s.Error
+		if s.localError {
+			detail = s.displayValidation(detail)
+		}
 		if s.RefreshError != "" {
 			detail = s.RefreshError
 		}

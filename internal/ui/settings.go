@@ -146,7 +146,7 @@ func (a *App) settings(c *ui.Context) {
 				case "bug":
 					a.bugSettings(c)
 				default:
-					a.Empty(c, "Service unavailable", "The native service has not been mounted.")
+					a.Empty(c, a.Tr("go.settings.unavailable"), a.Tr("go.settings.unmounted"))
 				}
 			})
 		})
@@ -282,10 +282,10 @@ func (a *App) jsonDialog(c *ui.Context) {
 	}
 	a.modal(c.Key("configuration-editor"), &a.jsonOpen, 680, func() {
 		ui.Text(c, a.jsonTitle).FontSize(18).Bold()
-		ui.TextInput(c, &a.jsonName).Label("Name").Placeholder("Name").AlignSelf(ui.Stretch)
-		ui.MenuButton(c, a.jsonScope, func(m *ui.Menu) {
+		ui.TextInput(c, &a.jsonName).Label("Name").Placeholder(a.Tr("go.settings.name")).AlignSelf(ui.Stretch)
+		ui.MenuButton(c, a.text("go.settings.scope_"+a.jsonScope, a.jsonScope), func(m *ui.Menu) {
 			for _, s := range []string{"user", "project"} {
-				if m.Item(s).Chosen() {
+				if m.Item(a.text("go.settings.scope_"+s, s)).Chosen() {
 					a.jsonScope = s
 				}
 			}
@@ -293,10 +293,10 @@ func (a *App) jsonDialog(c *ui.Context) {
 		_, height := c.Size()
 		ui.TextArea(c, &a.jsonValue).Font(a.Fonts.CodeFamily).Label("JSON configuration").Height(min(360, max(100, height-250))).AlignSelf(ui.Stretch)
 		ui.Row(c).Justify(ui.End).Gap(8).Children(func() {
-			if a.button(c, "Cancel", "", false).Clicked() {
+			if a.button(c, a.Tr("settings.cancel"), "", false).Label("Cancel").Clicked() {
 				a.jsonOpen = false
 			}
-			if a.button(c, "Save", "", true).Clicked() {
+			if a.button(c, a.Tr("mcp.save"), "", true).Label("Save").Clicked() {
 				fn, name, scope, value := a.jsonCommit, a.jsonName, a.jsonScope, a.jsonValue
 				if fn != nil {
 					a.Async(func() func() {
@@ -316,12 +316,12 @@ func (a *App) jsonDialog(c *ui.Context) {
 	})
 }
 func (a *App) bugSettings(c *ui.Context) {
-	a.section(c, "Report a bug", func() {
-		ui.Text(c, "Review diagnostics before sharing them. Do not include API keys or private session content.").TextColor(a.Theme.TextMuted)
-		if a.button(c, "Copy diagnostics", "icons/copy.svg", false).Clicked() {
+	a.section(c, a.Tr("settings.report_bug"), func() {
+		ui.Text(c, a.Tr("go.bug.review")).TextColor(a.Theme.TextMuted)
+		if a.button(c, a.Tr("go.bug.copy"), "icons/copy.svg", false).Clicked() {
 			c.Services().WriteClipboard("Orbit Go native\nMyGo 0.6.3\nRuntime connected: " + fmt.Sprint(a.Model.Connected))
 		}
-		if a.button(c, "Open issue tracker", "icons/external-link.svg", false).Clicked() {
+		if a.button(c, a.Tr("go.bug.open"), "icons/external-link.svg", false).Clicked() {
 			a.Dispatch(Action{Kind: "OpenLink", Value: "https://github.com/charlzyx/orbit/issues"})
 		}
 	})

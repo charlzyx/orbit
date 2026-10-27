@@ -76,6 +76,7 @@ type confirmation struct {
 }
 
 type State struct {
+	localBusyError                                             bool
 	Options                                                    Options
 	Workspace                                                  string
 	Servers                                                    []workbench.MCPServer
@@ -139,6 +140,7 @@ func (s *State) SetWorkspace(workspace string) {
 	s.Runtime = map[string]Runtime{}
 	s.Errors = nil
 	s.Error = ""
+	s.localBusyError = false
 	s.Status = ""
 	s.Query = ""
 	s.Selected = ""
@@ -204,6 +206,7 @@ func (s *State) start(activity string, job func(context.Context) (func(*State), 
 	s.Busy = true
 	s.activity = activity
 	s.Error = ""
+	s.localBusyError = false
 	s.generation++
 	generation := s.generation
 	ctx, cancel := context.WithCancel(context.Background())
@@ -261,6 +264,7 @@ func (s *State) tickAt(now time.Time) bool {
 			s.authTarget = ""
 			if r.err != nil {
 				s.Error = r.err.Error()
+				s.localBusyError = false
 			}
 			if r.apply != nil {
 				r.apply(s)
@@ -342,6 +346,7 @@ func (s *State) RefreshAndApply() {
 	}
 	if s.Busy {
 		s.Error = "Configuration operation in progress. Retry reconnect when it finishes."
+		s.localBusyError = true
 		return
 	}
 	service := s.service
@@ -482,6 +487,7 @@ func (s *State) saveEditor() {
 	prepared, e := s.Editor.prepare(s.Workspace)
 	if e != nil {
 		s.Editor.Error = e.Error()
+		s.Editor.validationError = true
 		return
 	}
 	if len(prepared.secrets) > 0 {
@@ -542,6 +548,7 @@ func (s *State) savePrepared(d preparedDraft) {
 			}
 			if err != nil && s.Editor != nil {
 				s.Editor.Error = err.Error()
+				s.Editor.validationError = false
 			}
 		}, err
 	})
@@ -653,6 +660,7 @@ func (s *State) SetPiBinary(binary string) {
 	s.probeErrors = nil
 	s.probeNote = ""
 	s.Error, s.Status = "", ""
+	s.localBusyError = false
 	s.service = workbench.New(s.service.Preferences, s.Workspace)
 	if binary != "" {
 		s.service.PiBinary = binary

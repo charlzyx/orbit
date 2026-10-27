@@ -53,7 +53,9 @@ func (a *App) appearanceSettings(c *ui.Context) {
 		a.sourceBackgroundRow(c)
 		a.sourceSettingsDivider(c)
 		a.sourceSettingsRow(c, a.Tr("language.title"), a.Tr("language.description"), "", func() {
-			a.sourceSettingsSelect(c, "Language", a.Prefs.Language, sourceLanguageChoices, func(v string) {
+			choices := append([]settingsChoice(nil), sourceLanguageChoices...)
+			choices[0].Label = a.Tr("language.system")
+			a.sourceSettingsSelect(c, "Language", a.Prefs.Language, choices, func(v string) {
 				a.Prefs.Language = v
 				a.reloadLocale()
 				a.save(a.Options.Store.SaveUI(a.Prefs))

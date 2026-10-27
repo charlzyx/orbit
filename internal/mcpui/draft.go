@@ -20,6 +20,7 @@ var variableName = regexp.MustCompile(`^[A-Za-z_][A-Za-z0-9_]*$`)
 // Draft is a typed native editor, not a raw JSON document. Secret-bearing
 // existing literals are masked; original is retained privately for round trips.
 type Draft struct {
+	validationError                                                                   bool
 	Name, Description, Transport, Scope, Exposure                                     string
 	Command, Args, Env, URL, Headers, Cwd, Timeout                                    string
 	OAuthClientID, OAuthClientSecret, OAuthCallbackPort, OAuthCallbackURL, OAuthScope string

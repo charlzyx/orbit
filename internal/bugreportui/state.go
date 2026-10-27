@@ -324,7 +324,7 @@ func (s *State) AddFiles(paths []string) {
 		return
 	}
 	if len(s.shots) >= native.MaxReportScreenshots {
-		s.Error = errors.New("Up to 6 screenshots.")
+		s.Error = localValidationError("Up to 6 screenshots.")
 		return
 	}
 	copyPaths := append([]string(nil), paths...)
@@ -339,7 +339,7 @@ func (s *State) pickScreenshots() {
 		return
 	}
 	if len(s.shots) >= native.MaxReportScreenshots {
-		s.Error = errors.New("Up to 6 screenshots.")
+		s.Error = localValidationError("Up to 6 screenshots.")
 		return
 	}
 	window, pick := s.Options.Window, s.Options.PickScreenshots
@@ -410,18 +410,18 @@ func ParseRedactionBoxes(text string) ([]image.Rectangle, error) {
 		}
 		parts := strings.Split(line, ",")
 		if len(parts) != 4 {
-			return nil, errors.New("use x,y,width,height; separate boxes with semicolons")
+			return nil, localValidationError("use x,y,width,height; separate boxes with semicolons")
 		}
 		var n [4]int
 		for i, p := range parts {
 			v, e := strconv.Atoi(strings.TrimSpace(p))
 			if e != nil || v < 0 || v > 100000 {
-				return nil, errors.New("redaction coordinates must be nonnegative pixels")
+				return nil, localValidationError("redaction coordinates must be nonnegative pixels")
 			}
 			n[i] = v
 		}
 		if n[2] == 0 || n[3] == 0 {
-			return nil, errors.New("redaction width and height must be positive")
+			return nil, localValidationError("redaction width and height must be positive")
 		}
 		boxes = append(boxes, image.Rect(n[0], n[1], n[0]+n[2], n[1]+n[3]))
 	}

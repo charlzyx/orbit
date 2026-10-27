@@ -1,6 +1,10 @@
 package orbitassets
 
-import "testing"
+import (
+	"regexp"
+	"slices"
+	"testing"
+)
 
 func TestGoLocaleSupplementFallbackAndOwnership(t *testing.T) {
 	en, err := Locale("en")
@@ -46,5 +50,17 @@ func TestGoLocaleSupplementFallbackAndOwnership(t *testing.T) {
 	again, _ := Locale("zh-CN")
 	if again["go.action.enable"] != "启用" {
 		t.Fatal("shared locale state")
+	}
+}
+
+func TestSettingsChineseSupplementPlaceholders(t *testing.T) {
+	re := regexp.MustCompile(`%\{[^}]+\}|\$\{[^}]+\}`)
+	for key, english := range goEnglish {
+		a, b := re.FindAllString(english, -1), re.FindAllString(goChinese[key], -1)
+		slices.Sort(a)
+		slices.Sort(b)
+		if !slices.Equal(a, b) {
+			t.Fatal(key, a, b)
+		}
 	}
 }

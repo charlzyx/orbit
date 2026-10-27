@@ -99,7 +99,7 @@ func (a *App) privacySettings(c *ui.Context) {
 		a.sourceSettingsRow(c, a.Tr("settings.session_retention_run"), a.Tr("settings.session_retention_run_description"), "", func() {
 			if a.sourceSettingsButton(c, a.Tr("settings.session_retention_run")).Label("Run session cleanup").Height(a.Theme.Px(32)).Disabled(a.retentionBusy).Clicked() {
 				if a.retention.Mode == "delete" {
-					a.Confirm("Permanently delete old tasks?", fmt.Sprintf("Delete saved sessions idle for more than %d days. Open tasks are excluded. This cannot be undone.", a.retention.Days), func() { a.Dispatch(Action{Kind: "RunRetention"}) })
+					a.Confirm(a.Tr("go.retention.confirm"), strings.ReplaceAll(a.Tr("go.retention.detail"), "%{days}", fmt.Sprint(a.retention.Days)), func() { a.Dispatch(Action{Kind: "RunRetention"}) })
 				} else {
 					a.Dispatch(Action{Kind: "RunRetention"})
 				}
@@ -128,7 +128,7 @@ func (a *App) aboutSettings(c *ui.Context) {
 		a.sourceSettingsRow(c, a.Tr("settings.orbit_pi"), a.Tr("settings.native_workbench_for_the_pi_coding_agent"), "", func() { ui.Text(c, "v"+a.Options.Version).FontSize(t.Px(12)).TextColor(t.TextSecondary) })
 		a.sourceSettingsDivider(c)
 		// The migrated implementation must never claim the reference's GPUI engine.
-		a.sourceSettingsRow(c, "MyGo", "Native GPU UI framework · Go implementation ("+runtime.Version()+").", "", func() { ui.Text(c, "9c69cf829ece").FontSize(t.Px(12)).TextColor(t.TextSecondary) })
+		a.sourceSettingsRow(c, "MyGo", strings.ReplaceAll(a.Tr("go.about.framework"), "%{version}", runtime.Version()), "", func() { ui.Text(c, "9c69cf829ece").FontSize(t.Px(12)).TextColor(t.TextSecondary) })
 		a.sourceSettingsDivider(c)
 		a.sourceSettingsRow(c, a.Tr("settings.pi_cli"), a.Tr("settings.the_only_agent_runtime_pi_speaks_its_own_rpc_pro"), "", func() { a.sourceConnectionStatus(c) })
 		a.sourceSettingsDivider(c)

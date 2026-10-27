@@ -104,7 +104,11 @@ func (s *State) editorView(c *ui.Context) {
 				})
 			})
 			if d.Error != "" {
-				ui.Text(c, d.Error).FontSize(a.Px(12)).TextColor(a.native.Danger).MaxLines(3).Shrink(0)
+				message := d.Error
+				if d.validationError {
+					message = s.displayValidation(message)
+				}
+				ui.Text(c, message).FontSize(a.Px(12)).TextColor(a.native.Danger).MaxLines(3).Shrink(0)
 			}
 			ui.Row(c.Key("footer")).Padding(a.Space(8)).Gap(a.Space(4)).Shrink(0).Justify(ui.End).BorderWidth(1, 0, 0, 0).BorderColor(a.native.Border).Children(func() {
 				if s.button(c, "cancel", s.label("mcp.cancel", "Cancel"), false).Clicked() {

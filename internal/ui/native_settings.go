@@ -116,11 +116,11 @@ func sourceTempAge(at, now time.Time) string {
 }
 func (a *App) cleanTemp(ai bool) {
 	snapshot := a.nativeSettings.temp
-	a.Confirm("Permanently delete temporary files?", "Eligible temporary files will be removed permanently. Active and recent files are retained.", func() {
+	a.Confirm(a.Tr("go.privacy.confirm"), a.Tr("go.privacy.confirm_detail"), func() {
 		a.Async(func() func() {
 			out := native.CleanTempFiles(snapshot, ai)
 			return func() {
-				a.Notify(fmt.Sprintf("Removed %d files (%d bytes); %d active retained; %d failures", out.Removed, out.Bytes, len(out.SkippedActive), len(out.Failed)), len(out.Failed) > 0)
+				a.Notify(strings.NewReplacer("%{count}", fmt.Sprint(out.Removed), "%{bytes}", fmt.Sprint(out.Bytes), "%{active}", fmt.Sprint(len(out.SkippedActive)), "%{failed}", fmt.Sprint(len(out.Failed))).Replace(a.Tr("go.privacy.removed")), len(out.Failed) > 0)
 				for _, f := range out.Failed {
 					a.Notify(f.Path+": "+f.Error, true)
 				}
@@ -137,10 +137,10 @@ func (a *App) updateSettings(c *ui.Context) {
 	}
 	s := u.Snapshot()
 	if !s.Enabled {
-		ui.Text(c, "Signed updates are not configured for this build.").TextColor(a.Theme.TextMuted)
+		ui.Text(c, a.Tr("go.update.unconfigured")).TextColor(a.Theme.TextMuted)
 		return
 	}
-	ui.Text(c, "Status: "+string(s.Status)).TextColor(a.Theme.TextMuted)
+	ui.Text(c, strings.ReplaceAll(a.Tr("go.update.status"), "%{status}", a.text("go.update.state_"+string(s.Status), string(s.Status)))).TextColor(a.Theme.TextMuted)
 	if s.Error != "" {
 		ui.Text(c, s.Error).TextColor(a.Theme.Error)
 	}
@@ -149,11 +149,11 @@ func (a *App) updateSettings(c *ui.Context) {
 		ui.Text(c, s.Available.Notes).MaxLines(8)
 	}
 	if s.Status == native.UpdateDownloading {
-		ui.Text(c, fmt.Sprintf("%d / %d bytes", s.Downloaded, s.Total))
+		ui.Text(c, strings.NewReplacer("%{downloaded}", fmt.Sprint(s.Downloaded), "%{total}", fmt.Sprint(s.Total)).Replace(a.Tr("go.update.bytes")))
 	}
 	if s.Status == native.UpdateStaged && s.CanInstall {
-		if a.button(c, "Install and restart…", "icons/refresh.svg", true).Clicked() {
-			a.Confirm("Install verified update and restart?", "Running tasks will be stopped after the verified installer is launched.", func() {
+		if a.button(c, a.Tr("go.update.install"), "icons/refresh.svg", true).Clicked() {
+			a.Confirm(a.Tr("go.update.confirm"), a.Tr("go.update.confirm_detail"), func() {
 				a.Async(func() func() {
 					e := u.Install(context.Background())
 					return func() {
