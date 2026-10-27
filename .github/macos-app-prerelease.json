@@ -1,7 +1,7 @@
 {
   "enabled": true,
-  "version": "0.2.12-go-test.20261027.1",
-  "runtime_source_sha256": "ee9b4ba654bd17ac335d3746834f613045dba023dae1c5359c20080ad6e7f214",
+  "version": "0.2.12-go-test.20261027.2",
+  "runtime_source_sha256": "fe127c46d961abf92b353617599d0199bf105a1285ab5cc20de27181b10859e1",
   "minimum_macos": "13.0",
   "required_native_smoke": true
 }
