@@ -48,6 +48,9 @@ func (x *Controller) tickConfigApply(now time.Time) {
 		return
 	default:
 	}
+	if x.configApplyFlight == nil && x.configApplyAfter.IsZero() {
+		return
+	}
 	s := x.Agent.Snapshot()
 	process := x.Agent.RuntimeSnapshot().Active
 	if f := x.configApplyFlight; f != nil {

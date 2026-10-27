@@ -1301,6 +1301,13 @@ func cloneValue(value reflect.Value) reflect.Value {
 			return reflect.Zero(value.Type())
 		}
 		copy := reflect.MakeSlice(value.Type(), value.Len(), value.Len())
+		// Raw JSON and other byte slices still need independent storage,
+		// but copying each byte through reflection adds work proportional to
+		// history size on every UI snapshot. Preserve named slice types.
+		if value.Type().Elem().Kind() == reflect.Uint8 {
+			reflect.Copy(copy, value)
+			return copy
+		}
 		for i := 0; i < value.Len(); i++ {
 			copy.Index(i).Set(cloneValue(value.Index(i)))
 		}
