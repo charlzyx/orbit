@@ -1,5 +1,7 @@
 KNOWN LIMITS / 已知限制 — experimental Finder app
 
+- This version includes Chinese Settings and dialog translations, preserving
+  English, configuration identifiers and raw external error details.
 - This version includes the GOPI wordmark and pixel PI icon, bounded process
   recovery without operation replay, independent commit model choice, and
   editor identity/rename fixes. These are tested code changes, not full parity.
