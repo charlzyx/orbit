@@ -830,7 +830,7 @@ func Run(o RunOptions) error {
 		return startupError(e)
 	}
 	defer x.Close()
-	mygo.App.SetName("Orbit")
+	mygo.App.SetName("GoPi")
 	var lifecycle *native.Lifecycle
 	create := func() *mygo.Window {
 		display := mygo.Screen.PrimaryDisplay()
@@ -854,7 +854,7 @@ func Run(o RunOptions) error {
 	lifecycle = native.BindLifecycle(native.LifecycleOptions{Reopen: create, OpenSession: func(path string) { x.OpenSession(path) }, OpenFile: x.UI.OpenFile, Quit: x.Close, Notifier: x.Notifier})
 	defer lifecycle.Close()
 	x.rebuildMenu = func() {
-		mygo.App.SetMenu(native.NativeMenu(native.MenuOptions{AppName: "Orbit", Text: x.UI.text, CanCheckUpdates: x.Updater.Snapshot().Enabled, Dispatch: func(command string) {
+		mygo.App.SetMenu(native.NativeMenu(native.MenuOptions{AppName: "GoPi", Text: x.UI.text, CanCheckUpdates: x.Updater.Snapshot().Enabled, Dispatch: func(command string) {
 			if command != "Quit" {
 				lifecycle.Show()
 			}
@@ -975,5 +975,5 @@ func windowRestoreSize(displayWidth, displayHeight int) (int, int) {
 // The source has no in-window menu bar on Linux. Auto-hide retains native edit
 // roles and accelerators without allocating an unwanted GTK/Windows strip.
 func sourceWindowOptions(width, height int) mygo.WindowOptions {
-	return mygo.WindowOptions{Title: "Orbit", Width: width, Height: height, MinWidth: 960, MinHeight: 640, Maximized: true, AutoHideMenuBar: true, HideWindowButtons: runtime.GOOS == "linux", TitleBarStyle: mygo.TitleBarHidden, TitleBarHeight: 44, TrafficLightPosition: &mygo.Point{X: 12, Y: 16}}
+	return mygo.WindowOptions{Title: "GoPi", Width: width, Height: height, MinWidth: 960, MinHeight: 640, Maximized: true, AutoHideMenuBar: true, HideWindowButtons: runtime.GOOS == "linux", TitleBarStyle: mygo.TitleBarHidden, TitleBarHeight: 44, TrafficLightPosition: &mygo.Point{X: 12, Y: 16}}
 }

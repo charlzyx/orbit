@@ -60,3 +60,13 @@ func TestNativeEditMenuUsesContentFirstRoleDispatch(t *testing.T) {
 		}
 	}
 }
+
+func TestGoPiMenuDisplayNamePreservesNativeEditRoles(t *testing.T) {
+	menu := NativeMenuTemplate(MenuOptions{AppName: "GoPi"}, "darwin")
+	if menu[0].Label != "GoPi" || menu[0].Submenu[0].Label != "About GoPi" {
+		t.Fatal("display name", menu[0])
+	}
+	if menu[2].Submenu[1].Role != mygo.RoleCopy {
+		t.Fatal("copy role changed")
+	}
+}

@@ -2,7 +2,7 @@
 """Assemble only the arm64 native-smoke-passed DMG from this exact Actions run."""
 from pathlib import Path
 import argparse,json,shutil,os
-from common import check_source,write,digest,HERE,ARCHITECTURES
+from common import check_source,write,digest,HERE,ARCHITECTURES,dmg_name
 
 def assemble(root,inputs,out,commit):
  m,_=check_source(root,commit)
@@ -11,7 +11,7 @@ def assemble(root,inputs,out,commit):
  out.mkdir(parents=True);assets=[]
  for arch in ARCHITECTURES:
   p=inputs/arch/f'package-{arch}.json';a=json.loads(p.read_text())
-  name=f'Orbit-Go-Test-{m["version"]}-{commit[:12]}-ci-macos-{arch}.dmg'
+  name=dmg_name(m["version"],commit,arch)
   if a.get('filename')!=name or a.get('source_commit')!=commit or a.get('version')!=m['version'] or a.get('architecture')!=arch or a.get('native_macos_smoke')!='PASS':raise ValueError('Wrong source/version or absent native smoke gate')
   expected_ci=f'https://github.com/{os.environ["GITHUB_REPOSITORY"]}/actions/runs/{os.environ["GITHUB_RUN_ID"]}'
   if a.get('ci_run')!=expected_ci:raise ValueError('Artifact not produced by this Actions run')
@@ -28,7 +28,7 @@ This performance test package uses verified source 426979ab: byte-slice snapshot
 
 This test package contains the user-approved vector GOPI sidebar wordmark and pixel PI Go app icon. Bundle identity and private Orbit Home paths are unchanged. It includes bounded selected-process recovery without replaying prompts/tools, an independent commit-message model preference, request/error ownership fixes, and the tested editor rename/identity protections. Composer navigation, menus, folding, attachment admission, normal Pi configuration inheritance and bounded private diagnostics remain. The user reported .20261026.2 usable, but full functionality, feel and visual parity remain unfinished; the earlier specific workspace-picker hang is not independently confirmed fixed. All earlier tags and assets remain unchanged.
 
-Download the arm64 DMG for Apple Silicon. Future builds are arm64 only; existing Intel releases and assets remain unchanged. Open the disk image, drag Orbit Go Test.app to Applications, eject the image, then open the app. No Terminal command or separate Node/Pi installation is required. Bundled Node22.23.4 and Pi1.4.0 materialize into private app runtime data on first launch. Pi reads the launch user's normal ~/.pi/agent or PI_CODING_AGENT_DIR, including existing model/provider configuration. Stock Pi may normally migrate settings and refresh OAuth credentials; Orbit does not copy credentials. If no provider is configured, configure one in the app before model inference. No account or credential is bundled.
+Download the arm64 DMG for Apple Silicon. Future builds are arm64 only; existing Intel releases and assets remain unchanged. Open the disk image, drag GoPi.app to Applications, eject the image, then open the app. No Terminal command or separate Node/Pi installation is required. Bundled Node22.23.4 and Pi1.4.0 materialize into private app runtime data on first launch. Pi reads the launch user's normal ~/.pi/agent or PI_CODING_AGENT_DIR, including existing model/provider configuration. Stock Pi may normally migrate settings and refresh OAuth credentials; Orbit does not copy credentials. If no provider is configured, configure one in the app before model inference. No account or credential is bundled.
 
 This exact arm64 DMG passed matching-architecture hosted macOS launch smoke: read-only mount, copy outside build directory, detach, native visible first frame with an in-process content-render PNG (not OS screen pixels), Ghostty load, Pi RPC get_state, second launch and unchanged app bytes. These are bounded smoke checks, not full feature or pixel parity, not downloaded-app Gatekeeper acceptance, and not successful model inference.
 

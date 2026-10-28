@@ -5,7 +5,7 @@ credential creation, settings changes, signing, or automatic retry is supported.
 """
 from pathlib import Path
 import argparse,hashlib,json,os,re,subprocess,tempfile,urllib.request,urllib.parse,urllib.error
-from common import COMMIT_RE,VERSION_RE,digest,marker,git,ARCHITECTURES
+from common import COMMIT_RE,VERSION_RE,digest,marker,git,ARCHITECTURES,DISPLAY_NAME,dmg_name
 
 class SafeAPIError(RuntimeError):pass
 
@@ -122,7 +122,7 @@ def find_release(repo,tag):
 def local_assets(folder,commit,version):
  m=json.loads((folder/'release-manifest.json').read_text())
  if m.get('source_commit')!=commit or m.get('version')!=version or m.get('tag')!='macos-test-v'+version:raise ValueError('Artifact/source/version mismatch')
- expected_dmgs={f'Orbit-Go-Test-{version}-{commit[:12]}-ci-macos-{a}.dmg' for a in ARCHITECTURES}
+ expected_dmgs={dmg_name(version,commit,a) for a in ARCHITECTURES}
  if {x['filename'] for x in m['assets']}!=expected_dmgs or len(m['assets'])!=len(ARCHITECTURES) or {x.get('architecture') for x in m['assets']}!=set(ARCHITECTURES):raise ValueError('Wrong architecture asset set')
  if m.get('native_macos_smoke') != {arch:'PASS' for arch in ARCHITECTURES}:raise ValueError('arm64 native macOS smoke gate must pass')
  for a in m['assets']:
@@ -166,7 +166,7 @@ def main(root,folder):
  ensure_feature_head(repo,commit)
  # Create once and retain the exact ID returned by GitHub. Never resolve
  # a mutable tag to choose the release to upload into or publish.
- created=rest_json('POST',f'repos/{repo}/releases',{'tag_name':tag,'target_commitish':commit,'name':'Orbit Go macOS test '+version,'body':(folder/'RELEASE-NOTES.md').read_text(),'draft':True,'prerelease':True,'make_latest':'false'})
+ created=rest_json('POST',f'repos/{repo}/releases',{'tag_name':tag,'target_commitish':commit,'name':DISPLAY_NAME+' '+version,'body':(folder/'RELEASE-NOTES.md').read_text(),'draft':True,'prerelease':True,'make_latest':'false'})
  if not isinstance(created,dict) or type(created.get('id')) is not int or created['id']<=0 or created.get('draft') is not True or created.get('prerelease') is not True or created.get('tag_name')!=tag or created.get('target_commitish')!=commit or created.get('assets')!=[]:raise RuntimeError('New empty exact-commit draft could not be established; stop without retry')
  created_id=created['id'];uploaded_ids={}
  print(json.dumps({'publisher_owned_draft':{'repository':repo,'id':created_id,'source_commit':commit,'tag':tag}},sort_keys=True),flush=True)

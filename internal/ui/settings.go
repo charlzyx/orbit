@@ -20,7 +20,7 @@ var settingsCategories = []struct{ ID, Title, Icon, Description string }{
 	{"skills", "Skills", "icons/magic-wand.svg", "Instructions available to the agent."},
 	{"plugins", "Plugins", "icons/extensions.svg", "Packages installed in pi."},
 	{"mcp", "MCP", "icons/tools/mcp.svg", "Model Context Protocol servers and their configuration."},
-	{"about", "About", "icons/info.svg", "Orbit, rebuilt in Go with native MyGo UI."},
+	{"about", "About", "icons/info.svg", "GoPi, rebuilt in Go with native MyGo UI."},
 	{"bug", "Report a bug", "icons/github.svg", "Diagnostics and issue reporting."},
 }
 
@@ -63,7 +63,7 @@ func (a *App) settings(c *ui.Context) {
 		})
 		a.line(c)
 		ui.Row(c).Height(HeaderHeight).PaddingX(t.Space(16)).Gap(t.Space(6)).AlignItems(ui.Center).Children(func() {
-			ui.Text(c, a.text("app.name", "Orbit")).FontSize(t.Px(12)).TextColor(t.TextMuted)
+			ui.Text(c, a.text("app.name", "GoPi")).FontSize(t.Px(12)).TextColor(t.TextMuted)
 			if a.Options.Version != "" {
 				ui.Text(c, "v"+a.Options.Version).Font(a.Fonts.CodeFamily).FontSize(t.Px(12)).TextColor(t.TextMuted)
 			}
@@ -95,7 +95,7 @@ func (a *App) settings(c *ui.Context) {
 			ui.Column(c).AlignSelf(ui.Stretch).Padding(t.Space(20), t.Space(24), t.Space(12)).Gap(t.Space(12)).Children(func() {
 				ui.Column(c.Key("settings-header")).AlignSelf(ui.Stretch).Gap(t.Space(4)).Children(func() {
 					if a.settingsPage == "about" {
-						ui.Image(c, logos["go-app-icon.png"]).Size(48, 48).Label("Orbit Go app icon")
+						ui.Image(c, logos["go-app-icon.png"]).Size(48, 48).Label("GoPi app icon")
 					}
 					for _, cat := range settingsCategories {
 						if cat.ID == a.settingsPage {
@@ -319,7 +319,7 @@ func (a *App) bugSettings(c *ui.Context) {
 	a.section(c, a.Tr("settings.report_bug"), func() {
 		ui.Text(c, a.Tr("go.bug.review")).TextColor(a.Theme.TextMuted)
 		if a.button(c, a.Tr("go.bug.copy"), "icons/copy.svg", false).Clicked() {
-			c.Services().WriteClipboard("Orbit Go native\nMyGo 0.6.3\nRuntime connected: " + fmt.Sprint(a.Model.Connected))
+			c.Services().WriteClipboard("GoPi native\nMyGo 0.6.3\nRuntime connected: " + fmt.Sprint(a.Model.Connected))
 		}
 		if a.button(c, a.Tr("go.bug.open"), "icons/external-link.svg", false).Clicked() {
 			a.Dispatch(Action{Kind: "OpenLink", Value: "https://github.com/charlzyx/orbit/issues"})

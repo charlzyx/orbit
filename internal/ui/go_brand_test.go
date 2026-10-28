@@ -79,7 +79,10 @@ func TestGoBrandDedicatedIconAndLightDarkScreens(t *testing.T) {
 			app.Navigate("settings")
 			app.settingsPage = "about"
 			tt.Frame()
-			icon, ok := tt.Find("Orbit Go app icon")
+			if !tt.HasText("GoPi") {
+				t.Fatal("About display name not GoPi", tt.Texts())
+			}
+			icon, ok := tt.Find("GoPi app icon")
 			if !ok || icon.W != 48 || icon.H != 48 {
 				t.Fatal("About Go icon not mounted at preserved size", icon)
 			}

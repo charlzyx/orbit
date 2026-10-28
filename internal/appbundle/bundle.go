@@ -14,6 +14,8 @@ import (
 	"github.com/charlzyx/orbit/internal/preferences"
 )
 
+// StateDirectory is a persistent compatibility identity, not the display name.
+// Renaming the app must not create an empty preference/runtime home.
 const StateDirectory = "Orbit Go Test"
 
 type Layout struct {
@@ -96,7 +98,7 @@ func (l Layout) Prepare(realHome string, o Options, environment []string) (Prepa
 	home := o.Home
 	if home == "" {
 		if realHome == "" || !filepath.IsAbs(realHome) {
-			return p, errors.New("Cannot locate your home folder for Orbit Go Test settings")
+			return p, errors.New("Cannot locate your home folder for GoPi settings")
 		}
 		anchor, err := filepath.EvalSymlinks(realHome)
 		if err != nil {

@@ -64,3 +64,20 @@ func TestSettingsChineseSupplementPlaceholders(t *testing.T) {
 		}
 	}
 }
+
+func TestGoPiDisplayBrandEveryLocale(t *testing.T) {
+	for _, language := range Languages {
+		catalog, err := Locale(language)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if catalog["app.name"] != "GoPi" || catalog["settings.orbit_pi"] != "GoPi" {
+			t.Fatal(language, "brand", catalog["app.name"], catalog["settings.orbit_pi"])
+		}
+	}
+	catalog := map[string]string{"view.set_up_orbit": "Set up Orbit", "sidebar.star_orbit": "Star Orbit", "theme.orbit": "Orbit Cobalt", "backend": "Orbit Go Test/Home"}
+	supplementGoLocale(catalog, "en")
+	if catalog["view.set_up_orbit"] != "Set up GoPi" || catalog["sidebar.star_orbit"] != "Star GoPi" || catalog["theme.orbit"] != "Orbit Cobalt" || catalog["backend"] != "Orbit Go Test/Home" {
+		t.Fatal(catalog)
+	}
+}

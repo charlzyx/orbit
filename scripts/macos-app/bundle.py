@@ -2,8 +2,7 @@
 """Build a native Finder .app and DMG on a matching hosted Mac; never publish."""
 from pathlib import Path
 import argparse,json,os,platform,plistlib,re,shutil,subprocess,struct
-from common import HERE,LEGACY,check_source,copy,write,run,digest,native_download,inspect,ARCHITECTURES
-APP_NAME='Orbit Go Test.app'
+from common import HERE,LEGACY,check_source,copy,write,run,digest,native_download,inspect,ARCHITECTURES,DISPLAY_NAME,APP_NAME,dmg_name
 SYSTEM_PATH='/usr/bin:/bin:/usr/sbin:/sbin'
 
 def tree_hashes(root):
@@ -78,6 +77,9 @@ def install_go_icon(root,res):
  if digest(res/'OrbitTest.icns')!=digest(root/'assets/icons/go/orbit-go.icns'):raise ValueError('Packaged Go icon changed')
  copy(root/'assets/icons/go/manifest.json',res/'Provenance/go-icon-manifest.json')
 
+def bundle_info(version):
+ return {'CFBundleDevelopmentRegion':'en','CFBundleName':DISPLAY_NAME,'CFBundleDisplayName':DISPLAY_NAME,'CFBundleIdentifier':'dev.orbit.go.experimental','CFBundleVersion':version.split('go-test.')[1],'CFBundleShortVersionString':'0.2.12','CFBundleExecutable':'Orbit','CFBundlePackageType':'APPL','CFBundleIconFile':'OrbitTest','LSMinimumSystemVersion':'13.0','NSHighResolutionCapable':True,'NSPrincipalClass':'NSApplication','NSSupportsAutomaticGraphicsSwitching':True}
+
 def build(root,binaries,runtime,out,commit,arch,validation):
  if arch not in ARCHITECTURES:raise ValueError('Future macOS app builds support arm64 only')
  if platform.system()!='Darwin' or platform.machine()!='arm64':raise ValueError('Matching native macOS runner required')
@@ -98,11 +100,11 @@ def build(root,binaries,runtime,out,commit,arch,validation):
  nodeaudit=require_arch(res/'node/bin/node',arch)
  if not (res/'pi/node_modules/@earendil-works/pi-coding-agent/dist/bundle/cli.js').is_file():raise ValueError('Pinned Pi CLI missing')
  install_go_icon(root,res)
- info={'CFBundleDevelopmentRegion':'en','CFBundleName':'Orbit Go Test','CFBundleDisplayName':'Orbit Go Test','CFBundleIdentifier':'dev.orbit.go.experimental','CFBundleVersion':m['version'].split('go-test.')[1],'CFBundleShortVersionString':'0.2.12','CFBundleExecutable':'Orbit','CFBundlePackageType':'APPL','CFBundleIconFile':'OrbitTest','LSMinimumSystemVersion':'13.0','NSHighResolutionCapable':True,'NSPrincipalClass':'NSApplication','NSSupportsAutomaticGraphicsSwitching':True}
+ info=bundle_info(m['version'])
  (app/'Contents/Info.plist').write_bytes(plistlib.dumps(info));write(app/'Contents/PkgInfo','APPL????')
  write(res/'bin/pi','#!/bin/sh\nset -eu\nRES="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd -P)"\nexec "$RES/node/bin/node" "$RES/pi/node_modules/@earendil-works/pi-coding-agent/dist/bundle/cli.js" "$@"\n',0o755)
- write(res/'sample-workspace/README.md','# Orbit Go Test workspace\n\nSynthetic starter project. 中文输入测试。\nChanges are saved in your experimental app data directory, never in the application bundle.\n')
- write(res/'sample-workspace/hello.go','package main\n\nimport "fmt"\nfunc main() { fmt.Println("Hello, Orbit") }\n')
+ write(res/'sample-workspace/README.md','# GoPi workspace\n\nSynthetic starter project. 中文输入测试。\nChanges are saved in your experimental app data directory, never in the application bundle.\n')
+ write(res/'sample-workspace/hello.go','package main\n\nimport "fmt"\nfunc main() { fmt.Println("Hello, GoPi") }\n')
  for rel,h in json.loads((LEGACY/'licenses-sha256.json').read_text()).items():
   if digest(LEGACY/'third-party-licenses'/rel)!=h:raise ValueError('Core license drift: '+rel)
  shutil.copytree(LEGACY/'third-party-licenses',res/'Licenses/core')
@@ -134,8 +136,8 @@ def build(root,binaries,runtime,out,commit,arch,validation):
  copy(HERE/'KNOWN-LIMITS.txt',res/'KNOWN-LIMITS.txt');copy(HERE/'README.txt',res/'README.txt')
  hashes=tree_hashes(app);write(prov/'bundle-files.json',json.dumps(hashes,indent=2,sort_keys=True)+'\n')
  copy(HERE/'README.txt',volume/'READ-ME-FIRST.txt');copy(HERE/'KNOWN-LIMITS.txt',volume/'KNOWN-LIMITS.txt');os.symlink('/Applications',volume/'Applications')
- name=f'Orbit-Go-Test-{m["version"]}-{commit[:12]}-ci-macos-{arch}.dmg';target=out/name
- run('/usr/bin/hdiutil','create','-volname','Orbit Go Test','-srcfolder',volume,'-format','UDZO','-fs','HFS+',target)
+ name=dmg_name(m["version"],commit,arch);target=out/name
+ run('/usr/bin/hdiutil','create','-volname',DISPLAY_NAME,'-srcfolder',volume,'-format','UDZO','-fs','HFS+',target)
  run('/usr/bin/hdiutil','verify',target)
  # Preserve expected app bytes outside the DMG; no payload edits after creation.
  write(out/f'expected-app-{arch}.json',json.dumps(tree_hashes(app),sort_keys=True)+'\n')

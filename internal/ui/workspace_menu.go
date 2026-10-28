@@ -84,7 +84,11 @@ func (a *App) workspaceHeader(c *ui.Context, r sidebarRow, sticky, ownsActions b
 	row.Children(func() {
 		var b ui.Element
 		if ownsActions {
-			b = ui.ButtonBase(c.Key("header")).Label(r.label)
+			hint := "go.sidebar.collapse_hint"
+			if r.collapsed {
+				hint = "go.sidebar.expand_hint"
+			}
+			b = ui.ButtonBase(c.Key("header")).Label(r.label).Tooltip(a.Tr(hint))
 		} else {
 			b = ui.Row(c.Key("header-presentation"))
 		}

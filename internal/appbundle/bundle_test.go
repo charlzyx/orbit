@@ -532,3 +532,37 @@ func TestInvalidSharedPiConfigFailsBeforePrivateStateCreation(t *testing.T) {
 		t.Fatal("invalid config created private runtime/state")
 	}
 }
+
+func TestGoPiRenamedBundleReusesExistingPrivateHome(t *testing.T) {
+	old, realHome := fixture(t)
+	before, err := old.Prepare(realHome, Options{}, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	note := filepath.Join(before.Workspace, "existing-user-file.txt")
+	if err = os.WriteFile(note, []byte("preserve user data"), 0600); err != nil {
+		t.Fatal(err)
+	}
+	renamed := filepath.Join(filepath.Dir(old.Root), "GoPi.app")
+	if err = os.Rename(old.Root, renamed); err != nil {
+		t.Fatal(err)
+	}
+	next, ok := Discover(filepath.Join(renamed, "Contents", "MacOS", "Orbit"), "darwin")
+	if !ok {
+		t.Fatal("GoPi bundle undiscovered")
+	}
+	after, err := next.Prepare(realHome, Options{}, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if after.Home != before.Home || after.Workspace != before.Workspace || after.PiBinary != before.PiBinary {
+		t.Fatal("rename changed persistent identity", before.Home, after.Home)
+	}
+	data, err := os.ReadFile(note)
+	if err != nil || string(data) != "preserve user data" {
+		t.Fatal("existing data lost", err)
+	}
+	if _, err = os.Stat(filepath.Join(realHome, "Library", "Application Support", "GoPi")); !os.IsNotExist(err) {
+		t.Fatal("unexpected new data directory", err)
+	}
+}

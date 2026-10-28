@@ -150,7 +150,7 @@ func run(args []string) int {
 		// This explicit path was set before any terminal construction. A missing or
 		// broken library is a visible error, never an implicit runtime download.
 		if err := ghostty.Load(); err != nil {
-			return fail(fmt.Errorf("The bundled terminal runtime could not load: %w. Download a fresh copy of Orbit.app", err))
+			return fail(fmt.Errorf("The bundled terminal runtime could not load: %w. Download a fresh copy of GoPi.app", err))
 		}
 		o.Smoke.GhosttyLoaded()
 	} else if a.smokeReport != "" {

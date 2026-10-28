@@ -7,6 +7,9 @@ sys.path.insert(0,str(LEGACY))
 from package import runtime_inputs, native_download, COMMIT_RE, VERSION_RE
 from macho import inspect
 MARKER='.github/macos-app-prerelease.json'
+DISPLAY_NAME='GoPi'
+APP_NAME=DISPLAY_NAME+'.app'
+def dmg_name(version,commit,arch):return f'{DISPLAY_NAME}-{version}-{commit[:12]}-ci-macos-{arch}.dmg'
 # Future supported packages are Apple Silicon only. Existing releases stay immutable.
 ARCHITECTURES=('arm64',)
 def digest(path):

@@ -10,6 +10,16 @@ spec=importlib.util.spec_from_file_location('publisher',Path(__file__).with_name
 spec=importlib.util.spec_from_file_location('assembler',Path(__file__).with_name('assemble-release.py'));assembler=importlib.util.module_from_spec(spec);spec.loader.exec_module(assembler)
 HERE=Path(__file__).resolve().parent
 class PackagingTests(unittest.TestCase):
+ def test_gopi_display_brand_keeps_storage_and_bundle_identity(self):
+  info=bundle.bundle_info('0.2.12-go-test.20261027.2')
+  self.assertEqual((info['CFBundleName'],info['CFBundleDisplayName']),('GoPi','GoPi'))
+  self.assertEqual(info['CFBundleIdentifier'],'dev.orbit.go.experimental')
+  self.assertEqual(info['CFBundleExecutable'],'Orbit')
+  self.assertEqual(info['CFBundleIconFile'],'OrbitTest')
+  self.assertEqual(info['CFBundleVersion'],'20261027.2')
+  self.assertEqual(bundle.APP_NAME,'GoPi.app')
+  self.assertEqual(package.dmg_name('0.2.12-go-test.20261027.2','a'*40,'arm64'),'GoPi-0.2.12-go-test.20261027.2-aaaaaaaaaaaa-ci-macos-arm64.dmg')
+  self.assertIn('Application Support/Orbit Go Test/Home',(HERE/'README.txt').read_text())
  def test_diagnostics_require_fresh_private_allowlisted_stages(self):
   with tempfile.TemporaryDirectory() as d:
    p=Path(d)/'app.log';version='0.2.12-go-test.20261025.4'
@@ -39,7 +49,7 @@ class PackagingTests(unittest.TestCase):
  def fixture_assets(self,r):
   commit='a'*40;version='0.2.12-go-test.20261025.2';assets=[]
   for a in ('arm64',):
-   p=r/f'Orbit-Go-Test-{version}-{commit[:12]}-ci-macos-{a}.dmg';p.write_bytes(b'synthetic archive fixture '+a.encode());assets.append({'filename':p.name,'bytes':p.stat().st_size,'sha256':package.digest(p),'architecture':a})
+   p=r/bundle.dmg_name(version,commit,a);p.write_bytes(b'synthetic archive fixture '+a.encode());assets.append({'filename':p.name,'bytes':p.stat().st_size,'sha256':package.digest(p),'architecture':a})
   (r/'KNOWN-LIMITS.txt').write_text('Native Mac NOT RUN')
   (r/'RELEASE-NOTES.md').write_text('Synthetic offline test only')
   (r/'release-manifest.json').write_text(json.dumps({'version':version,'tag':'macos-test-v'+version,'source_commit':commit,'assets':assets,'native_macos_smoke':{'arm64':'PASS'}}))

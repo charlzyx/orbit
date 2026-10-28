@@ -145,7 +145,7 @@ func (a *App) updateSettings(c *ui.Context) {
 		ui.Text(c, s.Error).TextColor(a.Theme.Error)
 	}
 	if s.Available != nil {
-		ui.Text(c, "Orbit "+s.Available.Version).FontWeight(500)
+		ui.Text(c, "GoPi "+s.Available.Version).FontWeight(500)
 		ui.Text(c, s.Available.Notes).MaxLines(8)
 	}
 	if s.Status == native.UpdateDownloading {

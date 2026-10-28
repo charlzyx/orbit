@@ -27,11 +27,11 @@ func (e *RuntimeError) Error() string { return e.Message }
 // ShowStartupError runs a minimal native lifecycle, not a shell/osascript
 // workaround. Call only before the application's normal App.Run, on main.
 func ShowStartupError(err error) error {
-	mygo.App.SetName("Orbit Go Test")
+	mygo.App.SetName("GoPi")
 	mygo.App.WhenReady(func() {
 		var workspace *WorkspaceError
 		var runtime *RuntimeError
-		options := mygo.MessageOptions{Type: mygo.MessageError, Title: "Orbit could not start", Message: "Orbit could not start", Detail: err.Error(), Buttons: []string{"Quit"}}
+		options := mygo.MessageOptions{Type: mygo.MessageError, Title: "GoPi could not start", Message: "GoPi could not start", Detail: err.Error(), Buttons: []string{"Quit"}}
 		if errors.As(err, &workspace) {
 			options.Buttons = []string{"Choose Folder…", "Quit"}
 			options.CancelButton = 1
@@ -53,7 +53,7 @@ func ShowStartupError(err error) error {
 			_, _ = mygo.Dialog.Message(mygo.MessageOptions{Type: mygo.MessageError, Message: "The runtime selection could not be updated", Detail: resetErr.Error(), Buttons: []string{"Quit"}})
 		}
 		if workspace != nil && result.Button == 0 {
-			paths, pickErr := mygo.Dialog.Open(mygo.OpenDialogOptions{Title: "Choose your Orbit workspace", Directory: true})
+			paths, pickErr := mygo.Dialog.Open(mygo.OpenDialogOptions{Title: "Choose your GoPi workspace", Directory: true})
 			if pickErr == nil && len(paths) > 0 {
 				path := paths[0]
 				info, statErr := os.Stat(path)

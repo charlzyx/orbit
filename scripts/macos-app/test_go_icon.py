@@ -31,7 +31,7 @@ class GoIconTests(unittest.TestCase):
    with self.assertRaises(ValueError):bundle.verify_go_icon(r)
  def test_packaged_icon_bytes_and_provenance(self):
   with tempfile.TemporaryDirectory() as d:
-   res=Path(d)/'Orbit Go Test.app/Contents/Resources'
+   res=Path(d)/'GoPi.app/Contents/Resources'
    bundle.install_go_icon(ROOT,res)
    self.assertEqual((res/'OrbitTest.icns').read_bytes(),(ROOT/'assets/icons/go/orbit-go.icns').read_bytes())
    self.assertEqual((res/'Provenance/go-icon-manifest.json').read_bytes(),(ROOT/'assets/icons/go/manifest.json').read_bytes())

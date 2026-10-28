@@ -1,8 +1,12 @@
 package orbitassets
 
+import "strings"
+
 // Go-only UI states do not change the pinned Rust catalogs. English is explicit
 // fallback for languages whose supplement has not yet been translated.
 var goEnglish = map[string]string{
+	"go.sidebar.collapse_hint":   "Collapse other sessions; keep current, pinned and running sessions visible",
+	"go.sidebar.expand_hint":     "Expand workspace sessions (current, pinned and running sessions stay visible when collapsed)",
 	"go.providers.refresh_usage": "Refresh usage",
 	"go.bug.cancelling":          "Cancelling",
 	"go.bug.issue_created":       "Issue created:",
@@ -225,6 +229,8 @@ var goEnglish = map[string]string{
 	"go.bug.remove":                         "Remove %{name}",
 }
 var goChinese = map[string]string{
+	"go.sidebar.collapse_hint":   "折叠其他会话；保留当前、置顶和运行中的会话",
+	"go.sidebar.expand_hint":     "展开工作区会话（折叠时仍保留当前、置顶和运行中的会话）",
 	"go.providers.refresh_usage": "刷新用量",
 	"go.bug.cancelling":          "正在取消",
 	"go.bug.issue_created":       "已创建问题：",
@@ -448,6 +454,15 @@ var goChinese = map[string]string{
 }
 
 func supplementGoLocale(catalog map[string]string, language string) {
+	// Go-only display branding; leave the pinned Rust catalogs and storage keys intact.
+	catalog["app.name"] = "GoPi"
+	catalog["settings.orbit_pi"] = "GoPi"
+	for _, key := range []string{"view.set_up_orbit", "sidebar.star_orbit"} {
+		if value, ok := catalog[key]; ok {
+			catalog[key] = strings.ReplaceAll(value, "Orbit", "GoPi")
+		}
+	}
+
 	for key, fallback := range goEnglish {
 		// Source catalog ownership wins, even if future Rust adds this exact key.
 		if _, exists := catalog[key]; exists {
