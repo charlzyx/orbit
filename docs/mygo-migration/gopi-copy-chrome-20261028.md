@@ -68,3 +68,11 @@ recovery-budget and child-count assertions remain unchanged, with no new sleeps,
 production edits, retries or extended deadlines. The fixed case passed 30 race
 runs; a fresh complete agent package run also passed. The failed initial full run
 is retained, not converted into a pass by these narrower results.
+
+Final v2 gate (2026-10-28): full race 3749 pass / 19 conditional skips;
+20 toolkit, 32 menu and 115 terminal tests passed (terminal: 2 conditional
+skips). All 1679 enumerated root top-level names ran; all 84 selected exact
+regressions passed without skip. Vet, five platform cross-builds, packaging,
+icon, wrapper and offline harness suites passed. 1917 non-Markdown source/asset
+SHA256 values remained unchanged throughout. These are automated cloud results;
+physical macOS Cmd+C and the renamed installed app still require user validation.
