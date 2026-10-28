@@ -1,15 +1,17 @@
 KNOWN LIMITS / 已知限制 — experimental Finder app
 
-- This version reduces repeated deep copying on idle/input frames. Synthetic
-  Linux Controller tests with 1,000 messages measured input 177.11 -> 19.09 ms
-  and idle Frame 90.62 -> 13.01 ms. Empty-history input was roughly unchanged.
-  These are CPU Tester measurements, not macOS frame rates or proof that the
-  reported user-Mac high idle CPU is resolved. Fresh user-side retest is needed.
-- This version includes Chinese Settings and dialog translations, preserving
-  English, configuration identifiers and raw external error details.
-- This version includes the GOPI wordmark and pixel PI icon, bounded process
-  recovery without operation replay, independent commit model choice, and
-  editor identity/rename fixes. These are tested code changes, not full parity.
+- Visible app/installer name is GoPi. The original bundle identifier and private
+  Orbit Go Test data directory are deliberately retained. Quit the old app before
+  starting GoPi; do not run both copies against the same data simultaneously.
+- Native Edit/Copy now reaches retained transcript selection. Mounted command,
+  composer cut/copy/paste and focus-reset tests passed; physical macOS Cmd+C
+  still needs user retesting. No full clipboard/IME parity claim is made.
+- Sidebar/Thought/ChangedFiles and external-app toolbar styling is closer to the
+  reference; generic file glyphs and other detailed differences remain. Current,
+  pinned and running sessions intentionally remain visible when collapsed.
+- Earlier snapshot/idle performance fixes and Chinese Settings are retained.
+  This styling batch had comparable same-data Linux UI frame/input allocations
+  and timing, not a new speedup or proof of macOS performance on every workload.
 - Launch-smoke PNGs are in-process content renders, not OS screen captures.
   Dedicated cloud Mac composer proof remains NOT_RUN (no runner assigned).
 
