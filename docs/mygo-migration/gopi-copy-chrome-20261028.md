@@ -56,3 +56,15 @@ in-process Linux renders, not macOS screenshots or evidence of Cocoa menu input.
 UI histories, idle frames and type/backspace operations, with 20 iterations and
 three repeats. This is a UI-frame allocation/time check, not a Controller snapshot
 benchmark, actual IME input or a claim about the user's observed macOS CPU.
+
+The first combined full race run completed with 3748 passing test events,
+19 conditional skips and one failure in the pre-existing recovery fixture.
+The same exact test reproduced 2 failures / 20 runs on both the public base and
+this candidate. Failure-only real-child tracing showed `auth.list` followed by
+`break_stdin` before `quota.list`: Connected was visible while the final startup
+probe could still write. Only that test now waits for the actual final probe and
+an ordered RPC barrier before deliberately closing stdin. Original failure,
+recovery-budget and child-count assertions remain unchanged, with no new sleeps,
+production edits, retries or extended deadlines. The fixed case passed 30 race
+runs; a fresh complete agent package run also passed. The failed initial full run
+is retained, not converted into a pass by these narrower results.

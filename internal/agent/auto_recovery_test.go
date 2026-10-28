@@ -429,6 +429,26 @@ func TestAutoRecoveryDuplicateTransportAndExitConsumesOnce(t *testing.T) {
 	m.mu.Lock()
 	c := m.sessions[m.active].client
 	m.mu.Unlock()
+	// Connected is published before the final auth/quota probes finish. Wait
+	// for the real child's last bootstrap request, then its ordered barrier,
+	// so this test injects exactly its own write failure rather than racing a
+	// remaining bootstrap write against break_stdin's acknowledgement.
+	waitFor(t, m, func(Snapshot) bool {
+		data, err := os.ReadFile(trace)
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, line := range bytes.Split(data, []byte("\n")) {
+			var row recoveryTrace
+			// A concurrently appended final line may be incomplete; only a
+			// completely decoded request is evidence of child admission.
+			if json.Unmarshal(line, &row) == nil && row.Kind == pirpc.QuotaList {
+				return true
+			}
+		}
+		return false
+	})
+	p1Call(t, m, c, "barrier", nil)
 	p1Call(t, m, c, "break_stdin", nil)
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
