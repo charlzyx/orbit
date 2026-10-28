@@ -368,14 +368,24 @@ func Files(c *ui.Context, s *State, files []ChangedFile, o Options) ui.Element {
 		added += f.Added
 		removed += f.Removed
 	}
-	return ui.Column(c).AlignSelf(ui.Stretch).MinWidth(0).Border(1, o.Colors.Border).Radius(8).Children(func() {
-		ui.Row(c).AlignSelf(ui.Stretch).Unselectable().Padding(10, 14).Gap(10).AlignItems(ui.Center).Children(func() {
-			o.icon(c, "icons/file-diff.svg", 20, o.Colors.Muted)
-			ui.Text(c, changedFilesTitle(len(files), o)).Grow(1).TextColor(o.Colors.Text)
-			ui.Text(c, fmt.Sprintf("+%d", added)).TextColor(o.Colors.Success)
-			ui.Text(c, fmt.Sprintf("-%d", removed)).TextColor(o.Colors.Error)
+	return ui.Column(c).AlignSelf(ui.Stretch).MinWidth(0).Border(1, o.Colors.Border).Radius(o.FontSize * 12 / 14).Children(func() {
+		ui.Row(c).AlignSelf(ui.Stretch).Unselectable().MinHeight(o.FontSize*56/14).Padding(o.FontSize*10/14, o.FontSize).Gap(o.FontSize*10/14).AlignItems(ui.Center).BorderWidth(0, 0, 1, 0).BorderColor(o.Colors.Border).Children(func() {
+			ui.Box(c).Size(o.FontSize*2, o.FontSize*2).Radius(o.FontSize*8/14).Background(o.Colors.Surface).Border(1, o.Colors.Border).Center().Children(func() { o.icon(c, "icons/file-diff.svg", o.FontSize, o.Colors.Muted) })
+			ui.Column(c).Grow(1).MinWidth(0).Gap(o.FontSize * 2 / 14).Children(func() {
+				ui.Text(c, changedFilesTitle(len(files), o)).FontSize(o.FontSize).FontWeight(500).FixedLineHeight(o.FontSize * 17 / 14).TextColor(o.Colors.Text)
+				ui.Row(c).Gap(o.FontSize * 6 / 14).Children(func() {
+					ui.Text(c, fmt.Sprintf("+%d", added)).FontSize(o.FontSize * 12 / 14).FixedLineHeight(o.FontSize).TextColor(o.Colors.Success)
+					ui.Text(c, fmt.Sprintf("-%d", removed)).FontSize(o.FontSize * 12 / 14).FixedLineHeight(o.FontSize).TextColor(o.Colors.Error)
+				})
+			})
 			if o.Review != nil {
-				if ui.Button(c, o.tr("transcript_view.review", "Review")).Clicked() {
+				label := o.tr("transcript_view.review", "Review")
+				review := ui.ButtonBase(c).Label(label).Height(o.FontSize*2).Padding(0, o.FontSize*8/14).Gap(o.FontSize*4/14).Radius(o.FontSize*8/14).Background(o.Colors.Surface).Border(1, o.Colors.Border).AlignItems(ui.Center)
+				review.Children(func() {
+					o.icon(c, "icons/file-diff.svg", o.FontSize, o.Colors.Muted)
+					ui.Text(c, label).FontSize(o.FontSize).TextColor(o.Colors.Muted)
+				})
+				if review.Clicked() {
 					o.Review()
 				}
 			}

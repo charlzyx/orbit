@@ -868,7 +868,14 @@ func Run(o RunOptions) error {
 		x.UI.Async(func() func() {
 			apps, e := native.DetectOpenInApps()
 			prefs, e2 := native.LoadOpenInPrefs(filepath.Join(x.Store.RootDir, "open-in.json"))
-			return func() { x.UI.OpenApps = apps; x.UI.OpenPrefs = prefs; x.UI.save(e); x.UI.save(e2) }
+			appIcons := decodeOpenAppIcons(apps)
+			return func() {
+				x.UI.OpenApps = apps
+				x.UI.openAppIcons = appIcons
+				x.UI.OpenPrefs = prefs
+				x.UI.save(e)
+				x.UI.save(e2)
+			}
 		})
 		if !o.Bundled {
 			x.Updater.StartAutomatic(context.Background(), filepath.Join(x.Store.RootDir, "updates.json"))

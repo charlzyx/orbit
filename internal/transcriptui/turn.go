@@ -251,13 +251,12 @@ func activity(c *ui.Context, s *State, rowKey string, all []Step, part Part, o O
 	open := s.Open(key, part.Live)
 	title := activityTitle(steps, part.Live, o)
 	ui.Column(c).AlignSelf(ui.Stretch).MinWidth(0).Gap(6).Children(func() {
-		b := ui.ButtonBase(c.Key("header")).AlignSelf(ui.Stretch).Padding(5, 8).Gap(5).Label(title)
+		b := ui.ButtonBase(c.Key("header")).AlignSelf(ui.Start).Height(o.FontSize*2).Padding(0, o.FontSize*8/14).Gap(o.FontSize*4/14).Radius(o.FontSize*8/14).Background(o.Colors.Surface).Border(1, o.Colors.Border).Label(title)
 		b.Children(func() {
 			for _, icon := range activityIcons(steps) {
-				o.icon(c, icon, 14, o.Colors.Muted)
+				o.icon(c, icon, o.FontSize*12/14, o.Colors.Muted)
 			}
 			ui.Text(c, title).MinWidth(0).FontSize(o.FontSize - 1).TextColor(o.Colors.Muted)
-			ui.Spacer(c)
 			icon := "icons/chevron-right.svg"
 			if open {
 				icon = "icons/chevron-down.svg"

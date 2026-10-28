@@ -77,7 +77,7 @@ func (a *App) workspaceHeader(c *ui.Context, r sidebarRow, sticky, ownsActions b
 	ctx := c.Key(fmt.Sprintf("workspace-menu:%d:%s:%p:%d", s.epoch, r.path, w, w.AddedAt))
 	icon, ink := a.workspaceMark(*w)
 	// Keep the menu button left of the inset native scrollbar and resize grip.
-	row := ui.Row(ctx).AlignSelf(ui.Stretch).Margin(0, sidebarScrollbarGutter(c), 0, 8).AlignItems(ui.Center)
+	row := ui.Row(ctx).AlignSelf(ui.Stretch).Margin(0, sidebarScrollbarGutter(c), 0, 8).Padding(12, 0, 2, 0).AlignItems(ui.Center)
 	if !sticky {
 		row.Bind(a.sidebarHeaderHandle(r.path)).Label("Sidebar workspace header " + r.path)
 	}
@@ -92,15 +92,16 @@ func (a *App) workspaceHeader(c *ui.Context, r sidebarRow, sticky, ownsActions b
 		} else {
 			b = ui.Row(c.Key("header-presentation"))
 		}
-		b = b.Grow(1).MinWidth(0).Padding(6, 8).Gap(6).AlignItems(ui.Center)
+		b = b.Grow(1).MinWidth(0).Height(a.Theme.Px(26)).Padding(0, a.Theme.Space(8), 0, a.Theme.Space(6)).Gap(a.Theme.Space(6)).AlignItems(ui.Center)
 		b.Children(func() {
 			chevron := "icons/chevron-down.svg"
 			if r.collapsed {
 				chevron = "icons/chevron-right.svg"
 			}
-			a.icon(c, chevron, 10, a.Theme.TextMuted)
-			a.icon(c, icon, 16, ink)
-			ui.Text(c, r.label).MaxLines(1).Grow(1)
+			a.icon(c, chevron, a.Theme.Px(12), a.Theme.TextMuted)
+			a.icon(c, icon, a.Theme.Px(16), ink)
+			ui.Text(c, r.label).MaxLines(1).Grow(1).FontSize(a.Theme.Px(14)).FontWeight(500)
+			ui.Text(c, fmt.Sprint(r.count)).FontSize(a.Theme.Px(12)).TextColor(a.Theme.TextMuted).Shrink(0)
 		})
 		if ownsActions && b.Clicked() {
 			a.activateSidebarRow(r)

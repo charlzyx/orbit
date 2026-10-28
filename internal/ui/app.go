@@ -182,6 +182,7 @@ type App struct {
 	Workspaces                                                      preferences.WorkspaceList
 	workspaceActions                                                workspaceMenuState
 	OpenApps                                                        []native.ExternalApp
+	openAppIcons                                                    map[string]ui.ImageSource
 	OpenPrefs                                                       native.OpenInPrefs
 	Fonts                                                           preferences.Fonts
 	Appearance                                                      preferences.Appearance
@@ -688,7 +689,7 @@ func (a *App) sidebar(c *ui.Context) {
 				return
 			}
 			s := r.session
-			b := ui.ButtonBase(c).AlignSelf(ui.Stretch).Margin(1, 8).Padding(t.Space(6), t.Space(12)).Radius(t.Px(4)).Label(s.Name)
+			b := ui.ButtonBase(c).AlignSelf(ui.Stretch).Margin(1, 8).Padding(t.Space(4), t.Space(8), t.Space(4), t.Px(22)).Radius(t.Px(6)).Label(s.Name)
 			if a.sidebarSessionActive(s) {
 				b.Background(t.Active)
 			} else if b.Hovered() {
@@ -696,7 +697,10 @@ func (a *App) sidebar(c *ui.Context) {
 			}
 			b.Children(func() {
 				ui.Column(c).Grow(1).MinWidth(0).Gap(2).Children(func() {
-					ui.Text(c, s.Name).MaxLines(1).FontSize(t.FontSize)
+					title := ui.Text(c, s.Name).MaxLines(1).FontSize(t.FontSize)
+					if a.sidebarSessionActive(s) {
+						title.FontWeight(500)
+					}
 					a.workspaceSessionSummary(c, s)
 				})
 				if s.Running {
@@ -854,29 +858,11 @@ func (a *App) header(c *ui.Context) {
 			ui.Text(c, "Working").FontSize(t.Px(12)).TextColor(t.TextMuted)
 		}
 		a.runtimeQuotaControl(c, &a.quotaOpen, a.Model.Quotas, a.Model.QuotaSupport, a.Model.ModelProvider)
-		if preferred := a.OpenPrefs.Preferred(a.Model.Workspace, a.OpenApps); preferred != nil {
-			if a.button(c, preferred.Label, "icons/arrow-up-right.svg", false).Clicked() {
-				a.Dispatch(Action{Kind: "OpenInApp", Value: preferred.ID})
-			}
-		}
-		if len(a.OpenApps) > 0 {
-			a.iconButton(c, "Open in…", "icons/external-link.svg").Menu(func(m *ui.Menu) {
-				for _, app := range a.OpenApps {
-					if m.Item(app.Label).Chosen() {
-						a.Dispatch(Action{Kind: "OpenInApp", Value: app.ID})
-					}
-				}
-				for _, entry := range []struct{ label, kind string }{{"File manager", "RevealWorkspace"}, {"Terminal", "ToggleTerminal"}, {"Files", "OpenFiles"}, {"Git", "OpenGit"}} {
-					if m.Item(entry.label).Chosen() {
-						a.command(entry.kind, "")
-					}
-				}
-			})
-		}
-		if a.iconButton(c, "Review changes", "icons/panel-right.svg").Background(t.Elevated).Border(1, t.Border).Radius(t.Px(8)).Clicked() {
+		a.headerOpenIn(c)
+		if a.iconButton(c, "Review changes", "icons/panel-right.svg").Background(t.Elevated).Border(1, t.Border).Radius(t.Px(8)).Shadow(0, 1, 1, 0, t.composerContact()).Clicked() {
 			a.command("ToggleSidePanel", "")
 		}
-		a.iconButton(c, "More actions", "icons/more.svg").Background(t.Elevated).Border(1, t.Border).Radius(t.Px(8)).Menu(func(m *ui.Menu) {
+		a.iconButton(c, "More actions", "icons/more.svg").Background(t.Elevated).Border(1, t.Border).Radius(t.Px(8)).Shadow(0, 1, 1, 0, t.composerContact()).Menu(func(m *ui.Menu) {
 			for _, entry := range []struct{ label, kind string }{{"Rename task…", "RenameSession"}, {"Review changes", "ReviewChanges"}, {"Git", "ToggleGit"}, {"Worktrees", "OpenWorktrees"}, {"Usage", "ToggleUsage"}, {"Settings", "OpenSettings"}, {"Export session…", "ExportSession"}} {
 				if m.Item(entry.label).Chosen() {
 					a.command(entry.kind, "")
