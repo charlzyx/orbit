@@ -964,6 +964,11 @@ func (rt *engine) shortcut(id uint64, mods Modifiers, key Key) bool {
 }
 
 func (rt *engine) editEvent(ev editEvent) {
+	// Native Edit/Copy (including macOS Cmd+C) uses commands rather than raw keys.
+	// Match the opt-in retained selection priority of keyEvent before focus dispatch.
+	if ev.kind == editCommand && ev.text == "copy" && rt.selection.blocks != nil && rt.copyRetainedTextSelection() {
+		return
+	}
 	if s := rt.states[rt.focused]; s != nil && s.textClient != nil && rt.windowFocus() && s.flags&flagDisabled == 0 && (s.editor == nil || !s.editor.readOnly) {
 		if ev.kind == editInsert || ev.kind == editCompose {
 			var r *TextInputRange

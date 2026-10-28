@@ -22,7 +22,7 @@
     },
     "ui/input.go": {
       "source": "input.go.txt",
-      "sha256": "a421dcb51c812f263e3b9d02d784325a3cb617213d20a01123e942543a599c99",
+      "sha256": "4432f2b209c96b51ae43bfb45caf3e8bac639db9b5b6f8f1f17ce0e43de9b499",
       "added": false
     },
     "ui/orbit_selection.go": {
@@ -32,9 +32,9 @@
     },
     "ui/orbit_selection_test.go": {
       "source": "orbit_selection_test.go.txt",
-      "sha256": "323a5d480ed89d0e2554f556380610e03ae51df7ac443f73bb5b780d365f5dbf",
+      "sha256": "b9cfac0530c2c875b679ddd5e9c45a79f1c68c6270710ca73f884bf94ea88f72",
       "added": true
     }
   },
-  "patch_sha256": "2b7438244db85cf67ce90a160f873c0ada010b2ea3b9fc1faf7151052bbe348c"
+  "patch_sha256": "ddabc99d3daf04c5250c478bd187297cc21c57b6ca3a690d57a5a41b83606d51"
 }

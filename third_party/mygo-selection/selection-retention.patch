@@ -214,6 +214,12 @@
  	k := keyEvent{mods, key}
  	if key == KeyEscape && mods == 0 && rt.dragCancel() {
  		return true
+@@ -954,0 +967,5 @@
++	// Native Edit/Copy (including macOS Cmd+C) uses commands rather than raw keys.
++	// Match the opt-in retained selection priority of keyEvent before focus dispatch.
++	if ev.kind == editCommand && ev.text == "copy" && rt.selection.blocks != nil && rt.copyRetainedTextSelection() {
++		return
++	}
 --- /dev/null
 +++ b/ui/orbit_selection.go
 @@ -0,0 +1,274 @@
@@ -493,7 +499,7 @@
 +}
 --- /dev/null
 +++ b/ui/orbit_selection_test.go
-@@ -0,0 +1,394 @@
+@@ -0,0 +1,463 @@
 +package ui
 +
 +import (
@@ -886,5 +892,74 @@
 +	tt.Key(Cmd, KeyC)
 +	if tt.Clipboard() != "sentinel" {
 +		t.Fatal("foreign owner granted local selection exception")
++	}
++}
++
++func TestOrbitSelectionNativeCopyPriorityContextMenuAndReset(t *testing.T) {
++	var input = "composer selection"
++	focusInput := false
++	var scopeID uint64
++	tt := NewTester(func(c *Context) {
++		Column(c).Size(400, 240).Children(func() {
++			scope := Column(c.Key("scope")).Size(400, 160).RetainTextSelection("menu-fixture")
++			scopeID = scope.ID()
++			scope.Children(func() {
++				Text(c, "First 用户").Height(40)
++				Text(c, "Second row").Height(40)
++				Text(c, "Third untouched").Height(40)
++			})
++			scope.ContextMenu(func(m *Menu) {
++				if m.Item("Copy Selection").Disabled(len(scope.SelectedTexts()) == 0).Chosen() {
++					c.WriteClipboard("menu:" + strings.Join(func() []string {
++						var out []string
++						for _, p := range scope.SelectedTexts() {
++							out = append(out, string([]rune(p.Text)[p.Start:p.End]))
++						}
++						return out
++					}(), "\n"))
++				}
++			})
++			editor := TextInput(c, &input).Label("composer")
++			if focusInput {
++				editor.Focus()
++			}
++		})
++	}, 400, 240)
++	a, _ := tt.Find("First 用户")
++	b, _ := tt.Find("Second row")
++	tt.Press(a.X+1, a.Y+10)
++	tt.Move(b.X+b.W-1, b.Y+10)
++	tt.Release(b.X+b.W-1, b.Y+10)
++	focusInput = true
++	tt.Frame()
++	tt.Key(Cmd, KeyA)
++	tt.Command("copy")
++	if tt.Clipboard() != "First 用户\nSecond row" {
++		t.Fatalf("source copy priority lost: %q", tt.Clipboard())
++	}
++	// Right-clicking even an unselected location within the same transcript
++	// leaves the source snapshot intact and offers the selected copy action.
++	focusInput = false
++	if err := tt.RightClick("Third untouched"); err != nil {
++		t.Fatal(err)
++	}
++	if err := tt.ChooseMenuItem("Copy Selection"); err != nil {
++		t.Fatal(err)
++	}
++	if tt.Clipboard() != "menu:First 用户\nSecond row" {
++		t.Fatalf("menu selection %q", tt.Clipboard())
++	}
++	tt.RightClick("Third untouched")
++	tt.Key(0, KeyEscape)
++	if tt.rt.selection.scope != scopeID {
++		t.Fatal("menu dismissal cleared selection")
++	}
++	if err := tt.Click("composer"); err != nil {
++		t.Fatal(err)
++	}
++	tt.Key(Cmd, KeyA)
++	tt.Command("copy")
++	if tt.Clipboard() != input {
++		t.Fatal("cleared transcript selection stole input copy")
 +	}
 +}
